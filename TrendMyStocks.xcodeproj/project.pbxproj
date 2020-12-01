@@ -1,0 +1,615 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		EAC1904A257641160030B331 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC19049257641160030B331 /* AppDelegate.swift */; };
+		EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1904B257641160030B331 /* SceneDelegate.swift */; };
+		EAC1904E257641160030B331 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1904D257641160030B331 /* ViewController.swift */; };
+		EAC19051257641160030B331 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAC1904F257641160030B331 /* Main.storyboard */; };
+		EAC19054257641160030B331 /* TrendMyStocks.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */; };
+		EAC19056257641180030B331 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EAC19055257641180030B331 /* Assets.xcassets */; };
+		EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAC19057257641180030B331 /* LaunchScreen.storyboard */; };
+		EAC19064257641180030B331 /* TrendMyStocksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC19063257641180030B331 /* TrendMyStocksTests.swift */; };
+		EAC1906F257641180030B331 /* TrendMyStocksUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1906E257641180030B331 /* TrendMyStocksUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		EAC19060257641180030B331 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EAC1903E257641160030B331 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EAC19045257641160030B331;
+			remoteInfo = TrendMyStocks;
+		};
+		EAC1906B257641180030B331 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EAC1903E257641160030B331 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EAC19045257641160030B331;
+			remoteInfo = TrendMyStocks;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		EAC19046257641160030B331 /* TrendMyStocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrendMyStocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAC19049257641160030B331 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		EAC1904B257641160030B331 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		EAC1904D257641160030B331 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		EAC19050257641160030B331 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		EAC19053257641160030B331 /* TrendMyStocks.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TrendMyStocks.xcdatamodel; sourceTree = "<group>"; };
+		EAC19055257641180030B331 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		EAC19058257641180030B331 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		EAC1905A257641180030B331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EAC1905F257641180030B331 /* TrendMyStocksTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrendMyStocksTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAC19063257641180030B331 /* TrendMyStocksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMyStocksTests.swift; sourceTree = "<group>"; };
+		EAC19065257641180030B331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EAC1906A257641180030B331 /* TrendMyStocksUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrendMyStocksUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAC1906E257641180030B331 /* TrendMyStocksUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMyStocksUITests.swift; sourceTree = "<group>"; };
+		EAC19070257641180030B331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EAC19043257641160030B331 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAC1905C257641180030B331 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAC19067257641180030B331 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		EAC1903D257641160030B331 = {
+			isa = PBXGroup;
+			children = (
+				EAC19048257641160030B331 /* TrendMyStocks */,
+				EAC19062257641180030B331 /* TrendMyStocksTests */,
+				EAC1906D257641180030B331 /* TrendMyStocksUITests */,
+				EAC19047257641160030B331 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		EAC19047257641160030B331 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EAC19046257641160030B331 /* TrendMyStocks.app */,
+				EAC1905F257641180030B331 /* TrendMyStocksTests.xctest */,
+				EAC1906A257641180030B331 /* TrendMyStocksUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EAC19048257641160030B331 /* TrendMyStocks */ = {
+			isa = PBXGroup;
+			children = (
+				EAC19049257641160030B331 /* AppDelegate.swift */,
+				EAC1904B257641160030B331 /* SceneDelegate.swift */,
+				EAC1904D257641160030B331 /* ViewController.swift */,
+				EAC1904F257641160030B331 /* Main.storyboard */,
+				EAC19055257641180030B331 /* Assets.xcassets */,
+				EAC19057257641180030B331 /* LaunchScreen.storyboard */,
+				EAC1905A257641180030B331 /* Info.plist */,
+				EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */,
+			);
+			path = TrendMyStocks;
+			sourceTree = "<group>";
+		};
+		EAC19062257641180030B331 /* TrendMyStocksTests */ = {
+			isa = PBXGroup;
+			children = (
+				EAC19063257641180030B331 /* TrendMyStocksTests.swift */,
+				EAC19065257641180030B331 /* Info.plist */,
+			);
+			path = TrendMyStocksTests;
+			sourceTree = "<group>";
+		};
+		EAC1906D257641180030B331 /* TrendMyStocksUITests */ = {
+			isa = PBXGroup;
+			children = (
+				EAC1906E257641180030B331 /* TrendMyStocksUITests.swift */,
+				EAC19070257641180030B331 /* Info.plist */,
+			);
+			path = TrendMyStocksUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EAC19045257641160030B331 /* TrendMyStocks */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EAC19073257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocks" */;
+			buildPhases = (
+				EAC19042257641160030B331 /* Sources */,
+				EAC19043257641160030B331 /* Frameworks */,
+				EAC19044257641160030B331 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TrendMyStocks;
+			productName = TrendMyStocks;
+			productReference = EAC19046257641160030B331 /* TrendMyStocks.app */;
+			productType = "com.apple.product-type.application";
+		};
+		EAC1905E257641180030B331 /* TrendMyStocksTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EAC19076257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocksTests" */;
+			buildPhases = (
+				EAC1905B257641180030B331 /* Sources */,
+				EAC1905C257641180030B331 /* Frameworks */,
+				EAC1905D257641180030B331 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EAC19061257641180030B331 /* PBXTargetDependency */,
+			);
+			name = TrendMyStocksTests;
+			productName = TrendMyStocksTests;
+			productReference = EAC1905F257641180030B331 /* TrendMyStocksTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		EAC19069257641180030B331 /* TrendMyStocksUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EAC19079257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocksUITests" */;
+			buildPhases = (
+				EAC19066257641180030B331 /* Sources */,
+				EAC19067257641180030B331 /* Frameworks */,
+				EAC19068257641180030B331 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EAC1906C257641180030B331 /* PBXTargetDependency */,
+			);
+			name = TrendMyStocksUITests;
+			productName = TrendMyStocksUITests;
+			productReference = EAC1906A257641180030B331 /* TrendMyStocksUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EAC1903E257641160030B331 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1220;
+				LastUpgradeCheck = 1220;
+				TargetAttributes = {
+					EAC19045257641160030B331 = {
+						CreatedOnToolsVersion = 12.2;
+					};
+					EAC1905E257641180030B331 = {
+						CreatedOnToolsVersion = 12.2;
+						TestTargetID = EAC19045257641160030B331;
+					};
+					EAC19069257641180030B331 = {
+						CreatedOnToolsVersion = 12.2;
+						TestTargetID = EAC19045257641160030B331;
+					};
+				};
+			};
+			buildConfigurationList = EAC19041257641160030B331 /* Build configuration list for PBXProject "TrendMyStocks" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = EAC1903D257641160030B331;
+			productRefGroup = EAC19047257641160030B331 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EAC19045257641160030B331 /* TrendMyStocks */,
+				EAC1905E257641180030B331 /* TrendMyStocksTests */,
+				EAC19069257641180030B331 /* TrendMyStocksUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EAC19044257641160030B331 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */,
+				EAC19056257641180030B331 /* Assets.xcassets in Resources */,
+				EAC19051257641160030B331 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAC1905D257641180030B331 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAC19068257641180030B331 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EAC19042257641160030B331 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAC19054257641160030B331 /* TrendMyStocks.xcdatamodeld in Sources */,
+				EAC1904E257641160030B331 /* ViewController.swift in Sources */,
+				EAC1904A257641160030B331 /* AppDelegate.swift in Sources */,
+				EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAC1905B257641180030B331 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAC19064257641180030B331 /* TrendMyStocksTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAC19066257641180030B331 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAC1906F257641180030B331 /* TrendMyStocksUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EAC19061257641180030B331 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EAC19045257641160030B331 /* TrendMyStocks */;
+			targetProxy = EAC19060257641180030B331 /* PBXContainerItemProxy */;
+		};
+		EAC1906C257641180030B331 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EAC19045257641160030B331 /* TrendMyStocks */;
+			targetProxy = EAC1906B257641180030B331 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		EAC1904F257641160030B331 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EAC19050257641160030B331 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		EAC19057257641180030B331 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EAC19058257641180030B331 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		EAC19071257641180030B331 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		EAC19072257641180030B331 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		EAC19074257641180030B331 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9T25ACNCQ7;
+				INFOPLIST_FILE = TrendMyStocks/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocks;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EAC19075257641180030B331 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9T25ACNCQ7;
+				INFOPLIST_FILE = TrendMyStocks/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocks;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		EAC19077257641180030B331 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9T25ACNCQ7;
+				INFOPLIST_FILE = TrendMyStocksTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocksTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TrendMyStocks.app/TrendMyStocks";
+			};
+			name = Debug;
+		};
+		EAC19078257641180030B331 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9T25ACNCQ7;
+				INFOPLIST_FILE = TrendMyStocksTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocksTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TrendMyStocks.app/TrendMyStocks";
+			};
+			name = Release;
+		};
+		EAC1907A257641180030B331 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9T25ACNCQ7;
+				INFOPLIST_FILE = TrendMyStocksUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocksUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TrendMyStocks;
+			};
+			name = Debug;
+		};
+		EAC1907B257641180030B331 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9T25ACNCQ7;
+				INFOPLIST_FILE = TrendMyStocksUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocksUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TrendMyStocks;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		EAC19041257641160030B331 /* Build configuration list for PBXProject "TrendMyStocks" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EAC19071257641180030B331 /* Debug */,
+				EAC19072257641180030B331 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EAC19073257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocks" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EAC19074257641180030B331 /* Debug */,
+				EAC19075257641180030B331 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EAC19076257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocksTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EAC19077257641180030B331 /* Debug */,
+				EAC19078257641180030B331 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EAC19079257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocksUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EAC1907A257641180030B331 /* Debug */,
+				EAC1907B257641180030B331 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				EAC19053257641160030B331 /* TrendMyStocks.xcdatamodel */,
+			);
+			currentVersion = EAC19053257641160030B331 /* TrendMyStocks.xcdatamodel */;
+			path = TrendMyStocks.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = EAC1903E257641160030B331 /* Project object */;
+}
