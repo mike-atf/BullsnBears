@@ -37,10 +37,7 @@ struct Stock {
             pricesInRange = dailyPrices
         }
         
-        return pricesInRange.compactMap { $0.low }.min { (x, y) -> Bool in
-            if y > x { return false }
-            else { return true }
-        }
+        return pricesInRange.compactMap { $0.low }.min()
     }
     
     public func highestPrice(_ from: Date? = nil,_ to: Date? = nil) -> Double? {
@@ -63,10 +60,7 @@ struct Stock {
             pricesInRange = dailyPrices
         }
 
-        return pricesInRange.compactMap { $0.high }.max { (x, y) -> Bool in
-            if y < x { return false }
-            else { return true }
-        }
+        return pricesInRange.compactMap { $0.high }.max()
     }
     
     public func priceDateRange() -> [Date]? {

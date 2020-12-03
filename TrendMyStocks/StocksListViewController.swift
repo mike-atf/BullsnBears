@@ -12,7 +12,8 @@ class StocksListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        print("StocksListVC SVC - added a stock")
+        self.navigationItem.rightBarButtonItem = splitViewController?.displayModeButtonItem
+
         stocks.append(CSVImporter.csvExtractor())
 
         

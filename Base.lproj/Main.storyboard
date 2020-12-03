@@ -26,7 +26,7 @@
                                 <rect key="frame" x="20" y="129" width="664" height="619"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="TrendMyStocks" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="664" height="619"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="3320" height="619"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <connections>
                                             <outlet property="widthConstraint" destination="nCS-ry-DVy" id="9gC-Dq-kMR"/>
@@ -38,7 +38,7 @@
                                     <constraint firstItem="B5Z-ih-tAD" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="JwZ-tn-17v"/>
                                     <constraint firstAttribute="bottom" secondItem="B5Z-ih-tAD" secondAttribute="bottom" id="Nox-67-sIg"/>
                                     <constraint firstItem="B5Z-ih-tAD" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" id="ZTM-Db-tNJ"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="width" secondItem="Doh-lM-a4B" secondAttribute="width" id="nCS-ry-DVy"/>
+                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="width" secondItem="Doh-lM-a4B" secondAttribute="width" multiplier="5" id="nCS-ry-DVy"/>
                                     <constraint firstAttribute="trailing" secondItem="B5Z-ih-tAD" secondAttribute="trailing" id="uJg-o2-bID"/>
                                 </constraints>
                                 <viewLayoutGuide key="contentLayoutGuide" id="JIg-Ya-QlM"/>
