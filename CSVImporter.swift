@@ -1,0 +1,81 @@
+//
+//  CSVImporter.swift
+//  TrendMyStocks
+//
+//  Created by aDav on 01/12/2020.
+//
+
+import Foundation
+
+
+class CSVImporter: NSObject {
+    
+    class func openCSVFile(fileName: String) -> String? {
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: "csv") else {
+            return nil
+        }
+
+        do {
+            let content = try String(contentsOf: url, encoding: .utf8)//String(contentsOf: url, usedEncoding: &.utf8)
+            return content
+        } catch let error {
+            print("Error reading file content \(error)")
+        }
+
+        return nil
+    }
+
+    class func csvExtractor() -> Stock {
+        var stockPrices = [StockPrice_Daily]()
+        
+        let fileContent$ = openCSVFile(fileName: "LOGI")
+        let rows: [String] = fileContent$?.components(separatedBy: NSMutableCharacterSet.newlines) ?? []
+
+        let expectedOrder = ["Date","Open","High","Low","Close","Adj Close","Volume"]
+        if let headerArray = rows.first?.components(separatedBy: ",") {
+            var count = 0
+            headerArray.forEach { (header) in
+                if header != expectedOrder[count] { print("error in order, should be \(expectedOrder) but is \(headerArray)")}
+                count += 1
+            }
+        }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyy-MM-dd"
+        for index in 1..<rows.count { // first line has header titles
+            let array = rows[index].components(separatedBy: ",")
+            let date$ = array[0]
+            guard let date = dateFormatter.date(from: date$) else {
+                print("error converting to 'date' \(array[0])")
+                continue
+            }
+            guard let open = Double(array[1]) else {
+                print("error converting to 'open' \(array[1])")
+                continue
+            }
+            guard let high = Double(array[2]) else {
+                print("error converting to 'high' \(array[2])")
+                continue
+            }
+            guard let low = Double(array[3]) else {
+                print("error converting to 'high' \(array[3])")
+                continue
+            }
+            guard let close = Double(array[4]) else {
+                print("error converting to 'high' \(array[4])")
+                continue
+
+            }
+            guard let volume = Double(array[6]) else {
+                print("error converting to 'high' \(array[6])")
+                continue
+
+            }
+            
+            let newObject = StockPrice_Daily(open: open, close: close, low: low, high: high, volume: volume, date: date)
+            stockPrices.append(newObject)
+        }
+
+        return Stock(name: "LOGI", dailyPrices: stockPrices)
+    }
+}

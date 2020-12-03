@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="0XX-RQ-AUp">
+    <device id="ipad9_7" orientation="landscape" layout="fullscreen" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Stock ChartVC-->
+        <scene sceneID="eWb-DL-wM9">
+            <objects>
+                <viewController id="GS7-IZ-4uD" customClass="StockChartVC" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="DMz-IK-SGN" customClass="ChartContainerView" customModule="TrendMyStocks" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="703.5" height="768"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Stock name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RL9-y0-71P">
+                                <rect key="frame" x="266" y="72" width="172" height="41"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doh-lM-a4B">
+                                <rect key="frame" x="20" y="129" width="664" height="619"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="TrendMyStocks" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="664" height="619"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <connections>
+                                            <outlet property="widthConstraint" destination="nCS-ry-DVy" id="9gC-Dq-kMR"/>
+                                        </connections>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="top" secondItem="Doh-lM-a4B" secondAttribute="top" id="Iei-LA-PaS"/>
+                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="JwZ-tn-17v"/>
+                                    <constraint firstAttribute="bottom" secondItem="B5Z-ih-tAD" secondAttribute="bottom" id="Nox-67-sIg"/>
+                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" id="ZTM-Db-tNJ"/>
+                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="width" secondItem="Doh-lM-a4B" secondAttribute="width" id="nCS-ry-DVy"/>
+                                    <constraint firstAttribute="trailing" secondItem="B5Z-ih-tAD" secondAttribute="trailing" id="uJg-o2-bID"/>
+                                </constraints>
+                                <viewLayoutGuide key="contentLayoutGuide" id="JIg-Ya-QlM"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="ZAI-FU-kZr"/>
+                            </scrollView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="HJZ-h8-yHo"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="HJZ-h8-yHo" firstAttribute="bottom" secondItem="Doh-lM-a4B" secondAttribute="bottom" constant="20" id="Hdy-Aq-Als"/>
+                            <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="Doh-lM-a4B" secondAttribute="trailing" constant="19.5" id="MDZ-3g-dxC"/>
+                            <constraint firstItem="RL9-y0-71P" firstAttribute="centerX" secondItem="HJZ-h8-yHo" secondAttribute="centerX" id="b5e-I2-NFx"/>
+                            <constraint firstItem="RL9-y0-71P" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="22" id="kiX-A7-JuK"/>
+                            <constraint firstItem="Doh-lM-a4B" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="20" id="oPp-hK-NnZ"/>
+                            <constraint firstItem="Doh-lM-a4B" firstAttribute="top" secondItem="RL9-y0-71P" secondAttribute="bottom" constant="16" id="wGk-P7-3pH"/>
+                        </constraints>
+                        <connections>
+                            <outlet property="contentView" destination="B5Z-ih-tAD" id="zk0-qN-Goi"/>
+                            <outlet property="scrollView" destination="Doh-lM-a4B" id="aU4-OR-VFs"/>
+                            <outlet property="titleLabel" destination="RL9-y0-71P" id="KeW-NM-aGj"/>
+                        </connections>
+                    </view>
+                    <navigationItem key="navigationItem" id="9tx-0k-L9K"/>
+                    <connections>
+                        <outlet property="chart" destination="DMz-IK-SGN" id="oYm-P0-xbE"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="R1G-6f-cB6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1318.9453125" y="512.5"/>
+        </scene>
+        <!--Root View Controller-->
+        <scene sceneID="gJ5-Jm-dY6">
+            <objects>
+                <tableViewController clearsSelectionOnViewWillAppear="NO" id="RUK-Av-gO5" customClass="StocksListViewController" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="xrD-9c-2g4">
+                        <rect key="frame" x="0.0" y="0.0" width="420" height="768"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="stockListCell" textLabel="B01-u4-nBe" style="IBUITableViewCellStyleDefault" id="1l5-i6-cpz">
+                                <rect key="frame" x="0.0" y="28" width="420" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="1l5-i6-cpz" id="3Cb-Zg-Ep2">
+                                    <rect key="frame" x="100" y="0.0" width="320" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" tag="10" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="B01-u4-nBe">
+                                            <rect key="frame" x="16" y="0.0" width="288" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="7pi-tm-0Fg" kind="show" id="RX4-Uv-7Zw"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="RUK-Av-gO5" id="aEM-mi-Tdu"/>
+                            <outlet property="delegate" destination="RUK-Av-gO5" id="cgj-Ht-gUx"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Root View Controller" id="dC2-zO-YAW"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Sbx-mL-E9N" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1313" y="-299"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="pal-JD-bya">
+            <objects>
+                <navigationController id="hIj-B5-SEC" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="1lW-g1-AsB">
+                        <rect key="frame" x="0.0" y="0.0" width="420" height="50"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="RUK-Av-gO5" kind="relationship" relationship="rootViewController" id="f9E-Zn-dXb"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ff3-7O-oWf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="595" y="-299"/>
+        </scene>
+        <!--Master Split View-->
+        <scene sceneID="59P-Xd-ioB">
+            <objects>
+                <splitViewController allowDoubleColumnStyle="YES" id="0XX-RQ-AUp" customClass="MasterSplitView" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                    <connections>
+                        <segue destination="hIj-B5-SEC" kind="relationship" relationship="masterViewController" id="kSt-DT-z5r"/>
+                        <segue destination="7pi-tm-0Fg" kind="relationship" relationship="detailViewController" id="mBp-dp-A5V"/>
+                    </connections>
+                </splitViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Jc7-07-BNf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-122" y="5"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="BCh-wJ-Uql">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="7pi-tm-0Fg" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="0le-dl-q45"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="2ca-N3-KT8">
+                        <rect key="frame" x="0.0" y="0.0" width="703.5" height="50"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="GS7-IZ-4uD" kind="relationship" relationship="rootViewController" id="4AP-WW-5oY"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Hch-7o-DEh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="594.7265625" y="512.5"/>
+        </scene>
+    </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="mBp-dp-A5V"/>
+    </inferredMetricsTieBreakers>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

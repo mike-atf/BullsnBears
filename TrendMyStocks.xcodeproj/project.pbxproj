@@ -9,13 +9,39 @@
 /* Begin PBXBuildFile section */
 		EAC1904A257641160030B331 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC19049257641160030B331 /* AppDelegate.swift */; };
 		EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1904B257641160030B331 /* SceneDelegate.swift */; };
-		EAC1904E257641160030B331 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1904D257641160030B331 /* ViewController.swift */; };
 		EAC19051257641160030B331 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAC1904F257641160030B331 /* Main.storyboard */; };
 		EAC19054257641160030B331 /* TrendMyStocks.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */; };
 		EAC19056257641180030B331 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EAC19055257641180030B331 /* Assets.xcassets */; };
 		EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAC19057257641180030B331 /* LaunchScreen.storyboard */; };
 		EAC19064257641180030B331 /* TrendMyStocksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC19063257641180030B331 /* TrendMyStocksTests.swift */; };
 		EAC1906F257641180030B331 /* TrendMyStocksUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1906E257641180030B331 /* TrendMyStocksUITests.swift */; };
+		EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1908E257642F20030B331 /* CSVImporter.swift */; };
+		EAC19090257642F20030B331 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1908E257642F20030B331 /* CSVImporter.swift */; };
+		EAC19091257642F20030B331 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1908E257642F20030B331 /* CSVImporter.swift */; };
+		EAC19099257643D50030B331 /* LOGI.csv in Resources */ = {isa = PBXBuildFile; fileRef = EAC19098257643D50030B331 /* LOGI.csv */; };
+		EAC1909A257643D50030B331 /* LOGI.csv in Resources */ = {isa = PBXBuildFile; fileRef = EAC19098257643D50030B331 /* LOGI.csv */; };
+		EAC1909B257643D50030B331 /* LOGI.csv in Resources */ = {isa = PBXBuildFile; fileRef = EAC19098257643D50030B331 /* LOGI.csv */; };
+		EAC190B3257661F60030B331 /* MasterSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B2257661F60030B331 /* MasterSplitView.swift */; };
+		EAC190B4257661F60030B331 /* MasterSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B2257661F60030B331 /* MasterSplitView.swift */; };
+		EAC190B5257661F60030B331 /* MasterSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B2257661F60030B331 /* MasterSplitView.swift */; };
+		EAC190BA257662930030B331 /* StocksListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B9257662930030B331 /* StocksListViewController.swift */; };
+		EAC190BB257662930030B331 /* StocksListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B9257662930030B331 /* StocksListViewController.swift */; };
+		EAC190BC257662930030B331 /* StocksListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B9257662930030B331 /* StocksListViewController.swift */; };
+		EAC190C1257663200030B331 /* PublicVars.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190C0257663200030B331 /* PublicVars.swift */; };
+		EAC190C2257663200030B331 /* PublicVars.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190C0257663200030B331 /* PublicVars.swift */; };
+		EAC190C3257663200030B331 /* PublicVars.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190C0257663200030B331 /* PublicVars.swift */; };
+		EAC190CB257663730030B331 /* Stock.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190CA257663730030B331 /* Stock.swift */; };
+		EAC190CC257663730030B331 /* Stock.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190CA257663730030B331 /* Stock.swift */; };
+		EAC190CD257663730030B331 /* Stock.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190CA257663730030B331 /* Stock.swift */; };
+		EAC190D52576731B0030B331 /* StockChartVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190D42576731B0030B331 /* StockChartVC.swift */; };
+		EAC190D62576731B0030B331 /* StockChartVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190D42576731B0030B331 /* StockChartVC.swift */; };
+		EAC190D72576731B0030B331 /* StockChartVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190D42576731B0030B331 /* StockChartVC.swift */; };
+		EAC190EA2577E2E20030B331 /* ChartContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190E92577E2E20030B331 /* ChartContainerView.swift */; };
+		EAC190EB2577E2E20030B331 /* ChartContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190E92577E2E20030B331 /* ChartContainerView.swift */; };
+		EAC190EC2577E2E20030B331 /* ChartContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190E92577E2E20030B331 /* ChartContainerView.swift */; };
+		EAC190F42577E3B60030B331 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190F32577E3B60030B331 /* ChartView.swift */; };
+		EAC190F52577E3B60030B331 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190F32577E3B60030B331 /* ChartView.swift */; };
+		EAC190F62577E3B60030B331 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190F32577E3B60030B331 /* ChartView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,7 +65,6 @@
 		EAC19046257641160030B331 /* TrendMyStocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrendMyStocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAC19049257641160030B331 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EAC1904B257641160030B331 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		EAC1904D257641160030B331 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		EAC19050257641160030B331 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EAC19053257641160030B331 /* TrendMyStocks.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TrendMyStocks.xcdatamodel; sourceTree = "<group>"; };
 		EAC19055257641180030B331 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -51,6 +76,15 @@
 		EAC1906A257641180030B331 /* TrendMyStocksUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrendMyStocksUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAC1906E257641180030B331 /* TrendMyStocksUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMyStocksUITests.swift; sourceTree = "<group>"; };
 		EAC19070257641180030B331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EAC1908E257642F20030B331 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
+		EAC19098257643D50030B331 /* LOGI.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LOGI.csv; sourceTree = "<group>"; };
+		EAC190B2257661F60030B331 /* MasterSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterSplitView.swift; sourceTree = "<group>"; };
+		EAC190B9257662930030B331 /* StocksListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksListViewController.swift; sourceTree = "<group>"; };
+		EAC190C0257663200030B331 /* PublicVars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicVars.swift; sourceTree = "<group>"; };
+		EAC190CA257663730030B331 /* Stock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stock.swift; sourceTree = "<group>"; };
+		EAC190D42576731B0030B331 /* StockChartVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockChartVC.swift; sourceTree = "<group>"; };
+		EAC190E92577E2E20030B331 /* ChartContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartContainerView.swift; sourceTree = "<group>"; };
+		EAC190F32577E3B60030B331 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +115,11 @@
 		EAC1903D257641160030B331 = {
 			isa = PBXGroup;
 			children = (
+				EAC1908E257642F20030B331 /* CSVImporter.swift */,
+				EAC19098257643D50030B331 /* LOGI.csv */,
+				EAC190C0257663200030B331 /* PublicVars.swift */,
+				EAC190CA257663730030B331 /* Stock.swift */,
+				EAC1904F257641160030B331 /* Main.storyboard */,
 				EAC19048257641160030B331 /* TrendMyStocks */,
 				EAC19062257641180030B331 /* TrendMyStocksTests */,
 				EAC1906D257641180030B331 /* TrendMyStocksUITests */,
@@ -103,8 +142,11 @@
 			children = (
 				EAC19049257641160030B331 /* AppDelegate.swift */,
 				EAC1904B257641160030B331 /* SceneDelegate.swift */,
-				EAC1904D257641160030B331 /* ViewController.swift */,
-				EAC1904F257641160030B331 /* Main.storyboard */,
+				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
+				EAC190B9257662930030B331 /* StocksListViewController.swift */,
+				EAC190D42576731B0030B331 /* StockChartVC.swift */,
+				EAC190E92577E2E20030B331 /* ChartContainerView.swift */,
+				EAC190F32577E3B60030B331 /* ChartView.swift */,
 				EAC19055257641180030B331 /* Assets.xcassets */,
 				EAC19057257641180030B331 /* LaunchScreen.storyboard */,
 				EAC1905A257641180030B331 /* Info.plist */,
@@ -235,6 +277,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */,
+				EAC19099257643D50030B331 /* LOGI.csv in Resources */,
 				EAC19056257641180030B331 /* Assets.xcassets in Resources */,
 				EAC19051257641160030B331 /* Main.storyboard in Resources */,
 			);
@@ -244,6 +287,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC1909A257643D50030B331 /* LOGI.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,6 +295,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC1909B257643D50030B331 /* LOGI.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,9 +307,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAC19054257641160030B331 /* TrendMyStocks.xcdatamodeld in Sources */,
-				EAC1904E257641160030B331 /* ViewController.swift in Sources */,
+				EAC190BA257662930030B331 /* StocksListViewController.swift in Sources */,
+				EAC190D52576731B0030B331 /* StockChartVC.swift in Sources */,
+				EAC190EA2577E2E20030B331 /* ChartContainerView.swift in Sources */,
+				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
 				EAC1904A257641160030B331 /* AppDelegate.swift in Sources */,
 				EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */,
+				EAC190C1257663200030B331 /* PublicVars.swift in Sources */,
+				EAC190B3257661F60030B331 /* MasterSplitView.swift in Sources */,
+				EAC190CB257663730030B331 /* Stock.swift in Sources */,
+				EAC190F42577E3B60030B331 /* ChartView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -272,7 +324,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC190C2257663200030B331 /* PublicVars.swift in Sources */,
+				EAC190BB257662930030B331 /* StocksListViewController.swift in Sources */,
+				EAC190F52577E3B60030B331 /* ChartView.swift in Sources */,
+				EAC190EB2577E2E20030B331 /* ChartContainerView.swift in Sources */,
+				EAC190CC257663730030B331 /* Stock.swift in Sources */,
+				EAC190D62576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC19064257641180030B331 /* TrendMyStocksTests.swift in Sources */,
+				EAC19090257642F20030B331 /* CSVImporter.swift in Sources */,
+				EAC190B4257661F60030B331 /* MasterSplitView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,7 +340,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC190C3257663200030B331 /* PublicVars.swift in Sources */,
+				EAC190BC257662930030B331 /* StocksListViewController.swift in Sources */,
+				EAC190F62577E3B60030B331 /* ChartView.swift in Sources */,
+				EAC190EC2577E2E20030B331 /* ChartContainerView.swift in Sources */,
+				EAC190CD257663730030B331 /* Stock.swift in Sources */,
+				EAC190D72576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC1906F257641180030B331 /* TrendMyStocksUITests.swift in Sources */,
+				EAC19091257642F20030B331 /* CSVImporter.swift in Sources */,
+				EAC190B5257661F60030B331 /* MasterSplitView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -450,7 +518,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocks;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -469,7 +537,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocks;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
 		};
