@@ -17,8 +17,20 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Stock name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RL9-y0-71P">
-                                <rect key="frame" x="266" y="72" width="172" height="41"/>
+                                <rect key="frame" x="10" y="72" width="172" height="41"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mean trend (low)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oO1-Ti-lKG">
+                                <rect key="frame" x="218" y="88.5" width="129.5" height="20.5"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Trend range (low)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MHU-Cw-cot">
+                                <rect key="frame" x="377" y="88.5" width="135" height="21"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -48,17 +60,23 @@
                         <viewLayoutGuide key="safeArea" id="HJZ-h8-yHo"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="oO1-Ti-lKG" firstAttribute="firstBaseline" secondItem="RL9-y0-71P" secondAttribute="firstBaseline" id="AwY-zv-gtR"/>
                             <constraint firstItem="HJZ-h8-yHo" firstAttribute="bottom" secondItem="Doh-lM-a4B" secondAttribute="bottom" constant="20" id="Hdy-Aq-Als"/>
                             <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="Doh-lM-a4B" secondAttribute="trailing" constant="19.5" id="MDZ-3g-dxC"/>
-                            <constraint firstItem="RL9-y0-71P" firstAttribute="centerX" secondItem="HJZ-h8-yHo" secondAttribute="centerX" id="b5e-I2-NFx"/>
+                            <constraint firstItem="oO1-Ti-lKG" firstAttribute="leading" secondItem="RL9-y0-71P" secondAttribute="trailing" constant="36" id="Wh6-NA-hFp"/>
+                            <constraint firstItem="MHU-Cw-cot" firstAttribute="firstBaseline" secondItem="oO1-Ti-lKG" secondAttribute="firstBaseline" id="ZmN-7N-T30"/>
+                            <constraint firstItem="RL9-y0-71P" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="10" id="bsP-Oe-jf5"/>
                             <constraint firstItem="RL9-y0-71P" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="22" id="kiX-A7-JuK"/>
                             <constraint firstItem="Doh-lM-a4B" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="20" id="oPp-hK-NnZ"/>
                             <constraint firstItem="Doh-lM-a4B" firstAttribute="top" secondItem="RL9-y0-71P" secondAttribute="bottom" constant="16" id="wGk-P7-3pH"/>
+                            <constraint firstItem="MHU-Cw-cot" firstAttribute="leading" secondItem="oO1-Ti-lKG" secondAttribute="trailing" constant="29.5" id="z5h-70-O1v"/>
                         </constraints>
                         <connections>
                             <outlet property="contentView" destination="B5Z-ih-tAD" id="zk0-qN-Goi"/>
+                            <outlet property="meanTrendLabel" destination="oO1-Ti-lKG" id="3Kx-yV-yKj"/>
                             <outlet property="scrollView" destination="Doh-lM-a4B" id="aU4-OR-VFs"/>
                             <outlet property="titleLabel" destination="RL9-y0-71P" id="KeW-NM-aGj"/>
+                            <outlet property="trendRangeLabel" destination="MHU-Cw-cot" id="CsX-wv-tEl"/>
                         </connections>
                     </view>
                     <navigationItem key="navigationItem" id="9tx-0k-L9K"/>

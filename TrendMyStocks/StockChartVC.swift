@@ -23,6 +23,10 @@ class StockChartVC: UIViewController {
         chart.stockToShow = stockToShow
     }
     
+    override func viewWillLayoutSubviews() {
+        chart.contentView.setNeedsDisplay()
+    }
+    
 
     /*
     // MARK: - Navigation

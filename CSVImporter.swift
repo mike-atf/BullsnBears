@@ -26,7 +26,7 @@ class CSVImporter: NSObject {
     }
 
     class func csvExtractor() -> Stock {
-        var stockPrices = [StockPrice_Daily]()
+        var stockPrices = [PricePoint]()
         
         let fileContent$ = openCSVFile(fileName: "LOGI")
         let rows: [String] = fileContent$?.components(separatedBy: NSMutableCharacterSet.newlines) ?? []
@@ -72,7 +72,7 @@ class CSVImporter: NSObject {
 
             }
             
-            let newObject = StockPrice_Daily(open: open, close: close, low: low, high: high, volume: volume, date: date)
+            let newObject = PricePoint(open: open, close: close, low: low, high: high, volume: volume, date: date)
             stockPrices.append(newObject)
         }
 
