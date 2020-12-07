@@ -14,16 +14,14 @@ struct Stock {
     
     var name: String
     var dailyPrices: [PricePoint]
-    var lowTrends = [StockTrend]()
     
     init(name: String, dailyPrices:[PricePoint]) {
         self.name = name
         self.dailyPrices = dailyPrices
-        lowTrends = findLowTrends(30)
     }
     
     
-    private mutating func findLowTrends(_ days: TimeInterval) -> [StockTrend]{
+    public func findTrends(_ days: TimeInterval, priceOption: PricePointOptions, findOption: FindOptions) -> [StockTrend] {
         
         var endDate = dailyPrices.last!.tradingDate
         let lastDate = dailyPrices.first!.tradingDate
@@ -32,44 +30,86 @@ struct Stock {
         
         while endDate >= lastDate {
             let startDate = endDate.addingTimeInterval(-days*24*3600)
-            if let lowPrice = lowestPrice(startDate, endDate) {
-                let newTrend = StockTrend(start: startDate, end: endDate, startPrice: lowPrice, endPrice: previousLowPrice)
+            if let price = findPrice(lowOrHigh: findOption, priceOption: priceOption,startDate, endDate) {
+                let newTrend = StockTrend(start: startDate, end: endDate, startPrice: price, endPrice: previousLowPrice)
                 trends.append(newTrend)
-                previousLowPrice = lowPrice
-            }
+                previousLowPrice = price
+           }
             endDate = endDate.addingTimeInterval(-days*24*3600)
         }
+                
         trends.sort { (t0, t1) -> Bool in
             if t0.startDate < t1.startDate { return true }
             else { return false }
         }
         return trends
-  
     }
     
-    public func findLowPoints(_ days: TimeInterval) -> [PriceDate] {
-        // extract lowest prices and their tradingDates for all 30 day intervals
+    public func findPricePoints(_ days: TimeInterval, priceOption: PricePointOptions, findOption: FindOptions) -> [PriceDate] {
+        // extract prices and their tradingDates for all 30 day intervals
         // starting from most recent, so date decending
 
-        var lowPoints = [PriceDate]()
+        var pricePoints = [PriceDate]()
         var endDate = dailyPrices.last!.tradingDate
         let lastDate = dailyPrices.first!.tradingDate
         
         while endDate >= lastDate {
             let startDate = endDate.addingTimeInterval(-days*24*3600)
-            if let lowPrice = lowestPrice(startDate, endDate) {
-                let lowestDailyPrices = dailyPrices.filter( { (element) -> Bool in
-                    if element.tradingDate < startDate { return false }
-                    if element.tradingDate > endDate { return false }
-                    if element.low == lowPrice { return true }
-                    else { return false }
-                })
-                let newPriceDate: PriceDate = (lowestDailyPrices.first!.tradingDate, lowPrice)
-                lowPoints.append(newPriceDate)
+                        
+            var dailyPriceInRange = dailyPrices.filter( { (element) -> Bool in
+                if element.tradingDate < startDate { return false }
+                if element.tradingDate > endDate { return false }
+                return true
+            })
+            
+            dailyPriceInRange.sort { (p0, p1) -> Bool in
+                
+                if (p0.returnPrice(option: priceOption)) < (p1.returnPrice(option: priceOption)) { return true }
+                else { return false }
             }
+            
+            var newPriceDate: PriceDate!
+            
+            if findOption == .minimum {
+                newPriceDate = (dailyPriceInRange.first!.tradingDate, dailyPriceInRange.first!.returnPrice(option: priceOption))
+                
+            }
+            else {
+                newPriceDate = (dailyPriceInRange.last!.tradingDate, dailyPriceInRange.last!.returnPrice(option: priceOption))
+            }
+                        
+            pricePoints.append(newPriceDate)
             endDate = endDate.addingTimeInterval(-days*24*3600)
         }
-        return lowPoints
+        return pricePoints
+    }
+    
+    
+    public func findPrice(lowOrHigh: FindOptions ,priceOption: PricePointOptions ,_ from: Date? = nil,_ to: Date? = nil) -> Double? {
+        
+        var pricesInRange: [PricePoint]!
+        
+        if let validFrom = from {
+            pricesInRange = dailyPrices.filter({ (element) -> Bool in
+                if element.tradingDate < validFrom {
+                    return false
+                }
+                if element.tradingDate > to! {
+                    return false
+                }
+                
+                return true
+            })
+        }
+        else {
+            pricesInRange = dailyPrices
+        }
+        
+        let pricesInQuestion = pricesInRange.compactMap { $0.returnPrice(option: priceOption) }
+
+        if lowOrHigh == .minimum { return pricesInQuestion.min() }
+        else { return pricesInQuestion.max() }
+        
     }
     
     public func lowestPrice(_ from: Date? = nil,_ to: Date? = nil) -> Double? {
@@ -140,8 +180,12 @@ struct Stock {
             })
         }
         
-        var inclinesInRange = trendsInRange.compactMap { $0.incline } // exclude nil elements
         
+        var inclinesInRange = trendsInRange.compactMap { $0.incline } // exclude nil elements
+//        let start = from ?? dailyPrices.compactMap{ $0.tradingDate }.min()!
+//        let end = to ?? dailyPrices.compactMap{ $0.tradingDate }.max()!
+//        var inclinesInRange = trendsInRange.compactMap { $0.timeWeightedIncline(totalTimeSpan: (end.timeIntervalSince(start))) } // exclude nil elements
+
         if cutOffQuartiles {
             let sortedInclinesInRange = inclinesInRange.sorted { (t0, t1) -> Bool in
                 if t0 <= t1 { return true }
@@ -178,6 +222,14 @@ struct Stock {
         return [inclinesInRange.min()!, inclinesInRange.max()!]
 
     }
+    
+//    public func recentAverageTrend(trends: [StockTrend],_ from: Date? = nil, _ to: Date? = nil) -> Double? {
+//
+//        trends.forEach { (trend) in
+//            <#code#>
+//        }
+//
+//    }
     
     public func trendInfo(trends:[StockTrend], _ from: Date? = nil, _ to: Date? = nil) -> TrendPackage? {
         
@@ -322,5 +374,24 @@ struct PricePoint {
         self.tradingDate = calendar.date(from: dateComponents) ?? date
     }
     
+    public func returnPrice(option: PricePointOptions) -> Double {
+        
+        switch option {
+        case .low:
+                return low
+            case .high:
+                return high
+            case .open:
+                return open
+            case .close:
+                return close
+            case .volume:
+                return volume
+//        default:
+//            print("unrecognised price selector in PricePoint - returnPrice")
+//            return low
+        }
+        
+    }
 }
 

@@ -8,3 +8,17 @@
 import Foundation
 
 var stocks = [Stock]()
+
+enum FindOptions {
+    case minimum
+    case maximum
+}
+
+enum PricePointOptions {
+    case open
+    case high
+    case close
+    case low
+    case volume
+}
+
