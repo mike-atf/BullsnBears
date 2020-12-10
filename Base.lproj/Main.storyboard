@@ -13,32 +13,32 @@
             <objects>
                 <viewController id="GS7-IZ-4uD" customClass="StockChartVC" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DMz-IK-SGN" customClass="ChartContainerView" customModule="TrendMyStocks" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="703.5" height="768"/>
+                        <rect key="frame" x="0.0" y="0.0" width="420" height="768"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Stock name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RL9-y0-71P">
-                                <rect key="frame" x="10" y="72" width="172" height="41"/>
+                                <rect key="frame" x="110" y="72" width="172" height="41"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mean trend (low)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oO1-Ti-lKG">
-                                <rect key="frame" x="218" y="88.5" width="129.5" height="20.5"/>
+                                <rect key="frame" x="318" y="88.5" width="129.5" height="20.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Trend range (low)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MHU-Cw-cot">
-                                <rect key="frame" x="377" y="88.5" width="135" height="21"/>
+                                <rect key="frame" x="477" y="88.5" width="135" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doh-lM-a4B">
-                                <rect key="frame" x="20" y="129" width="664" height="619"/>
+                                <rect key="frame" x="120" y="129" width="280.5" height="619"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="TrendMyStocks" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="3320" height="619"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="1402.5" height="619"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <connections>
                                             <outlet property="widthConstraint" destination="nCS-ry-DVy" id="9gC-Dq-kMR"/>
@@ -88,7 +88,7 @@
             </objects>
             <point key="canvasLocation" x="1318.9453125" y="512.5"/>
         </scene>
-        <!--Root View Controller-->
+        <!--Title-->
         <scene sceneID="gJ5-Jm-dY6">
             <objects>
                 <tableViewController clearsSelectionOnViewWillAppear="NO" id="RUK-Av-gO5" customClass="StocksListViewController" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
@@ -123,7 +123,16 @@
                             <outlet property="delegate" destination="RUK-Av-gO5" id="cgj-Ht-gUx"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="dC2-zO-YAW"/>
+                    <navigationItem key="navigationItem" title="Title" id="DtB-UT-kti">
+                        <barButtonItem key="rightBarButtonItem" style="plain" systemItem="add" id="hqe-cX-e7c">
+                            <connections>
+                                <action selector="addButtonAction:" destination="RUK-Av-gO5" id="Eta-eI-A4Z"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="addButton" destination="hqe-cX-e7c" id="e8n-8V-PlC"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Sbx-mL-E9N" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -165,7 +174,7 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="0le-dl-q45"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="2ca-N3-KT8">
-                        <rect key="frame" x="0.0" y="0.0" width="703.5" height="50"/>
+                        <rect key="frame" x="0.0" y="0.0" width="420" height="50"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -179,7 +188,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="mBp-dp-A5V"/>
+        <segue reference="RX4-Uv-7Zw"/>
     </inferredMetricsTieBreakers>
     <resources>
         <systemColor name="systemBackgroundColor">

@@ -15,7 +15,7 @@ class ChartView: UIView {
     var yAxisLabels = [UILabel]()
     var yAxisNumbers = [Double]()
     var xAxisLabels = [UILabel]()
-//    var trendLabels = [UILabel]()
+    var trendLabels = [UILabel]()
     
     var dateFormatter: DateFormatter!
     var currencyFormatter : NumberFormatter!
@@ -35,6 +35,7 @@ class ChartView: UIView {
     var minPrice = Double()
     var maxPrice = Double()
     var dateRange: [Date]?
+    var chartTimeSpan = TimeInterval()
     
     var chartAreaSize = CGSize()
     var chartOrigin = CGPoint()
@@ -172,7 +173,7 @@ class ChartView: UIView {
        }
 
 // candles
-        let chartTimeSpan = dateRange!.last!.timeIntervalSince(dateRange!.first!)
+        chartTimeSpan = dateRange!.last!.timeIntervalSince(dateRange!.first!)
         let boxWidth = chartAreaSize.width / CGFloat(dateRange!.last!.timeIntervalSince(dateRange!.first!) / (24*3600))
         stockToShow?.dailyPrices.forEach({ (pricePoint) in
             let boxLeft = chartOrigin.x - (boxWidth * 0.8 / 2) + CGFloat(pricePoint.tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width
@@ -197,14 +198,14 @@ class ChartView: UIView {
         })
         
 // lowest point lines
+        /*
         let lastPoint: PriceDate = (date: validStock.dailyPrices.last!.tradingDate, price: validStock.dailyPrices.last!.low)
         let lowestPoints = validStock.findPricePoints(10, priceOption: .low, findOption: .minimum)
-//        let lowestPoints = validStock.findLowPoints(10, priceOption: .low)
         let lowTrendLine = UIBezierPath()
-        lowTrendLine.move(to: plotPricePoint(pricePoint: lastPoint, chartOrigin: CGPoint(x: chartOrigin.x, y: chartOrigin.y), chartTimeSpan: chartTimeSpan))
+        lowTrendLine.move(to: plotPricePoint(pricePoint: lastPoint))
         
         lowestPoints.forEach( { (element) in
-            let point = plotPricePoint(pricePoint: element, chartOrigin: chartOrigin, chartTimeSpan: chartTimeSpan)
+            let point = plotPricePoint(pricePoint: element)
             lowTrendLine.addLine(to: point)
         })
         
@@ -213,41 +214,74 @@ class ChartView: UIView {
         lowTrendLine.stroke()
         
         
-        meanTrendLine(stock: validStock, trend: validStock.findTrends(30, priceOption: .low, findOption: .minimum), chartOrigin: chartOrigin, chartEnd: chartEnd, chartTimeSpan: chartTimeSpan)
+        trendLabels.forEach { (label) in
+            label.removeFromSuperview()
+        }
+        trendLabels.removeAll()
+        */
+// low trends
+        let trends = validStock.findTrends(priceOption: .low, findOption: .minimum)
+        let autoTrends = UIBezierPath()
+        var point = plotPricePoint(pricePoint: PriceDate(trends.first!.startDate, trends.first!.startPrice!))
+        autoTrends.move(to: point)
+        
+        for i in 1..<trends.count {
+            point = plotPricePoint(pricePoint: PriceDate(trends[i].startDate, trends[i].startPrice!))
+            autoTrends.addLine(to: point)
+        }
+        autoTrends.lineWidth = 2.0
+        UIColor.systemRed.setStroke()
+        autoTrends.stroke()
         
         
-        meanTrendLine(stock: validStock, trend: validStock.findTrends(30, priceOption: .high, findOption: .maximum), chartOrigin: chartOrigin, chartEnd: chartEnd, chartTimeSpan: chartTimeSpan)
+// low trends
+        
+        drawTrendLine(stock: validStock, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor.systemRed)
 
+
+        drawTrendLine(stock: validStock, type: .mean, priceOption: .high, highOrLow: .maximum, quartiles: false, color: UIColor.systemGreen)
+
+        drawTrendLine(stock: validStock, type: .recentWeighted, priceOption: .low, highOrLow: .minimum, quartiles: false, color: UIColor.systemOrange)
+        
+        let startDate = dateRange!.last!.addingTimeInterval(-120*24*3600)
+        drawTrendLine(stock: validStock, type: .recentWeighted, priceOption: .low, highOrLow: .minimum, quartiles: false, color: UIColor.systemIndigo, from: startDate)
     }
     
-    private func meanTrendLine(stock: Stock, trend: [StockTrend], chartOrigin: CGPoint, chartEnd: CGPoint, chartTimeSpan: TimeInterval) {
+    private func drawTrendLine(stock: Stock, type: TrendType, priceOption: PricePointOptions, highOrLow: FindOptions, quartiles: Bool, color: UIColor, from: Date? = nil, to: Date? = nil) {
         
-        // mean Low Trend
-        if let meanTrend = stock.averageTrend(trends: trend) {
-            let startPointY = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - stock.dailyPrices.first!.low) / (maxPrice - minPrice))
-            
-            let projectedlowPrice = stock.dailyPrices.first!.low + meanTrend * chartTimeSpan
-            let endPointY = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - projectedlowPrice) / (maxPrice - minPrice))
+        let trendStart = from ?? dateRange!.first!
+        let trendEnd = to ?? dateRange!.last!
+
+        let trends = stock.findTrends(from: trendStart, to: trendEnd, priceOption: priceOption, findOption: highOrLow)
+        
+        let trendInfo = stock.trendsAnalysis(trends: trends, type: type, priceOption: priceOption, minOrMax: highOrLow, cutOffQuartiles: quartiles)
+        
+        if let validIncline = trendInfo?.incline {
+                        
+            let startPrice = trends.first!.startPrice!
+            let projectedPrice = startPrice + validIncline * trendEnd.timeIntervalSince(trendStart)
+            let endPointY = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - projectedPrice) / (maxPrice - minPrice))
             let meanTrendLine = UIBezierPath()
-            meanTrendLine.move(to: CGPoint(x: chartOrigin.x, y: startPointY))
-            meanTrendLine.addLine(to: CGPoint(x: chartEnd.x, y: endPointY))
+            meanTrendLine.move(to: plotPricePoint(pricePoint: PriceDate(trends.first!.startDate, trends.first!.startPrice!)))
+
+            meanTrendLine.addLine(to: plotPricePoint(pricePoint: PriceDate(trendEnd, projectedPrice)))
             meanTrendLine.lineWidth = 2.0
-            UIColor.systemBlue.setStroke()
+            color.setStroke()
             meanTrendLine.stroke()
             
             // trendInfo label
-            if let trendInfo = stock.trendInfo(trends: trend) {
-                let endPrice$ = currencyFormatter.string(from: NSNumber(value: trendInfo.endPrice))!
-                let increase$ = percentFormatter.string(from: NSNumber(value: trendInfo.pctIncrease))!
-                let min$ = percentFormatter.string(from: NSNumber(value: trendInfo.increaseMin))!
-                let max$ = percentFormatter.string(from: NSNumber(value: trendInfo.increaseMax))!
+            if let validTrendInfo = trendInfo {
+                let endPrice$ = currencyFormatter.string(from: NSNumber(value: projectedPrice))!
+                let increase$ = percentFormatter.string(from: NSNumber(value: (projectedPrice - trends.first!.startPrice!) / trends.first!.startPrice!))!
+                let min$ = percentFormatter.string(from: NSNumber(value: validTrendInfo.increaseMin))!
+                let max$ = percentFormatter.string(from: NSNumber(value: validTrendInfo.increaseMax))!
                 
                 let text = " \(endPrice$) ( \(increase$) [\(min$) - \(max$)]) "
                 let newTrendLabel: UILabel = {
                     let label = UILabel()
-                    label.font = UIFont.preferredFont(forTextStyle: .caption1)
+                    label.font = UIFont.preferredFont(forTextStyle: .body)
                     label.textColor = UIColor.white
-                    label.backgroundColor = UIColor.systemBlue
+                    label.backgroundColor = color
                     label.text = text
                     label.sizeToFit()
                     label.frame = CGRect(x: chartEnd.x - label.frame.width,
@@ -257,12 +291,12 @@ class ChartView: UIView {
                    return label
                 }()
                 addSubview(newTrendLabel)
-                
+                trendLabels.append(newTrendLabel)
             }
         }
     }
     
-    private func plotPricePoint(pricePoint: PriceDate, chartOrigin: CGPoint, chartTimeSpan: TimeInterval) -> CGPoint {
+    private func plotPricePoint(pricePoint: PriceDate) -> CGPoint {
         
         let timeFromEarliest = pricePoint.date.timeIntervalSince(dateRange![0])
         let datePoint: CGFloat = chartOrigin.x + CGFloat(timeFromEarliest / chartTimeSpan) * chartAreaSize.width

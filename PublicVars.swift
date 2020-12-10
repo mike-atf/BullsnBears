@@ -22,3 +22,8 @@ enum PricePointOptions {
     case volume
 }
 
+enum TrendType {
+    case mean
+    case recentWeighted
+    case timeWeighted
+}

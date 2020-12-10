@@ -8,15 +8,22 @@
 import UIKit
 
 class StocksListViewController: UITableViewController {
+    @IBOutlet var addButton: UIBarButtonItem!
+    
+    let documentInterActionController = UIDocumentInteractionController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         stocks.append(CSVImporter.csvExtractor())
+        documentInterActionController.delegate = self
 
         
     }
 
+    @IBAction func addButtonAction(_ sender: Any) {
+        
+    }
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -85,4 +92,15 @@ class StocksListViewController: UITableViewController {
         }
     }
 
+}
+
+extension StocksListViewController: UIDocumentInteractionControllerDelegate {
+    
+    func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
+        
+        guard let nav = self.navigationController else {
+            return self
+        }
+        return nav
+    }
 }

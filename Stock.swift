@@ -8,7 +8,7 @@
 import Foundation
 
 typealias PriceDate = (date: Date, price: Double)
-typealias TrendPackage = (endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
+typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
 
 struct Stock {
     
@@ -20,28 +20,62 @@ struct Stock {
         self.dailyPrices = dailyPrices
     }
     
-    
-    public func findTrends(_ days: TimeInterval, priceOption: PricePointOptions, findOption: FindOptions) -> [StockTrend] {
+    public func priceOnDate(date: Date, priceOption: PricePointOptions) -> Double {
         
-        var endDate = dailyPrices.last!.tradingDate
-        let lastDate = dailyPrices.first!.tradingDate
-        var previousLowPrice: Double?
-        var trends = [StockTrend]()
-        
-        while endDate >= lastDate {
-            let startDate = endDate.addingTimeInterval(-days*24*3600)
-            if let price = findPrice(lowOrHigh: findOption, priceOption: priceOption,startDate, endDate) {
-                let newTrend = StockTrend(start: startDate, end: endDate, startPrice: price, endPrice: previousLowPrice)
-                trends.append(newTrend)
-                previousLowPrice = price
-           }
-            endDate = endDate.addingTimeInterval(-days*24*3600)
-        }
-                
-        trends.sort { (t0, t1) -> Bool in
-            if t0.startDate < t1.startDate { return true }
+        let prices = dailyPrices.filter { (pricePoint) -> Bool in
+            if pricePoint.tradingDate >= date { return true }
             else { return false }
         }
+        
+        return prices.first!.returnPrice(option: priceOption)
+    }
+    
+    public func findTrends(from: Date? = nil, to: Date? = nil, priceOption: PricePointOptions, findOption: FindOptions) -> [StockTrend] {
+        
+        let lastDate = to ?? dailyPrices.last!.tradingDate
+        let firstDate = from ?? dailyPrices.first!.tradingDate
+//        var previousPrice: Double?
+        var trends = [StockTrend]()
+        
+        // find turning point by identifying high and low points:
+        // from dailyPrice to dailyPrice: check trend to previous price: upward or downward
+        // compare with price to next price. If up/downward != previous trend = 'turning point'
+        // trends are between turning points
+        
+        
+        let dailyPricesInRange = dailyPrices.filter { (pricePoint) -> Bool in
+            if pricePoint.tradingDate < firstDate { return false }
+            else if pricePoint.tradingDate > lastDate { return false }
+            else { return true }
+        }
+        
+        var trendChangePoints = [dailyPricesInRange.first!]
+        
+        for index in 1..<dailyPricesInRange.count-1 {
+            
+            let previous = dailyPricesInRange[index-1].returnPrice(option: priceOption)
+            let current = dailyPricesInRange[index].returnPrice(option: priceOption)
+            let next = dailyPricesInRange[index+1].returnPrice(option: priceOption)
+            
+            let trendToCurrent = current - previous
+            let trendToNext = next - current
+            
+            if (trendToCurrent != 0 && trendToNext != 0) {
+                let trendToCurrentDirection = (trendToCurrent / abs(trendToCurrent)) // 1 or -1
+                let trendToNextDirection = (trendToNext / abs(trendToNext))
+                
+                if trendToCurrentDirection + trendToNextDirection == 0 {
+                    trendChangePoints.append(dailyPricesInRange[index])
+                }
+            }
+        }
+        trendChangePoints.append(dailyPricesInRange.last!)
+        
+        for index in 0..<trendChangePoints.count - 1 {
+            let newTrend = StockTrend(start: trendChangePoints[index].tradingDate, end: trendChangePoints[index+1].tradingDate, startPrice: trendChangePoints[index].returnPrice(option: priceOption), endPrice: trendChangePoints[index+1].returnPrice(option: priceOption))
+            trends.append(newTrend)
+        }
+ 
         return trends
     }
     
@@ -85,7 +119,7 @@ struct Stock {
     }
     
     
-    public func findPrice(lowOrHigh: FindOptions ,priceOption: PricePointOptions ,_ from: Date? = nil,_ to: Date? = nil) -> Double? {
+    public func findPrice(lowOrHigh: FindOptions, priceOption: PricePointOptions ,_ from: Date? = nil,_ to: Date? = nil) -> PriceDate? {
         
         var pricesInRange: [PricePoint]!
         
@@ -105,10 +139,25 @@ struct Stock {
             pricesInRange = dailyPrices
         }
         
-        let pricesInQuestion = pricesInRange.compactMap { $0.returnPrice(option: priceOption) }
+        var maxPriceDate = PriceDate(date: Date(), price: 0)
+        var minPriceDate = PriceDate(date: Date(), price: 10000000)
+        
+        for pricePoint in pricesInRange {
+            let price = pricePoint.returnPrice(option: priceOption)
+            if price > maxPriceDate.price {
+                maxPriceDate.price = price
+                maxPriceDate.date = pricePoint.tradingDate
+            }
+            if price < minPriceDate.price {
+                minPriceDate.price = price
+                minPriceDate.date = pricePoint.tradingDate
+            }
+            
+        }
+//        let pricesInQuestion = pricesInRange.compactMap { $0.returnPrice(option: priceOption), $0.tradingDate }
 
-        if lowOrHigh == .minimum { return pricesInQuestion.min() }
-        else { return pricesInQuestion.max() }
+        if lowOrHigh == .minimum { return minPriceDate}
+        else { return maxPriceDate }
         
     }
     
@@ -168,41 +217,79 @@ struct Stock {
         else { return nil }
     }
     
-    public func averageTrend(trends: [StockTrend], cutOffQuartiles: Bool = false,_ from: Date? = nil, _ to: Date? = nil) -> Double? {
+    public func trendsAnalysis(trends: [StockTrend], type: TrendType, priceOption: PricePointOptions, minOrMax: FindOptions, cutOffQuartiles: Bool = false) -> TrendInfoPackage? {
         
-        var trendsInRange = trends
         
-        if let validFrom = from {
-            trendsInRange = trends.filter({ (trend) -> Bool in
-                if trend.endDate < validFrom { return false }
-                else if trend.startDate > to! { return false }
-                else { return true }
-            })
+        var percentage = Double()
+        var projectedPriceIn30Days = Double()
+        var minRange = Double()
+        var maxRange = Double()
+        var meanIncline: Double?
+        var totalTimeSpan = TimeInterval()
+        
+        let descendingTrendsInRange = trends.sorted { (t0, t1) -> Bool in
+            if t0.startDate > t1.startDate { return true }
+            else { return false }
         }
         
-        
-        var inclinesInRange = trendsInRange.compactMap { $0.incline } // exclude nil elements
-//        let start = from ?? dailyPrices.compactMap{ $0.tradingDate }.min()!
-//        let end = to ?? dailyPrices.compactMap{ $0.tradingDate }.max()!
-//        var inclinesInRange = trendsInRange.compactMap { $0.timeWeightedIncline(totalTimeSpan: (end.timeIntervalSince(start))) } // exclude nil elements
+        totalTimeSpan = descendingTrendsInRange.first!.endDate.timeIntervalSince(descendingTrendsInRange.last!.startDate)
 
-        if cutOffQuartiles {
-            let sortedInclinesInRange = inclinesInRange.sorted { (t0, t1) -> Bool in
-                if t0 <= t1 { return true }
-                else { return false }
+        if type == .mean {
+        
+            var inclinesInRange = descendingTrendsInRange.compactMap { $0.timeWeightedIncline() } // exclude nil elements
+
+            if cutOffQuartiles {
+                let sortedInclinesInRange = inclinesInRange.sorted { (t0, t1) -> Bool in
+                    if t0 <= t1 { return true }
+                    else { return false }
+                }
+                
+                let count = inclinesInRange.count
+                let quartile = Int(count / 10)
+                inclinesInRange = Array(sortedInclinesInRange[quartile..<(count-quartile)])
             }
             
-            let count = sortedInclinesInRange.count
-            let quartile = Int(count / 4)
-            inclinesInRange = Array(sortedInclinesInRange[quartile..<(count-quartile)])
+            meanIncline = inclinesInRange.reduce(0,+) / totalTimeSpan
+
+        }
+        else if type == .recentWeighted {
+            let lastDate = descendingTrendsInRange.first!.endDate
+
+            let recentWeightedTrend = descendingTrendsInRange.compactMap { $0.recentWeightedIncline(totalTimeSpan, lastDate: lastDate) }
+            meanIncline = (recentWeightedTrend.reduce(0,+)) / Double(recentWeightedTrend.count)
+        }
+        else {
+            // timeWeighted or other
+            return nil
         }
         
-        let count = inclinesInRange.count
-        let sum = inclinesInRange.reduce(0,+)
-        if count > 0 {
-            return sum / Double(count)
+        
+        if let validMeanIncline = meanIncline {
+            if let validPrice = descendingTrendsInRange.last?.startPrice { // trends are in descending date order
+                if let futureDate = descendingTrendsInRange.first?.endDate.addingTimeInterval(30*24*3600) {
+                    let trendStartToFutureDate = futureDate.timeIntervalSince(descendingTrendsInRange.last!.startDate)
+                    percentage = validMeanIncline * totalTimeSpan / validPrice
+                    projectedPriceIn30Days = validPrice + validMeanIncline * trendStartToFutureDate
+                }
+            }
         }
-        else { return nil }
+        if let minIncline = descendingTrendsInRange.compactMap({ $0.incline }).min() {
+            if let maxIncline = descendingTrendsInRange.compactMap({ $0.incline }).max() {
+                
+                let futureDate = descendingTrendsInRange.first!.endDate.addingTimeInterval(30*24*3600)
+                let trendStartToFutureDate = futureDate.timeIntervalSince(descendingTrendsInRange.last!.startDate)
+                
+                let minimumAnnualIncrease = descendingTrendsInRange.last!.startPrice! + minIncline * trendStartToFutureDate
+                let maximumAnnualIncrease = descendingTrendsInRange.last!.startPrice! + maxIncline * trendStartToFutureDate
+                
+                minRange = (minimumAnnualIncrease) / descendingTrendsInRange.last!.startPrice!
+                maxRange = (maximumAnnualIncrease) / descendingTrendsInRange.last!.startPrice!
+
+            }
+        }
+        
+        return TrendInfoPackage(incline: meanIncline, endPrice: projectedPriceIn30Days, pctIncrease: percentage, increaseMin: minRange, increaseMax: maxRange)
+
     }
     
     public func trendRange(trends:[StockTrend], _ from: Date? = nil, _ to: Date? = nil) -> [Double] {
@@ -223,22 +310,45 @@ struct Stock {
 
     }
     
-//    public func recentAverageTrend(trends: [StockTrend],_ from: Date? = nil, _ to: Date? = nil) -> Double? {
-//
-//        trends.forEach { (trend) in
-//            <#code#>
-//        }
-//
-//    }
+    public func recentWeightedTrend(trends: [StockTrend], priceOption: PricePointOptions, minOrMax: FindOptions,_ from: Date? = nil, _ to: Date? = nil) -> Double? {
+
+        var descendingTrends = trends.sorted { (t0, t1) -> Bool in
+            if t0.startDate > t1.startDate { return true }
+            else { return false }
+        }
+        
+        if let validFrom = from {
+            descendingTrends = descendingTrends.filter { (trend) -> Bool in
+                if trend.endDate < validFrom { return false }
+                if trend.startDate > to! { return false }
+                return true
+            }
+        }
+        
+        let lastDate = descendingTrends.first!.startDate
+        let totalTrendTime = descendingTrends.last!.endDate.timeIntervalSince(descendingTrends.first!.startDate)
+        let recentWeightedTrend = trends.compactMap { $0.recentWeightedIncline(totalTrendTime, lastDate: lastDate) }
+        return (recentWeightedTrend.reduce(0,+)) / Double(recentWeightedTrend.count)
+    }
     
-    public func trendInfo(trends:[StockTrend], _ from: Date? = nil, _ to: Date? = nil) -> TrendPackage? {
+    /*
+    public func trendInfo(trends:[StockTrend], type: TrendType, cutOffQuartiles: Bool = false) -> TrendPackage? {
         
         var percentage: Double?
         var endPrice: Double?
         var minRange: Double?
         var maxRange: Double?
         
-        if let validTrend = averageTrend(trends: trends, from, to) {
+        var incline: Double?
+        
+        if type == .mean {
+            incline = meanTrendIncline(trends: trends, cutOffQuartiles: type, cutOffQuartiles)
+        }
+        else if type == .recentWeighted {
+            incline = recentWeightedTrend(trends: trends, priceOption: <#T##PricePointOptions#>, minOrMax: <#T##FindOptions#>, <#T##from: Date?##Date?#>, <#T##to: Date?##Date?#>)
+        }
+        
+        if let validTrend = meanTrendIncline(trends: trends, from, to) {
             let lowTrendAnnualIncrease = validTrend * TimeInterval(365*24*3600)
             percentage = lowTrendAnnualIncrease / dailyPrices.first!.low
             endPrice = validTrend * (395*24*3600) + dailyPrices.first!.low
@@ -274,7 +384,7 @@ struct Stock {
             return TrendPackage(endPrice!, percentage!, minRange!, maxRange!)
         }
     }
-    
+    */
     /*
     func correlation(trends: [StockTrend], meanIncline: Double) -> Double? {
         
@@ -332,10 +442,21 @@ struct StockTrend {
         }
     }
     
-    public func timeWeightedIncline(totalTimeSpan: TimeInterval) -> Double? {
-        
+    public func timeWeightedIncline() -> Double? {
+        // makes sense only for trends of different time durations.
+        // currently al are 30 days
         guard let validIncline = incline else { return nil }
-        return validIncline * (endDate.timeIntervalSince(startDate) / totalTimeSpan) }
+        return validIncline * endDate.timeIntervalSince(startDate)
+        
+    }
+    
+    public func recentWeightedIncline(_ totalTime: TimeInterval, lastDate: Date) -> Double? {
+        guard let validIncline = incline else { return nil }
+        let timeSinceLastDate = lastDate.timeIntervalSince(endDate)
+        let factor = 1 - timeSinceLastDate / totalTime
+//        print("unweighted incline \(validIncline)  - factor \(factor)")
+        return validIncline * factor
+    }
 }
 
 struct PricePoint {
