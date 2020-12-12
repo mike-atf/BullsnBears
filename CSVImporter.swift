@@ -10,26 +10,53 @@ import Foundation
 
 class CSVImporter: NSObject {
     
-    class func openCSVFile(fileName: String) -> String? {
-        guard let url = Bundle.main.url(forResource: fileName, withExtension: "csv") else {
-            return nil
-        }
+    class func openCSVFile(url: URL? = nil, fileName: String) -> String? {
+        
+        if let fileURL = url {
 
-        do {
-            let content = try String(contentsOf: url, encoding: .utf8)//String(contentsOf: url, usedEncoding: &.utf8)
-            return content
-        } catch let error {
-            print("Error reading file content \(error)")
+            do {
+                let content = try String(contentsOf: fileURL, encoding: .utf8)
+                return content
+            } catch let error {
+                print("Error reading file content \(error)")
+            }
+
+        }
+        else {
+            guard let fileURL = Bundle.main.url(forResource: fileName, withExtension: "csv") else {
+                return nil
+            }
+            
+            do {
+                let content = try String(contentsOf: fileURL, encoding: .utf8)
+                return content
+            } catch let error {
+                print("Error reading file content \(error)")
+            }
+
         }
 
         return nil
     }
 
-    class func csvExtractor() -> Stock {
+    class func csvExtractor(url: URL? = nil) -> Stock {
+        
         var stockPrices = [PricePoint]()
         
-        let fileContent$ = openCSVFile(fileName: "LOGI")
-        let rows: [String] = fileContent$?.components(separatedBy: NSMutableCharacterSet.newlines) ?? []
+        var fileContent$: String?
+        var rows = [String]()
+        var stockName = String()
+        
+        if let validURL = url {
+            fileContent$ = openCSVFile(url: validURL, fileName: "nono")
+            stockName = validURL.lastPathComponent
+        }
+        else {
+            fileContent$ = openCSVFile(fileName: "LOGI")
+            stockName = "LOGI"
+        }
+
+        rows = fileContent$?.components(separatedBy: NSMutableCharacterSet.newlines) ?? []
 
         let expectedOrder = ["Date","Open","High","Low","Close","Adj Close","Volume"]
         if let headerArray = rows.first?.components(separatedBy: ",") {
@@ -76,6 +103,6 @@ class CSVImporter: NSObject {
             stockPrices.append(newObject)
         }
 
-        return Stock(name: "LOGI", dailyPrices: stockPrices)
+        return Stock(name: stockName, dailyPrices: stockPrices)
     }
 }

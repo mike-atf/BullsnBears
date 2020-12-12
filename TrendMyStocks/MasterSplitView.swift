@@ -8,12 +8,24 @@
 import UIKit
 
 class MasterSplitView: UISplitViewController, UISplitViewControllerDelegate {
+    
+    var listView: StocksListViewController?
+    var detailView: StockChartVC?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         preferredDisplayMode = .oneBesideSecondary
         delegate = self
+        
+        for vc in viewControllers {
+            if let lv = vc as? StocksListViewController {
+                listView = lv
+            }
+            else if let dv = vc as? StockChartVC {
+                detailView = dv
+            }
+        }
                 
     }
     
@@ -29,4 +41,10 @@ class MasterSplitView: UISplitViewController, UISplitViewControllerDelegate {
         }
         else { return false }
     }
+}
+
+extension MasterSplitView {
+  func openRemoteDocument(_ inboundURL: URL, importIfNeeded: Bool) {
+    listView?.openDocumentBrowser(with: inboundURL, importIfNeeded: importIfNeeded)
+  }
 }

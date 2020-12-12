@@ -8,21 +8,38 @@
 import UIKit
 
 class StocksListViewController: UITableViewController {
+    
     @IBOutlet var addButton: UIBarButtonItem!
     
-    let documentInterActionController = UIDocumentInteractionController()
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
         stocks.append(CSVImporter.csvExtractor())
-        documentInterActionController.delegate = self
-
-        
     }
 
     @IBAction func addButtonAction(_ sender: Any) {
         
+        if let docBrowser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DocBrowserView") as? DocumentBrowserViewController {
+
+            docBrowser.stockListVC = self
+            self.present(docBrowser, animated: true)
+        }
+    }
+    
+    public func openDocumentBrowser(with remoteURL: URL, importIfNeeded: Bool) {
+        
+        if let docBrowser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DocBrowserView") as?  DocumentBrowserViewController {
+        
+            self.present(docBrowser, animated: true) {
+                docBrowser.openRemoteDocument(remoteURL, importIfNeeded: importIfNeeded)
+            }
+
+        }
+    }
+    
+    public func addStock(fileURL: URL) {
+        stocks.append(CSVImporter.csvExtractor(url: fileURL))
+        tableView.reloadData()
     }
     // MARK: - Table view data source
 
@@ -44,6 +61,11 @@ class StocksListViewController: UITableViewController {
 
         return cell
     }
+    
+//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//
+//        performSegue(withIdentifier: "stockSelectionSegue", sender: indexPath)
+//    }
 
     /*
     // Override to support conditional editing of the table view.
@@ -87,20 +109,20 @@ class StocksListViewController: UITableViewController {
         
         if let chartView = segue.destination as? StockChartVC {
             if let indexPath = tableView.indexPathForSelectedRow {
+                
                 chartView.stockToShow = stocks[indexPath.row]
+
+            }
+        }
+        else if let navView = segue.destination as? UINavigationController {
+            if let chartView = navView.topViewController as? StockChartVC {
+                if let indexPath = tableView.indexPathForSelectedRow {
+                    
+                    chartView.stockToShow = stocks[indexPath.row]
+                    chartView.configure()
+                }
             }
         }
     }
 
-}
-
-extension StocksListViewController: UIDocumentInteractionControllerDelegate {
-    
-    func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
-        
-        guard let nav = self.navigationController else {
-            return self
-        }
-        return nav
-    }
 }

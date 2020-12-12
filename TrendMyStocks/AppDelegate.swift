@@ -11,7 +11,7 @@ import CoreData
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
+    var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -76,6 +76,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
+    
+    func application(_ app: UIApplication, open inputURL: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        // Ensure the URL is a file URL
+        guard inputURL.isFileURL else { return false }
+                
+        // Reveal / import the document at the URL
+        guard let masterSplitView = window?.rootViewController as? MasterSplitView else { return false }
+        
+        masterSplitView.openRemoteDocument(inputURL, importIfNeeded: true)
+
+        return true
+    }
+
 
 }
 

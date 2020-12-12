@@ -24,11 +24,7 @@ class ChartView: UIView {
     var candleBoxes = UIBezierPath()
     var candleSticks = UIBezierPath()
     
-    var stockToShow: Stock? {
-        didSet {
-            configure()
-        }
-    }
+    var stockToShow: Stock?
     
     var lowestPriceInRange: Double?
     var highestPriceInRange: Double?
@@ -84,7 +80,9 @@ class ChartView: UIView {
         
     }
     
-    public func configure() {
+    public func configure(stock: Stock) {
+        
+        stockToShow = stock
 
         guard let validStock = stockToShow else { return }
 
@@ -127,11 +125,13 @@ class ChartView: UIView {
             count += 1
         }
                 
-        setNeedsDisplay()
+        self.setNeedsDisplay()
+        
     }
 
     override func draw(_ rect: CGRect) {
                 
+        
 // Y axis
        chartOrigin.x = rect.width * 0.1
         chartEnd.y = rect.height * 0.1
@@ -213,12 +213,14 @@ class ChartView: UIView {
         lowTrendLine.lineWidth = 1.0
         lowTrendLine.stroke()
         
+         */
+        
         
         trendLabels.forEach { (label) in
             label.removeFromSuperview()
         }
         trendLabels.removeAll()
-        */
+
 // low trends
         let trends = validStock.findTrends(priceOption: .low, findOption: .minimum)
         let autoTrends = UIBezierPath()

@@ -12,19 +12,28 @@ class StockChartVC: UIViewController {
     var stockToShow: Stock?
     @IBOutlet var chart: ChartContainerView!
     
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         if stockToShow == nil {
             stockToShow = stocks.first
+            configure()
         }
         
-        chart.stockToShow = stockToShow
     }
     
     override func viewWillLayoutSubviews() {
         chart.contentView.setNeedsDisplay()
+    }
+    
+    func configure() {
+        loadViewIfNeeded() // leave! essential
+        if let validChart = chart {
+            if let stock = stockToShow {
+                validChart.configure(with: stock)
+            }
+        }
     }
     
 

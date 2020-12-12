@@ -42,6 +42,7 @@
 		EAC190F42577E3B60030B331 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190F32577E3B60030B331 /* ChartView.swift */; };
 		EAC190F52577E3B60030B331 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190F32577E3B60030B331 /* ChartView.swift */; };
 		EAC190F62577E3B60030B331 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190F32577E3B60030B331 /* ChartView.swift */; };
+		EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,7 @@
 		EAC190D42576731B0030B331 /* StockChartVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockChartVC.swift; sourceTree = "<group>"; };
 		EAC190E92577E2E20030B331 /* ChartContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartContainerView.swift; sourceTree = "<group>"; };
 		EAC190F32577E3B60030B331 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +142,7 @@
 		EAC19048257641160030B331 /* TrendMyStocks */ = {
 			isa = PBXGroup;
 			children = (
+				EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */,
 				EAC19049257641160030B331 /* AppDelegate.swift */,
 				EAC1904B257641160030B331 /* SceneDelegate.swift */,
 				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
@@ -310,6 +313,7 @@
 				EAC190BA257662930030B331 /* StocksListViewController.swift in Sources */,
 				EAC190D52576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC190EA2577E2E20030B331 /* ChartContainerView.swift in Sources */,
+				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
 				EAC1904A257641160030B331 /* AppDelegate.swift in Sources */,
 				EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */,
