@@ -53,7 +53,7 @@ class CSVImporter: NSObject {
         var stockName = String()
         
         fileContent$ = openCSVFile(url: validURL, fileName: "nono")
-        stockName = validURL.lastPathComponent
+        stockName = String(validURL.lastPathComponent.split(separator: ".").first ?? "missing")
 
         rows = fileContent$?.components(separatedBy: NSMutableCharacterSet.newlines) ?? []
         

@@ -50,7 +50,7 @@ class StocksListViewController: UITableViewController {
                                     stocks.append(stock)
                                 }
                                 do {
-                                    try FileManager.default.moveItem(at: url, to: URL(fileURLWithPath: documentFolder + url.lastPathComponent))
+                                    try FileManager.default.moveItem(at: url, to: URL(fileURLWithPath: documentFolder + "/" + url.lastPathComponent))
                                 }
                                 catch let error {
                                     print("error trying to move file out of the Inbox into the Document folder \(error)")
