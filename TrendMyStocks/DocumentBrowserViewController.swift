@@ -45,13 +45,41 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
 //    }
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didPickDocumentsAt documentURLs: [URL]) {
+        
         guard let sourceURL = documentURLs.first else { return }
         
+        copyFileToDocumentDirectory(url: sourceURL)
+        
         if let validStockList = stockListVC {
-            validStockList.addStock(fileURL: sourceURL)
+           validStockList.addStock(fileURL: sourceURL)
             self.dismiss(animated: true, completion: nil)
         }
 
+    }
+    
+    func copyFileToDocumentDirectory(url: URL) {
+        
+        let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        if let documentFolder = appDocumentPaths.first {
+            let copyFilePath = documentFolder + "/" + url.lastPathComponent
+
+            if FileManager.default.fileExists(atPath: copyFilePath) {
+                do {
+                    //remove any existing file
+                    try FileManager.default.removeItem(atPath: copyFilePath)
+                } catch let error {
+                    print("File removing error \(error)")
+                }
+            }
+            
+            let copyToURL = URL(fileURLWithPath: copyFilePath)
+            do {
+                try FileManager.default.copyItem(at: url, to: copyToURL)
+            } catch let error {
+                print("File copying error \(error)")
+            }
+                
+        }
     }
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didImportDocumentAt sourceURL: URL, toDestinationURL destinationURL: URL) {

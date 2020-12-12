@@ -14,10 +14,12 @@ struct Stock {
     
     var name: String
     var dailyPrices: [PricePoint]
+    var fileURL: URL?
     
-    init(name: String, dailyPrices:[PricePoint]) {
+    init(name: String, dailyPrices:[PricePoint], fileURL: URL?) {
         self.name = name
         self.dailyPrices = dailyPrices
+        self.fileURL = fileURL
     }
     
     public func priceOnDate(date: Date, priceOption: PricePointOptions) -> Double {

@@ -39,7 +39,12 @@ class CSVImporter: NSObject {
         return nil
     }
 
-    class func csvExtractor(url: URL? = nil) -> Stock {
+    class func csvExtractor(url: URL? = nil) -> Stock? {
+        
+        guard let validURL = url else {
+            print("wrong/ missing url when trying to extract CSV")
+            return nil
+        }
         
         var stockPrices = [PricePoint]()
         
@@ -47,16 +52,15 @@ class CSVImporter: NSObject {
         var rows = [String]()
         var stockName = String()
         
-        if let validURL = url {
-            fileContent$ = openCSVFile(url: validURL, fileName: "nono")
-            stockName = validURL.lastPathComponent
-        }
-        else {
-            fileContent$ = openCSVFile(fileName: "LOGI")
-            stockName = "LOGI"
-        }
+        fileContent$ = openCSVFile(url: validURL, fileName: "nono")
+        stockName = validURL.lastPathComponent
 
         rows = fileContent$?.components(separatedBy: NSMutableCharacterSet.newlines) ?? []
+        
+        if rows.count < 1 {
+            print("csvExtraction error - no file content")
+            return nil
+        }
 
         let expectedOrder = ["Date","Open","High","Low","Close","Adj Close","Volume"]
         if let headerArray = rows.first?.components(separatedBy: ",") {
@@ -103,6 +107,6 @@ class CSVImporter: NSObject {
             stockPrices.append(newObject)
         }
 
-        return Stock(name: stockName, dailyPrices: stockPrices)
+        return Stock(name: stockName, dailyPrices: stockPrices, fileURL: validURL)
     }
 }

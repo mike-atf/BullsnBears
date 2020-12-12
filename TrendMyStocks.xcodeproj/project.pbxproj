@@ -18,9 +18,6 @@
 		EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1908E257642F20030B331 /* CSVImporter.swift */; };
 		EAC19090257642F20030B331 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1908E257642F20030B331 /* CSVImporter.swift */; };
 		EAC19091257642F20030B331 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1908E257642F20030B331 /* CSVImporter.swift */; };
-		EAC19099257643D50030B331 /* LOGI.csv in Resources */ = {isa = PBXBuildFile; fileRef = EAC19098257643D50030B331 /* LOGI.csv */; };
-		EAC1909A257643D50030B331 /* LOGI.csv in Resources */ = {isa = PBXBuildFile; fileRef = EAC19098257643D50030B331 /* LOGI.csv */; };
-		EAC1909B257643D50030B331 /* LOGI.csv in Resources */ = {isa = PBXBuildFile; fileRef = EAC19098257643D50030B331 /* LOGI.csv */; };
 		EAC190B3257661F60030B331 /* MasterSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B2257661F60030B331 /* MasterSplitView.swift */; };
 		EAC190B4257661F60030B331 /* MasterSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B2257661F60030B331 /* MasterSplitView.swift */; };
 		EAC190B5257661F60030B331 /* MasterSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B2257661F60030B331 /* MasterSplitView.swift */; };
@@ -78,7 +75,6 @@
 		EAC1906E257641180030B331 /* TrendMyStocksUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMyStocksUITests.swift; sourceTree = "<group>"; };
 		EAC19070257641180030B331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EAC1908E257642F20030B331 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
-		EAC19098257643D50030B331 /* LOGI.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LOGI.csv; sourceTree = "<group>"; };
 		EAC190B2257661F60030B331 /* MasterSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterSplitView.swift; sourceTree = "<group>"; };
 		EAC190B9257662930030B331 /* StocksListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksListViewController.swift; sourceTree = "<group>"; };
 		EAC190C0257663200030B331 /* PublicVars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicVars.swift; sourceTree = "<group>"; };
@@ -118,7 +114,6 @@
 			isa = PBXGroup;
 			children = (
 				EAC1908E257642F20030B331 /* CSVImporter.swift */,
-				EAC19098257643D50030B331 /* LOGI.csv */,
 				EAC190C0257663200030B331 /* PublicVars.swift */,
 				EAC190CA257663730030B331 /* Stock.swift */,
 				EAC1904F257641160030B331 /* Main.storyboard */,
@@ -280,7 +275,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */,
-				EAC19099257643D50030B331 /* LOGI.csv in Resources */,
 				EAC19056257641180030B331 /* Assets.xcassets in Resources */,
 				EAC19051257641160030B331 /* Main.storyboard in Resources */,
 			);
@@ -290,7 +284,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EAC1909A257643D50030B331 /* LOGI.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,7 +291,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EAC1909B257643D50030B331 /* LOGI.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

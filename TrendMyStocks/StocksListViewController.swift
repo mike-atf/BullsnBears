@@ -14,7 +14,7 @@ class StocksListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        stocks.append(CSVImporter.csvExtractor())
+        openCSCFilesInDocumentDirectory()
     }
 
     @IBAction func addButtonAction(_ sender: Any) {
@@ -23,6 +23,47 @@ class StocksListViewController: UITableViewController {
 
             docBrowser.stockListVC = self
             self.present(docBrowser, animated: true)
+        }
+    }
+    
+    func openCSCFilesInDocumentDirectory() {
+        
+        let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        if let documentFolder = appDocumentPaths.first {
+            
+            do {
+                let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: documentFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                
+                for url in fileURLs {
+                    if url.lastPathComponent.contains(".csv") {
+                        if let stock = CSVImporter.csvExtractor(url: url) {
+                            stocks.append(stock)
+                        }
+                    }
+                    else if url.lastPathComponent.contains("Inbox") {
+                        let inboxFolder = documentFolder + "/Inbox"
+                        let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: inboxFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                        
+                        for url in fileURLs {
+                            if url.lastPathComponent.contains(".csv") {
+                                if let stock = CSVImporter.csvExtractor(url: URL(fileURLWithPath: documentFolder + url.lastPathComponent)) {
+                                    stocks.append(stock)
+                                }
+                                do {
+                                    try FileManager.default.moveItem(at: url, to: URL(fileURLWithPath: documentFolder + url.lastPathComponent))
+                                }
+                                catch let error {
+                                    print("error trying to move file out of the Inbox into the Document folder \(error)")
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch let error {
+               print(error)
+            }
+
+            
         }
     }
     
@@ -38,7 +79,10 @@ class StocksListViewController: UITableViewController {
     }
     
     public func addStock(fileURL: URL) {
-        stocks.append(CSVImporter.csvExtractor(url: fileURL))
+        if let stock = CSVImporter.csvExtractor(url: fileURL) {
+            stocks.append(stock)
+        }
+
         tableView.reloadData()
     }
     // MARK: - Table view data source
@@ -62,11 +106,35 @@ class StocksListViewController: UITableViewController {
         return cell
     }
     
-//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//
-//        performSegue(withIdentifier: "stockSelectionSegue", sender: indexPath)
-//    }
+    
 
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete")
+        { (action, view, bool) in
+            
+            let objectToDelete = stocks[indexPath.row]
+
+            if let validURL = objectToDelete.fileURL {
+                do {
+                    try FileManager.default.removeItem(at: validURL)
+                }
+                catch let error {
+                    print("couldn't remove stock file \(error)")
+                }
+            }
+            
+            stocks.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+            
+            let swipeActions = UISwipeActionsConfiguration(actions: [deleteAction])
+        
+            return swipeActions
+
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
