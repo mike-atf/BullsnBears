@@ -36,9 +36,13 @@ class StocksListViewController: UITableViewController {
                 
                 for url in fileURLs {
                     if url.lastPathComponent.contains(".csv") {
+                        guard url.startAccessingSecurityScopedResource() else {
+                            continue
+                        }
                         if let stock = CSVImporter.csvExtractor(url: url) {
                             stocks.append(stock)
                         }
+                        url.stopAccessingSecurityScopedResource()
                     }
                     else if url.lastPathComponent.contains("Inbox") {
                         let inboxFolder = documentFolder + "/Inbox"

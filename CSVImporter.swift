@@ -15,8 +15,14 @@ class CSVImporter: NSObject {
         if let fileURL = url {
 
             do {
-                let content = try String(contentsOf: fileURL, encoding: .utf8)
-                return content
+                if fileURL.startAccessingSecurityScopedResource() {
+                    let content = try String(contentsOf: fileURL, encoding: .utf8)
+                    fileURL.stopAccessingSecurityScopedResource()
+                    return content
+                }
+                else {
+                    print("\(fileURL) access denied ")
+                }
             } catch let error {
                 print("Error reading file content \(error)")
             }

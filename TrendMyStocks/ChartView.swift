@@ -255,10 +255,10 @@ class ChartView: UIView {
 //        drawTrendLine(stock: validStock, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor.systemRed)
 
         var twoLowPointTrends = validStock.twoLowPointsTrend(priceOption: .low, findOption: .minimum, timeOption: .half)
-        drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor.systemPurple)
+        drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor.systemRed)
         
         twoLowPointTrends = validStock.twoLowPointsTrend(priceOption: .low, findOption: .minimum, timeOption: .quarter)
-        drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor.systemBlue)
+        drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor.systemRed)
 
 //        drawTrendLine(stock: validStock, type: .mean, priceOption: .high, highOrLow: .maximum, quartiles: false, color: UIColor.systemGreen)
 //
@@ -292,29 +292,34 @@ class ChartView: UIView {
             meanTrendLine.stroke()
             
             // trendInfo label
-            if let validTrendInfo = trendInfo {
-                let endPrice$ = currencyFormatter.string(from: NSNumber(value: projectedPrice))!
-                let increase$ = percentFormatter.string(from: NSNumber(value: (projectedPrice - trends.first!.startPrice!) / trends.first!.startPrice!))!
-                let min$ = percentFormatter.string(from: NSNumber(value: validTrendInfo.increaseMin))!
-                let max$ = percentFormatter.string(from: NSNumber(value: validTrendInfo.increaseMax))!
-                
-                let text = " \(endPrice$) ( \(increase$) [\(min$) - \(max$)]) "
-                let newTrendLabel: UILabel = {
-                    let label = UILabel()
-                    label.font = UIFont.preferredFont(forTextStyle: .body)
-                    label.textColor = UIColor.white
-                    label.backgroundColor = color
-                    label.text = text
-                    label.sizeToFit()
-                    label.frame = CGRect(x: chartEnd.x - label.frame.width,
-                                           y: endPointY - label.frame.height,
-                                        width: label.frame.width,
-                                        height: label.frame.height)
-                   return label
-                }()
-                addSubview(newTrendLabel)
-                trendLabels.append(newTrendLabel)
-            }
+//            if let validTrendInfo = trendInfo {
+            let endPrice$ = currencyFormatter.string(from: NSNumber(value: projectedPrice))!
+            let increase$ = percentFormatter.string(from: NSNumber(value: (projectedPrice - trends.first!.startPrice!) / trends.first!.startPrice!))!
+//                let min$ = percentFormatter.string(from: NSNumber(value: validTrendInfo.increaseMin))!
+//                let max$ = percentFormatter.string(from: NSNumber(value: validTrendInfo.increaseMax))!
+            
+            let text = " \(endPrice$) (\(increase$))"
+            let newTrendLabel: UILabel = {
+                let label = UILabel()
+                label.font = UIFont.preferredFont(forTextStyle: .body)
+                label.textColor = UIColor.white
+                label.backgroundColor = color
+                label.text = text
+                label.sizeToFit()
+                var labelY = endPointY - label.frame.height
+                if labelY < chartEnd.y { labelY = chartEnd.y + label.frame.height }
+                else if labelY > chartOrigin.y {
+                    labelY = chartOrigin.y - label.frame.height
+                }
+                label.frame = CGRect(x: chartEnd.x - label.frame.width,
+                                       y: labelY,
+                                    width: label.frame.width,
+                                    height: label.frame.height)
+               return label
+            }()
+            addSubview(newTrendLabel)
+            trendLabels.append(newTrendLabel)
+//            }
         }
     }
     
