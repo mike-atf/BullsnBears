@@ -58,6 +58,12 @@
                                 <viewLayoutGuide key="contentLayoutGuide" id="JIg-Ya-QlM"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="ZAI-FU-kZr"/>
                             </scrollView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="lastDate" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CBt-jY-Yss">
+                                <rect key="frame" x="211" y="88.5" width="63" height="21"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="HJZ-h8-yHo"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -67,10 +73,13 @@
                             <constraint firstItem="RL9-y0-71P" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="10" id="bsP-Oe-jf5"/>
                             <constraint firstItem="RL9-y0-71P" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="22" id="kiX-A7-JuK"/>
                             <constraint firstItem="Doh-lM-a4B" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="20" id="oPp-hK-NnZ"/>
+                            <constraint firstItem="CBt-jY-Yss" firstAttribute="leading" secondItem="RL9-y0-71P" secondAttribute="trailing" constant="29" id="rAs-ZS-hzj"/>
+                            <constraint firstItem="CBt-jY-Yss" firstAttribute="firstBaseline" secondItem="RL9-y0-71P" secondAttribute="firstBaseline" id="t6d-6t-TOh"/>
                             <constraint firstItem="Doh-lM-a4B" firstAttribute="top" secondItem="RL9-y0-71P" secondAttribute="bottom" constant="16" id="wGk-P7-3pH"/>
                         </constraints>
                         <connections>
                             <outlet property="contentView" destination="B5Z-ih-tAD" id="zk0-qN-Goi"/>
+                            <outlet property="lastDateLabel" destination="CBt-jY-Yss" id="4OC-UQ-dvg"/>
                             <outlet property="meanTrendLabel" destination="oO1-Ti-lKG" id="3Kx-yV-yKj"/>
                             <outlet property="scrollView" destination="Doh-lM-a4B" id="aU4-OR-VFs"/>
                             <outlet property="titleLabel" destination="RL9-y0-71P" id="KeW-NM-aGj"/>
@@ -95,7 +104,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="stockListCell" textLabel="B01-u4-nBe" style="IBUITableViewCellStyleDefault" id="1l5-i6-cpz">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="stockListCell" textLabel="B01-u4-nBe" detailTextLabel="s7C-GE-7RU" style="IBUITableViewCellStyleValue1" id="1l5-i6-cpz">
                                 <rect key="frame" x="0.0" y="28" width="420" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="1l5-i6-cpz" id="3Cb-Zg-Ep2">
@@ -103,7 +112,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" tag="10" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="B01-u4-nBe">
-                                            <rect key="frame" x="16" y="0.0" width="288" height="43.5"/>
+                                            <rect key="frame" x="16" y="5" width="52.5" height="33.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" multipleTouchEnabled="YES" tag="20" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="s7C-GE-7RU">
+                                            <rect key="frame" x="260" y="15" width="44" height="20.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>

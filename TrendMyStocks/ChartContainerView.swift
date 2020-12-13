@@ -21,6 +21,7 @@ class ChartContainerView: UIView {
     @IBOutlet var contentView: ChartView!
     @IBOutlet var meanTrendLabel: UILabel!
     @IBOutlet var trendRangeLabel: UILabel!
+    @IBOutlet var lastDateLabel: UILabel!
     
     
     let percentFormatter: NumberFormatter = {
@@ -30,7 +31,7 @@ class ChartContainerView: UIView {
         formatter.minimumIntegerDigits = 1
         return formatter
     }()
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -54,6 +55,7 @@ class ChartContainerView: UIView {
             let offset = scroll.contentSize.width - scrollView.bounds.width
             scroll.setContentOffset(CGPoint(x: offset, y: 0), animated: false)
         }
+        
     }
     
 }

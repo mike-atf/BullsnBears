@@ -11,6 +11,17 @@ class StocksListViewController: UITableViewController {
     
     @IBOutlet var addButton: UIBarButtonItem!
     
+    let timeFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.day]
+        formatter.unitsStyle = .brief
+        formatter.zeroFormattingBehavior = .pad
+        formatter.maximumUnitCount = 3
+        formatter.includesApproximationPhrase = true
+        return formatter
+    }()
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -103,8 +114,14 @@ class StocksListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath)
 
-        if let label = cell.contentView.viewWithTag(10) as? UILabel {
-            label.text = stocks[indexPath.row].name
+            
+        if let title = cell.contentView.viewWithTag(10) as? UILabel {
+            title.text = stocks[indexPath.row].name
+        }
+        
+        if let detail = cell.contentView.viewWithTag(20) as? UILabel {
+            let timeSinceLastStockDate = Date().timeIntervalSince(stocks[indexPath.row].dailyPrices.last!.tradingDate)
+            detail.text = timeFormatter.string(from: timeSinceLastStockDate)
         }
 
         return cell
