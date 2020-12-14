@@ -10,11 +10,6 @@ import UIKit
 class ChartContainerView: UIView {
 
     var stockToShow: Stock?
-//    {
-//        didSet {
-//            setNeedsDisplay()
-//        }
-//    }
     
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var scrollView: UIScrollView!

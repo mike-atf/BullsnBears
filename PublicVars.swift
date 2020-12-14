@@ -33,3 +33,15 @@ enum QuarterOption {
     case half
     case quarter
 }
+
+struct Correlation {
+    var incline = Double()
+    var yIntercept = Double()
+    var coEfficient = Double()
+    
+    init(m: Double, b: Double, r: Double) {
+        self.incline = m
+        self.yIntercept = b
+        self.coEfficient = r
+    }
+}
