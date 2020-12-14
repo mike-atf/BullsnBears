@@ -15,9 +15,10 @@ class ChartContainerView: UIView {
     @IBOutlet var scrollView: UIScrollView!
     @IBOutlet var contentView: ChartView!
     @IBOutlet var meanTrendLabel: UILabel!
-    @IBOutlet var trendRangeLabel: UILabel!
-    @IBOutlet var lastDateLabel: UILabel!
     
+    @IBOutlet var button1: CheckButton!
+    @IBOutlet var button2: CheckButton!
+    @IBOutlet var button3: CheckButton!
     
     let percentFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -34,10 +35,16 @@ class ChartContainerView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
+        tintColor = UIColor.label
+                
     }
     
     public func configure(with: Stock) {
+        
+        button1.configure(title: "", color: UIColor(named: "Red")!)
+        button2.configure(title: "", color: UIColor.systemBlue)
+        button3.configure(title: "", color: UIColor(named: "Green")!)
+        
         stockToShow = with
         if let validLabel = titleLabel {
             validLabel.text = stockToShow?.name
@@ -53,4 +60,29 @@ class ChartContainerView: UIView {
         
     }
     
+    @IBAction func button3Action(_ sender: CheckButton) {
+        sender.active.toggle()
+        sender.setNeedsDisplay()
+        
+        contentView.drawHighs = sender.active
+        contentView.setNeedsDisplay()
+    }
+    
+    @IBAction func button2Action(_ sender: CheckButton) {
+        sender.active.toggle()
+        sender.setNeedsDisplay()
+        
+        contentView.drawRegression = sender.active
+        contentView.setNeedsDisplay()
+
+    }
+    
+    @IBAction func button1Action(_ sender: CheckButton) {
+        sender.active.toggle()
+        sender.setNeedsDisplay()
+        
+        contentView.drawLows = sender.active
+        contentView.setNeedsDisplay()
+        
+    }
 }

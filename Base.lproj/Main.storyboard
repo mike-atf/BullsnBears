@@ -16,21 +16,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="703.5" height="768"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Stock name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RL9-y0-71P">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" text="Stock name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RL9-y0-71P">
                                 <rect key="frame" x="10" y="72" width="172" height="41"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Trend range (low)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MHU-Cw-cot">
-                                <rect key="frame" x="377" y="88.5" width="135" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doh-lM-a4B">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doh-lM-a4B">
                                 <rect key="frame" x="20" y="129" width="664" height="619"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Mean trend (low)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oO1-Ti-lKG">
                                         <rect key="frame" x="266.5" y="299" width="129.5" height="20.5"/>
@@ -39,51 +33,66 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="TrendMyStocks" customModuleProvider="target">
+                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="TrendMyStocks" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="3320" height="619"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                        <connections>
-                                            <outlet property="widthConstraint" destination="nCS-ry-DVy" id="9gC-Dq-kMR"/>
-                                        </connections>
                                     </view>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="top" secondItem="Doh-lM-a4B" secondAttribute="top" id="Iei-LA-PaS"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="JwZ-tn-17v"/>
-                                    <constraint firstAttribute="bottom" secondItem="B5Z-ih-tAD" secondAttribute="bottom" id="Nox-67-sIg"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" id="ZTM-Db-tNJ"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="width" secondItem="Doh-lM-a4B" secondAttribute="width" multiplier="5" id="nCS-ry-DVy"/>
-                                    <constraint firstAttribute="trailing" secondItem="B5Z-ih-tAD" secondAttribute="trailing" id="uJg-o2-bID"/>
-                                </constraints>
                                 <viewLayoutGuide key="contentLayoutGuide" id="JIg-Ya-QlM"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="ZAI-FU-kZr"/>
                             </scrollView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="lastDate" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CBt-jY-Yss">
-                                <rect key="frame" x="211" y="88.5" width="63" height="21"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MVz-dh-kgA" customClass="CheckButton" customModule="TrendMyStocks" customModuleProvider="target">
+                                <rect key="frame" x="212" y="76" width="33" height="33"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="MVz-dh-kgA" secondAttribute="height" multiplier="1:1" id="HBs-ps-l8O"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="button1Action:" destination="DMz-IK-SGN" eventType="touchUpInside" id="nh3-IR-h7E"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pyF-an-nSb" customClass="CheckButton" customModule="TrendMyStocks" customModuleProvider="target">
+                                <rect key="frame" x="264" y="76" width="32.5" height="33"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="pyF-an-nSb" secondAttribute="height" multiplier="1:1" id="qGc-0v-etA"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="button2Action:" destination="DMz-IK-SGN" eventType="touchUpInside" id="sBm-VO-5Y4"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vMW-cw-G3E" userLabel="Button3" customClass="CheckButton" customModule="TrendMyStocks" customModuleProvider="target">
+                                <rect key="frame" x="316.5" y="76" width="33" height="33"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="vMW-cw-G3E" secondAttribute="height" multiplier="1:1" id="wSD-I9-LoS"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="button3Action:" destination="DMz-IK-SGN" eventType="touchUpInside" id="EGl-Ad-wig"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="HJZ-h8-yHo"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="HJZ-h8-yHo" firstAttribute="bottom" secondItem="Doh-lM-a4B" secondAttribute="bottom" constant="20" id="Hdy-Aq-Als"/>
-                            <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="Doh-lM-a4B" secondAttribute="trailing" constant="19.5" id="MDZ-3g-dxC"/>
-                            <constraint firstItem="RL9-y0-71P" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="10" id="bsP-Oe-jf5"/>
-                            <constraint firstItem="RL9-y0-71P" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="22" id="kiX-A7-JuK"/>
-                            <constraint firstItem="Doh-lM-a4B" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="20" id="oPp-hK-NnZ"/>
-                            <constraint firstItem="CBt-jY-Yss" firstAttribute="leading" secondItem="RL9-y0-71P" secondAttribute="trailing" constant="29" id="rAs-ZS-hzj"/>
-                            <constraint firstItem="CBt-jY-Yss" firstAttribute="firstBaseline" secondItem="RL9-y0-71P" secondAttribute="firstBaseline" id="t6d-6t-TOh"/>
-                            <constraint firstItem="Doh-lM-a4B" firstAttribute="top" secondItem="RL9-y0-71P" secondAttribute="bottom" constant="16" id="wGk-P7-3pH"/>
+                            <constraint firstItem="pyF-an-nSb" firstAttribute="centerY" secondItem="RL9-y0-71P" secondAttribute="centerY" id="2C6-vO-rh2"/>
+                            <constraint firstItem="RL9-y0-71P" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="22" id="656-QT-5TR"/>
+                            <constraint firstItem="pyF-an-nSb" firstAttribute="height" secondItem="RL9-y0-71P" secondAttribute="height" multiplier="0.8" id="77x-8t-Wms"/>
+                            <constraint firstItem="MVz-dh-kgA" firstAttribute="height" secondItem="RL9-y0-71P" secondAttribute="height" multiplier="0.8" id="FgN-bV-N3J"/>
+                            <constraint firstItem="RL9-y0-71P" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="10" id="Fyg-YK-Cx5"/>
+                            <constraint firstItem="vMW-cw-G3E" firstAttribute="height" secondItem="RL9-y0-71P" secondAttribute="height" multiplier="0.8" id="OBv-iz-BGX"/>
+                            <constraint firstItem="vMW-cw-G3E" firstAttribute="leading" secondItem="pyF-an-nSb" secondAttribute="trailing" constant="20" id="TPp-DN-YCJ"/>
+                            <constraint firstItem="pyF-an-nSb" firstAttribute="leading" secondItem="MVz-dh-kgA" secondAttribute="trailing" constant="19" id="ZHj-M2-zd5"/>
+                            <constraint firstItem="MVz-dh-kgA" firstAttribute="centerY" secondItem="RL9-y0-71P" secondAttribute="centerY" id="maz-h8-bSx"/>
+                            <constraint firstItem="MVz-dh-kgA" firstAttribute="leading" secondItem="RL9-y0-71P" secondAttribute="trailing" constant="30" id="sNp-1Y-4NU"/>
+                            <constraint firstItem="vMW-cw-G3E" firstAttribute="centerY" secondItem="RL9-y0-71P" secondAttribute="centerY" id="tKs-G2-mhF"/>
                         </constraints>
                         <connections>
+                            <outlet property="button1" destination="MVz-dh-kgA" id="3GY-42-YzN"/>
+                            <outlet property="button2" destination="pyF-an-nSb" id="os7-EU-Vfy"/>
+                            <outlet property="button3" destination="vMW-cw-G3E" id="GcE-I3-GyE"/>
                             <outlet property="contentView" destination="B5Z-ih-tAD" id="zk0-qN-Goi"/>
-                            <outlet property="lastDateLabel" destination="CBt-jY-Yss" id="4OC-UQ-dvg"/>
                             <outlet property="meanTrendLabel" destination="oO1-Ti-lKG" id="3Kx-yV-yKj"/>
                             <outlet property="scrollView" destination="Doh-lM-a4B" id="aU4-OR-VFs"/>
                             <outlet property="titleLabel" destination="RL9-y0-71P" id="KeW-NM-aGj"/>
-                            <outlet property="trendRangeLabel" destination="MHU-Cw-cot" id="CsX-wv-tEl"/>
                         </connections>
                     </view>
                     <navigationItem key="navigationItem" id="9tx-0k-L9K"/>
