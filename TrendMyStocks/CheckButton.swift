@@ -21,6 +21,7 @@ class CheckButton: UIButton {
         super.init(coder: aDecoder)
         
         self.color = UIColor.label
+        backgroundColor = UIColor.clear
     }
     
     func configure(title: String, color: UIColor) {

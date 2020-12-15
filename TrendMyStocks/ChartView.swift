@@ -145,10 +145,10 @@ class ChartView: UIView {
                 
         
 // Y axis
-       chartOrigin.x = rect.width * 0.1
-        chartEnd.y = rect.height * 0.1
-       chartOrigin.y = rect.height * 0.9
-        chartEnd.x = rect.width * 0.9
+       chartOrigin.x = rect.width * 0
+        chartEnd.y = rect.height * 0
+       chartOrigin.y = rect.height * 0.95
+        chartEnd.x = rect.width * 0.95
         chartAreaSize.height = chartOrigin.y - chartEnd.y
         chartAreaSize.width = chartEnd.x - chartOrigin.x
        
