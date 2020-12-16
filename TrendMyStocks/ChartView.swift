@@ -234,18 +234,15 @@ class ChartView: UIView {
             drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Red") ?? UIColor.systemRed)
 
             twoLowPointTrends = validStock.twoLowPointsTrend(priceOption: .low, findOption: .minimum, timeOption: .quarter)
-            drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Red") ?? UIColor.systemRed)
+            drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Red") ?? UIColor.systemRed, dash: true)
+            
+            plotRegressionLine(from: dateRange!.last!.addingTimeInterval(-121*24*3600), priceOption: .low, highorLow: .minimum, color: UIColor(named: "Red") ?? UIColor.systemRed)
         }
         
         if drawRegression {
             plotRegressionLine(priceOption: .close, highorLow: .minimum, color: UIColor.systemBlue)
             
-            plotRegressionLine(from: dateRange!.last!.addingTimeInterval(-121*24*3600), priceOption: .close, highorLow: .minimum, color: UIColor.systemBlue)
-            
-            plotRegressionLine(from: dateRange!.last!.addingTimeInterval(-121*24*3600), priceOption: .low, highorLow: .minimum, color: UIColor(named: "Red") ?? UIColor.systemRed)
-            
-            plotRegressionLine(from: dateRange!.last!.addingTimeInterval(-121*24*3600), priceOption: .high, highorLow: .maximum, color: UIColor(named: "Green") ?? UIColor.systemGreen)
-
+            plotRegressionLine(from: dateRange!.last!.addingTimeInterval(-121*24*3600), priceOption: .close, highorLow: .minimum, color: UIColor.systemBlue, dash: true)
         }
         
         if drawHighs {
@@ -253,12 +250,15 @@ class ChartView: UIView {
             drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Green") ?? UIColor.systemGreen)
 
             twoLowPointTrends = validStock.twoLowPointsTrend(priceOption: .high, findOption: .maximum, timeOption: .quarter)
-            drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Green") ?? UIColor.systemGreen)
+            drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Green") ?? UIColor.systemGreen, dash: true)
+            
+            plotRegressionLine(from: dateRange!.last!.addingTimeInterval(-121*24*3600), priceOption: .high, highorLow: .maximum, color: UIColor(named: "Green") ?? UIColor.systemGreen)
+
 
         }
     }
     
-    public func drawTrendLine(stock: Stock, trends: [StockTrend]? = nil ,type: TrendType, priceOption: PricePointOptions, highOrLow: FindOptions, quartiles: Bool, color: UIColor, from: Date? = nil, to: Date? = nil) {
+    public func drawTrendLine(stock: Stock, trends: [StockTrend]? = nil ,type: TrendType, priceOption: PricePointOptions, highOrLow: FindOptions, quartiles: Bool, color: UIColor, from: Date? = nil, to: Date? = nil, dash: Bool? = nil) {
         
         var trendStart = from ?? dateRange!.first!
         let trendEnd = to ?? dateRange!.last!
@@ -277,6 +277,10 @@ class ChartView: UIView {
 
             meanTrendLine.addLine(to: plotPricePoint(pricePoint: PriceDate(trendEnd, projectedPrice)))
             meanTrendLine.lineWidth = 2.0
+            if from != nil || (dash ?? false) {
+                let dashPattern: [CGFloat] = [5,5]
+                meanTrendLine.setLineDash(dashPattern, count: dashPattern.count, phase: 0)
+            }
             color.setStroke()
             meanTrendLine.stroke()
             
@@ -285,7 +289,7 @@ class ChartView: UIView {
         }
     }
     
-    public func plotRegressionLine(from: Date? = nil, to: Date? = nil, priceOption: PricePointOptions, highorLow: FindOptions, color: UIColor) {
+    public func plotRegressionLine(from: Date? = nil, to: Date? = nil, priceOption: PricePointOptions, highorLow: FindOptions, color: UIColor, dash: Bool? = nil) {
         
         guard let validStock = stockToShow else {
             return
@@ -305,6 +309,11 @@ class ChartView: UIView {
             let regressionLine = UIBezierPath()
             regressionLine.move(to: startPoint)
             regressionLine.addLine(to: endPoint)
+            if (dash ?? false) {
+                let dashPattern: [CGFloat] = [5,5]
+                regressionLine.setLineDash(dashPattern, count: dashPattern.count, phase: 0)
+            }
+
             regressionLine.lineWidth = 2.0
             color.setStroke()
             regressionLine.stroke()
