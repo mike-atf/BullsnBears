@@ -38,10 +38,11 @@ class ChartView: UIView {
     var chartOrigin = CGPoint()
     var chartEnd = CGPoint()
     
-    var drawLows = false
-    var drawRegression = false
-    var drawHighs = false
-    
+    var trendsToShow = [TrendProperties]()
+    var buttonGroupTime = [CheckButton]()
+    var buttonGroupType = [CheckButton]()
+
+       
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -101,7 +102,7 @@ class ChartView: UIView {
         lowestPriceInRange = validStock.lowestPrice()
         highestPriceInRange = validStock.highestPrice()
         dateRange = validStock.priceDateRange()
-        dateRange![1] = dateRange!.last!.addingTimeInterval(foreCastTime)
+        dateRange![1] = Date().addingTimeInterval(foreCastTime)
         
         guard lowestPriceInRange != nil else { return }
         guard highestPriceInRange != nil else { return }
@@ -215,114 +216,158 @@ class ChartView: UIView {
         }
         trendLabels.removeAll()
 
-// low trends
-        let trends = validStock.longerTrends(priceOption: .low, findOption: .minimum)
-        let autoTrends2 = UIBezierPath()
-        var point = plotPricePoint(pricePoint: PriceDate(trends.first!.startDate, trends.first!.startPrice!))
-        autoTrends2.move(to: point)
+        var point = CGPoint()
         
-        for i in 1..<trends.count {
-            point = plotPricePoint(pricePoint: PriceDate(trends[i].startDate, trends[i].startPrice!))
-            autoTrends2.addLine(to: point)
-        }
-        autoTrends2.lineWidth = 2.0
-        UIColor.systemPurple.setStroke()
-        autoTrends2.stroke()
+// low point connection lines
+//        let trends = validStock.longerTrends(priceOption: .low, findOption: .minimum)
+//        let autoTrends2 = UIBezierPath()
+//            point = plotPricePoint(pricePoint: PriceDate(trends.first!.startDate, trends.first!.startPrice!))
+//        autoTrends2.move(to: point)
+//
+//        for i in 1..<trends.count {
+//            point = plotPricePoint(pricePoint: PriceDate(trends[i].startDate, trends[i].startPrice!))
+//            autoTrends2.addLine(to: point)
+//        }
+//        autoTrends2.lineWidth = 2.0
+//        UIColor.systemPurple.setStroke()
+//        autoTrends2.stroke()
 
-        if drawLows {
-            var twoLowPointTrends = validStock.twoLowPointsTrend(priceOption: .low, findOption: .minimum, timeOption: .half)
-            drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Red") ?? UIColor.systemRed)
-
-            twoLowPointTrends = validStock.twoLowPointsTrend(priceOption: .low, findOption: .minimum, timeOption: .quarter)
-            drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Red") ?? UIColor.systemRed, dash: true)
-            
-            plotRegressionLine(from: dateRange!.last!.addingTimeInterval(-121*24*3600), priceOption: .low, highorLow: .minimum, color: UIColor(named: "Red") ?? UIColor.systemRed)
-        }
         
-        if drawRegression {
-            plotRegressionLine(priceOption: .close, highorLow: .minimum, color: UIColor.systemBlue)
-            
-            plotRegressionLine(from: dateRange!.last!.addingTimeInterval(-121*24*3600), priceOption: .close, highorLow: .minimum, color: UIColor.systemBlue, dash: true)
+// major trends
+
+//        let macroTrends = validStock.findMajorTrends(priceOption: .close, findOption: .minimum, changeThreshold: 0.2)
+//        let minimumTrend = validStock.findMajorTrend2(priceOption: .low, findOption: .minimum)
+//        let maximumTrend = validStock.findMajorTrend2(priceOption: .high, findOption: .maximum)
+//        let macroTrends = [minimumTrend,maximumTrend]
+//        
+//        trendsToShow.append(minimumTrend)
+//        trendsToShow.append(maximumTrend)
+//        
+//        let autoTrends3 = UIBezierPath()
+////        point = plotPricePoint(pricePoint: PriceDate(macroTrends.first!.startDate, macroTrends.first!.startPrice!))
+////        autoTrends3.move(to: point)
+//
+//        for i in 0..<macroTrends.count {
+//            point = plotPricePoint(pricePoint: PriceDate(macroTrends[i].startDate, macroTrends[i].startPrice!))
+//            autoTrends3.move(to: point)
+//            point = plotPricePoint(pricePoint: PriceDate(macroTrends[i].endDate, macroTrends[i].endPrice!))
+//            autoTrends3.addLine(to: point)
+//        }
+////        point = plotPricePoint(pricePoint: PriceDate(macroTrends.last!.endDate, macroTrends.last!.endPrice!))
+////        autoTrends3.addLine(to: point)
+//        
+//
+//
+//        autoTrends3.lineWidth = 2.0
+//        UIColor.systemTeal.setStroke()
+//        autoTrends3.stroke()
+
+        trendsToShow.forEach { (trend) in
+            drawTrend(stock: validStock, trendProperties: trend)
         }
-        
-        if drawHighs {
-            var twoLowPointTrends = validStock.twoLowPointsTrend(priceOption: .high, findOption: .maximum, timeOption: .half)
-            drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Green") ?? UIColor.systemGreen)
-
-            twoLowPointTrends = validStock.twoLowPointsTrend(priceOption: .high, findOption: .maximum, timeOption: .quarter)
-            drawTrendLine(stock: validStock, trends: twoLowPointTrends, type: .mean, priceOption: .low, highOrLow: .minimum, quartiles: false ,color: UIColor(named: "Green") ?? UIColor.systemGreen, dash: true)
-            
-            plotRegressionLine(from: dateRange!.last!.addingTimeInterval(-121*24*3600), priceOption: .high, highorLow: .maximum, color: UIColor(named: "Green") ?? UIColor.systemGreen)
 
 
-        }
     }
     
-    public func drawTrendLine(stock: Stock, trends: [StockTrend]? = nil ,type: TrendType, priceOption: PricePointOptions, highOrLow: FindOptions, quartiles: Bool, color: UIColor, from: Date? = nil, to: Date? = nil, dash: Bool? = nil) {
+    private func drawTrend(stock: Stock, trendProperties: TrendProperties) {
         
-        var trendStart = from ?? dateRange!.first!
-        let trendEnd = to ?? dateRange!.last!
-
-        let trends = trends ?? stock.findTrends(from: trendStart, to: trendEnd, priceOption: priceOption, findOption: highOrLow)
+        var trendDuration = dateRange!.last!.timeIntervalSince(dateRange!.first!)
         
-        let trendInfo = stock.trendsAnalysis(trends: trends, type: type, priceOption: priceOption, minOrMax: highOrLow, cutOffQuartiles: quartiles)
+        switch trendProperties.time {
+        case .full:
+            trendDuration = dateRange!.last!.timeIntervalSince(dateRange!.first!)
+        case .quarter:
+            trendDuration = trendDuration / 4
+        case .half:
+            trendDuration = trendDuration / 2
+        case .month:
+            trendDuration = 30*24*3600
+        case .none:
+            trendDuration = dateRange!.last!.timeIntervalSince(dateRange!.first!)
+        }
         
-        if let validIncline = trendInfo?.incline {
-                        
-            trendStart = max(trendStart, trends.first!.startDate)
-            let startPrice = trends.first!.startPrice!
-            let projectedPrice = startPrice + validIncline * trendEnd.timeIntervalSince(trendStart)
-            let meanTrendLine = UIBezierPath()
-            meanTrendLine.move(to: plotPricePoint(pricePoint: PriceDate(trends.first!.startDate, trends.first!.startPrice!)))
-
-            meanTrendLine.addLine(to: plotPricePoint(pricePoint: PriceDate(trendEnd, projectedPrice)))
-            meanTrendLine.lineWidth = 2.0
-            if from != nil || (dash ?? false) {
-                let dashPattern: [CGFloat] = [5,5]
-                meanTrendLine.setLineDash(dashPattern, count: dashPattern.count, phase: 0)
+        let trendStart = dateRange!.last!.addingTimeInterval(-trendDuration-foreCastTime)
+        let trendEnd = dateRange!.last!
+        
+        var startPoint = CGPoint()
+        var endPoint = CGPoint()
+        var startPrice = Double()
+        var projectedPrice = Double()
+        var coCoEff:Double?
+        
+        if trendProperties.type == TrendType.regression {
+            // draw regression trends
+            if let correlation = stock.correlationTrend2(properties: trendProperties) {
+                let a = PriceDate(date:trendStart, price: correlation.yIntercept)
+                let b = PriceDate(date:trendEnd, price: correlation.yIntercept + correlation.incline * trendEnd.timeIntervalSince(trendStart))
+                
+                coCoEff = correlation.coEfficient
+                startPrice = a.price
+                projectedPrice = b.price
+                startPoint = plotPricePoint(pricePoint: a)
+                endPoint = plotPricePoint(pricePoint: b)
             }
-            color.setStroke()
-            meanTrendLine.stroke()
+        }
+        else {
+            // twoPoints
+//            let trend = stock.twoPointTrend(properties: trendProperties)
+            let trend = stock.findMajorTrend2(properties: trendProperties)
+            startPrice = trend.startPrice!
+            projectedPrice = startPrice + trend.incline! * dateRange!.last!.timeIntervalSince(trend.startDate)
+            startPoint = plotPricePoint(pricePoint: PriceDate(trend.startDate,startPrice))
+            endPoint = plotPricePoint(pricePoint: PriceDate(trendEnd, projectedPrice))
             
-            let increase = (projectedPrice - trends.first!.startPrice!) / trends.first!.startPrice!
-            addTrendLabel(price: projectedPrice, increase: increase, color: color)
-        }
-    }
-    
-    public func plotRegressionLine(from: Date? = nil, to: Date? = nil, priceOption: PricePointOptions, highorLow: FindOptions, color: UIColor, dash: Bool? = nil) {
-        
-        guard let validStock = stockToShow else {
-            return
-        }
-        
-        let start = from ?? dateRange!.first!
-        let end = to ?? dateRange!.last!
+            //regression
+//            if let correlation = stock.correlationTrend2(properties: trendProperties) {
+//                let a = PriceDate(date:trendStart, price: correlation.yIntercept)
+//                let b = PriceDate(date:trendEnd, price: correlation.yIntercept + correlation.incline * trendEnd.timeIntervalSince(trendStart))
+//
+//                coCoEff = correlation.coEfficient
+//                startPrice = a.price
+//                projectedPrice = b.price
+//                startPoint = plotPricePoint(pricePoint: a)
+//                endPoint = plotPricePoint(pricePoint: b)
+//            }
 
+        }
         
-        if let correlation = validStock.correlationTrend(priceOption: priceOption, minOrMax: highorLow, from: start, end) {
-            let a = PriceDate(date:start, price: correlation.yIntercept)
-            let b = PriceDate(date:end, price: correlation.yIntercept + correlation.incline * end.timeIntervalSince(start))
+        let trendLine = UIBezierPath()
+        trendLine.move(to:startPoint)
+
+        trendLine.addLine(to: endPoint)
+        trendLine.lineWidth = 2.0
+        if trendProperties.dash {
             
-            let startPoint = plotPricePoint(pricePoint: a)
-            let endPoint = plotPricePoint(pricePoint: b)
-            
-            let regressionLine = UIBezierPath()
-            regressionLine.move(to: startPoint)
-            regressionLine.addLine(to: endPoint)
-            if (dash ?? false) {
-                let dashPattern: [CGFloat] = [5,5]
-                regressionLine.setLineDash(dashPattern, count: dashPattern.count, phase: 0)
+            var dashPattern = [CGFloat]()
+            if trendProperties.time == TrendTimeOption.quarter {
+                dashPattern = [6,7]
             }
-
-            regressionLine.lineWidth = 2.0
-            color.setStroke()
-            regressionLine.stroke()
-            
-            let projectedPrice = correlation.yIntercept + correlation.incline * dateRange!.last!.timeIntervalSince(start)
-            let increase = (projectedPrice - correlation.yIntercept) / correlation.yIntercept
-            
-            addTrendLabel(price: projectedPrice, increase: increase, correlation: correlation.coEfficient, color: color)
+            else if trendProperties.time == TrendTimeOption.month {
+                dashPattern = [3,7]
+            }
+            else {
+                dashPattern = [7,7]
+            }
+            trendLine.setLineDash(dashPattern, count: dashPattern.count, phase: 0)
         }
+        trendProperties.color.setStroke()
+        trendLine.stroke()
+        
+        var reliability: Double?
+        if trendProperties.type != .regression {
+            if let failureRate = stock.testTwoPointReliability(_covering: trendDuration, trendType: trendProperties.type) {
+                reliability = 1 - failureRate
+            }
+        }
+        else {
+            if let failureRate = stock.testRegressionReliability(_covering: trendDuration, trendType: trendProperties.type) {
+                reliability = 1 - failureRate
+            }
+        }
+        
+        let increase = (projectedPrice - startPrice) / startPrice
+        let increaseFromLatest = (projectedPrice - stock.dailyPrices.last!.close) / stock.dailyPrices.last!.close
+        addTrendLabel(price: projectedPrice, increase1: increase, increase2: increaseFromLatest, correlation: coCoEff , reliability: reliability,color: trendProperties.color)
 
     }
     
@@ -334,43 +379,65 @@ class ChartView: UIView {
         return CGPoint(x: datePoint, y: point)
     }
     
-    private func addTrendLabel(price: Double, increase: Double, correlation: Double? = nil, color: UIColor) {
+    private func addTrendLabel(price: Double, increase1: Double, increase2: Double? = nil, correlation: Double? = nil, reliability: Double? = nil, color: UIColor) {
         
         let endPrice$ = currencyFormatter.string(from: NSNumber(value: price))!
-        let increase$ = percentFormatter.string(from: NSNumber(value: increase))!
-        let endPointY = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - price) / (maxPrice - minPrice))
+        let increase1$ = percentFormatter.string(from: NSNumber(value: increase1))!
+        var increase2$ = ""
+        if let validIncrease2 = increase2 {
+            increase2$ = percentFormatter.string(from: NSNumber(value: validIncrease2))!
+        }
+        let labelMidY = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - price) / (maxPrice - minPrice))
+//        let plotDisplayRect = CGRect(origin: chartOrigin, size: chartAreaSize)
         
-        var text = " \(endPrice$) (\(increase$)) "
+        var text = " \(endPrice$) = \(increase1$) \n From latest: \(increase2$) "
         if let r = correlation {
-            text = text + "r=" + numberFormatter.string(from: NSNumber(value: r))! + " "
+            text = text + "\n r=" + numberFormatter.string(from: NSNumber(value: r))! + " "
+        }
+        if let r = reliability {
+            text = text + "\n R=" + percentFormatter.string(from: NSNumber(value: r))! + " "
         }
         
         let newTrendLabel: UILabel = {
             let label = UILabel()
-            label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+            label.numberOfLines = 0
+            label.font = UIFont.preferredFont(forTextStyle: .callout)
             label.textColor = UIColor.white
             label.backgroundColor = color
             label.text = text
             label.sizeToFit()
-            var labelY = endPointY - label.frame.height
-            if labelY < chartEnd.y { labelY = chartEnd.y + label.frame.height }
-            else if labelY > chartOrigin.y {
-                labelY = chartOrigin.y - label.frame.height
+            
+            let labelTop = labelMidY - label.frame.height / 2
+            let labelBottom = labelMidY + label.frame.height / 2
+            
+            label.frame = label.frame.offsetBy(dx: chartEnd.x - label.frame.width, dy:labelTop)
+            
+            if labelTop < chartEnd.y {
+                label.frame.origin = CGPoint(x: chartEnd.x - label.frame.width, y: 0)
             }
-            label.frame = CGRect(x: chartEnd.x - label.frame.width,
-                                   y: labelY,
-                                width: label.frame.width,
-                                height: label.frame.height)
-            trendLabels.forEach { (tLabel) in
-                if label.frame.intersects(tLabel.frame) {
-                    label.frame = tLabel.frame.offsetBy(dx: 0, dy: tLabel.frame.height)
-                }
+            else if labelBottom > chartEnd.y + chartAreaSize.height {
+                label.frame = label.frame.offsetBy(dx: 0, dy: labelBottom + chartEnd.y - chartAreaSize.height)
             }
+            
             return label
         }()
+    
         addSubview(newTrendLabel)
         trendLabels.append(newTrendLabel)
-
+        
+        trendLabels.sort { (l0, l1) -> Bool in
+            if l0.frame.minY < l1.frame.minY { return true }
+            else { return false }
+        }
+        
+        for i in 0..<trendLabels.count {
+            for j in 0..<i {
+                if trendLabels[i].frame.intersects(trendLabels[j].frame) {
+                    let intersect = trendLabels[i].frame.intersection(trendLabels[j].frame)
+                    trendLabels[i].frame = trendLabels[i].frame.offsetBy(dx: 0, dy: intersect.height)
+                }
+            }
+        }
     }
     
     private func findYAxisValues(min: Double, max: Double) -> Double {
@@ -389,3 +456,51 @@ class ChartView: UIView {
     }
     
 }
+
+extension ChartView: ChartButtonDelegate {
+        
+    var timeButtons: [CheckButton] {
+        get {
+            return buttonGroupTime
+        }
+        set {
+            buttonGroupTime = newValue
+        }
+    }
+    
+    var typeButtons: [CheckButton] {
+        get {
+            return buttonGroupType
+        }
+        set {
+            buttonGroupType = newValue
+        }
+    }
+    
+    
+    func trendButtonPressed(button: CheckButton) {
+                
+        let typesShown = buttonGroupType.filter { (button) -> Bool in
+            return button.active
+        }
+        
+        let timesShown = buttonGroupTime.filter { (button) -> Bool in
+            return button.active
+        }
+        
+        trendsToShow.removeAll()
+        for typeButton in typesShown {
+            for timeButton in timesShown {
+                var dashedLine = true
+                if timeButton.associatedTrendTime == TrendTimeOption.full { dashedLine = false }
+                let newTrend = TrendProperties(type: typeButton.associatedTrendType!, time: timeButton.associatedTrendTime ?? TrendTimeOption.full, dash: dashedLine)
+                trendsToShow.append(newTrend)
+            }
+        }
+        
+        setNeedsDisplay()
+    }
+    
+    
+}
+

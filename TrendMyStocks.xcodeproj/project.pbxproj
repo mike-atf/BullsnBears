@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EA163F77258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
+		EA163F78258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
+		EA163F79258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EAA099C42588020B00DBB93C /* CheckButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA099C32588020B00DBB93C /* CheckButton.swift */; };
 		EAC1904A257641160030B331 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC19049257641160030B331 /* AppDelegate.swift */; };
 		EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1904B257641160030B331 /* SceneDelegate.swift */; };
@@ -40,6 +43,24 @@
 		EAC190F42577E3B60030B331 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190F32577E3B60030B331 /* ChartView.swift */; };
 		EAC190F52577E3B60030B331 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190F32577E3B60030B331 /* ChartView.swift */; };
 		EAC190F62577E3B60030B331 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190F32577E3B60030B331 /* ChartView.swift */; };
+		EAC2FC3C25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3825A0B76B0060F387 /* DCFValuation+CoreDataClass.swift */; };
+		EAC2FC3D25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3825A0B76B0060F387 /* DCFValuation+CoreDataClass.swift */; };
+		EAC2FC3E25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3825A0B76B0060F387 /* DCFValuation+CoreDataClass.swift */; };
+		EAC2FC3F25A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3925A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift */; };
+		EAC2FC4025A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3925A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift */; };
+		EAC2FC4125A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3925A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift */; };
+		EAC2FC4225A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3A25A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift */; };
+		EAC2FC4325A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3A25A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift */; };
+		EAC2FC4425A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3A25A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift */; };
+		EAC2FC4525A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3B25A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift */; };
+		EAC2FC4625A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3B25A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift */; };
+		EAC2FC4725A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC3B25A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift */; };
+		EAC2FC5025A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */; };
+		EAC2FC5125A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */; };
+		EAC2FC5225A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */; };
+		EAC2FC5325A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */; };
+		EAC2FC5425A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */; };
+		EAC2FC5525A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */; };
 		EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +82,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EA163F76258BA85E000974AB /* StockTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockTrend.swift; sourceTree = "<group>"; };
 		EAA099C32588020B00DBB93C /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
 		EAC19046257641160030B331 /* TrendMyStocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrendMyStocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAC19049257641160030B331 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -84,6 +106,12 @@
 		EAC190D42576731B0030B331 /* StockChartVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockChartVC.swift; sourceTree = "<group>"; };
 		EAC190E92577E2E20030B331 /* ChartContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartContainerView.swift; sourceTree = "<group>"; };
 		EAC190F32577E3B60030B331 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		EAC2FC3825A0B76B0060F387 /* DCFValuation+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DCFValuation+CoreDataClass.swift"; sourceTree = "<group>"; };
+		EAC2FC3925A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DCFValuation+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		EAC2FC3A25A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rule1Valuation+CoreDataClass.swift"; sourceTree = "<group>"; };
+		EAC2FC3B25A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rule1Valuation+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockListCellTableViewCell.swift; sourceTree = "<group>"; };
+		EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StockListCellTableViewCell.xib; sourceTree = "<group>"; };
 		EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -118,7 +146,9 @@
 				EAC1908E257642F20030B331 /* CSVImporter.swift */,
 				EAC190C0257663200030B331 /* PublicVars.swift */,
 				EAC190CA257663730030B331 /* Stock.swift */,
+				EA163F76258BA85E000974AB /* StockTrend.swift */,
 				EAC1904F257641160030B331 /* Main.storyboard */,
+				EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */,
 				EAC19048257641160030B331 /* TrendMyStocks */,
 				EAC19062257641180030B331 /* TrendMyStocksTests */,
 				EAC1906D257641180030B331 /* TrendMyStocksUITests */,
@@ -144,6 +174,7 @@
 				EAC1904B257641160030B331 /* SceneDelegate.swift */,
 				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
 				EAC190B9257662930030B331 /* StocksListViewController.swift */,
+				EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */,
 				EAC190D42576731B0030B331 /* StockChartVC.swift */,
 				EAC190E92577E2E20030B331 /* ChartContainerView.swift */,
 				EAA099C32588020B00DBB93C /* CheckButton.swift */,
@@ -151,7 +182,7 @@
 				EAC19055257641180030B331 /* Assets.xcassets */,
 				EAC19057257641180030B331 /* LaunchScreen.storyboard */,
 				EAC1905A257641180030B331 /* Info.plist */,
-				EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */,
+				EAC2FC2D25A0B33B0060F387 /* Model Files */,
 			);
 			path = TrendMyStocks;
 			sourceTree = "<group>";
@@ -172,6 +203,18 @@
 				EAC19070257641180030B331 /* Info.plist */,
 			);
 			path = TrendMyStocksUITests;
+			sourceTree = "<group>";
+		};
+		EAC2FC2D25A0B33B0060F387 /* Model Files */ = {
+			isa = PBXGroup;
+			children = (
+				EAC2FC3825A0B76B0060F387 /* DCFValuation+CoreDataClass.swift */,
+				EAC2FC3925A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift */,
+				EAC2FC3A25A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift */,
+				EAC2FC3B25A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift */,
+				EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */,
+			);
+			path = "Model Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -279,6 +322,7 @@
 			files = (
 				EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */,
 				EAC19056257641180030B331 /* Assets.xcassets in Resources */,
+				EAC2FC5325A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
 				EAC19051257641160030B331 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -287,6 +331,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC2FC5425A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +339,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC2FC5525A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,12 +356,18 @@
 				EAC190EA2577E2E20030B331 /* ChartContainerView.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
+				EA163F77258BA85E000974AB /* StockTrend.swift in Sources */,
+				EAC2FC4525A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
 				EAC1904A257641160030B331 /* AppDelegate.swift in Sources */,
 				EAA099C42588020B00DBB93C /* CheckButton.swift in Sources */,
+				EAC2FC4225A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */,
 				EAC190C1257663200030B331 /* PublicVars.swift in Sources */,
+				EAC2FC3F25A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
+				EAC2FC3C25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */,
 				EAC190B3257661F60030B331 /* MasterSplitView.swift in Sources */,
 				EAC190CB257663730030B331 /* Stock.swift in Sources */,
+				EAC2FC5025A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
 				EAC190F42577E3B60030B331 /* ChartView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -324,6 +376,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC2FC4325A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EAC190C2257663200030B331 /* PublicVars.swift in Sources */,
 				EAC190BB257662930030B331 /* StocksListViewController.swift in Sources */,
 				EAC190F52577E3B60030B331 /* ChartView.swift in Sources */,
@@ -332,7 +385,12 @@
 				EAC190D62576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC19064257641180030B331 /* TrendMyStocksTests.swift in Sources */,
 				EAC19090257642F20030B331 /* CSVImporter.swift in Sources */,
+				EAC2FC4625A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
+				EAC2FC5125A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
+				EA163F78258BA85E000974AB /* StockTrend.swift in Sources */,
+				EAC2FC3D25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */,
 				EAC190B4257661F60030B331 /* MasterSplitView.swift in Sources */,
+				EAC2FC4025A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +398,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAC2FC4425A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EAC190C3257663200030B331 /* PublicVars.swift in Sources */,
 				EAC190BC257662930030B331 /* StocksListViewController.swift in Sources */,
 				EAC190F62577E3B60030B331 /* ChartView.swift in Sources */,
@@ -348,7 +407,12 @@
 				EAC190D72576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC1906F257641180030B331 /* TrendMyStocksUITests.swift in Sources */,
 				EAC19091257642F20030B331 /* CSVImporter.swift in Sources */,
+				EAC2FC4725A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
+				EAC2FC5225A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
+				EA163F79258BA85E000974AB /* StockTrend.swift in Sources */,
+				EAC2FC3E25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */,
 				EAC190B5257661F60030B331 /* MasterSplitView.swift in Sources */,
+				EAC2FC4125A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

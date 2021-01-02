@@ -7,6 +7,12 @@
 
 import UIKit
 
+protocol ChartButtonDelegate {
+    var timeButtons: [CheckButton] { get set }
+    var typeButtons: [CheckButton] { get set }
+    func trendButtonPressed(button: CheckButton)
+}
+
 class ChartContainerView: UIView {
 
     var stockToShow: Stock?
@@ -14,12 +20,14 @@ class ChartContainerView: UIView {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var scrollView: UIScrollView!
     @IBOutlet var contentView: ChartView!
-    @IBOutlet var meanTrendLabel: UILabel!
     
     @IBOutlet var button1: CheckButton!
     @IBOutlet var button2: CheckButton!
     @IBOutlet var button3: CheckButton!
     
+    @IBOutlet var button4: CheckButton!
+    @IBOutlet var button5: CheckButton!
+    @IBOutlet var button6: CheckButton!
     let percentFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .percent
@@ -27,6 +35,8 @@ class ChartContainerView: UIView {
         formatter.minimumIntegerDigits = 1
         return formatter
     }()
+    
+    var buttonDelegate: ChartButtonDelegate!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -41,10 +51,19 @@ class ChartContainerView: UIView {
     
     public func configure(with: Stock) {
         
-        button1.configure(title: "", color: UIColor(named: "Red")!)
-        button2.configure(title: "", color: UIColor.systemBlue)
-        button3.configure(title: "", color: UIColor(named: "Green")!)
+        button1.configureTrendType(title: "", color: UIColor(named: "Red")!, type: .bottom)
+        button2.configureTrendType(title: "", color: UIColor.systemBlue, type: .regression)
+        button3.configureTrendType(title: "", color: UIColor(named: "Green")!, type: .ceiling)
         
+        button4.configureTrendTime(title: "A", color: UIColor.systemGray, trendTime: .full)
+        button5.configureTrendTime(title: "3", color: UIColor.systemGray2, trendTime: .quarter)
+        button6.configureTrendTime(title: "1", color: UIColor.systemGray3, trendTime: .month)
+        
+// button presets
+        
+        button6.active = true
+        button6.setNeedsDisplay()
+//
         stockToShow = with
         if let validLabel = titleLabel {
             validLabel.text = stockToShow?.name
@@ -56,33 +75,17 @@ class ChartContainerView: UIView {
             scroll.contentSize = contentView.bounds.size
             let offset = scroll.contentSize.width - scrollView.bounds.width
             scroll.setContentOffset(CGPoint(x: offset, y: 0), animated: false)
+            buttonDelegate = contentView
+            buttonDelegate.timeButtons = [button4, button5, button6]
+            buttonDelegate.typeButtons = [button1, button2, button3]
         }
         
     }
     
-    @IBAction func button3Action(_ sender: CheckButton) {
+    @IBAction func chartButtonAction(_ sender: CheckButton) {
         sender.active.toggle()
         sender.setNeedsDisplay()
-        
-        contentView.drawHighs = sender.active
-        contentView.setNeedsDisplay()
+        buttonDelegate.trendButtonPressed(button: sender)
     }
     
-    @IBAction func button2Action(_ sender: CheckButton) {
-        sender.active.toggle()
-        sender.setNeedsDisplay()
-        
-        contentView.drawRegression = sender.active
-        contentView.setNeedsDisplay()
-
-    }
-    
-    @IBAction func button1Action(_ sender: CheckButton) {
-        sender.active.toggle()
-        sender.setNeedsDisplay()
-        
-        contentView.drawLows = sender.active
-        contentView.setNeedsDisplay()
-        
-    }
 }

@@ -11,6 +11,8 @@ class CheckButton: UIButton {
 
     var color: UIColor!
     var active = false
+    var associatedTrendTime: TrendTimeOption?
+    var associatedTrendType: TrendType?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,14 +26,19 @@ class CheckButton: UIButton {
         backgroundColor = UIColor.clear
     }
     
-    func configure(title: String, color: UIColor) {
+    func configureTrendTime(title: String, color: UIColor, trendTime: TrendTimeOption) {
         self.setTitle(title, for: .normal)
         self.color = color
+        self.associatedTrendTime = trendTime
+    }
+    
+    func configureTrendType(title: String, color: UIColor, type: TrendType) {
+        self.setTitle(title, for: .normal)
+        self.color = color
+        self.associatedTrendType = type
     }
 
     override func draw(_ rect: CGRect) {
-        // Drawing code
-        
         let square = UIBezierPath(roundedRect: rect.insetBy(dx: 2.5, dy: 2.5), cornerRadius: 5.0)
         square.lineWidth = 2.5
         color.setStroke()

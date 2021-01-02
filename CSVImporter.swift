@@ -78,33 +78,33 @@ class CSVImporter: NSObject {
         }
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyy-MM-dd"
+        dateFormatter.dateFormat = "yyyy-MM-dd"
         for index in 1..<rows.count { // first line has header titles
             let array = rows[index].components(separatedBy: ",")
             let date$ = array[0]
             guard let date = dateFormatter.date(from: date$) else {
-                print("error converting to 'date' \(array[0])")
+                print("\(stockName) error converting to 'date' \(array[0])")
                 continue
             }
             guard let open = Double(array[1]) else {
-                print("error converting to 'open' \(array[1])")
+                print("\(stockName) error converting to 'open' \(array[1])")
                 continue
             }
             guard let high = Double(array[2]) else {
-                print("error converting to 'high' \(array[2])")
+                print("\(stockName) error converting to 'high' \(array[2])")
                 continue
             }
             guard let low = Double(array[3]) else {
-                print("error converting to 'high' \(array[3])")
+                print("\(stockName) error converting to 'high' \(array[3])")
                 continue
             }
             guard let close = Double(array[4]) else {
-                print("error converting to 'high' \(array[4])")
+                print("\(stockName) error converting to 'high' \(array[4])")
                 continue
 
             }
             guard let volume = Double(array[6]) else {
-                print("error converting to 'high' \(array[6])")
+                print("\(stockName) error converting to 'high' \(array[6])")
                 continue
 
             }
