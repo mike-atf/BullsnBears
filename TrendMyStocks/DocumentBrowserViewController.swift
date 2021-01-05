@@ -20,13 +20,6 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         allowsDocumentCreation = false
         allowsPickingMultipleItems = false
         
-        // Update the style of the UIDocumentBrowserViewController
-        // browserUserInterfaceStyle = .dark
-        // view.tintColor = .white
-        
-        // Specify the allowed content types of your application via the Info.plist.
-        
-        // Do any additional setup after loading the view.
     }
     
     
@@ -43,6 +36,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
 //            importHandler(nil, .none)
 //        }
 //    }
+    
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didPickDocumentsAt documentURLs: [URL]) {
         

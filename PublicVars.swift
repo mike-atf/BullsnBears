@@ -9,6 +9,14 @@ import UIKit
 
 var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
+var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+
+let dcfValuationSectionTitles = ["General","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction",""]
+
+enum ValuationMethods {
+    case dcf
+    case rule1
+}
 
 enum FindOptions {
     case minimum
@@ -28,11 +36,6 @@ enum TrendValue {
     case recentWeighted
     case timeWeighted
 }
-
-//enum QuarterOption {
-//    case half
-//    case quarter
-//}
 
 enum TrendType {
     case bottom

@@ -15,6 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        setUserDefaults()
         return true
     }
 
@@ -31,16 +32,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-
+    
+    func setUserDefaults() {
+        if UserDefaults.standard.value(forKey: "10YUSTreasuryBondRate") as? Double == nil {
+            UserDefaults.standard.set(0.0082, forKey: "10YUSTreasuryBondRate")
+        }
+        if UserDefaults.standard.value(forKey: "PerpetualGrowthRate") as? Double == nil {
+            UserDefaults.standard.set(0.022, forKey: "PerpetualGrowthRate")
+        }
+        if UserDefaults.standard.value(forKey: "LongTermMarketReturn") as? Double == nil {
+            UserDefaults.standard.set(0.1, forKey: "LongTermMarketReturn")
+        }
+    }
+        
     // MARK: - Core Data stack
 
-    lazy var persistentContainer: NSPersistentCloudKitContainer = {
-        /*
-         The persistent container for the application. This implementation
-         creates and returns a container, having loaded the store for the
-         application to it. This property is optional since there are legitimate
-         error conditions that could cause the creation of the store to fail.
-        */
+    var persistentContainer: NSPersistentCloudKitContainer = {
+
         let container = NSPersistentCloudKitContainer(name: "TrendMyStocks")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {

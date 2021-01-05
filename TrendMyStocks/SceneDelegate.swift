@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -14,17 +15,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
-//        guard
-//          let splitViewController = window?.rootViewController as? UISplitViewController,
-//          let leftNavController = splitViewController.viewControllers.first
-//            as? UINavigationController,
-//          let masterViewController = leftNavController.viewControllers.first
-//            as? StocksListViewController,
-//          let detailViewController = splitViewController.viewControllers.last
-//            as? StockChartVC
-//          else { fatalError() }
-//
-//        detailViewController.stockToShow = stocks.first
         guard let _ = (scene as? UIWindowScene) else { return }
     }
 
@@ -35,11 +25,55 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
     }
 
+    /// check if any new .csv documents have been placed into the Documents/Inbox folder
+    /// if so, try to move to Document folder
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-    }
+        
+        var filesImported = [String]()
+        let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        
+        if let documentFolder = appDocumentPaths.first {
 
+            let inboxFolder = documentFolder + "/Inbox"
+            
+            do {
+                let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: inboxFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                for url in fileURLs {
+                    if url.lastPathComponent.contains(".csv") {
+                        do {
+                            let targetPath = documentFolder + "/" + url.lastPathComponent
+                            if FileManager.default.fileExists(atPath: targetPath) {
+                                removeFile(atPath: targetPath)
+                            }
+                            try FileManager.default.moveItem(at: url, to: URL(fileURLWithPath: targetPath))
+                            filesImported.append(targetPath)
+                        }
+                        catch let error {
+                            print("error trying to move file out of the Inbox into the Document folder \(error)")
+                        }
+                    }
+                }
+            } catch let error {
+                print("error trying to move file out of the Inbox into the Document folder \(error)")
+            }
+            
+            if filesImported.count > 0 {
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "NewFilesArrived"), object: filesImported, userInfo: nil)
+            }
+        }
+    } 
+    
+    private func removeFile(atPath: String) {
+       
+        do {
+            try FileManager.default.removeItem(atPath: atPath)
+        } catch let error {
+            print("error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder \(error)")
+        }
+    }
+    
     func sceneWillResignActive(_ scene: UIScene) {
         // Called when the scene will move from an active state to an inactive state.
         // This may occur due to temporary interruptions (ex. an incoming phone call).

@@ -6,17 +6,20 @@
 //
 
 import UIKit
+import CoreData
 
 class StocksListViewController: UITableViewController {
     
     @IBOutlet var addButton: UIBarButtonItem!
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.register(UINib(nibName: "StockListCellTableViewCell", bundle: nil), forCellReuseIdentifier: "stockListCell")
         openCSCFilesInDocumentDirectory()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
+        
     }
 
     @IBAction func addButtonAction(_ sender: Any) {
@@ -28,6 +31,7 @@ class StocksListViewController: UITableViewController {
         }
     }
     
+    @objc
     func openCSCFilesInDocumentDirectory() {
         
         let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
@@ -45,24 +49,6 @@ class StocksListViewController: UITableViewController {
                             stocks.append(stock)
                         }
                         url.stopAccessingSecurityScopedResource()
-                    }
-                    else if url.lastPathComponent.contains("Inbox") {
-                        let inboxFolder = documentFolder + "/Inbox"
-                        let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: inboxFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-                        
-                        for url in fileURLs {
-                            if url.lastPathComponent.contains(".csv") {
-                                if let stock = CSVImporter.csvExtractor(url: URL(fileURLWithPath: documentFolder + url.lastPathComponent)) {
-                                    stocks.append(stock)
-                                }
-                                do {
-                                    try FileManager.default.moveItem(at: url, to: URL(fileURLWithPath: documentFolder + "/" + url.lastPathComponent))
-                                }
-                                catch let error {
-                                    print("error trying to move file out of the Inbox into the Document folder \(error)")
-                                }
-                            }
-                        }
                     }
                 }
             } catch let error {
@@ -84,12 +70,24 @@ class StocksListViewController: UITableViewController {
         }
     }
     
+    @objc
+    func filesReceivedInBackground(notification: Notification) {
+        
+        if let paths = notification.object as? [String] {
+            for path in paths {
+                addStock(fileURL: URL(fileURLWithPath: path))
+            }
+        }
+    }
+    
     public func addStock(fileURL: URL) {
         if let stock = CSVImporter.csvExtractor(url: fileURL) {
             stocks.append(stock)
         }
 
         tableView.reloadData()
+        tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .top)
+        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
     }
     // MARK: - Table view data source
 
@@ -105,11 +103,10 @@ class StocksListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
-        cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row])
+        let valuation = ValuationsController.returnDCFValuations(company: stocks[indexPath.row].name)
+        cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row], valuation: valuation?.first)
         return cell
     }
-    
-    
 
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
@@ -140,6 +137,10 @@ class StocksListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 70
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
     }
     
     /*
@@ -206,6 +207,15 @@ extension StocksListViewController: StockListCellDelegate {
     
     func valuationButtonPressed(indexpath: IndexPath) {
         print("valuation action for \(indexpath)")
+                
+        if let choser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationChoser") as? ValuationChooser {
+            choser.loadViewIfNeeded()
+            choser.stock = stocks[indexpath.row]
+            choser.rootView = self
+            
+            self.present(choser, animated: true)
+        }
+
     }
     
     

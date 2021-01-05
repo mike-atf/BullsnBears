@@ -43,7 +43,7 @@ class StockListCellTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    public func configureCell(indexPath: IndexPath, delegate: StockListCellDelegate, stock: Stock) {
+    public func configureCell(indexPath: IndexPath, delegate: StockListCellDelegate, stock: Stock, valuation: DCFValuation?) {
         self.indexPath = indexPath
         self.stock = stock
         self.cellDelegate = delegate
@@ -51,6 +51,10 @@ class StockListCellTableViewCell: UITableViewCell {
         title.text = stock.name
         let timeSinceLastStockDate = Date().timeIntervalSince(stock.dailyPrices.last!.tradingDate)
         detail.text = timeFormatter.string(from: timeSinceLastStockDate)
+        if let validValuation = valuation {
+            valuationButton.setBackgroundImage(nil, for: .normal)
+            valuationButton.setTitle(validValuation.returnIvalue(), for: .normal)
+        }
 
     }
     

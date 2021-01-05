@@ -147,7 +147,39 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="R1G-6f-cB6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1225" y="406"/>
+            <point key="canvasLocation" x="1313" y="512"/>
+        </scene>
+        <!--Revenue-->
+        <scene sceneID="esG-QI-hKZ">
+            <objects>
+                <tableViewController storyboardIdentifier="ValuationListViewController" title="Revenue" extendedLayoutIncludesOpaqueBars="YES" modalTransitionStyle="crossDissolve" id="44u-xA-fyj" customClass="ValuationListViewController" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="9kl-Gg-cku">
+                        <rect key="frame" x="0.0" y="0.0" width="350" height="660"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valuationListCell" id="e9i-LB-o3D" customClass="ValuationTableViewCell" customModule="TrendMyStocks" customModuleProvider="target">
+                                <rect key="frame" x="16" y="55.5" width="318" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e9i-LB-o3D" id="Ie0-Ok-DJG">
+                                    <rect key="frame" x="0.0" y="0.0" width="318" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="44u-xA-fyj" id="gfO-dL-kEU"/>
+                            <outlet property="delegate" destination="44u-xA-fyj" id="TfP-2x-DjM"/>
+                        </connections>
+                    </tableView>
+                    <value key="contentSizeForViewInPopover" type="size" width="350" height="660"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                    <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="350" height="680"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4di-L7-JI6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="695" y="1553"/>
         </scene>
         <!--Company List-->
         <scene sceneID="gJ5-Jm-dY6">
@@ -158,13 +190,16 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="cg2-P5-XAy" customClass="StockListCellTableViewCell" customModule="TrendMyStocks" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="stockListCell" id="cg2-P5-XAy" customClass="StockListCellTableViewCell" customModule="TrendMyStocks" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="28" width="420" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cg2-P5-XAy" id="kvh-gM-G2b">
                                     <rect key="frame" x="100" y="0.0" width="320" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="7pi-tm-0Fg" kind="showDetail" identifier="stockSelectionSegue" id="Kjm-sZ-WT1"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -235,6 +270,74 @@
             </objects>
             <point key="canvasLocation" x="594.7265625" y="512.5"/>
         </scene>
+        <!--Choose Valuation-->
+        <scene sceneID="3rP-MM-pnC">
+            <objects>
+                <viewController storyboardIdentifier="ValuationChoser" title="Choose Valuation" modalTransitionStyle="crossDissolve" modalPresentationStyle="formSheet" id="mJb-IX-AOv" customClass="ValuationChooser" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8TO-EM-VNf">
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="200"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zjy-Hx-5Wo">
+                                <rect key="frame" x="50" y="50" width="250" height="75"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                <color key="tintColor" systemColor="systemOrangeColor"/>
+                                <state key="normal" title="DCF"/>
+                                <connections>
+                                    <action selector="dcfAction:" destination="mJb-IX-AOv" eventType="touchUpInside" id="1ON-YJ-deu"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="15k-No-cQj">
+                                <rect key="frame" x="50" y="125" width="250" height="75"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                <color key="tintColor" systemColor="systemOrangeColor"/>
+                                <state key="normal" title="Rule No. One"/>
+                                <connections>
+                                    <action selector="rule1Action:" destination="mJb-IX-AOv" eventType="touchUpInside" id="wNm-aj-ZpZ"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PQ0-gK-f7j">
+                                <rect key="frame" x="5" y="107" width="37" height="36"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="PQ0-gK-f7j" secondAttribute="height" multiplier="1:1" id="N1I-He-mO2"/>
+                                </constraints>
+                                <state key="normal" backgroundImage="xmark.circle" catalog="system"/>
+                                <connections>
+                                    <action selector="cancelAction:" destination="mJb-IX-AOv" eventType="touchUpInside" id="hKW-oY-Rpo"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="lCt-VC-g1d"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="15k-No-cQj" firstAttribute="top" secondItem="Zjy-Hx-5Wo" secondAttribute="bottom" id="0e8-oF-0g6"/>
+                            <constraint firstItem="lCt-VC-g1d" firstAttribute="centerY" secondItem="Zjy-Hx-5Wo" secondAttribute="bottom" id="7eT-ho-55Y"/>
+                            <constraint firstItem="Zjy-Hx-5Wo" firstAttribute="leading" secondItem="PQ0-gK-f7j" secondAttribute="trailing" constant="8" symbolic="YES" id="93B-jU-f6k"/>
+                            <constraint firstItem="lCt-VC-g1d" firstAttribute="trailing" secondItem="15k-No-cQj" secondAttribute="trailing" id="JOd-aq-uY8"/>
+                            <constraint firstItem="lCt-VC-g1d" firstAttribute="trailing" secondItem="Zjy-Hx-5Wo" secondAttribute="trailing" id="TeP-bD-ywZ"/>
+                            <constraint firstItem="Zjy-Hx-5Wo" firstAttribute="leading" secondItem="lCt-VC-g1d" secondAttribute="leading" constant="50" id="X4h-j5-sAT"/>
+                            <constraint firstItem="15k-No-cQj" firstAttribute="height" secondItem="Zjy-Hx-5Wo" secondAttribute="height" id="XfP-KZ-4T4"/>
+                            <constraint firstItem="Zjy-Hx-5Wo" firstAttribute="top" secondItem="lCt-VC-g1d" secondAttribute="top" id="c90-4Z-Nh0"/>
+                            <constraint firstItem="PQ0-gK-f7j" firstAttribute="centerY" secondItem="lCt-VC-g1d" secondAttribute="centerY" id="rlX-P9-PSX"/>
+                            <constraint firstItem="PQ0-gK-f7j" firstAttribute="leading" secondItem="lCt-VC-g1d" secondAttribute="leading" constant="5" id="tDj-kr-jk5"/>
+                            <constraint firstItem="15k-No-cQj" firstAttribute="leading" secondItem="Zjy-Hx-5Wo" secondAttribute="leading" id="wVv-kY-Fda"/>
+                        </constraints>
+                    </view>
+                    <value key="contentSizeForViewInPopover" type="size" width="300" height="170"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="300" height="200"/>
+                    <connections>
+                        <outlet property="cancelButton" destination="PQ0-gK-f7j" id="lEi-wZ-Ddv"/>
+                        <outlet property="dcfButton" destination="Zjy-Hx-5Wo" id="sM5-SB-cX0"/>
+                        <outlet property="rule1Button" destination="15k-No-cQj" id="dF5-3O-4fM"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qob-5s-5fq" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="450" y="1553"/>
+        </scene>
         <!--Document Browser View Controller-->
         <scene sceneID="YiR-FU-KNn">
             <objects>
@@ -251,9 +354,16 @@
             <point key="canvasLocation" x="-145" y="1554"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="Kjm-sZ-WT1"/>
+    </inferredMetricsTieBreakers>
     <resources>
+        <image name="xmark.circle" catalog="system" width="128" height="121"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemOrangeColor">
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
