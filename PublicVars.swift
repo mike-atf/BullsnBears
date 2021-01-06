@@ -11,7 +11,14 @@ var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
 var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
-let dcfValuationSectionTitles = ["General","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction",""]
+
+enum ValuationCellValueFormat {
+    case currency
+    case percent
+    case number
+    case date
+    case text
+}
 
 enum ValuationMethods {
     case dcf
@@ -49,6 +56,39 @@ enum TrendTimeOption {
     case full
     case month
 }
+
+let currencyFormatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.currencySymbol = "$ "
+    formatter.numberStyle = NumberFormatter.Style.currency
+    formatter.maximumFractionDigits = 0
+    formatter.usesGroupingSeparator = true
+    return formatter
+}()
+
+let percentFormatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .percent
+    formatter.maximumFractionDigits = 1
+    formatter.minimumIntegerDigits = 1
+    return formatter
+}()
+
+let numberFormatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.maximumFractionDigits = 2
+    formatter.minimumIntegerDigits = 1
+    return formatter
+}()
+
+let dateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.locale = NSLocale.current
+    formatter.timeZone = NSTimeZone.local
+    formatter.dateStyle = .short
+    return formatter
+}()
+
 
 struct Correlation {
     var incline = Double()
@@ -143,5 +183,6 @@ struct PricePoint {
         return (pricePoint.returnPrice(option: priceOption) - self.returnPrice(option: priceOption)) / pricePoint.tradingDate.timeIntervalSince(self.tradingDate)
 
     }
+    
 }
 

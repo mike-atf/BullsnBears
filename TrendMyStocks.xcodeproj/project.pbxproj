@@ -190,19 +190,11 @@
 		EAC19048257641160030B331 /* TrendMyStocks */ = {
 			isa = PBXGroup;
 			children = (
-				EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */,
-				EAC2FC6F25A23FFC0060F387 /* ValuationTableViewCell.swift */,
-				EAC2FC6225A232780060F387 /* ValuationChooser.swift */,
+				EAFD824925A4D2C000D27566 /* DCFValuation FIles */,
 				EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */,
 				EAC19049257641160030B331 /* AppDelegate.swift */,
 				EAC1904B257641160030B331 /* SceneDelegate.swift */,
-				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
-				EAC190B9257662930030B331 /* StocksListViewController.swift */,
-				EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */,
-				EAC190D42576731B0030B331 /* StockChartVC.swift */,
-				EAC190E92577E2E20030B331 /* ChartContainerView.swift */,
-				EAA099C32588020B00DBB93C /* CheckButton.swift */,
-				EAC190F32577E3B60030B331 /* ChartView.swift */,
+				EAFD825025A4D2D800D27566 /* Main Display Files */,
 				EAC19055257641180030B331 /* Assets.xcassets */,
 				EAC19057257641180030B331 /* LaunchScreen.storyboard */,
 				EAC1905A257641180030B331 /* Info.plist */,
@@ -248,6 +240,30 @@
 				EAC2FC9925A256AD0060F387 /* ValuationsController.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		EAFD824925A4D2C000D27566 /* DCFValuation FIles */ = {
+			isa = PBXGroup;
+			children = (
+				EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */,
+				EAC2FC6F25A23FFC0060F387 /* ValuationTableViewCell.swift */,
+				EAC2FC6225A232780060F387 /* ValuationChooser.swift */,
+			);
+			path = "DCFValuation FIles";
+			sourceTree = "<group>";
+		};
+		EAFD825025A4D2D800D27566 /* Main Display Files */ = {
+			isa = PBXGroup;
+			children = (
+				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
+				EAC190B9257662930030B331 /* StocksListViewController.swift */,
+				EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */,
+				EAC190D42576731B0030B331 /* StockChartVC.swift */,
+				EAC190E92577E2E20030B331 /* ChartContainerView.swift */,
+				EAA099C32588020B00DBB93C /* CheckButton.swift */,
+				EAC190F32577E3B60030B331 /* ChartView.swift */,
+			);
+			path = "Main Display Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

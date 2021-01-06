@@ -28,6 +28,7 @@
                         <textInputTraits key="textInputTraits" spellCheckingType="no" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                         <connections>
                             <action selector="textEntryComplete:" destination="KGk-i7-Jjw" eventType="editingDidEnd" id="LKd-8m-Usa"/>
+                            <action selector="textWasChanged" destination="KGk-i7-Jjw" eventType="editingChanged" id="MTN-MU-v6e"/>
                         </connections>
                     </textField>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Detail" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Phv-It-qW5">

@@ -17,10 +17,8 @@ class ChartView: UIView {
     var xAxisLabels = [UILabel]()
     var trendLabels = [UILabel]()
     
-    var dateFormatter: DateFormatter!
-    var currencyFormatter : NumberFormatter!
-    var percentFormatter: NumberFormatter!
-    var numberFormatter: NumberFormatter!
+//    var dateFormatter: DateFormatter!
+//    var numberFormatter: NumberFormatter!
 
     var candleBoxes = UIBezierPath()
     var candleSticks = UIBezierPath()
@@ -51,34 +49,34 @@ class ChartView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
                 
-        dateFormatter = {
-            let formatter = DateFormatter()
-            formatter.locale = NSLocale.current
-            formatter.timeZone = NSTimeZone.local
-            formatter.dateFormat = "d.M."
-            return formatter
-        }()
-        
-        currencyFormatter = {
-            let formatter = NumberFormatter()
-            formatter.currencySymbol = "$"
-            formatter.numberStyle = NumberFormatter.Style.currency
-            return formatter
-        }()
-        
-        percentFormatter = {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .percent
-            formatter.maximumFractionDigits = 0
-            formatter.minimumIntegerDigits = 1
-            return formatter
-        }()
-        
-        numberFormatter = {
-            let formatter = NumberFormatter()
-            formatter.maximumFractionDigits = 2
-            return formatter
-        }()
+//        dateFormatter = {
+//            let formatter = DateFormatter()
+//            formatter.locale = NSLocale.current
+//            formatter.timeZone = NSTimeZone.local
+//            formatter.dateFormat = "d.M."
+//            return formatter
+//        }()
+//
+//        currencyFormatter = {
+//            let formatter = NumberFormatter()
+//            formatter.currencySymbol = "$"
+//            formatter.numberStyle = NumberFormatter.Style.currency
+//            return formatter
+//        }()
+//
+//        percentFormatter = {
+//            let formatter = NumberFormatter()
+//            formatter.numberStyle = .percent
+//            formatter.maximumFractionDigits = 0
+//            formatter.minimumIntegerDigits = 1
+//            return formatter
+//        }()
+//
+//        numberFormatter = {
+//            let formatter = NumberFormatter()
+//            formatter.maximumFractionDigits = 2
+//            return formatter
+//        }()
 
                 
         for _ in 0...30 {
@@ -310,25 +308,13 @@ class ChartView: UIView {
         }
         else {
             // twoPoints
-//            let trend = stock.twoPointTrend(properties: trendProperties)
-            let trend = stock.findMajorTrend2(properties: trendProperties)
+            let trend = stock.twoPointTrend(properties: trendProperties)
+//            let trend = stock.findMajorTrend2(properties: trendProperties)
             startPrice = trend.startPrice!
             projectedPrice = startPrice + trend.incline! * dateRange!.last!.timeIntervalSince(trend.startDate)
             startPoint = plotPricePoint(pricePoint: PriceDate(trend.startDate,startPrice))
             endPoint = plotPricePoint(pricePoint: PriceDate(trendEnd, projectedPrice))
             
-            //regression
-//            if let correlation = stock.correlationTrend2(properties: trendProperties) {
-//                let a = PriceDate(date:trendStart, price: correlation.yIntercept)
-//                let b = PriceDate(date:trendEnd, price: correlation.yIntercept + correlation.incline * trendEnd.timeIntervalSince(trendStart))
-//
-//                coCoEff = correlation.coEfficient
-//                startPrice = a.price
-//                projectedPrice = b.price
-//                startPoint = plotPricePoint(pricePoint: a)
-//                endPoint = plotPricePoint(pricePoint: b)
-//            }
-
         }
         
         let trendLine = UIBezierPath()
