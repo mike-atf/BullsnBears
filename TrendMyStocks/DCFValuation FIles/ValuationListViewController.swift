@@ -145,6 +145,11 @@ class ValuationListViewController: UITableViewController {
         
     }
 
+    
+    public func helperUpdatedRows(paths: [IndexPath]) {
+        
+        tableView.reloadRows(at: paths, with: .automatic)
+    }
 
     /*
     // Override to support conditional editing of the table view.

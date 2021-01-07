@@ -22,7 +22,11 @@ class ValuationsController : DCFValuationHelper {
     var rowTitles: [[String]]?
     var valuationListViewController: ValuationListViewController!
     var valuation: DCFValuation?
-    
+    var revenueGrowthRates = [Double]()
+    var netIncomeGrowthRates = [Double]()
+    var fcfGrowthRates = [Double]()
+    var averagePredictedRevGrowth: Double?
+
     let dcfValuationSectionTitles = ["General","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
     let dcfValuationSectionSubtitles = ["General","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "","Details > Analysis > Revenue estimate", "", ""]
     
@@ -30,6 +34,9 @@ class ValuationsController : DCFValuationHelper {
     init(listView: ValuationListViewController) {
         self.valuationListViewController = listView
         self.valuation = listView.valuation
+        recalculateRevenueGrowth()
+        recalculateIncomeGrowth()
+        recalculateFCFGrowth()
     }
 
     
@@ -159,8 +166,10 @@ class ValuationsController : DCFValuationHelper {
         let value$ = getCellValueText(value: value, indexPath: indexPath)
         let rowTitle = (rowTitles ?? buildRowTitles())[indexPath.section][indexPath.row]
         let format = dcfCellValueFormat(indexPath: indexPath)
+        let detail$ = getDetail$(indexPath: indexPath) ?? ""
+        print("detail for \(indexPath) = \(detail$)")
         
-        cell.configure(title: rowTitle, value$: value$, detail: "", indexPath: indexPath, delegate: self, valueFormat: format)
+        cell.configure(title: rowTitle, value$: value$, detail: detail$, indexPath: indexPath, delegate: self, valueFormat: format)
     }
     
     func userEnteredText(sender: UITextField, indexPath: IndexPath) {
@@ -208,22 +217,11 @@ class ValuationsController : DCFValuationHelper {
         case 2:
             // 'Income Statement S1 - Revenue
             validValuation.tRevenueActual![indexPath.row] = value
-//            for i in 1..<tRevenueActual!.count {
-//                if validValuation.tRevenueActual![i] != 0 {
-//                    let result = (tRevenueActual![i-1] - tRevenueActual![i]) / tRevenueActual![i]
-//                    revenueGrowth.insert(result, at: i-1)
-//                }
-//                for i in 0..<(revGrowthPredAdj?.count ?? 0) {
-//                    revGrowthPredAdj?[i] = averageGrowthRate
-//                }
-//                if revenueGrowth.count > indexPath.row {
-//                    return percentFormatter.string(from: revenueGrowth[indexPath.row] as NSNumber)
-//                }
-////                else { return nil }
-//            }
+            recalculateRevenueGrowth()
         case 3:
             // 'Income Statement S2 - net income
             validValuation.netIncome![indexPath.row] = value
+            recalculateIncomeGrowth()
         case 4:
             // 'Income Statement S3 -
             switch indexPath.row {
@@ -249,6 +247,7 @@ class ValuationsController : DCFValuationHelper {
         case 6:
             // 'Cash Flow S1
             validValuation.tFCFo![indexPath.row] = value
+            recalculateFCFGrowth()
         case 7:
             // 'Cash Flow S2
             validValuation.capExpend![indexPath.row] = value
@@ -258,15 +257,127 @@ class ValuationsController : DCFValuationHelper {
        case 9:
             // 'Prediction S2
             validValuation.revGrowthPred![indexPath.row] = value / 100.0
+            recalculateAvgGrowthRate()
         case 10:
-            // adjsuted predcited growth rate
+            // adjsuted predicted growth rate
             validValuation.revGrowthPredAdj![indexPath.row] = value / 100.0
         default:
             print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
         }
+        
+        if let updatePaths = determineRowsToUpdateAfterUserEntry(indexPath: indexPath) {
+            valuationListViewController.helperUpdatedRows(paths: updatePaths)
+        }
+    }
+    
+    internal func determineRowsToUpdateAfterUserEntry(indexPath: IndexPath) -> [IndexPath]? {
+        
+        
+        guard let validValuation = valuation else {
+            print("error assiging entered text: Controller doesn't have valuation")
+            return nil
+        }
+        
+        var paths: [IndexPath]?
 
+        switch indexPath.section {
+        case 0:
+            return nil
+        case 1:
+            return nil
+        case 2:
+            if indexPath.row > 0 && indexPath.row < (validValuation.tRevenueActual!.count) {
+                paths = [IndexPath(row: indexPath.row-1, section: indexPath.section)]
+            }
+            paths?.append(IndexPath(row: 0, section: 10))
+            paths?.append(IndexPath(row: 1, section: 10))
+        case 3:
+            if indexPath.row > 0 && indexPath.row < (validValuation.netIncome!.count) {
+                paths = [IndexPath(row: indexPath.row-1, section: indexPath.section)]
+            }
+        case 4:
+            if indexPath.row == 2 {
+                paths = [indexPath]
+            }
+        case 5:
+            paths = [indexPath]
+        case 6:
+            if indexPath.row > 0 && indexPath.row < (validValuation.tFCFo!.count) {
+                paths = [IndexPath]()
+                let newpath = IndexPath(row: indexPath.row-1, section: indexPath.section)
+                paths?.append(newpath)
+            }
+        case 9:
+            paths = [IndexPath(row: 0, section: 10)]
+            paths?.append(IndexPath(row: 1, section: 10))
+
+        default:
+            print(" unexpected default encountered in \(determineRowsToUpdateAfterUserEntry)")
+        }
+        
+        return paths
+    }
+    
+    internal func recalculateRevenueGrowth() {
+        
+        revenueGrowthRates.removeAll()
+        
+        for i in 1..<(valuation?.tRevenueActual?.count ?? 0) {
+            if valuation!.tRevenueActual![i] > 0 {
+                let rate = (valuation!.tRevenueActual![i-1] - valuation!.tRevenueActual![i]) / valuation!.tRevenueActual![i]
+                revenueGrowthRates.append(rate)
+            }
+            else {
+                revenueGrowthRates.append(Double()) // add fifth unused element to allow return in 'getDetailValue'
+            }
+        }
+        revenueGrowthRates.append(Double())
+        
+        recalculateAvgGrowthRate()
+    }
+    
+    internal func recalculateAvgGrowthRate() {
+        
+        var growthRateSum = revenueGrowthRates.compactMap{ $0 }.reduce(0, +)
+        growthRateSum += valuation?.revGrowthPred?.compactMap{ $0 }.reduce(0, +) ?? 0.0
+        
+        averagePredictedRevGrowth = growthRateSum / Double(revenueGrowthRates.compactMap{ $0 }.count + (valuation?.revGrowthPred?.compactMap{ $0 }.count ?? 0) )
+    }
+    
+    internal func recalculateIncomeGrowth() {
+        
+        netIncomeGrowthRates.removeAll()
+        
+        for i in 1..<(valuation?.tRevenueActual?.count ?? 0) {
+            if valuation!.tRevenueActual![i] > 0 {
+                let rate = (valuation!.netIncome![i-1] - valuation!.netIncome![i]) / valuation!.tRevenueActual![i]
+                netIncomeGrowthRates.append(rate)
+            }
+            else {
+                netIncomeGrowthRates.append(Double())
+            }
+        }
+        netIncomeGrowthRates.append(Double()) // add fifth unused element to allow return in 'getDetailValue'
         
     }
+    
+    internal func recalculateFCFGrowth() {
+        
+        fcfGrowthRates.removeAll()
+        
+        for i in 1..<(valuation?.tFCFo?.count ?? 0) {
+            if valuation!.tFCFo![i] > 0 {
+                let rate = (valuation!.tFCFo![i-1] - valuation!.tFCFo![i]) / valuation!.tFCFo![i]
+                fcfGrowthRates.append(rate)
+            }
+            else {
+                fcfGrowthRates.append(Double())
+            }
+        }
+        fcfGrowthRates.append(Double()) // add fifth unused element to allow return in 'getDetailValue'
+        
+    }
+
 
     
     internal func getCellValueText(value: Any?, indexPath: IndexPath) -> String? {
@@ -370,12 +481,112 @@ class ValuationsController : DCFValuationHelper {
             return valuation.revGrowthPred![indexPath.row]
         case 10:
             // adjsuted predcited growth rate
-            return valuation.revGrowthPredAdj![indexPath.row]
+            return averagePredictedRevGrowth
         default:
             print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
         }
         
         return "error"
+
+    }
+    
+    internal func getDetail$(indexPath: IndexPath) -> String? {
+        
+        switch indexPath.section {
+        case 0:
+            // 'General
+            switch indexPath.row {
+            case 0:
+                return nil
+            case 1:
+                return nil
+            case 2:
+                return nil
+            case 3:
+                return nil
+            default:
+                print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
+            }
+        case 1:
+            // 'Key Statistics
+            switch indexPath.row {
+            case 0:
+                return nil
+            case 1:
+                return nil
+            default:
+                print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
+            }
+        case 2:
+            // 'Income Statement S1 - Revenue
+            if indexPath.row < (valuation?.tRevenueActual?.count ?? 0) - 1 {
+                return percentFormatter.string(from: revenueGrowthRates[indexPath.row] as NSNumber)
+            }
+            else { return "" }
+        case 3:
+            // 'Income Statement S2 - net income
+            if indexPath.row < (valuation?.netIncome?.count ?? 0) - 1 {
+                return percentFormatter.string(from: netIncomeGrowthRates[indexPath.row] as NSNumber)
+            }
+            else { return "" }
+        case 4:
+            // 'Income Statement S3 -
+            switch indexPath.row {
+            case 0:
+                return nil
+            case 1:
+                return nil
+            case 2:
+                if (valuation?.incomePreTax ?? 0.0) > 0 {
+                    let result = ((valuation?.expenseIncomeTax ?? 0.0) / valuation!.incomePreTax)
+                    return percentFormatter.string(from: result as NSNumber)
+                }
+                else { return nil }
+            default:
+                print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
+            }
+        case 5:
+            // 'balance sheet'
+            switch indexPath.row {
+            case 0:
+                if (valuation?.marketCap ?? 0.0) > 0 {
+                    let result = (valuation?.debtST ?? 0) / ((valuation?.debtST ?? 0) + valuation!.marketCap)
+                    return percentFormatter.string(from: result as NSNumber)
+                } else { return nil }
+            case 1:
+                if (valuation?.marketCap ?? 0.0) > 0 {
+                    let result =  (valuation?.debtLT ?? 0) / ((valuation?.debtLT ?? 0) + valuation!.marketCap)
+                    return percentFormatter.string(from: result as NSNumber)
+                } else { return nil }
+            default:
+                print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
+                return ""
+            }
+        case 6:
+            // 'Cash Flow S1
+            if indexPath.row < (valuation?.tFCFo?.count ?? 0) - 1 {
+                return percentFormatter.string(from: fcfGrowthRates[indexPath.row] as NSNumber)
+            }
+            else { return "" }
+        case 7:
+            // 'Cash Flow S2
+            return nil
+        case 8:
+            // 'Prediction S1
+            return nil
+       case 9:
+            // 'Prediction S2
+            return nil
+        case 10:
+            // adjsuted predcited growth rate
+            if let value = averagePredictedRevGrowth {
+                return percentFormatter.string(from: value as NSNumber)
+            }
+        default:
+            print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
+        }
+        
+        return nil
 
     }
     

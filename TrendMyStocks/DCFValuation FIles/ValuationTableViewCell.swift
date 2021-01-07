@@ -49,7 +49,7 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
         self.title.text = title
         self.textField.placeholder = value$
         self.valueFormat = valueFormat
-        
+        self.detail.text = detail
     }
     
     @IBAction func textEntryComplete(_ sender: UITextField) {
