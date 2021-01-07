@@ -14,7 +14,8 @@ class ValuationChooser: UIViewController {
     @IBOutlet weak var rule1Button: UIButton!
 
     var stock: Stock!
-    var rootView: UIViewController!
+    var rootView: StocksListViewController!
+    var sourceCellPath: IndexPath!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +38,9 @@ class ValuationChooser: UIViewController {
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.dcf
             tvc.valuation = valuation
+            tvc.presentingListVC = rootView
+            tvc.sourceIndexPath = sourceCellPath
+            
             self.dismiss(animated: true) {
 //                self.rootView.navigationController?.pushViewController(tvc, animated: true)
                 self.rootView.present(tvc, animated: true)

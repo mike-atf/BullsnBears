@@ -143,6 +143,10 @@ class StocksListViewController: UITableViewController {
         performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
     }
     
+    func valuationCompleted(indexPath: IndexPath) {
+        tableView.reloadRows(at: [indexPath], with: .automatic)
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -206,12 +210,12 @@ class StocksListViewController: UITableViewController {
 extension StocksListViewController: StockListCellDelegate {
     
     func valuationButtonPressed(indexpath: IndexPath) {
-        print("valuation action for \(indexpath)")
                 
         if let choser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationChoser") as? ValuationChooser {
             choser.loadViewIfNeeded()
             choser.stock = stocks[indexpath.row]
             choser.rootView = self
+            choser.sourceCellPath = indexpath
             
             self.present(choser, animated: true)
         }

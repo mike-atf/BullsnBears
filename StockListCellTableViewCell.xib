@@ -29,13 +29,16 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s5V-FW-Vej">
-                        <rect key="frame" x="232.5" y="13.5" width="17.5" height="17"/>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s5V-FW-Vej">
+                        <rect key="frame" x="197" y="13" width="53" height="18"/>
                         <constraints>
-                            <constraint firstAttribute="width" secondItem="s5V-FW-Vej" secondAttribute="height" multiplier="1:1" id="uHj-uU-W0R"/>
+                            <constraint firstAttribute="width" secondItem="s5V-FW-Vej" secondAttribute="height" multiplier="3:1" id="jtn-oL-aZc"/>
                         </constraints>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
                         <color key="tintColor" systemColor="systemOrangeColor"/>
-                        <state key="normal" backgroundImage="dollarsign.circle" catalog="system"/>
+                        <state key="normal" image="dollarsign.circle" catalog="system">
+                            <color key="titleColor" systemColor="systemOrangeColor"/>
+                        </state>
                         <connections>
                             <action selector="valuationButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="d0V-KR-odH"/>
                         </connections>

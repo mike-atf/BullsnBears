@@ -9,6 +9,9 @@ import UIKit
 
 class ValuationListViewController: UITableViewController {
     
+    var presentingListVC: StocksListViewController!
+    var sourceIndexPath: IndexPath!
+    
     var valuationMethod:ValuationMethods!
     var valuation: DCFValuation?
     var sectionSubtitles: [String]?
@@ -142,7 +145,10 @@ class ValuationListViewController: UITableViewController {
     
     @objc
     func saveValuation() {
-        
+        valuation?.save()
+        self.dismiss(animated: true) {
+            self.presentingListVC.valuationCompleted(indexPath: self.sourceIndexPath)
+        }
     }
 
     

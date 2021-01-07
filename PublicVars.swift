@@ -69,7 +69,7 @@ let currencyFormatter: NumberFormatter = {
 let percentFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.numberStyle = .percent
-    formatter.maximumFractionDigits = 1
+    formatter.maximumFractionDigits = 2
     formatter.minimumIntegerDigits = 1
     return formatter
 }()

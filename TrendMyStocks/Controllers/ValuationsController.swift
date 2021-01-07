@@ -167,7 +167,6 @@ class ValuationsController : DCFValuationHelper {
         let rowTitle = (rowTitles ?? buildRowTitles())[indexPath.section][indexPath.row]
         let format = dcfCellValueFormat(indexPath: indexPath)
         let detail$ = getDetail$(indexPath: indexPath) ?? ""
-        print("detail for \(indexPath) = \(detail$)")
         
         cell.configure(title: rowTitle, value$: value$, detail: detail$, indexPath: indexPath, delegate: self, valueFormat: format)
     }
@@ -184,7 +183,7 @@ class ValuationsController : DCFValuationHelper {
         }
         
         guard let validValuation = valuation else {
-            print("error assiging entered text: Controller doesn't have valuation")
+            print("error assigning entered text: Controller doesn't have valuation")
             return
         }
         
@@ -211,6 +210,8 @@ class ValuationsController : DCFValuationHelper {
                 validValuation.marketCap = value
             case 1:
                 validValuation.beta = value
+            case 2:
+                validValuation.sharesOutstanding = value
             default:
                 print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
             }
@@ -312,7 +313,7 @@ class ValuationsController : DCFValuationHelper {
             paths?.append(IndexPath(row: 1, section: 10))
 
         default:
-            print(" unexpected default encountered in \(determineRowsToUpdateAfterUserEntry)")
+            print(" unexpected default encountered in determineRowsToUpdateAfterUserEntry")
         }
         
         return paths
@@ -436,6 +437,8 @@ class ValuationsController : DCFValuationHelper {
                 return valuation.marketCap
             case 1:
                 return valuation.beta
+            case 2:
+                return valuation.sharesOutstanding
             default:
                 print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
             }
@@ -495,28 +498,10 @@ class ValuationsController : DCFValuationHelper {
         switch indexPath.section {
         case 0:
             // 'General
-            switch indexPath.row {
-            case 0:
-                return nil
-            case 1:
-                return nil
-            case 2:
-                return nil
-            case 3:
-                return nil
-            default:
-                print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
-            }
+            return nil
         case 1:
             // 'Key Statistics
-            switch indexPath.row {
-            case 0:
-                return nil
-            case 1:
-                return nil
-            default:
-                print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
-            }
+            return nil
         case 2:
             // 'Income Statement S1 - Revenue
             if indexPath.row < (valuation?.tRevenueActual?.count ?? 0) - 1 {
@@ -661,7 +646,7 @@ class ValuationsController : DCFValuationHelper {
         adjGrowthPredTitles.removeFirst()
         
         let generalSectionTitles = ["Date", "US 10y Treasure Bond rate", "Perpetual growth rate", "Exp. LT Market return"]
-        let keyStatsTitles = ["Market cap", "beta"]
+        let keyStatsTitles = ["Market cap", "beta", "Shares outstanding"]
         let singleIncomeSectionTitles = ["Interest expense","Pre-Tax income","Income tax expend."]
         let balanceSheetSectionTitles = ["Current debt","Long term debt"]
         
