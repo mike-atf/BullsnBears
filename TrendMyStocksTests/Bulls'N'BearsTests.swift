@@ -6,9 +6,9 @@
 //
 
 import XCTest
-@testable import TrendMyStocks
+@testable import Bulls_N_Bears
 
-class TrendMyStocksTests: XCTestCase {
+class Bulls_N_BearsTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

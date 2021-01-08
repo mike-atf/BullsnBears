@@ -17,8 +17,6 @@
 		EAC19054257641160030B331 /* TrendMyStocks.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */; };
 		EAC19056257641180030B331 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EAC19055257641180030B331 /* Assets.xcassets */; };
 		EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAC19057257641180030B331 /* LaunchScreen.storyboard */; };
-		EAC19064257641180030B331 /* TrendMyStocksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC19063257641180030B331 /* TrendMyStocksTests.swift */; };
-		EAC1906F257641180030B331 /* TrendMyStocksUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1906E257641180030B331 /* TrendMyStocksUITests.swift */; };
 		EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1908E257642F20030B331 /* CSVImporter.swift */; };
 		EAC19090257642F20030B331 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1908E257642F20030B331 /* CSVImporter.swift */; };
 		EAC19091257642F20030B331 /* CSVImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1908E257642F20030B331 /* CSVImporter.swift */; };
@@ -77,6 +75,8 @@
 		EAC2FC9B25A256AD0060F387 /* ValuationsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC9925A256AD0060F387 /* ValuationsController.swift */; };
 		EAC2FC9C25A256AD0060F387 /* ValuationsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC9925A256AD0060F387 /* ValuationsController.swift */; };
 		EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */; };
+		EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */; };
+		EAED14DF25A8D78C0073C46F /* Bulls'N'BearsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,7 +99,7 @@
 /* Begin PBXFileReference section */
 		EA163F76258BA85E000974AB /* StockTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockTrend.swift; sourceTree = "<group>"; };
 		EAA099C32588020B00DBB93C /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
-		EAC19046257641160030B331 /* TrendMyStocks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrendMyStocks.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAC19046257641160030B331 /* Bulls'N'Bears.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bulls'N'Bears.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAC19049257641160030B331 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EAC1904B257641160030B331 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		EAC19050257641160030B331 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -107,11 +107,8 @@
 		EAC19055257641180030B331 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EAC19058257641180030B331 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		EAC1905A257641180030B331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		EAC1905F257641180030B331 /* TrendMyStocksTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrendMyStocksTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		EAC19063257641180030B331 /* TrendMyStocksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMyStocksTests.swift; sourceTree = "<group>"; };
-		EAC19065257641180030B331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		EAC1906A257641180030B331 /* TrendMyStocksUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrendMyStocksUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		EAC1906E257641180030B331 /* TrendMyStocksUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendMyStocksUITests.swift; sourceTree = "<group>"; };
+		EAC1905F257641180030B331 /* Bulls'N'BearsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bulls'N'BearsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAC1906A257641180030B331 /* Bulls'N'BearsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bulls'N'BearsUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAC19070257641180030B331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EAC1908E257642F20030B331 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
 		EAC190B2257661F60030B331 /* MasterSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterSplitView.swift; sourceTree = "<group>"; };
@@ -133,6 +130,8 @@
 		EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationListViewController.swift; sourceTree = "<group>"; };
 		EAC2FC9925A256AD0060F387 /* ValuationsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationsController.swift; sourceTree = "<group>"; };
 		EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
+		EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsTests.swift"; path = "TrendMyStocksTests/Bulls'N'BearsTests.swift"; sourceTree = SOURCE_ROOT; };
+		EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsUITests.swift"; path = "TrendMyStocksUITests/Bulls'N'BearsUITests.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,13 +165,14 @@
 				EAC1908E257642F20030B331 /* CSVImporter.swift */,
 				EAC190C0257663200030B331 /* PublicVars.swift */,
 				EAC190CA257663730030B331 /* Stock.swift */,
+				EAED148F25A8CFF70073C46F /* Bulls'N'BearsUITests */,
+				EAED148425A8CF060073C46F /* Bulls'N'BearsTests */,
 				EA163F76258BA85E000974AB /* StockTrend.swift */,
+				EAED148325A8CED20073C46F /* Bulls'N'Bears */,
 				EAC1904F257641160030B331 /* Main.storyboard */,
 				EAC2FC7025A23FFC0060F387 /* ValuationTableViewCell.xib */,
 				EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */,
 				EAC19048257641160030B331 /* TrendMyStocks */,
-				EAC19062257641180030B331 /* TrendMyStocksTests */,
-				EAC1906D257641180030B331 /* TrendMyStocksUITests */,
 				EAC19047257641160030B331 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -180,9 +180,9 @@
 		EAC19047257641160030B331 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				EAC19046257641160030B331 /* TrendMyStocks.app */,
-				EAC1905F257641180030B331 /* TrendMyStocksTests.xctest */,
-				EAC1906A257641180030B331 /* TrendMyStocksUITests.xctest */,
+				EAC19046257641160030B331 /* Bulls'N'Bears.app */,
+				EAC1905F257641180030B331 /* Bulls'N'BearsTests.xctest */,
+				EAC1906A257641180030B331 /* Bulls'N'BearsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -190,36 +190,8 @@
 		EAC19048257641160030B331 /* TrendMyStocks */ = {
 			isa = PBXGroup;
 			children = (
-				EAFD824925A4D2C000D27566 /* DCFValuation FIles */,
-				EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */,
-				EAC19049257641160030B331 /* AppDelegate.swift */,
-				EAC1904B257641160030B331 /* SceneDelegate.swift */,
-				EAFD825025A4D2D800D27566 /* Main Display Files */,
-				EAC19055257641180030B331 /* Assets.xcassets */,
-				EAC19057257641180030B331 /* LaunchScreen.storyboard */,
-				EAC1905A257641180030B331 /* Info.plist */,
-				EAC2FCA025A256B80060F387 /* Controllers */,
-				EAC2FC2D25A0B33B0060F387 /* Model Files */,
 			);
 			path = TrendMyStocks;
-			sourceTree = "<group>";
-		};
-		EAC19062257641180030B331 /* TrendMyStocksTests */ = {
-			isa = PBXGroup;
-			children = (
-				EAC19063257641180030B331 /* TrendMyStocksTests.swift */,
-				EAC19065257641180030B331 /* Info.plist */,
-			);
-			path = TrendMyStocksTests;
-			sourceTree = "<group>";
-		};
-		EAC1906D257641180030B331 /* TrendMyStocksUITests */ = {
-			isa = PBXGroup;
-			children = (
-				EAC1906E257641180030B331 /* TrendMyStocksUITests.swift */,
-				EAC19070257641180030B331 /* Info.plist */,
-			);
-			path = TrendMyStocksUITests;
 			sourceTree = "<group>";
 		};
 		EAC2FC2D25A0B33B0060F387 /* Model Files */ = {
@@ -240,6 +212,40 @@
 				EAC2FC9925A256AD0060F387 /* ValuationsController.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		EAED148325A8CED20073C46F /* Bulls'N'Bears */ = {
+			isa = PBXGroup;
+			children = (
+				EAFD824925A4D2C000D27566 /* DCFValuation FIles */,
+				EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */,
+				EAC19049257641160030B331 /* AppDelegate.swift */,
+				EAC1904B257641160030B331 /* SceneDelegate.swift */,
+				EAFD825025A4D2D800D27566 /* Main Display Files */,
+				EAC19055257641180030B331 /* Assets.xcassets */,
+				EAC19057257641180030B331 /* LaunchScreen.storyboard */,
+				EAC1905A257641180030B331 /* Info.plist */,
+				EAC2FCA025A256B80060F387 /* Controllers */,
+				EAC2FC2D25A0B33B0060F387 /* Model Files */,
+			);
+			path = "Bulls'N'Bears";
+			sourceTree = "<group>";
+		};
+		EAED148425A8CF060073C46F /* Bulls'N'BearsTests */ = {
+			isa = PBXGroup;
+			children = (
+				EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */,
+			);
+			path = "Bulls'N'BearsTests";
+			sourceTree = "<group>";
+		};
+		EAED148F25A8CFF70073C46F /* Bulls'N'BearsUITests */ = {
+			isa = PBXGroup;
+			children = (
+				EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */,
+				EAC19070257641180030B331 /* Info.plist */,
+			);
+			path = "Bulls'N'BearsUITests";
 			sourceTree = "<group>";
 		};
 		EAFD824925A4D2C000D27566 /* DCFValuation FIles */ = {
@@ -269,9 +275,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		EAC19045257641160030B331 /* TrendMyStocks */ = {
+		EAC19045257641160030B331 /* Bulls'N'Bears */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = EAC19073257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocks" */;
+			buildConfigurationList = EAC19073257641180030B331 /* Build configuration list for PBXNativeTarget "Bulls'N'Bears" */;
 			buildPhases = (
 				EAC19042257641160030B331 /* Sources */,
 				EAC19043257641160030B331 /* Frameworks */,
@@ -281,14 +287,14 @@
 			);
 			dependencies = (
 			);
-			name = TrendMyStocks;
+			name = "Bulls'N'Bears";
 			productName = TrendMyStocks;
-			productReference = EAC19046257641160030B331 /* TrendMyStocks.app */;
+			productReference = EAC19046257641160030B331 /* Bulls'N'Bears.app */;
 			productType = "com.apple.product-type.application";
 		};
-		EAC1905E257641180030B331 /* TrendMyStocksTests */ = {
+		EAC1905E257641180030B331 /* Bulls'N'BearsTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = EAC19076257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocksTests" */;
+			buildConfigurationList = EAC19076257641180030B331 /* Build configuration list for PBXNativeTarget "Bulls'N'BearsTests" */;
 			buildPhases = (
 				EAC1905B257641180030B331 /* Sources */,
 				EAC1905C257641180030B331 /* Frameworks */,
@@ -299,14 +305,14 @@
 			dependencies = (
 				EAC19061257641180030B331 /* PBXTargetDependency */,
 			);
-			name = TrendMyStocksTests;
+			name = "Bulls'N'BearsTests";
 			productName = TrendMyStocksTests;
-			productReference = EAC1905F257641180030B331 /* TrendMyStocksTests.xctest */;
+			productReference = EAC1905F257641180030B331 /* Bulls'N'BearsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		EAC19069257641180030B331 /* TrendMyStocksUITests */ = {
+		EAC19069257641180030B331 /* Bulls'N'BearsUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = EAC19079257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocksUITests" */;
+			buildConfigurationList = EAC19079257641180030B331 /* Build configuration list for PBXNativeTarget "Bulls'N'BearsUITests" */;
 			buildPhases = (
 				EAC19066257641180030B331 /* Sources */,
 				EAC19067257641180030B331 /* Frameworks */,
@@ -317,9 +323,9 @@
 			dependencies = (
 				EAC1906C257641180030B331 /* PBXTargetDependency */,
 			);
-			name = TrendMyStocksUITests;
+			name = "Bulls'N'BearsUITests";
 			productName = TrendMyStocksUITests;
-			productReference = EAC1906A257641180030B331 /* TrendMyStocksUITests.xctest */;
+			productReference = EAC1906A257641180030B331 /* Bulls'N'BearsUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -344,7 +350,7 @@
 					};
 				};
 			};
-			buildConfigurationList = EAC19041257641160030B331 /* Build configuration list for PBXProject "TrendMyStocks" */;
+			buildConfigurationList = EAC19041257641160030B331 /* Build configuration list for PBXProject "Bulls'N'Bears" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -357,9 +363,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				EAC19045257641160030B331 /* TrendMyStocks */,
-				EAC1905E257641180030B331 /* TrendMyStocksTests */,
-				EAC19069257641180030B331 /* TrendMyStocksUITests */,
+				EAC19045257641160030B331 /* Bulls'N'Bears */,
+				EAC1905E257641180030B331 /* Bulls'N'BearsTests */,
+				EAC19069257641180030B331 /* Bulls'N'BearsUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -437,11 +443,11 @@
 				EAC190BB257662930030B331 /* StocksListViewController.swift in Sources */,
 				EAC190F52577E3B60030B331 /* ChartView.swift in Sources */,
 				EAC190EB2577E2E20030B331 /* ChartContainerView.swift in Sources */,
+				EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */,
 				EAC190CC257663730030B331 /* Stock.swift in Sources */,
 				EAC190D62576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC2FC7225A23FFC0060F387 /* ValuationTableViewCell.swift in Sources */,
 				EAC2FC6425A232780060F387 /* ValuationChooser.swift in Sources */,
-				EAC19064257641180030B331 /* TrendMyStocksTests.swift in Sources */,
 				EAC19090257642F20030B331 /* CSVImporter.swift in Sources */,
 				EAC2FC4625A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
 				EAC2FC5125A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
@@ -467,7 +473,7 @@
 				EAC190D72576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC2FC7325A23FFC0060F387 /* ValuationTableViewCell.swift in Sources */,
 				EAC2FC6525A232780060F387 /* ValuationChooser.swift in Sources */,
-				EAC1906F257641180030B331 /* TrendMyStocksUITests.swift in Sources */,
+				EAED14DF25A8D78C0073C46F /* Bulls'N'BearsUITests.swift in Sources */,
 				EAC19091257642F20030B331 /* CSVImporter.swift in Sources */,
 				EAC2FC4725A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
 				EAC2FC5225A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
@@ -485,12 +491,12 @@
 /* Begin PBXTargetDependency section */
 		EAC19061257641180030B331 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = EAC19045257641160030B331 /* TrendMyStocks */;
+			target = EAC19045257641160030B331 /* Bulls'N'Bears */;
 			targetProxy = EAC19060257641180030B331 /* PBXContainerItemProxy */;
 		};
 		EAC1906C257641180030B331 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = EAC19045257641160030B331 /* TrendMyStocks */;
+			target = EAC19045257641160030B331 /* Bulls'N'Bears */;
 			targetProxy = EAC1906B257641180030B331 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -638,12 +644,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9T25ACNCQ7;
-				INFOPLIST_FILE = TrendMyStocks/Info.plist;
+				INFOPLIST_FILE = "Bulls'N'Bears/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocks;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.uk.apptoolfactory.Bulls-N-Bears";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 2;
@@ -657,12 +663,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 9T25ACNCQ7;
-				INFOPLIST_FILE = TrendMyStocks/Info.plist;
+				INFOPLIST_FILE = "Bulls'N'Bears/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.TrendMyStocks;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.uk.apptoolfactory.Bulls-N-Bears";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 2;
@@ -687,7 +693,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TrendMyStocks.app/TrendMyStocks";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bulls'N'Bears.app/Bulls'N'Bears";
 			};
 			name = Debug;
 		};
@@ -709,7 +715,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TrendMyStocks.app/TrendMyStocks";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bulls'N'Bears.app/Bulls'N'Bears";
 			};
 			name = Release;
 		};
@@ -756,7 +762,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		EAC19041257641160030B331 /* Build configuration list for PBXProject "TrendMyStocks" */ = {
+		EAC19041257641160030B331 /* Build configuration list for PBXProject "Bulls'N'Bears" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EAC19071257641180030B331 /* Debug */,
@@ -765,7 +771,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EAC19073257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocks" */ = {
+		EAC19073257641180030B331 /* Build configuration list for PBXNativeTarget "Bulls'N'Bears" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EAC19074257641180030B331 /* Debug */,
@@ -774,7 +780,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EAC19076257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocksTests" */ = {
+		EAC19076257641180030B331 /* Build configuration list for PBXNativeTarget "Bulls'N'BearsTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EAC19077257641180030B331 /* Debug */,
@@ -783,7 +789,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EAC19079257641180030B331 /* Build configuration list for PBXNativeTarget "TrendMyStocksUITests" */ = {
+		EAC19079257641180030B331 /* Build configuration list for PBXNativeTarget "Bulls'N'BearsUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EAC1907A257641180030B331 /* Debug */,
