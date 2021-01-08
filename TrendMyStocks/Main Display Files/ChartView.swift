@@ -49,36 +49,7 @@ class ChartView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
                 
-//        dateFormatter = {
-//            let formatter = DateFormatter()
-//            formatter.locale = NSLocale.current
-//            formatter.timeZone = NSTimeZone.local
-//            formatter.dateFormat = "d.M."
-//            return formatter
-//        }()
-//
-//        currencyFormatter = {
-//            let formatter = NumberFormatter()
-//            formatter.currencySymbol = "$"
-//            formatter.numberStyle = NumberFormatter.Style.currency
-//            return formatter
-//        }()
-//
-//        percentFormatter = {
-//            let formatter = NumberFormatter()
-//            formatter.numberStyle = .percent
-//            formatter.maximumFractionDigits = 0
-//            formatter.minimumIntegerDigits = 1
-//            return formatter
-//        }()
-//
-//        numberFormatter = {
-//            let formatter = NumberFormatter()
-//            formatter.maximumFractionDigits = 2
-//            return formatter
-//        }()
 
-                
         for _ in 0...30 {
             let aLabel: UILabel = {
                 let label = UILabel()
@@ -208,13 +179,54 @@ class ChartView: UIView {
 
         })
         
+// current price line
+        
+        if let currentPrice = stockToShow?.dailyPrices.last?.close {
+            let currentPriceLine = UIBezierPath()
+            let pp1 = PriceDate(stockToShow!.dailyPrices.first!.tradingDate, currentPrice)
+            let pp2 = PriceDate(stockToShow!.dailyPrices.last!.tradingDate, currentPrice)
+            
+            let startPoint = plotPricePoint(pricePoint: pp1)
+            var endPoint = plotPricePoint(pricePoint: pp2)
+            endPoint.x = yAxisLabels.first!.frame.maxX + 5
+            currentPriceLine.move(to: startPoint)
+            currentPriceLine.addLine(to: endPoint)
+            
+            UIColor.white.setStroke()
+            currentPriceLine.stroke()
+            
+            if let existingValuation = ValuationsController.returnDCFValuations(company: stockToShow!.name)?.first {
+                if let fairValue = existingValuation.returnIValue() {
+                    let ratio = currentPrice / fairValue
+                    let ratio$ = " " + (numberFormatterWithFraction.string(from: ratio as NSNumber) ?? "") + "x"
+
+                    let newLabel: UILabel = {
+                        let label = UILabel()
+                        label.numberOfLines = 1
+                        label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                        label.textColor = UIColor.systemBlue
+                        label.backgroundColor = UIColor.label
+                        label.text = ratio$
+                        label.sizeToFit()
+                        
+                        let labelTop = endPoint.y - label.frame.height / 2
+                        
+                        label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
+                        return label
+                    }()
+                
+                    addSubview(newLabel)
+                }
+            }
+        }
+        
 // lowest point lines
         trendLabels.forEach { (label) in
             label.removeFromSuperview()
         }
         trendLabels.removeAll()
 
-        var point = CGPoint()
+//        var point = CGPoint()
         
 // low point connection lines
 //        let trends = validStock.longerTrends(priceOption: .low, findOption: .minimum)

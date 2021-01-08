@@ -115,7 +115,7 @@ public class DCFValuation: NSManagedObject {
         }
     }
     
-    public func returnIValue() -> Double {
+    public func returnIValue() -> Double? {
         
         // 1 calculate 'FCF_to_equity' from fFCFo + capExpend
         // 2 calculate 'FCF / netIncome[]' from FCF_t_e / netIncome
@@ -213,7 +213,10 @@ public class DCFValuation: NSManagedObject {
 // 19
         let todaysValue = pvOfFutureCF.reduce(0, +)
 // 20
-        let fairValue = todaysValue / sharesOutstanding
+        var fairValue: Double?
+        if sharesOutstanding > 0 {
+            fairValue = todaysValue / sharesOutstanding
+        }
         
         return fairValue
     }

@@ -51,10 +51,11 @@ class StockListCellTableViewCell: UITableViewCell {
         let timeSinceLastStockDate = Date().timeIntervalSince(stock.dailyPrices.last!.tradingDate)
         detail.text = timeFormatter.string(from: timeSinceLastStockDate)
         if let validValuation = valuation {
-            valuationButton.setImage(nil, for: .normal)
-            let intrinsicValue = validValuation.returnIValue()
-            let iv$ = currencyFormatterNoGapWithPence.string(from: intrinsicValue as NSNumber)
-            valuationButton.setTitle(iv$, for: .normal)
+            if let intrinsicValue = validValuation.returnIValue() {
+                let iv$ = currencyFormatterNoGapWithPence.string(from: intrinsicValue as NSNumber)
+                valuationButton.setImage(nil, for: .normal)
+                valuationButton.setTitle(iv$, for: .normal)
+            }
         }
 
     }
