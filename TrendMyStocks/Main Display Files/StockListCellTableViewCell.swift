@@ -30,18 +30,7 @@ class StockListCellTableViewCell: UITableViewCell {
         formatter.includesApproximationPhrase = true
         return formatter
     }()
-    
-    let currencyFormatter1: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.currencySymbol = "$"
-        formatter.numberStyle = NumberFormatter.Style.currency
-        formatter.minimumFractionDigits = 2
-        formatter.maximumFractionDigits = 2
-        formatter.usesGroupingSeparator = true
-        return formatter
-    }()
-
-    
+        
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -64,7 +53,7 @@ class StockListCellTableViewCell: UITableViewCell {
         if let validValuation = valuation {
             valuationButton.setImage(nil, for: .normal)
             let intrinsicValue = validValuation.returnIValue()
-            let iv$ = currencyFormatter1.string(from: intrinsicValue as NSNumber)
+            let iv$ = currencyFormatterNoGapWithPence.string(from: intrinsicValue as NSNumber)
             valuationButton.setTitle(iv$, for: .normal)
         }
 

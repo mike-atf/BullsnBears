@@ -118,7 +118,7 @@ class ChartView: UIView {
                 let label = UILabel()
                 label.font = UIFont.preferredFont(forTextStyle: .footnote)
                 label.textAlignment = .right
-                label.text = currencyFormatter.string(from: NSNumber(value: labelPrice))
+                label.text = currencyFormatterNoGapWithPence.string(from: NSNumber(value: labelPrice))
                 label.sizeToFit()
                 self.addSubview(label)
                 return label
@@ -367,7 +367,7 @@ class ChartView: UIView {
     
     private func addTrendLabel(price: Double, increase1: Double, increase2: Double? = nil, correlation: Double? = nil, reliability: Double? = nil, color: UIColor) {
         
-        let endPrice$ = currencyFormatter.string(from: NSNumber(value: price))!
+        let endPrice$ = currencyFormatterNoGapWithPence.string(from: NSNumber(value: price))!
         let increase1$ = percentFormatter.string(from: NSNumber(value: increase1))!
         var increase2$ = ""
         if let validIncrease2 = increase2 {
@@ -378,7 +378,7 @@ class ChartView: UIView {
         
         var text = " \(endPrice$) = \(increase1$) \n From latest: \(increase2$) "
         if let r = correlation {
-            text = text + "\n r=" + numberFormatter.string(from: NSNumber(value: r))! + " "
+            text = text + "\n r=" + numberFormatterWithFraction.string(from: NSNumber(value: r))! + " "
         }
         if let r = reliability {
             text = text + "\n R=" + percentFormatter.string(from: NSNumber(value: r))! + " "

@@ -106,7 +106,9 @@ class ValuationsController : DCFValuationHelper {
             case 0:
                 return .currency
             case 1:
-                return .number
+                return .numberWithDecimals
+            case 2:
+                return .numberNoDecimals
             default:
                 print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
             }
@@ -157,7 +159,7 @@ class ValuationsController : DCFValuationHelper {
             print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
         }
         
-        return .number
+        return .numberWithDecimals
     }
     
     public func configureCell(indexPath: IndexPath, cell: ValuationTableViewCell) {
@@ -394,11 +396,11 @@ class ValuationsController : DCFValuationHelper {
                     value$ = percentFormatter.string(from: number as NSNumber)
                }
                 else {
-                    if indexPath == IndexPath(item: 1, section: 1) {
+                    if indexPath == IndexPath(item: 1, section: 1) || indexPath == IndexPath(item: 2, section: 1) {
                         // beta
-                        value$ = numberFormatter.string(from: number as NSNumber)
+                        value$ = numberFormatterWithFraction.string(from: number as NSNumber)
                     } else {
-                        value$ = currencyFormatter.string(from: number as NSNumber)
+                        value$ = currencyFormatterGapNoPence.string(from: number as NSNumber)
                     }
                 }
             }

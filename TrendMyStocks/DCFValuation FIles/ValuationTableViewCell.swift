@@ -73,11 +73,16 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     @IBAction
     func textWasChanged() {
         
-        
         if valueFormat == .currency {
             let numbers = textField.text?.filter("0123456789.".contains)
             guard let value = (Double(numbers ?? "0")) else { return }
-            textField.text = currencyFormatter.string(from: value as NSNumber)
+            textField.text = currencyFormatterGapNoPence.string(from: value as NSNumber)
+        }
+        else if valueFormat == .numberNoDecimals {
+            let numbers = textField.text?.filter("0123456789.".contains)
+            guard let value = (Double(numbers ?? "0")) else { return }
+            let value$ = numberFormatterNoFraction.string(from: value as NSNumber)
+            textField.text = value$
         }
     }
 }
