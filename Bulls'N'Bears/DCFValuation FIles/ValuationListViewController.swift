@@ -13,13 +13,18 @@ class ValuationListViewController: UITableViewController {
     var sourceIndexPath: IndexPath!
     
     var valuationMethod:ValuationMethods!
-    var valuation: DCFValuation?
+    var dcfValuation: DCFValuation?
+    var r1Valuation: Rule1Valuation?
+    
     var sectionSubtitles: [String]?
     var sectionTitles: [String]?
     var rowTitles: [[String]]?
 
-    var helper: DCFValuationHelper!
-    var dcfController:ValuationsController!
+    var dcfHelper: DCFValuationHelper?
+    var dcfController: ValuationsController?
+    
+    var r1vHelper: R1ValuationHelper?
+    var r1VController: Rule1ValuationController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,13 +35,17 @@ class ValuationListViewController: UITableViewController {
         
         
         tableView.register(UINib(nibName: "ValuationTableViewCell", bundle: nil), forCellReuseIdentifier: "valuationTableViewCell")
-        
-        dcfController = ValuationsController(listView: self)
-        helper = dcfController
+        if valuationMethod == .dcf {
+            dcfController = ValuationsController(listView: self)
+            dcfHelper = dcfController
+        } else {
+            r1VController = Rule1ValuationController(listView: self)
+            r1vHelper = r1VController
+        }
 
-        sectionTitles = helper.dcfSectionTitles()
-        sectionSubtitles = helper.dcfSectionSubTitles()
-        rowTitles = helper.buildRowTitles()
+        sectionTitles = dcfHelper?.dcfSectionTitles() ?? r1vHelper?.r1SectionTitles()
+        sectionSubtitles = dcfHelper?.dcfSectionSubTitles() ?? r1vHelper?.r1SectionSubTitles()
+        rowTitles = dcfHelper?.buildRowTitles() ?? r1vHelper?.buildRowTitles()
         
         tableView.reloadData()
 
@@ -62,19 +71,25 @@ class ValuationListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: indexPath) as! ValuationTableViewCell
 
-        if indexPath == IndexPath(item: 2, section: 8) {
-            print()
+        if let helper = dcfHelper {
+            helper.configureCell(indexPath: indexPath, cell: cell)
+        } else {
+            r1vHelper!.configureCell(indexPath: indexPath, cell: cell)
         }
-        
-        helper.configureCell(indexPath: indexPath, cell: cell)
         
         return cell
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         
-        if [3,4,7,9].contains(section) { return 10 }
-        else {  return (UIDevice().userInterfaceIdiom == .pad) ? 70 : 60 }
+        if valuationMethod == .dcf {
+            if [3,4,7,9].contains(section) { return 10 }
+            else {  return (UIDevice().userInterfaceIdiom == .pad) ? 70 : 60 }
+        } else {
+            if [0,1,6,7,8,9,10,11].contains(section) { return 70 }
+            else {  return (UIDevice().userInterfaceIdiom == .pad) ? 40 : 60 }
+
+        }
        
     }
     
@@ -145,7 +160,7 @@ class ValuationListViewController: UITableViewController {
     
     @objc
     func saveValuation() {
-        valuation?.save()
+        dcfValuation?.save()
         self.dismiss(animated: true) {
             self.presentingListVC.valuationCompleted(indexPath: self.sourceIndexPath)
         }
@@ -159,8 +174,8 @@ class ValuationListViewController: UITableViewController {
     
     public func helperAskedToEnterNextTextField(targetPath: IndexPath) {
         
-//        let targetCell = tableView.cellForRow(at: targetPath) as! ValuationTableViewCell
-        let targetCell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: targetPath) as! ValuationTableViewCell
+        let targetCell = tableView.cellForRow(at: targetPath) as! ValuationTableViewCell
+//        let targetCell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: targetPath) as! ValuationTableViewCell
         
         tableView.selectRow(at: targetPath, animated: true, scrollPosition: .none)
         

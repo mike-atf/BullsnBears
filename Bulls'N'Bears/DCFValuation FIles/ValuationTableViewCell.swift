@@ -17,7 +17,8 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet var detail: UILabel!
     @IBOutlet var textField: UITextField!
         
-    var delegate: DCFValuationHelper!
+    var dcfDelegate: DCFValuationHelper?
+    var r1Delegate: R1ValuationHelper?
     var indexPath: IndexPath!
     var valueFormat: ValuationCellValueFormat!
     
@@ -42,9 +43,10 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
         indexPath = IndexPath()
     }
     
-    public func configure(title: String, value$: String?, detail: String, indexPath: IndexPath, delegate: DCFValuationHelper, valueFormat: ValuationCellValueFormat) {
+    public func configure(title: String, value$: String?, detail: String, indexPath: IndexPath, dcfDelegate: DCFValuationHelper?, r1Delegate: R1ValuationHelper?, valueFormat: ValuationCellValueFormat) {
         
-        self.delegate = delegate
+        self.dcfDelegate = dcfDelegate
+        self.r1Delegate = r1Delegate
         self.indexPath = indexPath
         self.title.text = title
         self.textField.placeholder = value$
@@ -54,7 +56,12 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     
     @IBAction func textEntryComplete(_ sender: UITextField) {
         
-        delegate.userEnteredText(sender: sender, indexPath: indexPath)
+        if let delegate = dcfDelegate {
+            delegate.userEnteredText(sender: sender, indexPath: indexPath)
+        }
+        else {
+            r1Delegate!.userEnteredText(sender: sender, indexPath: indexPath)
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

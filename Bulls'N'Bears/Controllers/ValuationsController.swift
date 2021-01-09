@@ -26,7 +26,6 @@ class ValuationsController : DCFValuationHelper {
     var netIncomeGrowthRates = [Double]()
     var fcfGrowthRates = [Double]()
     var averagePredictedRevGrowth: Double?
-    let locationOfError = "ValuationContoroller."
 
     let dcfValuationSectionTitles = ["General","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
     let dcfValuationSectionSubtitles = ["General","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "","Details > Analysis > Revenue estimate", "", ""]
@@ -34,7 +33,7 @@ class ValuationsController : DCFValuationHelper {
        
     init(listView: ValuationListViewController) {
         self.valuationListViewController = listView
-        self.valuation = listView.valuation
+        self.valuation = listView.dcfValuation
         recalculateRevenueGrowth()
         recalculateIncomeGrowth()
         recalculateFCFGrowth()
@@ -75,6 +74,22 @@ class ValuationsController : DCFValuationHelper {
         return newValuation
     }
     
+    static func createR1Valuation(company: String) -> Rule1Valuation? {
+        let newValuation:Rule1Valuation? = {
+            NSEntityDescription.insertNewObject(forEntityName: "Rule1Valuation", into: managedObjectContext) as? Rule1Valuation
+        }()
+        newValuation?.company = company
+        do {
+            try  managedObjectContext.save()
+        } catch {
+            let error = error
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
+        }
+
+        return newValuation
+    }
+
+    
     public func dcfSectionTitles() -> [String] {
         return dcfValuationSectionTitles
     }
@@ -83,7 +98,7 @@ class ValuationsController : DCFValuationHelper {
         return dcfValuationSectionSubtitles
     }
     
-    internal func dcfCellValueFormat(indexPath: IndexPath) -> ValuationCellValueFormat {
+    internal func cellValueFormat(indexPath: IndexPath) -> ValuationCellValueFormat {
         
         switch indexPath.section {
         case 0:
@@ -168,10 +183,10 @@ class ValuationsController : DCFValuationHelper {
         let value = getDCFValue(indexPath: indexPath)
         let value$ = getCellValueText(value: value, indexPath: indexPath)
         let rowTitle = (rowTitles ?? buildRowTitles())[indexPath.section][indexPath.row]
-        let format = dcfCellValueFormat(indexPath: indexPath)
+        let format = cellValueFormat(indexPath: indexPath)
         let detail$ = getDetail$(indexPath: indexPath) ?? ""
         
-        cell.configure(title: rowTitle, value$: value$, detail: detail$, indexPath: indexPath, delegate: self, valueFormat: format)
+        cell.configure(title: rowTitle, value$: value$, detail: detail$, indexPath: indexPath, dcfDelegate: self, r1Delegate: nil, valueFormat: format)
     }
     
     func userEnteredText(sender: UITextField, indexPath: IndexPath) {

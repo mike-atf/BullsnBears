@@ -24,11 +24,13 @@ extension Rule1Valuation {
     @NSManaged public var debt: Double
     @NSManaged public var hxPE: [Double]?
     @NSManaged public var growthEstimates: [Double]?
+    @NSManaged public var adjGrowthEstimates: [Double]?
     @NSManaged public var insiderStockBuys: Double
     @NSManaged public var insiderStockSells: Double
     @NSManaged public var company: String?
     @NSManaged public var creationDate: Date?
-
+    @NSManaged public var insiderStocks: Double
+    @NSManaged public var ceoRating: Double
 }
 
 extension Rule1Valuation : Identifiable {

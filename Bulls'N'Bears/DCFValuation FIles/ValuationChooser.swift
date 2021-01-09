@@ -37,12 +37,11 @@ class ValuationChooser: UIViewController {
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.dcf
-            tvc.valuation = valuation
+            tvc.dcfValuation = valuation
             tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
             
             self.dismiss(animated: true) {
-//                self.rootView.navigationController?.pushViewController(tvc, animated: true)
                 self.rootView.present(tvc, animated: true)
             }
 
@@ -53,6 +52,22 @@ class ValuationChooser: UIViewController {
     
     @IBAction func rule1Action(_ sender: UIButton) {
         
+        guard let valuation = (Rule1ValuationController.returnR1Valuations(company: stock.name)?.first ?? ValuationsController.createR1Valuation(company: stock.name)) else {
+            return
+        }
+
+        if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
+            tvc.valuationMethod = ValuationMethods.rule1
+            tvc.r1Valuation = valuation
+            tvc.presentingListVC = rootView
+            tvc.sourceIndexPath = sourceCellPath
+            
+            self.dismiss(animated: true) {
+                self.rootView.present(tvc, animated: true)
+            }
+
+        }
+
     }
 
     // MARK: - Navigation
