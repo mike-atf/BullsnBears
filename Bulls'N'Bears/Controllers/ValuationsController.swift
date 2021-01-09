@@ -26,6 +26,7 @@ class ValuationsController : DCFValuationHelper {
     var netIncomeGrowthRates = [Double]()
     var fcfGrowthRates = [Double]()
     var averagePredictedRevGrowth: Double?
+    let locationOfError = "ValuationContoroller."
 
     let dcfValuationSectionTitles = ["General","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
     let dcfValuationSectionSubtitles = ["General","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "","Details > Analysis > Revenue estimate", "", ""]
@@ -53,7 +54,7 @@ class ValuationsController : DCFValuationHelper {
         do {
             valuations = try managedObjectContext.fetch(fetchRequest)
             } catch let error {
-                print("error fetching dcfValuations: \(error)")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching dcfValuations")
         }
 
         return valuations
@@ -64,12 +65,11 @@ class ValuationsController : DCFValuationHelper {
             NSEntityDescription.insertNewObject(forEntityName: "DCFValuation", into: managedObjectContext) as? DCFValuation
         }()
         newValuation?.company = company
-        
         do {
             try  managedObjectContext.save()
         } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            let error = error
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving dcfValuations")
         }
 
         return newValuation
@@ -98,7 +98,7 @@ class ValuationsController : DCFValuationHelper {
             case 3:
                 return .percent
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 1:
             // 'Key Statistics
@@ -110,7 +110,8 @@ class ValuationsController : DCFValuationHelper {
             case 2:
                 return .numberNoDecimals
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
+
             }
         case 2:
             // 'Income Statement S1 - Revenue
@@ -128,7 +129,7 @@ class ValuationsController : DCFValuationHelper {
             case 2:
                 return .currency
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 5:
             // 'balance sheet'
@@ -138,7 +139,7 @@ class ValuationsController : DCFValuationHelper {
             case 1:
                 return .currency
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 6:
             // 'Cash Flow S1
@@ -156,7 +157,7 @@ class ValuationsController : DCFValuationHelper {
             // adjsuted predcited growth rate
             return .percent
         default:
-            print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
         }
         
         return .numberWithDecimals
@@ -180,12 +181,13 @@ class ValuationsController : DCFValuationHelper {
         }
         
         guard let value = Double(validtext.filter("0123456789.".contains)) else {
-            print("error converting entered text to number")
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "error converting entered text to number: \(sender.text ?? "no text")")
             return
         }
         
         guard let validValuation = valuation else {
             print("error assigning entered text: Controller doesn't have valuation")
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "error assigning entered text: Controller doesn't have valuation")
             return
         }
         
@@ -221,7 +223,7 @@ class ValuationsController : DCFValuationHelper {
                 validValuation.sharesOutstanding = value
                 jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 2:
             // 'Income Statement S1 - Revenue
@@ -250,7 +252,7 @@ class ValuationsController : DCFValuationHelper {
                 validValuation.expenseIncomeTax = value
                 jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 5:
             // 'balance sheet'
@@ -263,7 +265,7 @@ class ValuationsController : DCFValuationHelper {
                 validValuation.debtLT = value
                 jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 6:
             // 'Cash Flow S1
@@ -295,13 +297,12 @@ class ValuationsController : DCFValuationHelper {
             // adjsuted predicted growth rate
             validValuation.revGrowthPredAdj![indexPath.row] = value / 100.0
         default:
-            print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
         }
         
         if let updatePaths = determineRowsToUpdateAfterUserEntry(indexPath: indexPath) {
             valuationListViewController.helperUpdatedRows(paths: updatePaths)
         }
-        print(jumpToCellPath)
         if let jumpPath = jumpToCellPath {
             valuationListViewController.helperAskedToEnterNextTextField(targetPath: jumpPath)
         }
@@ -312,7 +313,7 @@ class ValuationsController : DCFValuationHelper {
         
         
         guard let validValuation = valuation else {
-            print("error assiging entered text: Controller doesn't have valuation")
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "error assiging entered text: Controller doesn't have valuation")
             return nil
         }
         
@@ -350,7 +351,7 @@ class ValuationsController : DCFValuationHelper {
             paths?.append(IndexPath(row: 1, section: 10))
 
         default:
-            print(" unexpected default encountered in determineRowsToUpdateAfterUserEntry")
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unexpected default encountered in determineRowsToUpdateAfterUserEntry")
         }
         
         return paths
@@ -477,7 +478,7 @@ class ValuationsController : DCFValuationHelper {
             case 2:
                 return valuation.sharesOutstanding
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 2:
             // 'Income Statement S1 - Revenue
@@ -495,7 +496,7 @@ class ValuationsController : DCFValuationHelper {
             case 2:
                 return valuation.expenseIncomeTax
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 5:
             // 'balance sheet'
@@ -505,7 +506,7 @@ class ValuationsController : DCFValuationHelper {
             case 1:
                 return valuation.debtLT
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 6:
             // 'Cash Flow S1
@@ -523,7 +524,7 @@ class ValuationsController : DCFValuationHelper {
             // adjsuted predcited growth rate
             return averagePredictedRevGrowth
         default:
-            print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
         }
         
         return "error"
@@ -565,7 +566,7 @@ class ValuationsController : DCFValuationHelper {
                 }
                 else { return nil }
             default:
-                print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 5:
             // 'balance sheet'
@@ -581,7 +582,7 @@ class ValuationsController : DCFValuationHelper {
                     return percentFormatter.string(from: result as NSNumber)
                 } else { return nil }
             default:
-                print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
                 return ""
             }
         case 6:
@@ -605,7 +606,7 @@ class ValuationsController : DCFValuationHelper {
                 return percentFormatter.string(from: value as NSNumber)
             }
         default:
-            print("undefined indexpath \(indexPath) in ValuationController.getDetailValue")
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
         }
         
         return nil

@@ -20,6 +20,10 @@ class StocksListViewController: UITableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
         
+        if stocks.count == 0 {
+            showWelcomeView()
+        }
+        
     }
 
     @IBAction func addButtonAction(_ sender: Any) {
@@ -28,8 +32,26 @@ class StocksListViewController: UITableViewController {
 
             docBrowser.stockListVC = self
             self.present(docBrowser, animated: true)
+            
         }
     }
+    
+    func showWelcomeView() {
+        
+        let welcomeView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WelcomeViewController")
+        
+        welcomeView.loadViewIfNeeded()
+        
+        self.present(welcomeView, animated: true) {
+            if let textView = welcomeView.view.viewWithTag(10) as? UITextView {
+                let text = "Thank you for trying Bulls 'N' Bears\n\nThe App displays candle stick charts from .csv files you need to import, and calculates and displays various price trends.\n\nIt also allows calculating a fair share price estimate from data you enter.\n\nHow does it work?\n1. Go to Yahoo Finance, select a stock, and download 'Historical Data' as .csv file.\n2. Inside this App, tap + to import the csv. file from where you downloaded it to on our device.\n\n3.Select trends by toggling color and time buttons\n(A = all, 3 = 3 months, 1 = 1 month\n4. To get a fair price estimate tap the '$' of a stock listed, then chose a valuation method.\n5. Then enter all required data from Yahoo finance or another source, and save."
+                textView.text = text
+            }
+
+        }
+        
+    }
+    
     
     @objc
     func openCSCFilesInDocumentDirectory() {
@@ -121,7 +143,7 @@ class StocksListViewController: UITableViewController {
                     try FileManager.default.removeItem(at: validURL)
                 }
                 catch let error {
-                    print("couldn't remove stock file \(error)")
+                    ErrorController.addErrorLog(errorLocation: "ValuationController." + #function, systemError: error, errorInfo: "couldn't remove stock file ")
                 }
             }
             

@@ -11,8 +11,8 @@
         <!--Stock ChartVC-->
         <scene sceneID="eWb-DL-wM9">
             <objects>
-                <viewController id="GS7-IZ-4uD" customClass="StockChartVC" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="DMz-IK-SGN" customClass="ChartContainerView" customModule="TrendMyStocks" customModuleProvider="target">
+                <viewController id="GS7-IZ-4uD" customClass="StockChartVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="DMz-IK-SGN" customClass="ChartContainerView" customModule="Bulls_N_Bears" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="859.5" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -22,7 +22,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MVz-dh-kgA" customClass="CheckButton" customModule="TrendMyStocks" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MVz-dh-kgA" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="212" y="64" width="33" height="33"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -32,7 +32,7 @@
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="hec-V4-skf"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pyF-an-nSb" customClass="CheckButton" customModule="TrendMyStocks" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pyF-an-nSb" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="265" y="64" width="32.5" height="33"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -42,7 +42,7 @@
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="xiO-nM-fR9"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vMW-cw-G3E" userLabel="Button3" customClass="CheckButton" customModule="TrendMyStocks" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vMW-cw-G3E" userLabel="Button3" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="317.5" y="64" width="33" height="33"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -55,7 +55,7 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doh-lM-a4B">
                                 <rect key="frame" x="20" y="111" width="820" height="689"/>
                                 <subviews>
-                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="TrendMyStocks" customModuleProvider="target">
+                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="3320" height="689"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
@@ -73,7 +73,7 @@
                                 <viewLayoutGuide key="contentLayoutGuide" id="JIg-Ya-QlM"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="ZAI-FU-kZr"/>
                             </scrollView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="28E-NM-pCT" customClass="CheckButton" customModule="TrendMyStocks" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="28E-NM-pCT" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="800.5" y="64" width="33" height="33"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -83,14 +83,14 @@
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="Bon-8v-zF6"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hAd-Vi-f51" customClass="CheckButton" customModule="TrendMyStocks" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hAd-Vi-f51" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="748" y="64" width="32.5" height="33"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="yGM-Sn-b0n"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hrq-ff-sUC" customClass="CheckButton" customModule="TrendMyStocks" customModuleProvider="target">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hrq-ff-sUC" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="695" y="64" width="33" height="33"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
@@ -152,13 +152,13 @@
         <!--Revenue-->
         <scene sceneID="esG-QI-hKZ">
             <objects>
-                <tableViewController storyboardIdentifier="ValuationListViewController" title="Revenue" extendedLayoutIncludesOpaqueBars="YES" modalTransitionStyle="crossDissolve" id="44u-xA-fyj" customClass="ValuationListViewController" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="ValuationListViewController" title="Revenue" extendedLayoutIncludesOpaqueBars="YES" modalTransitionStyle="crossDissolve" id="44u-xA-fyj" customClass="ValuationListViewController" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="9kl-Gg-cku">
                         <rect key="frame" x="0.0" y="0.0" width="350" height="660"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valuationListCell" id="e9i-LB-o3D" customClass="ValuationTableViewCell" customModule="TrendMyStocks" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valuationListCell" id="e9i-LB-o3D" customClass="ValuationTableViewCell" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="16" y="55.5" width="318" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e9i-LB-o3D" id="Ie0-Ok-DJG">
@@ -181,16 +181,16 @@
             </objects>
             <point key="canvasLocation" x="695" y="1553"/>
         </scene>
-        <!--Company List-->
+        <!--Stock List-->
         <scene sceneID="gJ5-Jm-dY6">
             <objects>
-                <tableViewController clearsSelectionOnViewWillAppear="NO" id="RUK-Av-gO5" customClass="StocksListViewController" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController clearsSelectionOnViewWillAppear="NO" id="RUK-Av-gO5" customClass="StocksListViewController" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="xrD-9c-2g4">
                         <rect key="frame" x="0.0" y="0.0" width="420" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="stockListCell" id="cg2-P5-XAy" customClass="StockListCellTableViewCell" customModule="TrendMyStocks" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="stockListCell" id="cg2-P5-XAy" customClass="StockListCellTableViewCell" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="28" width="420" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cg2-P5-XAy" id="kvh-gM-G2b">
@@ -207,7 +207,7 @@
                             <outlet property="delegate" destination="RUK-Av-gO5" id="cgj-Ht-gUx"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Company List" id="DtB-UT-kti">
+                    <navigationItem key="navigationItem" title="Stock List" id="DtB-UT-kti">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="hqe-cX-e7c">
                             <connections>
                                 <action selector="addButtonAction:" destination="RUK-Av-gO5" id="Eta-eI-A4Z"/>
@@ -238,10 +238,44 @@
             </objects>
             <point key="canvasLocation" x="595" y="-299"/>
         </scene>
+        <!--View Controller-->
+        <scene sceneID="9CG-B2-HBf">
+            <objects>
+                <viewController storyboardIdentifier="WelcomeViewController" id="bol-Tn-INp" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="lvt-vD-kDg">
+                        <rect key="frame" x="0.0" y="0.0" width="640" height="620"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" tag="10" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" text="Thanks for trying out Bulls 'N' Bears" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="4PW-Qz-h32">
+                                <rect key="frame" x="59" y="41" width="529" height="556"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="xZI-VJ-JUH"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="xZI-VJ-JUH" firstAttribute="trailing" secondItem="4PW-Qz-h32" secondAttribute="trailing" constant="52" id="2kv-0o-m3c"/>
+                            <constraint firstItem="4PW-Qz-h32" firstAttribute="leading" secondItem="xZI-VJ-JUH" secondAttribute="leading" constant="59" id="5Mh-Gb-yhJ"/>
+                            <constraint firstItem="4PW-Qz-h32" firstAttribute="top" secondItem="xZI-VJ-JUH" secondAttribute="top" constant="41" id="NaI-ic-gdH"/>
+                            <constraint firstItem="xZI-VJ-JUH" firstAttribute="bottom" secondItem="4PW-Qz-h32" secondAttribute="bottom" constant="23" id="jxx-ZD-PWv"/>
+                        </constraints>
+                    </view>
+                    <value key="contentSizeForViewInPopover" type="size" width="640" height="620"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oWZ-55-wYv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1303" y="-1058"/>
+        </scene>
         <!--Master Split View-->
         <scene sceneID="59P-Xd-ioB">
             <objects>
-                <splitViewController allowDoubleColumnStyle="YES" id="0XX-RQ-AUp" customClass="MasterSplitView" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController allowDoubleColumnStyle="YES" id="0XX-RQ-AUp" customClass="MasterSplitView" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <connections>
                         <segue destination="hIj-B5-SEC" kind="relationship" relationship="masterViewController" id="kSt-DT-z5r"/>
                         <segue destination="7pi-tm-0Fg" kind="relationship" relationship="detailViewController" id="mBp-dp-A5V"/>
@@ -273,7 +307,7 @@
         <!--Choose Valuation-->
         <scene sceneID="3rP-MM-pnC">
             <objects>
-                <viewController storyboardIdentifier="ValuationChoser" title="Choose Valuation" modalTransitionStyle="crossDissolve" modalPresentationStyle="formSheet" id="mJb-IX-AOv" customClass="ValuationChooser" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ValuationChoser" title="Choose Valuation" modalTransitionStyle="crossDissolve" modalPresentationStyle="formSheet" id="mJb-IX-AOv" customClass="ValuationChooser" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8TO-EM-VNf">
                         <rect key="frame" x="0.0" y="0.0" width="350" height="200"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -407,7 +441,7 @@
         <!--Document Browser View Controller-->
         <scene sceneID="YiR-FU-KNn">
             <objects>
-                <viewController storyboardIdentifier="DocBrowserView" id="uwl-5k-RRa" customClass="DocumentBrowserViewController" customModule="TrendMyStocks" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="DocBrowserView" id="uwl-5k-RRa" customClass="DocumentBrowserViewController" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3s9-Hb-PYN">
                         <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -162,6 +162,9 @@ class ValuationListViewController: UITableViewController {
 //        let targetCell = tableView.cellForRow(at: targetPath) as! ValuationTableViewCell
         let targetCell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: targetPath) as! ValuationTableViewCell
         
+        tableView.selectRow(at: targetPath, animated: true, scrollPosition: .none)
+        
+        targetCell.textField.text = "This is selected next"
         targetCell.textField.becomeFirstResponder()
     }
 

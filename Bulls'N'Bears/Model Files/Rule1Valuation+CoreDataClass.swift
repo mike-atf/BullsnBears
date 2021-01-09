@@ -24,8 +24,12 @@ public class Rule1Valuation: NSManagedObject {
         }
     }
     
-    static func save(in context: NSManagedObjectContext) {
+    func save() {
         
+        guard let context = managedObjectContext else {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "no moc available - can't save valuation")
+            return
+        }
         do {
             try  context.save()
         } catch {
@@ -34,13 +38,13 @@ public class Rule1Valuation: NSManagedObject {
         }
 
     }
-    
-    func delete(from managedObjectContext: NSManagedObjectContext) {
+
+    func delete() {
        
-        managedObjectContext.delete(self)
+        managedObjectContext?.delete(self)
  
         do {
-            try managedObjectContext.save()
+            try managedObjectContext?.save()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")

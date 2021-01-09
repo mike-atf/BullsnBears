@@ -47,7 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
     // MARK: - Core Data stack
 
-    var persistentContainer: NSPersistentCloudKitContainer = {
+    lazy var persistentContainer: NSPersistentCloudKitContainer = {
 
         let container = NSPersistentCloudKitContainer(name: "TrendMyStocks")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in

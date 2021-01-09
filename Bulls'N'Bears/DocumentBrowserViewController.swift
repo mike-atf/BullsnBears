@@ -62,20 +62,20 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                     //remove any existing file
                     try FileManager.default.removeItem(atPath: copyFilePath)
                 } catch let error {
-                    print("File removing error \(error)")
+                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File removing error")
                 }
             }
             
             let copyToURL = URL(fileURLWithPath: copyFilePath)
             do {
                 guard url.startAccessingSecurityScopedResource() else {
-                    print("Document Browser copying selected file to reources - access denied")
+                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Document Browser copying selected file to reources - access denied")
                     return
                 }
                 try FileManager.default.copyItem(at: url, to: copyToURL)
                 url.stopAccessingSecurityScopedResource()
             } catch let error {
-                print("File copying error \(error)")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File copying error")
             }
                 
         }
@@ -112,7 +112,7 @@ extension DocumentBrowserViewController {
     func openRemoteDocument(_ inboundURL: URL, importIfNeeded: Bool) {
         self.revealDocument(at: inboundURL, importIfNeeded: importIfNeeded) { (url, error) in
             if let error = error {
-              print("import did fail - should be communicated to user - \(error)")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File import failure error")
             } else if let url = url {
               
                 if let validStockList = self.stockListVC {

@@ -10,7 +10,7 @@ import UIKit
 var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
 var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-
+var errorLog: [ErrorLog]?
 
 enum ValuationCellValueFormat {
     case currency
@@ -112,6 +112,21 @@ let dateFormatter: DateFormatter = {
     formatter.dateStyle = .short
     return formatter
 }()
+
+struct ErrorLog {
+    var location = String()
+    var systemMessage: Error?
+    var errorInfo = String()
+    
+    mutating func create(location: String, systemError: NSError? = nil, errorInfo: String) {
+        self.location = location
+        self.errorInfo = errorInfo
+        if systemError != nil {
+            self.systemMessage = NSError()
+            self.systemMessage = systemError
+        }
+    }
+}
 
 
 struct Correlation {
