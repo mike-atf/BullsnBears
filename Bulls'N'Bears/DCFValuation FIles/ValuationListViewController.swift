@@ -156,6 +156,14 @@ class ValuationListViewController: UITableViewController {
         
         tableView.reloadRows(at: paths, with: .automatic)
     }
+    
+    public func helperAskedToEnterNextTextField(targetPath: IndexPath) {
+        
+//        let targetCell = tableView.cellForRow(at: targetPath) as! ValuationTableViewCell
+        let targetCell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: targetPath) as! ValuationTableViewCell
+        
+        targetCell.textField.becomeFirstResponder()
+    }
 
     /*
     // Override to support conditional editing of the table view.

@@ -189,13 +189,15 @@ class ValuationsController : DCFValuationHelper {
             return
         }
         
+        var jumpToCellPath: IndexPath?
+
         switch indexPath.section {
         case 0:
             // 'General
             switch indexPath.row {
             case 0:
                 // date - do nothing
-                return 
+                return
             case 1:
                 UserDefaults.standard.set(value / 100.0, forKey: "10YUSTreasuryBondRate")
             case 2:
@@ -207,6 +209,9 @@ class ValuationsController : DCFValuationHelper {
             }
         case 1:
             // 'Key Statistics
+            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
+            jumpToCellPath!.row += 1
+
             switch indexPath.row {
             case 0:
                 validValuation.marketCap = value
@@ -214,19 +219,28 @@ class ValuationsController : DCFValuationHelper {
                 validValuation.beta = value
             case 2:
                 validValuation.sharesOutstanding = value
+                jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
             default:
                 print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
             }
         case 2:
             // 'Income Statement S1 - Revenue
+            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
+            jumpToCellPath!.row += 1
             validValuation.tRevenueActual![indexPath.row] = value
             recalculateRevenueGrowth()
+            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
         case 3:
             // 'Income Statement S2 - net income
+            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
+            jumpToCellPath!.row += 1
             validValuation.netIncome![indexPath.row] = value
             recalculateIncomeGrowth()
+            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
         case 4:
             // 'Income Statement S3 -
+            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
+            jumpToCellPath!.row += 1
             switch indexPath.row {
             case 0:
                 validValuation.expenseInterest = value
@@ -234,33 +248,49 @@ class ValuationsController : DCFValuationHelper {
                 validValuation.incomePreTax = value
             case 2:
                 validValuation.expenseIncomeTax = value
+                jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
             default:
                 print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
             }
         case 5:
             // 'balance sheet'
-            switch indexPath.row {
+            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
+            jumpToCellPath!.row += 1
+           switch indexPath.row {
             case 0:
                 validValuation.debtST = value
             case 1:
                 validValuation.debtLT = value
+                jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
             default:
                 print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
             }
         case 6:
             // 'Cash Flow S1
+            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
+            jumpToCellPath!.row += 1
             validValuation.tFCFo![indexPath.row] = value
             recalculateFCFGrowth()
+            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
         case 7:
             // 'Cash Flow S2
+            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
+            jumpToCellPath!.row += 1
             validValuation.capExpend![indexPath.row] = value
+            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
         case 8:
             // 'Prediction S1
+            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
+            jumpToCellPath!.row += 1
             validValuation.tRevenuePred![indexPath.row] = value
+            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
        case 9:
             // 'Prediction S2
+            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
+            jumpToCellPath!.row += 1
             validValuation.revGrowthPred![indexPath.row] = value / 100.0
             recalculateAvgGrowthRate()
+            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
         case 10:
             // adjsuted predicted growth rate
             validValuation.revGrowthPredAdj![indexPath.row] = value / 100.0
@@ -271,6 +301,11 @@ class ValuationsController : DCFValuationHelper {
         if let updatePaths = determineRowsToUpdateAfterUserEntry(indexPath: indexPath) {
             valuationListViewController.helperUpdatedRows(paths: updatePaths)
         }
+        print(jumpToCellPath)
+        if let jumpPath = jumpToCellPath {
+            valuationListViewController.helperAskedToEnterNextTextField(targetPath: jumpPath)
+        }
+
     }
     
     internal func determineRowsToUpdateAfterUserEntry(indexPath: IndexPath) -> [IndexPath]? {

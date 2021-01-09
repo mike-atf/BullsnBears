@@ -77,6 +77,8 @@
 		EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */; };
 		EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */; };
 		EAED14DF25A8D78C0073C46F /* Bulls'N'BearsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */; };
+		EAED14FB25A8DA090073C46F /* Bulls'N'BearsTests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = EAC1905F257641180030B331 /* Bulls'N'BearsTests.xctest */; };
+		EAED14FC25A8DA100073C46F /* Bulls'N'BearsUITests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = EAC1906A257641180030B331 /* Bulls'N'BearsUITests.xctest */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -165,14 +167,13 @@
 				EAC1908E257642F20030B331 /* CSVImporter.swift */,
 				EAC190C0257663200030B331 /* PublicVars.swift */,
 				EAC190CA257663730030B331 /* Stock.swift */,
-				EAED148F25A8CFF70073C46F /* Bulls'N'BearsUITests */,
-				EAED148425A8CF060073C46F /* Bulls'N'BearsTests */,
-				EA163F76258BA85E000974AB /* StockTrend.swift */,
-				EAED148325A8CED20073C46F /* Bulls'N'Bears */,
 				EAC1904F257641160030B331 /* Main.storyboard */,
 				EAC2FC7025A23FFC0060F387 /* ValuationTableViewCell.xib */,
 				EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */,
-				EAC19048257641160030B331 /* TrendMyStocks */,
+				EA163F76258BA85E000974AB /* StockTrend.swift */,
+				EAED148325A8CED20073C46F /* Bulls'N'Bears */,
+				EAED148F25A8CFF70073C46F /* Bulls'N'BearsUITests */,
+				EAED148425A8CF060073C46F /* Bulls'N'BearsTests */,
 				EAC19047257641160030B331 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -185,13 +186,6 @@
 				EAC1906A257641180030B331 /* Bulls'N'BearsUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		EAC19048257641160030B331 /* TrendMyStocks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = TrendMyStocks;
 			sourceTree = "<group>";
 		};
 		EAC2FC2D25A0B33B0060F387 /* Model Files */ = {
@@ -387,6 +381,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAED14FB25A8DA090073C46F /* Bulls'N'BearsTests.xctest in Resources */,
 				EAC2FC5425A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
 				EAC2FC7525A23FFC0060F387 /* ValuationTableViewCell.xib in Resources */,
 			);
@@ -396,6 +391,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAED14FC25A8DA100073C46F /* Bulls'N'BearsUITests.xctest in Resources */,
 				EAC2FC5525A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
 				EAC2FC7625A23FFC0060F387 /* ValuationTableViewCell.xib in Resources */,
 			);
