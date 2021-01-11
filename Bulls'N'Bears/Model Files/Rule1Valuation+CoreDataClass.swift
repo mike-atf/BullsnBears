@@ -135,7 +135,6 @@ public class Rule1Valuation: NSManagedObject {
         }
         
         sumValidRates += roic?.compactMap{ $0 }.count ?? 0
-        print("total valid moat growth rates \(sumValidRates)")
         
         var ratesHigher10 = 0
         for growthRateArray in moatGrowthRates {
@@ -150,8 +149,6 @@ public class Rule1Valuation: NSManagedObject {
             else { return true }
         }).count ?? 0
         
-        print("moat growth rates > 10% \(ratesHigher10)")
-        
         return Double(ratesHigher10) / Double(sumValidRates)
     }
     
@@ -162,9 +159,6 @@ public class Rule1Valuation: NSManagedObject {
         guard let currentEPS = eps?.first else { return nil }
         guard let endValue = bvps?.first else { return nil }
         guard bvps?.count ?? 0 > 1 else { return nil }
-        
-        print(eps ?? [])
-        print(bvps ?? [])
         
         var bvpsGrowthRates = [Double]()
         for yearsBack in 1..<(bvps?.count ?? 0) {

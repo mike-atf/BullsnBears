@@ -201,7 +201,6 @@ class ValuationsController : DCFValuationHelper {
         }
         
         guard let validValuation = valuation else {
-            print("error assigning entered text: Controller doesn't have valuation")
             ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "error assigning entered text: Controller doesn't have valuation")
             return
         }
@@ -222,7 +221,7 @@ class ValuationsController : DCFValuationHelper {
             case 3:
                 UserDefaults.standard.set(value / 100.0, forKey: "LongTermMarketReturn")
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.getValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in DCFValuation.getValuationListItem")
             }
         case 1:
             // 'Key Statistics
@@ -481,7 +480,7 @@ class ValuationsController : DCFValuationHelper {
             case 3:
                 return UserDefaults.standard.value(forKey: "LongTermMarketReturn") as! Double
             default:
-                print("undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in DCFValuation.returnValuationListItem")
             }
         case 1:
             // 'Key Statistics

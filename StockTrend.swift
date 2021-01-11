@@ -39,7 +39,6 @@ struct StockTrend {
         guard let validIncline = incline else { return nil }
         let timeSinceLastDate = lastDate.timeIntervalSince(endDate)
         let factor = 1 - timeSinceLastDate / totalTime
-//        print("unweighted incline \(validIncline)  - factor \(factor)")
         return validIncline * factor
     }
 }

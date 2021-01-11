@@ -75,6 +75,8 @@ class StocksListViewController: UITableViewController {
                 }
             } catch let error {
                print(error)
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't access contens of directory \(documentFolder)")
+                
             }
 
             

@@ -297,8 +297,8 @@ struct Stock {
         }
         
         let dailyPricesInSecondtHalf = dailyPrices.filter { (pricePoint) -> Bool in
-            if pricePoint.tradingDate < halfDate { return false }
-            else { return true }
+            if pricePoint.tradingDate > halfDate { return true }
+            else { return false }
         }
 
         var priceOption: PricePointOptions!
@@ -409,7 +409,7 @@ struct Stock {
         }
         
         guard xArray.count == yArray.count else {
-            print("Error in trend correlation: y.count != x.count")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Error in trend correlation: y.count != x.count")
             return nil
         }
         

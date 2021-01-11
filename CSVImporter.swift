@@ -48,7 +48,7 @@ class CSVImporter: NSObject {
     class func csvExtractor(url: URL? = nil) -> Stock? {
         
         guard let validURL = url else {
-            print("wrong/ missing url when trying to extract CSV")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "wrong/ missing url when trying to extract CSV")
             return nil
         }
         
@@ -64,7 +64,7 @@ class CSVImporter: NSObject {
         rows = fileContent$?.components(separatedBy: NSMutableCharacterSet.newlines) ?? []
         
         if rows.count < 1 {
-            print("csvExtraction error - no file content")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "csvExtraction error - no file content")
             return nil
         }
 
@@ -83,28 +83,27 @@ class CSVImporter: NSObject {
             let array = rows[index].components(separatedBy: ",")
             let date$ = array[0]
             guard let date = dateFormatter.date(from: date$) else {
-                print("\(stockName) error converting to 'date' \(array[0])")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "\(stockName) error converting to 'date' \(array[0])")
                 continue
             }
             guard let open = Double(array[1]) else {
-                print("\(stockName) error converting to 'open' \(array[1])")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "\(stockName) error converting to 'date' \(array[1])")
                 continue
             }
             guard let high = Double(array[2]) else {
-                print("\(stockName) error converting to 'high' \(array[2])")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "\(stockName) error converting to 'date' \(array[2])")
                 continue
             }
             guard let low = Double(array[3]) else {
-                print("\(stockName) error converting to 'high' \(array[3])")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "\(stockName) error converting to 'date' \(array[3])")
                 continue
             }
             guard let close = Double(array[4]) else {
-                print("\(stockName) error converting to 'high' \(array[4])")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "\(stockName) error converting to 'date' \(array[4])")
                 continue
-
             }
             guard let volume = Double(array[6]) else {
-                print("\(stockName) error converting to 'high' \(array[6])")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "\(stockName) error converting to 'date' \(array[6])")
                 continue
 
             }

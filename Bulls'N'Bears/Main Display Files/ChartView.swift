@@ -180,7 +180,6 @@ class ChartView: UIView {
         })
         
 // current price line
-        
         if let currentPrice = stockToShow?.dailyPrices.last?.close {
             let currentPriceLine = UIBezierPath()
             let pp1 = PriceDate(stockToShow!.dailyPrices.first!.tradingDate, currentPrice)
@@ -205,7 +204,7 @@ class ChartView: UIView {
                         let label = UILabel()
                         label.numberOfLines = 1
                         label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                        label.textColor = UIColor.black
+                        label.textColor = UIColor(named: "antiLabel")
                         label.backgroundColor = UIColor.label
                         label.text = ratio$
                         label.sizeToFit()
@@ -230,7 +229,7 @@ class ChartView: UIView {
                         let label = UILabel()
                         label.numberOfLines = 1
                         label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                        label.textColor = UIColor.black
+                        label.textColor = UIColor(named: "antiLabel")
                         label.backgroundColor = UIColor.label
                         label.text = ratio$
                         label.sizeToFit()
@@ -245,7 +244,6 @@ class ChartView: UIView {
             }
         }
         
-// lowest point lines
         trendLabels.forEach { (label) in
             label.removeFromSuperview()
         }
@@ -360,10 +358,10 @@ class ChartView: UIView {
     private func addTrendLabel(price: Double, increase1: Double, increase2: Double? = nil, correlation: Double? = nil, reliability: Double? = nil, color: UIColor) {
         
         let endPrice$ = currencyFormatterNoGapWithPence.string(from: NSNumber(value: price))!
-        let increase1$ = percentFormatter2Digits.string(from: NSNumber(value: increase1))!
+        let increase1$ = percentFormatter0Digits.string(from: NSNumber(value: increase1))!
         var increase2$ = ""
         if let validIncrease2 = increase2 {
-            increase2$ = percentFormatter2Digits.string(from: NSNumber(value: validIncrease2))!
+            increase2$ = percentFormatter0Digits.string(from: NSNumber(value: validIncrease2))!
         }
         let labelMidY = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - price) / (maxPrice - minPrice))
 //        let plotDisplayRect = CGRect(origin: chartOrigin, size: chartAreaSize)
@@ -373,7 +371,7 @@ class ChartView: UIView {
             text = text + "\n r=" + numberFormatterWithFraction.string(from: NSNumber(value: r))! + " "
         }
         if let r = reliability {
-            text = text + "\n R=" + percentFormatter2Digits.string(from: NSNumber(value: r))! + " "
+            text = text + "\n R=" + percentFormatter0Digits.string(from: NSNumber(value: r))! + " "
         }
         
         let newTrendLabel: UILabel = {
