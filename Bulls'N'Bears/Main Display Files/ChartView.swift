@@ -194,27 +194,52 @@ class ChartView: UIView {
             
             UIColor.white.setStroke()
             currentPriceLine.stroke()
-            
+  
+// DCF Label
             if let existingValuation = ValuationsController.returnDCFValuations(company: stockToShow!.name)?.first {
                 if let fairValue = existingValuation.returnIValue() {
                     let ratio = currentPrice / fairValue
-                    let ratio$ = " " + (numberFormatterWithFraction.string(from: ratio as NSNumber) ?? "") + "x"
+                    let ratio$ = " DCF " + (numberFormatterWithFraction.string(from: ratio as NSNumber) ?? "") + "x "
 
                     let newLabel: UILabel = {
                         let label = UILabel()
                         label.numberOfLines = 1
                         label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                        label.textColor = UIColor.systemBlue
+                        label.textColor = UIColor.black
                         label.backgroundColor = UIColor.label
                         label.text = ratio$
                         label.sizeToFit()
                         
-                        let labelTop = endPoint.y - label.frame.height / 2
+                        let labelTop = endPoint.y - label.frame.height - 2
                         
                         label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
                         return label
                     }()
-                
+                    addSubview(newLabel)
+                }
+            }
+            
+// R1 Label
+            // R1 Label
+            if let existingValuation = Rule1ValuationController.returnR1Valuations(company: stockToShow!.name)?.first {
+                if let fairValue = existingValuation.stickerPrice() {
+                    let ratio = currentPrice / fairValue
+                    let ratio$ = " R1 " + (numberFormatterWithFraction.string(from: ratio as NSNumber) ?? "") + "x "
+
+                    let newLabel: UILabel = {
+                        let label = UILabel()
+                        label.numberOfLines = 1
+                        label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                        label.textColor = UIColor.black
+                        label.backgroundColor = UIColor.label
+                        label.text = ratio$
+                        label.sizeToFit()
+                        
+                        let labelTop = endPoint.y + 2
+                        
+                        label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
+                        return label
+                    }()
                     addSubview(newLabel)
                 }
             }
@@ -224,53 +249,8 @@ class ChartView: UIView {
         trendLabels.forEach { (label) in
             label.removeFromSuperview()
         }
+            
         trendLabels.removeAll()
-
-//        var point = CGPoint()
-        
-// low point connection lines
-//        let trends = validStock.longerTrends(priceOption: .low, findOption: .minimum)
-//        let autoTrends2 = UIBezierPath()
-//            point = plotPricePoint(pricePoint: PriceDate(trends.first!.startDate, trends.first!.startPrice!))
-//        autoTrends2.move(to: point)
-//
-//        for i in 1..<trends.count {
-//            point = plotPricePoint(pricePoint: PriceDate(trends[i].startDate, trends[i].startPrice!))
-//            autoTrends2.addLine(to: point)
-//        }
-//        autoTrends2.lineWidth = 2.0
-//        UIColor.systemPurple.setStroke()
-//        autoTrends2.stroke()
-
-        
-// major trends
-
-//        let macroTrends = validStock.findMajorTrends(priceOption: .close, findOption: .minimum, changeThreshold: 0.2)
-//        let minimumTrend = validStock.findMajorTrend2(priceOption: .low, findOption: .minimum)
-//        let maximumTrend = validStock.findMajorTrend2(priceOption: .high, findOption: .maximum)
-//        let macroTrends = [minimumTrend,maximumTrend]
-//        
-//        trendsToShow.append(minimumTrend)
-//        trendsToShow.append(maximumTrend)
-//        
-//        let autoTrends3 = UIBezierPath()
-////        point = plotPricePoint(pricePoint: PriceDate(macroTrends.first!.startDate, macroTrends.first!.startPrice!))
-////        autoTrends3.move(to: point)
-//
-//        for i in 0..<macroTrends.count {
-//            point = plotPricePoint(pricePoint: PriceDate(macroTrends[i].startDate, macroTrends[i].startPrice!))
-//            autoTrends3.move(to: point)
-//            point = plotPricePoint(pricePoint: PriceDate(macroTrends[i].endDate, macroTrends[i].endPrice!))
-//            autoTrends3.addLine(to: point)
-//        }
-////        point = plotPricePoint(pricePoint: PriceDate(macroTrends.last!.endDate, macroTrends.last!.endPrice!))
-////        autoTrends3.addLine(to: point)
-//        
-//
-//
-//        autoTrends3.lineWidth = 2.0
-//        UIColor.systemTeal.setStroke()
-//        autoTrends3.stroke()
 
         trendsToShow.forEach { (trend) in
             drawTrend(stock: validStock, trendProperties: trend)
@@ -380,10 +360,10 @@ class ChartView: UIView {
     private func addTrendLabel(price: Double, increase1: Double, increase2: Double? = nil, correlation: Double? = nil, reliability: Double? = nil, color: UIColor) {
         
         let endPrice$ = currencyFormatterNoGapWithPence.string(from: NSNumber(value: price))!
-        let increase1$ = percentFormatter.string(from: NSNumber(value: increase1))!
+        let increase1$ = percentFormatter2Digits.string(from: NSNumber(value: increase1))!
         var increase2$ = ""
         if let validIncrease2 = increase2 {
-            increase2$ = percentFormatter.string(from: NSNumber(value: validIncrease2))!
+            increase2$ = percentFormatter2Digits.string(from: NSNumber(value: validIncrease2))!
         }
         let labelMidY = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - price) / (maxPrice - minPrice))
 //        let plotDisplayRect = CGRect(origin: chartOrigin, size: chartAreaSize)
@@ -393,7 +373,7 @@ class ChartView: UIView {
             text = text + "\n r=" + numberFormatterWithFraction.string(from: NSNumber(value: r))! + " "
         }
         if let r = reliability {
-            text = text + "\n R=" + percentFormatter.string(from: NSNumber(value: r))! + " "
+            text = text + "\n R=" + percentFormatter2Digits.string(from: NSNumber(value: r))! + " "
         }
         
         let newTrendLabel: UILabel = {

@@ -67,6 +67,16 @@ let currencyFormatterGapNoPence: NumberFormatter = {
     return formatter
 }()
 
+let currencyFormatterNoGapNoPence: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.currencySymbol = "$"
+    formatter.numberStyle = NumberFormatter.Style.currency
+    formatter.maximumFractionDigits = 0
+    formatter.usesGroupingSeparator = true
+    return formatter
+}()
+
+
 let currencyFormatterNoGapWithPence: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.currencySymbol = "$"
@@ -77,14 +87,43 @@ let currencyFormatterNoGapWithPence: NumberFormatter = {
     return formatter
 }()
 
+let currencyFormatterGapWithPence: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.currencySymbol = "$ "
+    formatter.numberStyle = NumberFormatter.Style.currency
+    formatter.minimumFractionDigits = 2
+    formatter.maximumFractionDigits = 2
+    formatter.usesGroupingSeparator = true
+    return formatter
+}()
 
-let percentFormatter: NumberFormatter = {
+let currencyFormatterGapWithOptionalPence: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.currencySymbol = "$ "
+    formatter.numberStyle = NumberFormatter.Style.currency
+    formatter.maximumFractionDigits = 2
+    formatter.usesGroupingSeparator = true
+    return formatter
+}()
+
+
+
+let percentFormatter2Digits: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.numberStyle = .percent
     formatter.maximumFractionDigits = 2
     formatter.minimumIntegerDigits = 1
     return formatter
 }()
+
+let percentFormatter0Digits: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .percent
+    formatter.maximumFractionDigits = 0
+    formatter.minimumIntegerDigits = 1
+    return formatter
+}()
+
 
 let numberFormatterWithFraction: NumberFormatter = {
     let formatter = NumberFormatter()

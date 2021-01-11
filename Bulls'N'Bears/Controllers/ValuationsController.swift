@@ -318,9 +318,9 @@ class ValuationsController : DCFValuationHelper {
         if let updatePaths = determineRowsToUpdateAfterUserEntry(indexPath: indexPath) {
             valuationListViewController.helperUpdatedRows(paths: updatePaths)
         }
-        if let jumpPath = jumpToCellPath {
-            valuationListViewController.helperAskedToEnterNextTextField(targetPath: jumpPath)
-        }
+//        if let jumpPath = jumpToCellPath {
+//            valuationListViewController.helperAskedToEnterNextTextField(targetPath: jumpPath)
+//        }
 
     }
     
@@ -444,7 +444,7 @@ class ValuationsController : DCFValuationHelper {
             }
             else if let number = validValue as? Double {
                 if [0,9,10].contains(indexPath.section) {
-                    value$ = percentFormatter.string(from: number as NSNumber)
+                    value$ = percentFormatter2Digits.string(from: number as NSNumber)
                }
                 else {
                     if indexPath == IndexPath(item: 1, section: 1) || indexPath == IndexPath(item: 2, section: 1) {
@@ -558,13 +558,13 @@ class ValuationsController : DCFValuationHelper {
         case 2:
             // 'Income Statement S1 - Revenue
             if indexPath.row < (valuation?.tRevenueActual?.count ?? 0) - 1 {
-                return percentFormatter.string(from: revenueGrowthRates[indexPath.row] as NSNumber)
+                return percentFormatter2Digits.string(from: revenueGrowthRates[indexPath.row] as NSNumber)
             }
             else { return "" }
         case 3:
             // 'Income Statement S2 - net income
             if indexPath.row < (valuation?.netIncome?.count ?? 0) - 1 {
-                return percentFormatter.string(from: netIncomeGrowthRates[indexPath.row] as NSNumber)
+                return percentFormatter2Digits.string(from: netIncomeGrowthRates[indexPath.row] as NSNumber)
             }
             else { return "" }
         case 4:
@@ -577,7 +577,7 @@ class ValuationsController : DCFValuationHelper {
             case 2:
                 if (valuation?.incomePreTax ?? 0.0) > 0 {
                     let result = ((valuation?.expenseIncomeTax ?? 0.0) / valuation!.incomePreTax)
-                    return percentFormatter.string(from: result as NSNumber)
+                    return percentFormatter2Digits.string(from: result as NSNumber)
                 }
                 else { return nil }
             default:
@@ -589,12 +589,12 @@ class ValuationsController : DCFValuationHelper {
             case 0:
                 if (valuation?.marketCap ?? 0.0) > 0 {
                     let result = (valuation?.debtST ?? 0) / ((valuation?.debtST ?? 0) + valuation!.marketCap)
-                    return percentFormatter.string(from: result as NSNumber)
+                    return percentFormatter2Digits.string(from: result as NSNumber)
                 } else { return nil }
             case 1:
                 if (valuation?.marketCap ?? 0.0) > 0 {
                     let result =  (valuation?.debtLT ?? 0) / ((valuation?.debtLT ?? 0) + valuation!.marketCap)
-                    return percentFormatter.string(from: result as NSNumber)
+                    return percentFormatter2Digits.string(from: result as NSNumber)
                 } else { return nil }
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
@@ -603,7 +603,7 @@ class ValuationsController : DCFValuationHelper {
         case 6:
             // 'Cash Flow S1
             if indexPath.row < (valuation?.tFCFo?.count ?? 0) - 1 {
-                return percentFormatter.string(from: fcfGrowthRates[indexPath.row] as NSNumber)
+                return percentFormatter2Digits.string(from: fcfGrowthRates[indexPath.row] as NSNumber)
             }
             else { return "" }
         case 7:
@@ -618,7 +618,7 @@ class ValuationsController : DCFValuationHelper {
         case 10:
             // adjsuted predcited growth rate
             if let value = averagePredictedRevGrowth {
-                return percentFormatter.string(from: value as NSNumber)
+                return percentFormatter2Digits.string(from: value as NSNumber)
             }
         default:
             ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
@@ -699,7 +699,7 @@ class ValuationsController : DCFValuationHelper {
         adjGrowthPredTitles.removeFirst()
         
         let generalSectionTitles = ["Date", "US 10y Treasure Bond rate", "Perpetual growth rate", "Exp. LT Market return"]
-        let keyStatsTitles = ["Market cap", "beta", "Shares outstanding"]
+        let keyStatsTitles = ["Market cap", "beta", "Shares outstdg. (in thousands)"]
         let singleIncomeSectionTitles = ["Interest expense","Pre-Tax income","Income tax expend."]
         let balanceSheetSectionTitles = ["Current debt","Long term debt"]
         

@@ -161,6 +161,7 @@ class ValuationListViewController: UITableViewController {
     @objc
     func saveValuation() {
         dcfValuation?.save()
+        r1Valuation?.save()
         self.dismiss(animated: true) {
             self.presentingListVC.valuationCompleted(indexPath: self.sourceIndexPath)
         }

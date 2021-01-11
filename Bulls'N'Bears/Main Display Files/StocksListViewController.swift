@@ -126,7 +126,8 @@ class StocksListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
         let valuation = ValuationsController.returnDCFValuations(company: stocks[indexPath.row].name)
-        cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row], valuation: valuation?.first)
+        let r1valuation = Rule1ValuationController.returnR1Valuations(company: stocks[indexPath.row].name)
+        cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row], valuation: valuation?.first, r1Valuation: r1valuation?.first)
         return cell
     }
 
@@ -158,7 +159,7 @@ class StocksListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 70
+        return 75
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
