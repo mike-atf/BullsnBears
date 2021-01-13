@@ -6,6 +6,12 @@
 //
 
 import Foundation
+import UserNotifications
+
+protocol ErrorControllerDelegate {
+    func activateErrorButton()
+    func deactivateErrorButton()
+}
 
 class ErrorController {
     
@@ -17,10 +23,8 @@ class ErrorController {
         
         let newError = ErrorLog.init(location: errorLocation, systemMessage: systemError, errorInfo: errorInfo ?? "no info")
         errorLog?.append(newError)
-                
-        DispatchQueue.main.async {
-//            (UIApplication.shared.delegate as! AppDelegate).errorLogButton.isHidden = false
-        }
+        
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "NewErrorLogged"), object: nil, userInfo: nil)
     }
 
 }

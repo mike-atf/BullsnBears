@@ -41,21 +41,8 @@ public class Rule1Valuation: NSManagedObject {
         insiderStocks = Double()
         ceoRating = Double()
         
-        let reviewYears = 10
+//        let reviewYears = 10
         
-//        for _ in 0..<reviewYears {
-//            bvps?.append(Double())
-//            eps?.append(Double())
-//            revenue?.append(Double())
-//            oFCF?.append(Double())
-////            roic?.append(Double()) //excluded so no detail % is shown in ValuationListCell when no value has been entered
-//        }
-//
-//        for _ in 0..<2 {
-//            growthEstimates?.append(Double())
-//            adjGrowthEstimates?.append(Double())
-//            hxPE?.append(Double())
-//        }
     }
 
     
@@ -97,6 +84,25 @@ public class Rule1Valuation: NSManagedObject {
         return years.min() ?? 0
     }
     
+    func getDataFromDCFValuation(dcfValuation: DCFValuation?) {
+        
+        guard let valuation = dcfValuation else {
+            return
+        }
+        
+        var count = 0
+        for sales in valuation.tRevenueActual ?? [] {
+            self.revenue?.insert(sales, at: count)
+            count += 1
+        }
+                
+        count = 0
+        for sales in valuation.tFCFo ?? [] {
+            self.oFCF?.insert(sales, at: count)
+            count += 1
+        }
+    }
+
     
     internal func compoundGrowthRate(endValue: Double, startValue: Double, years: Double) -> Double {
         
@@ -135,6 +141,10 @@ public class Rule1Valuation: NSManagedObject {
         }
         
         sumValidRates += roic?.compactMap{ $0 }.count ?? 0
+        
+        guard sumValidRates > 0 else {
+            return nil
+        }
         
         var ratesHigher10 = 0
         for growthRateArray in moatGrowthRates {

@@ -44,8 +44,24 @@ class Rule1ValuationController: R1ValuationHelper {
        
     init(listView: ValuationListViewController) {
         self.valuationListViewController = listView
-        self.valuation = listView.r1Valuation
+//        self.valuation = listView.r1Valuation
     }
+    
+    static func createR1Valuation(company: String) -> Rule1Valuation? {
+        let newValuation:Rule1Valuation? = {
+            NSEntityDescription.insertNewObject(forEntityName: "Rule1Valuation", into: managedObjectContext) as? Rule1Valuation
+        }()
+        newValuation?.company = company
+        do {
+            try  managedObjectContext.save()
+        } catch {
+            let error = error
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
+        }
+
+        return newValuation
+    }
+
     
     static func returnR1Valuations(company: String? = nil) -> [Rule1Valuation]? {
         
@@ -258,7 +274,7 @@ class Rule1ValuationController: R1ValuationHelper {
         let format = cellValueFormat(indexPath: indexPath)
         let (detail$, color) = getDetail$(indexPath: indexPath)
         
-        cell.configure(title: rowTitle, value$: value$, detail: detail$ ?? "", indexPath: indexPath, dcfDelegate: nil, r1Delegate: self, valueFormat: format, detailColor: color)
+//        cell.configure(title: rowTitle, value$: value$, detail: detail$ ?? "", indexPath: indexPath, dcfDelegate: nil, r1Delegate: self, valueFormat: format, detailColor: color)
 
     }
     
@@ -414,6 +430,10 @@ class Rule1ValuationController: R1ValuationHelper {
             return
         }
         
+        guard validtext != "" else {
+            return
+        }
+        
         guard let value = Double(validtext.filter("0123456789.".contains)) else {
             ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "error converting entered text to number: \(sender.text ?? "no text")")
             return
@@ -480,6 +500,15 @@ class Rule1ValuationController: R1ValuationHelper {
         if let updatePaths = determineRowsToUpdateAfterUserEntry(indexPath: indexPath) {
             valuationListViewController.helperUpdatedRows(paths: updatePaths)
         }
+        
+        var jumpToCellPath = IndexPath(row: indexPath.row+1, section: indexPath.section)
+        if jumpToCellPath.row > rowTitles![indexPath.section].count {
+            jumpToCellPath = IndexPath(row: 0, section: indexPath.section + 1)
+        }
+         if jumpToCellPath.section < rowTitles!.count {
+            valuationListViewController.helperAskedToEnterNextTextField(targetPath: jumpToCellPath)
+        }
+
 
         return
     }

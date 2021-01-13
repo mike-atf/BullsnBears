@@ -35,11 +35,32 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         
         if let documentFolder = appDocumentPaths.first {
+            
+            guard URL(fileURLWithPath: documentFolder).startAccessingSecurityScopedResource() else {
+                ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: nil, errorInfo: "Accessing App Document Folder was not possible: lacking access rights")
+                return
+            }
+
 
             let inboxFolder = documentFolder + "/Inbox"
             
+            if !FileManager.default.fileExists(atPath: inboxFolder) {
+                do {
+                    try FileManager.default.createDirectory(atPath: inboxFolder, withIntermediateDirectories: true, attributes: nil)
+                } catch let error {
+                    ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: error, errorInfo: "Error trying to create new /Inbox folder")
+                }
+            }
+
+            
             do {
                 let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: inboxFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                
+                guard URL(fileURLWithPath: inboxFolder).startAccessingSecurityScopedResource() else {
+                    ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: nil, errorInfo: "Accessing App Document/Inbox Folder was not possible: lacking access rights")
+                    return
+                }
+
                 for url in fileURLs {
                     if url.lastPathComponent.contains(".csv") {
                         do {

@@ -17,9 +17,6 @@ class ChartView: UIView {
     var xAxisLabels = [UILabel]()
     var trendLabels = [UILabel]()
     
-//    var dateFormatter: DateFormatter!
-//    var numberFormatter: NumberFormatter!
-
     var candleBoxes = UIBezierPath()
     var candleSticks = UIBezierPath()
     
@@ -364,7 +361,6 @@ class ChartView: UIView {
             increase2$ = percentFormatter0Digits.string(from: NSNumber(value: validIncrease2))!
         }
         let labelMidY = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - price) / (maxPrice - minPrice))
-//        let plotDisplayRect = CGRect(origin: chartOrigin, size: chartAreaSize)
         
         var text = " \(endPrice$) = \(increase1$) \n From latest: \(increase2$) "
         if let r = correlation {

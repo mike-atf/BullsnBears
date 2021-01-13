@@ -62,20 +62,22 @@ class StockListCellTableViewCell: UITableViewCell {
             }
         }
         
-        var r1Title: String?
+        var r1Title = String()
         if let validValuation = r1Valuation {
             if let stickerPrice = validValuation.stickerPrice() {
                 r1Title = "R1: " + (currencyFormatterNoGapNoPence.string(from: stickerPrice as NSNumber) ?? "--")
             }
             if let score = validValuation.moatScore() {
-                let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
-                r1Title = r1Title! + " (moat: " + n$ + ")"
+                if !score.isNaN {
+                    let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
+                    r1Title = r1Title + " (moat: " + n$ + ")"
+                }
             }
             if buttonTitle == nil {
                 buttonTitle = r1Title
             }
             else {
-                buttonTitle! = buttonTitle! + "\n" + r1Title!
+                buttonTitle! = buttonTitle! + "\n" + r1Title
             }
         }
         

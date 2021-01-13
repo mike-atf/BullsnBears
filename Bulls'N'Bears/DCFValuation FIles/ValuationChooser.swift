@@ -31,15 +31,24 @@ class ValuationChooser: UIViewController {
     
     @IBAction func dcfAction(_ sender: UIButton) {
         
-        guard let valuation = (ValuationsController.returnDCFValuations(company: stock.name)?.first ?? ValuationsController.createDCFValuation(company: stock.name)) else {
-            return
+        var dcfValuation: DCFValuation!
+        
+        if let valuation = ValuationsController.returnDCFValuations(company: stock.name)?.first {
+            dcfValuation = valuation
+        }
+        else {
+            dcfValuation = ValuationsController.createDCFValuation(company: stock.name)
+            if let existingR1Valuation = Rule1ValuationController.returnR1Valuations(company: stock.name)?.first {
+                dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
+            }
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.dcf
-            tvc.dcfValuation = valuation
+//            tvc.dcfValuation = dcfValuation
             tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
+            tvc.stock = stock
             
             self.dismiss(animated: true) {
                 self.rootView.present(tvc, animated: true)
@@ -48,19 +57,27 @@ class ValuationChooser: UIViewController {
         }
         
     }
-
     
     @IBAction func rule1Action(_ sender: UIButton) {
         
-        guard let valuation = (Rule1ValuationController.returnR1Valuations(company: stock.name)?.first ?? ValuationsController.createR1Valuation(company: stock.name)) else {
-            return
+        var r1Valuation: Rule1Valuation!
+        
+        if let valuation = Rule1ValuationController.returnR1Valuations(company: stock.name)?.first {
+            r1Valuation = valuation
+        }
+        else {
+            r1Valuation = Rule1ValuationController.createR1Valuation(company: stock.name)
+            if let existingDCFValuation = ValuationsController.returnDCFValuations(company: stock.name)?.first {
+                r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
+            }
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.rule1
-            tvc.r1Valuation = valuation
+//            tvc.r1Valuation = r1Valuation
             tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
+            tvc.stock = stock
             
             self.dismiss(animated: true) {
                 self.rootView.present(tvc, animated: true)
@@ -69,7 +86,7 @@ class ValuationChooser: UIViewController {
         }
 
     }
-
+    
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -78,10 +95,10 @@ class ValuationChooser: UIViewController {
         var infoText = String()
         
         if segue.identifier == "dcfInfoSegue" {
-            infoText = "Discounted Cash Flow\n\nA suitable valuation method if...\n\n1. The company pays no dividend, or\n\n2. Only pays a small dividend compared to ability to pay, and\n\n3. Free Cash Flow trend aligns with profitability trend, and\n\n4. Investor is taking a control perspective.\n\nSee an introduction at https://youtu.be/fd_emLLzJnk"
+            infoText = "Discounted Cash Flow\n\nA suitable valuation method if...\n\n1. The company pays no dividend, or\n\n2. Only pays a small dividend compared to ability to pay, and\n\n3. Free Cash Flow trend aligns with profitability trend, and\n\n4. Investor is taking a control perspective.\n\nNot applicable to companies with negative revenue or net income in the last 3 years!\n\nSee an introduction at https://youtu.be/fd_emLLzJnk"
         }
         else {
-            
+            infoText = "Rule #1 valuation\n\nNot applicable to companies with negative revenue or net income in the last 10 years!\n\nEnter annual data up to 10 years back.\n\nAvailable e.g. on www.macrotrends.net.\n\nMore information about methodology on https://www.ruleoneinvesting.com"
         }
         
         if let textView = targetVC.view.viewWithTag(10) as? UITextView {

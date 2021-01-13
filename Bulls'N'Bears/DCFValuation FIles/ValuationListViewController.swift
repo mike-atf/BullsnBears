@@ -11,20 +11,23 @@ class ValuationListViewController: UITableViewController {
     
     var presentingListVC: StocksListViewController!
     var sourceIndexPath: IndexPath!
+    var stock: Stock!
     
     var valuationMethod:ValuationMethods!
-    var dcfValuation: DCFValuation?
-    var r1Valuation: Rule1Valuation?
+//    var dcfValuation: DCFValuation?
+//    var r1Valuation: Rule1Valuation?
     
     var sectionSubtitles: [String]?
     var sectionTitles: [String]?
     var rowTitles: [[String]]?
 
-    var dcfHelper: DCFValuationHelper?
-    var dcfController: ValuationsController?
+//    var dcfHelper: DCFValuationHelper?
+//    var dcfController: ValuationsController?
+    var valuationController: CombinedValuationController!
+    var helper: CombinedValuationController!
     
-    var r1vHelper: R1ValuationHelper?
-    var r1VController: Rule1ValuationController?
+//    var r1vHelper: R1ValuationHelper?
+//    var r1VController: Rule1ValuationController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,17 +38,27 @@ class ValuationListViewController: UITableViewController {
         
         
         tableView.register(UINib(nibName: "ValuationTableViewCell", bundle: nil), forCellReuseIdentifier: "valuationTableViewCell")
-        if valuationMethod == .dcf {
-            dcfController = ValuationsController(listView: self)
-            dcfHelper = dcfController
-        } else {
-            r1VController = Rule1ValuationController(listView: self)
-            r1vHelper = r1VController
-        }
 
-        sectionTitles = dcfHelper?.dcfSectionTitles() ?? r1vHelper?.r1SectionTitles()
-        sectionSubtitles = dcfHelper?.dcfSectionSubTitles() ?? r1vHelper?.r1SectionSubTitles()
-        rowTitles = dcfHelper?.buildRowTitles() ?? r1vHelper?.buildRowTitles()
+// OLD
+//        if valuationMethod == .dcf {
+//            dcfController = ValuationsController(listView: self)
+//            dcfHelper = dcfController
+//        } else {
+//            r1VController = Rule1ValuationController(listView: self)
+//            r1vHelper = r1VController
+//        }
+//
+//        sectionTitles = dcfHelper?.dcfSectionTitles() ?? r1vHelper?.r1SectionTitles()
+//        sectionSubtitles = dcfHelper?.dcfSectionSubTitles() ?? r1vHelper?.r1SectionSubTitles()
+//        rowTitles = dcfHelper?.buildRowTitles() ?? r1vHelper?.buildRowTitles()
+// NEW
+        valuationController = CombinedValuationController(stockName: stock.name, valuationMethod: valuationMethod, listView: self)
+        self.helper = valuationController
+        
+        sectionTitles = helper.sectionTitles()
+        sectionSubtitles = helper.sectionSubTitles()
+        rowTitles = helper.rowTitles()
+
         
         tableView.reloadData()
 
@@ -71,11 +84,13 @@ class ValuationListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: indexPath) as! ValuationTableViewCell
 
-        if let helper = dcfHelper {
-            helper.configureCell(indexPath: indexPath, cell: cell)
-        } else {
-            r1vHelper!.configureCell(indexPath: indexPath, cell: cell)
-        }
+        
+        helper.configureCell(indexPath: indexPath, cell: cell)
+//        if let helper = dcfHelper {
+//            helper.configureCell(indexPath: indexPath, cell: cell)
+//        } else {
+//            r1vHelper!.configureCell(indexPath: indexPath, cell: cell)
+//        }
         
         return cell
     }
@@ -83,8 +98,9 @@ class ValuationListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         
         if valuationMethod == .dcf {
-            if [3,4,7,9].contains(section) { return 10 }
-            else {  return (UIDevice().userInterfaceIdiom == .pad) ? 70 : 60 }
+            if [3,4,9].contains(section) { return 20 }
+            else if [7].contains(section) { return 40 }
+            else { return (UIDevice().userInterfaceIdiom == .pad) ? 70 : 60 }
         } else {
             if [0,1,6,7,8,9,10,11].contains(section) { return 70 }
             else {  return (UIDevice().userInterfaceIdiom == .pad) ? 40 : 60 }
@@ -160,8 +176,9 @@ class ValuationListViewController: UITableViewController {
     
     @objc
     func saveValuation() {
-        dcfValuation?.save()
-        r1Valuation?.save()
+        
+        helper.saveValuation()
+        
         self.dismiss(animated: true) {
             self.presentingListVC.valuationCompleted(indexPath: self.sourceIndexPath)
         }
@@ -170,18 +187,24 @@ class ValuationListViewController: UITableViewController {
     
     public func helperUpdatedRows(paths: [IndexPath]) {
         
-        tableView.reloadRows(at: paths, with: .automatic)
+        tableView.reloadRows(at: paths, with: .none)
     }
     
     public func helperAskedToEnterNextTextField(targetPath: IndexPath) {
         
-        let targetCell = tableView.cellForRow(at: targetPath) as! ValuationTableViewCell
+        if let targetCell = tableView.cellForRow(at: targetPath) as? ValuationTableViewCell {
+            targetCell.enterTextField()
+        }
+        else if let targetCell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: targetPath) as? ValuationTableViewCell {
+            targetCell.enterTextField()
+
+        }
 //        let targetCell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: targetPath) as! ValuationTableViewCell
         
-        tableView.selectRow(at: targetPath, animated: true, scrollPosition: .none)
-        
-        targetCell.textField.text = "This is selected next"
-        targetCell.textField.becomeFirstResponder()
+//        tableView.selectRow(at: targetPath, animated: true, scrollPosition: .none)
+//
+//        targetCell.textField.text = "This is selected next"
+//        targetCell.textField.becomeFirstResponder()
     }
 
     /*

@@ -17,16 +17,14 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet var detail: UILabel!
     @IBOutlet var textField: UITextField!
         
-    var dcfDelegate: DCFValuationHelper?
-    var r1Delegate: R1ValuationHelper?
+    var delegate: ValuationHelper!
     var indexPath: IndexPath!
     var valueFormat: ValuationCellValueFormat!
+    var method: ValuationMethods!
     
     override func awakeFromNib() {
         super.awakeFromNib()
 
-//        #selector(), for: .valueChanged  )
-        
         textField.delegate = self
     }
 
@@ -37,19 +35,19 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     }
     
     override func prepareForReuse() {
+        detail.textColor = UIColor.label
         title.text = ""
         detail.text = ""
         textField.text = ""
         indexPath = IndexPath()
     }
     
-    public func configure(title: String, value$: String?, detail: String, indexPath: IndexPath, dcfDelegate: DCFValuationHelper?, r1Delegate: R1ValuationHelper?, valueFormat: ValuationCellValueFormat, detailColor: UIColor? = UIColor.label) {
+    public func configure(title: String, value$: String?, detail: String, indexPath: IndexPath, method: ValuationMethods, delegate: ValuationHelper, valueFormat: ValuationCellValueFormat, detailColor: UIColor? = UIColor.label) {
         
-        self.dcfDelegate = dcfDelegate
-        self.r1Delegate = r1Delegate
+        self.method = method
+        self.delegate = delegate
         self.indexPath = indexPath
         self.title.text = title
-//        self.textField.placeholder = value$
         self.valueFormat = valueFormat
         self.detail.text = detail
         self.detail.textColor = detailColor
@@ -57,17 +55,15 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
                                                     attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
         
         textField.attributedPlaceholder = lighterPlaceHolderText
-
+    }
+    
+    public func enterTextField() {
+        textField.becomeFirstResponder()
     }
     
     @IBAction func textEntryComplete(_ sender: UITextField) {
         
-        if let delegate = dcfDelegate {
-            delegate.userEnteredText(sender: sender, indexPath: indexPath)
-        }
-        else {
-            r1Delegate!.userEnteredText(sender: sender, indexPath: indexPath)
-        }
+        delegate.userEnteredText(sender: sender, indexPath: indexPath)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -94,14 +90,8 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
         }
         
         if valueFormat == .currency {
-            let numbers = validText.filter("0123456789.".contains)
+            let numbers = validText.filter("-0123456789.".contains)
             guard let value = (Double(numbers)) else { return }
-            
-//            var lastTwo = ""
-//            if numbers?.count == 2 {
-//                let index = (numbers ?? "").index((numbers ?? "").endIndex, offsetBy: -2)
-//                lastTwo = String(numbers![index...])
-//            }
             
             if (numbers.last == ".") {
                 textField.text = "$ \(numbers)"
@@ -110,16 +100,12 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
             if String(numbers.suffix(2)) == ".0" {
                 textField.text = "$ \(numbers)"
             }
-            else
-            if dcfDelegate != nil {
-                textField.text = currencyFormatterGapNoPence.string(from: value as NSNumber)
-            }
             else {
                 textField.text = "$ " + numberFormatterWithFraction.string(from: value as NSNumber)!
             }
         }
         else if valueFormat == .numberNoDecimals {
-            let numbers = validText.filter("0123456789.".contains)
+            let numbers = validText.filter("-0123456789.".contains)
             guard let value = (Double(numbers)) else { return }
             let value$ = numberFormatterNoFraction.string(from: value as NSNumber)
             textField.text = value$

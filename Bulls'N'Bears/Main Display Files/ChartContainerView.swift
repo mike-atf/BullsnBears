@@ -73,7 +73,7 @@ class ChartContainerView: UIView {
         }
         if let scroll = scrollView {
             scroll.contentSize = contentView.bounds.size
-            let offset = scroll.contentSize.width - scrollView.bounds.width
+            let offset = scroll.contentSize.width
             scroll.setContentOffset(CGPoint(x: offset, y: 0), animated: false)
             buttonDelegate = contentView
             buttonDelegate.timeButtons = [button4, button5, button6]

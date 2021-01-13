@@ -140,9 +140,17 @@
                             <outlet property="titleLabel" destination="RL9-y0-71P" id="KeW-NM-aGj"/>
                         </connections>
                     </view>
-                    <navigationItem key="navigationItem" id="9tx-0k-L9K"/>
+                    <navigationItem key="navigationItem" id="9tx-0k-L9K">
+                        <barButtonItem key="leftBarButtonItem" image="exclamationmark.triangle.fill" catalog="system" id="Eh7-4A-Kqm">
+                            <color key="tintColor" systemColor="systemYellowColor"/>
+                            <connections>
+                                <action selector="errorButtonAction:" destination="GS7-IZ-4uD" id="d2h-RN-d78"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="chart" destination="DMz-IK-SGN" id="oYm-P0-xbE"/>
+                        <outlet property="errorButton" destination="Eh7-4A-Kqm" id="8oy-Nu-S0E"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="R1G-6f-cB6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -453,12 +461,45 @@
             </objects>
             <point key="canvasLocation" x="-145" y="1554"/>
         </scene>
+        <!--List of Errors occurred-->
+        <scene sceneID="Gaz-1b-2sh">
+            <objects>
+                <tableViewController storyboardIdentifier="ErrorListVC" title="List of Errors occurred" extendedLayoutIncludesOpaqueBars="YES" modalTransitionStyle="crossDissolve" id="fir-cP-t0e" customClass="ErrorListVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="D6k-gB-smv">
+                        <rect key="frame" x="0.0" y="0.0" width="400" height="660"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="errorLogListCell" id="hdh-zQ-MGT" customClass="ErrorLogListCell" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                <rect key="frame" x="20" y="55.5" width="360" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hdh-zQ-MGT" id="Grs-NJ-EEn">
+                                    <rect key="frame" x="0.0" y="0.0" width="360" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="fir-cP-t0e" id="svM-Hm-SRz"/>
+                            <outlet property="delegate" destination="fir-cP-t0e" id="28a-tr-B9s"/>
+                        </connections>
+                    </tableView>
+                    <value key="contentSizeForViewInPopover" type="size" width="400" height="660"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                    <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="400" height="680"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gdc-Dz-99x" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1303" y="1194"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="HCm-I9-2PD"/>
         <segue reference="Kjm-sZ-WT1"/>
     </inferredMetricsTieBreakers>
     <resources>
+        <image name="exclamationmark.triangle.fill" catalog="system" width="128" height="112"/>
         <image name="info.circle" catalog="system" width="128" height="121"/>
         <image name="xmark.circle" catalog="system" width="128" height="121"/>
         <systemColor name="labelColor">
@@ -469,6 +510,9 @@
         </systemColor>
         <systemColor name="systemOrangeColor">
             <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemYellowColor">
+            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

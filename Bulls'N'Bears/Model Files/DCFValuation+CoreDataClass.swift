@@ -106,6 +106,25 @@ public class DCFValuation: NSManagedObject {
         }
     }
     
+    func getDataFromR1Valuation(r1Valuation: Rule1Valuation?) {
+        
+        guard let valuation = r1Valuation else {
+            return
+        }
+        
+        var count = 0
+        for sales in valuation.revenue ?? [] {
+            self.tRevenueActual?.insert(sales, at: count)
+            count += 1
+        }
+                
+        count = 0
+        for sales in valuation.oFCF ?? [] {
+            self.tFCFo?.insert(sales, at: count)
+            count += 1
+        }
+    }
+    
     public func returnIValue() -> Double? {
         
         // 1 calculate 'FCF_to_equity' from fFCFo + capExpend
@@ -134,7 +153,7 @@ public class DCFValuation: NSManagedObject {
         var fcfToEquity = [Double]()
         var count = 0
         for annualFCF in tFCFo ?? [] {
-            fcfToEquity.append(annualFCF - (capExpend![count])) // capExpend entered as positive
+            fcfToEquity.append(annualFCF + (capExpend![count])) // capExpend entered as negative
             count += 1
         }
 // 2

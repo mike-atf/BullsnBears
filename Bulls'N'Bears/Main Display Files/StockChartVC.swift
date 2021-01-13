@@ -11,7 +11,8 @@ class StockChartVC: UIViewController {
 
     var stockToShow: Stock?
     @IBOutlet var chart: ChartContainerView!
-    
+    @IBOutlet var errorButton: UIBarButtonItem!
+    var buildLabel: UIBarButtonItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,6 +22,16 @@ class StockChartVC: UIViewController {
             configure()
         }
         
+        buildLabel = UIBarButtonItem(title: "Build: " + appBuild, style: .plain, target: nil, action: nil)
+        
+        self.navigationItem.leftBarButtonItem = nil
+        self.navigationItem.rightBarButtonItem = buildLabel
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(activateErrorButton), name: Notification.Name(rawValue: "NewErrorLogged"), object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewWillLayoutSubviews() {
@@ -36,6 +47,20 @@ class StockChartVC: UIViewController {
         }
     }
     
+    @IBAction func errorButtonAction(_ sender: UIBarButtonItem) {
+        
+        if let errorList = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ErrorListVC") as? ErrorListVC {
+            
+            self.present(errorList, animated: true, completion: nil)
+        
+        }
+    }
+    
+    @objc
+    func activateErrorButton() {
+        self.navigationItem.leftBarButtonItem = errorButton
+
+    }
 
     /*
     // MARK: - Navigation

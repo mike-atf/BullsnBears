@@ -10,6 +10,7 @@
 		EA163F77258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA163F78258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA163F79258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
+		EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */; };
 		EAA099C42588020B00DBB93C /* CheckButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA099C32588020B00DBB93C /* CheckButton.swift */; };
 		EAAA06B025AA01A00077A972 /* ErrorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAA06AF25AA01A00077A972 /* ErrorController.swift */; };
 		EAAA06B125AA01A00077A972 /* ErrorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAA06AF25AA01A00077A972 /* ErrorController.swift */; };
@@ -17,6 +18,7 @@
 		EAAA06B725AA0D890077A972 /* Rule1ValuationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAA06B625AA0D890077A972 /* Rule1ValuationController.swift */; };
 		EAAA06B825AA0D890077A972 /* Rule1ValuationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAA06B625AA0D890077A972 /* Rule1ValuationController.swift */; };
 		EAAA06B925AA0D890077A972 /* Rule1ValuationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAA06B625AA0D890077A972 /* Rule1ValuationController.swift */; };
+		EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC07D6525ACEE350045D83B /* ErrorListVC.swift */; };
 		EAC1904A257641160030B331 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC19049257641160030B331 /* AppDelegate.swift */; };
 		EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1904B257641160030B331 /* SceneDelegate.swift */; };
 		EAC19051257641160030B331 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAC1904F257641160030B331 /* Main.storyboard */; };
@@ -81,10 +83,12 @@
 		EAC2FC9B25A256AD0060F387 /* ValuationsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC9925A256AD0060F387 /* ValuationsController.swift */; };
 		EAC2FC9C25A256AD0060F387 /* ValuationsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC9925A256AD0060F387 /* ValuationsController.swift */; };
 		EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */; };
+		EAEA758C25ACF53F008EEC05 /* ErrorLogListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */; };
 		EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */; };
 		EAED14DF25A8D78C0073C46F /* Bulls'N'BearsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */; };
 		EAED14FB25A8DA090073C46F /* Bulls'N'BearsTests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = EAC1905F257641180030B331 /* Bulls'N'BearsTests.xctest */; };
 		EAED14FC25A8DA100073C46F /* Bulls'N'BearsUITests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = EAC1906A257641180030B331 /* Bulls'N'BearsUITests.xctest */; };
+		EAF5D73225AE1A8000E7A681 /* CombinedValuationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -106,9 +110,11 @@
 
 /* Begin PBXFileReference section */
 		EA163F76258BA85E000974AB /* StockTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockTrend.swift; sourceTree = "<group>"; };
+		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EAA099C32588020B00DBB93C /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
 		EAAA06AF25AA01A00077A972 /* ErrorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorController.swift; sourceTree = SOURCE_ROOT; };
 		EAAA06B625AA0D890077A972 /* Rule1ValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Rule1ValuationController.swift; path = "Bulls'N'Bears/DCFValuation FIles/Rule1ValuationController.swift"; sourceTree = SOURCE_ROOT; };
+		EAC07D6525ACEE350045D83B /* ErrorListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorListVC.swift; sourceTree = "<group>"; };
 		EAC19046257641160030B331 /* Bulls'N'Bears.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bulls'N'Bears.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAC19049257641160030B331 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EAC1904B257641160030B331 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -140,8 +146,10 @@
 		EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationListViewController.swift; sourceTree = "<group>"; };
 		EAC2FC9925A256AD0060F387 /* ValuationsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationsController.swift; sourceTree = "<group>"; };
 		EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
+		EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ErrorLogListCell.xib; sourceTree = "<group>"; };
 		EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsTests.swift"; path = "TrendMyStocksTests/Bulls'N'BearsTests.swift"; sourceTree = SOURCE_ROOT; };
 		EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsUITests.swift"; path = "TrendMyStocksUITests/Bulls'N'BearsUITests.swift"; sourceTree = SOURCE_ROOT; };
+		EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedValuationController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -219,6 +227,7 @@
 			isa = PBXGroup;
 			children = (
 				EAAA06B625AA0D890077A972 /* Rule1ValuationController.swift */,
+				EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */,
 				EAAA06AF25AA01A00077A972 /* ErrorController.swift */,
 				EAC2FC9925A256AD0060F387 /* ValuationsController.swift */,
 			);
@@ -228,6 +237,9 @@
 		EAED148325A8CED20073C46F /* Bulls'N'Bears */ = {
 			isa = PBXGroup;
 			children = (
+				EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */,
+				EAC07D6525ACEE350045D83B /* ErrorListVC.swift */,
+				EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */,
 				EAFD825025A4D2D800D27566 /* Main Display Files */,
 				EAFD824925A4D2C000D27566 /* DCFValuation FIles */,
 				EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */,
@@ -294,6 +306,7 @@
 				EAC19042257641160030B331 /* Sources */,
 				EAC19043257641160030B331 /* Frameworks */,
 				EAC19044257641160030B331 /* Resources */,
+				EAC07D5325ACE4430045D83B /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -388,6 +401,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */,
+				EAEA758C25ACF53F008EEC05 /* ErrorLogListCell.xib in Resources */,
 				EAC19056257641180030B331 /* Assets.xcassets in Resources */,
 				EAC2FC5325A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
 				EAC19051257641160030B331 /* Main.storyboard in Resources */,
@@ -417,6 +431,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		EAC07D5325ACE4430045D83B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		EAC19042257641160030B331 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -424,8 +458,10 @@
 			files = (
 				EAC19054257641160030B331 /* TrendMyStocks.xcdatamodeld in Sources */,
 				EAC190BA257662930030B331 /* StocksListViewController.swift in Sources */,
+				EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */,
 				EAC190D52576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC190EA2577E2E20030B331 /* ChartContainerView.swift in Sources */,
+				EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
 				EA163F77258BA85E000974AB /* StockTrend.swift in Sources */,
@@ -436,6 +472,7 @@
 				EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */,
 				EAC2FC7125A23FFC0060F387 /* ValuationTableViewCell.swift in Sources */,
 				EAC190C1257663200030B331 /* PublicVars.swift in Sources */,
+				EAF5D73225AE1A8000E7A681 /* CombinedValuationController.swift in Sources */,
 				EAAA06B025AA01A00077A972 /* ErrorController.swift in Sources */,
 				EAC2FC9A25A256AD0060F387 /* ValuationsController.swift in Sources */,
 				EAC2FC3F25A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
@@ -599,6 +636,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
 		};
@@ -654,6 +692,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};
@@ -669,7 +708,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -689,7 +728,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

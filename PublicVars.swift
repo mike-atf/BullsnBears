@@ -12,6 +12,19 @@ var foreCastTime: TimeInterval = 30*24*3600
 var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 var errorLog: [ErrorLog]?
 
+var appVersion:String = {
+    if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+        return version
+    } else { return "Version Number not Available" }
+}()
+    
+var appBuild: String = {
+    if let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
+        return build
+    } else { return "Build Number not Available" }
+}()
+
+
 enum ValuationCellValueFormat {
     case currency
     case percent

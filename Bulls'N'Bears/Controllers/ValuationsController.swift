@@ -33,7 +33,7 @@ class ValuationsController : DCFValuationHelper {
        
     init(listView: ValuationListViewController) {
         self.valuationListViewController = listView
-        self.valuation = listView.dcfValuation
+//        self.valuation = listView.dcfValuation
         recalculateRevenueGrowth()
         recalculateIncomeGrowth()
         recalculateFCFGrowth()
@@ -73,22 +73,6 @@ class ValuationsController : DCFValuationHelper {
 
         return newValuation
     }
-    
-    static func createR1Valuation(company: String) -> Rule1Valuation? {
-        let newValuation:Rule1Valuation? = {
-            NSEntityDescription.insertNewObject(forEntityName: "Rule1Valuation", into: managedObjectContext) as? Rule1Valuation
-        }()
-        newValuation?.company = company
-        do {
-            try  managedObjectContext.save()
-        } catch {
-            let error = error
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
-        }
-
-        return newValuation
-    }
-
     
     public func dcfSectionTitles() -> [String] {
         return dcfValuationSectionTitles
@@ -186,12 +170,16 @@ class ValuationsController : DCFValuationHelper {
         let format = cellValueFormat(indexPath: indexPath)
         let detail$ = getDetail$(indexPath: indexPath) ?? ""
         
-        cell.configure(title: rowTitle, value$: value$, detail: detail$, indexPath: indexPath, dcfDelegate: self, r1Delegate: nil, valueFormat: format)
+//        cell.configure(title: rowTitle, value$: value$, detail: detail$, indexPath: indexPath, dcfDelegate: self, r1Delegate: nil, valueFormat: format)
     }
     
     func userEnteredText(sender: UITextField, indexPath: IndexPath) {
         
         guard let validtext = sender.text else {
+            return
+        }
+        
+        guard validtext != "" else {
             return
         }
         
@@ -205,7 +193,6 @@ class ValuationsController : DCFValuationHelper {
             return
         }
         
-        var jumpToCellPath: IndexPath?
 
         switch indexPath.section {
         case 0:
@@ -225,8 +212,6 @@ class ValuationsController : DCFValuationHelper {
             }
         case 1:
             // 'Key Statistics
-            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            jumpToCellPath!.row += 1
 
             switch indexPath.row {
             case 0:
@@ -235,28 +220,20 @@ class ValuationsController : DCFValuationHelper {
                 validValuation.beta = value
             case 2:
                 validValuation.sharesOutstanding = value
-                jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 2:
             // 'Income Statement S1 - Revenue
-            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            jumpToCellPath!.row += 1
             validValuation.tRevenueActual![indexPath.row] = value
             recalculateRevenueGrowth()
-            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
         case 3:
             // 'Income Statement S2 - net income
-            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            jumpToCellPath!.row += 1
             validValuation.netIncome![indexPath.row] = value
             recalculateIncomeGrowth()
-            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
+
         case 4:
             // 'Income Statement S3 -
-            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            jumpToCellPath!.row += 1
             switch indexPath.row {
             case 0:
                 validValuation.expenseInterest = value
@@ -264,49 +241,33 @@ class ValuationsController : DCFValuationHelper {
                 validValuation.incomePreTax = value
             case 2:
                 validValuation.expenseIncomeTax = value
-                jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 5:
             // 'balance sheet'
-            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            jumpToCellPath!.row += 1
            switch indexPath.row {
             case 0:
                 validValuation.debtST = value
             case 1:
                 validValuation.debtLT = value
-                jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 6:
             // 'Cash Flow S1
-            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            jumpToCellPath!.row += 1
             validValuation.tFCFo![indexPath.row] = value
             recalculateFCFGrowth()
-            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
         case 7:
             // 'Cash Flow S2
-            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            jumpToCellPath!.row += 1
             validValuation.capExpend![indexPath.row] = value
-            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
         case 8:
             // 'Prediction S1
-            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            jumpToCellPath!.row += 1
             validValuation.tRevenuePred![indexPath.row] = value
-            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
        case 9:
             // 'Prediction S2
-            jumpToCellPath = IndexPath(row: indexPath.row, section: indexPath.section)
-            jumpToCellPath!.row += 1
             validValuation.revGrowthPred![indexPath.row] = value / 100.0
             recalculateAvgGrowthRate()
-            jumpToCellPath = IndexPath(row: 0, section: indexPath.section+1)
         case 10:
             // adjsuted predicted growth rate
             validValuation.revGrowthPredAdj![indexPath.row] = value / 100.0
@@ -317,10 +278,14 @@ class ValuationsController : DCFValuationHelper {
         if let updatePaths = determineRowsToUpdateAfterUserEntry(indexPath: indexPath) {
             valuationListViewController.helperUpdatedRows(paths: updatePaths)
         }
-//        if let jumpPath = jumpToCellPath {
-//            valuationListViewController.helperAskedToEnterNextTextField(targetPath: jumpPath)
-//        }
-
+        
+        var jumpToCellPath = IndexPath(row: indexPath.row+1, section: indexPath.section)
+        if jumpToCellPath.row > rowTitles![indexPath.section].count {
+            jumpToCellPath = IndexPath(row: 0, section: indexPath.section + 1)
+        }
+         if jumpToCellPath.section < rowTitles!.count {
+            valuationListViewController.helperAskedToEnterNextTextField(targetPath: jumpToCellPath)
+        }
     }
     
     internal func determineRowsToUpdateAfterUserEntry(indexPath: IndexPath) -> [IndexPath]? {
