@@ -35,6 +35,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         if let documentFolder = appDocumentPaths.first {
             
+            guard documentFolder != "{}" else {
+                return
+            }
+            
             guard URL(fileURLWithPath: documentFolder).startAccessingSecurityScopedResource() else {
                 ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: nil, errorInfo: "Accessing App Document Folder was not possible: lacking access rights")
                 return
@@ -82,6 +86,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             if filesImported.count > 0 {
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "NewFilesArrived"), object: filesImported, userInfo: nil)
             }
+            
+            URL(fileURLWithPath: documentFolder).stopAccessingSecurityScopedResource()
         }
     } 
     

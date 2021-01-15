@@ -75,7 +75,7 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         if valueFormat == .percent {
-            let numbers = textField.text?.filter("0123456789.".contains)
+            let numbers = textField.text?.filter("-0123456789.".contains)
                 if let value = (Double(numbers ?? "0")) {
                 textField.text = percentFormatter2Digits.string(from: (value / 100.0) as NSNumber)
             }

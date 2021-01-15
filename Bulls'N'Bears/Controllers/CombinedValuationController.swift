@@ -32,6 +32,7 @@ class CombinedValuationController: ValuationHelper {
         
         self.valuationListViewController = listView
         self.method = valuationMethod
+        self.stock = stock
         
         if valuationMethod == .rule1 {
             if let valuation = CombinedValuationController.returnR1Valuations(company: stock.name)?.first {
@@ -542,18 +543,28 @@ class CombinedValuationController: ValuationHelper {
         let section2$: String? = nil
         var color = UIColor.label
         
-        var section3$: String? = (indexPath.row < (valuation.tRevenueActual?.count ?? 0) - 1) ? percentFormatter0Digits.string(from: calculateGrowthDCF(valuation.tRevenueActual, element:indexPath.row)! as NSNumber) : ""
+        var section3$ = ""
+        if indexPath.row < (valuation.tRevenueActual?.count ?? 0) - 1 {
+            if let growth = calculateGrowthDCF(valuation.tRevenueActual, element:indexPath.row) {
+                section3$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
+            }
+        }
         if indexPath.section == 2 {
             if (valuation.tRevenueActual?[indexPath.row] ?? 0.0) < 0 {
                 color = UIColor(named: "Red")!
-                section3$ = "! " + (section3$ ?? "")
+                section3$ = "! " + (section3$)
             }
         }
-        var section4$: String? = (indexPath.row < (valuation.netIncome?.count ?? 0) - 1) ? percentFormatter0Digits.string(from: calculateGrowthDCF(valuation.netIncome, element:indexPath.row)! as NSNumber) : ""
-        if indexPath.section == 3 {
+        var section4$ = ""
+        if indexPath.row < (valuation.netIncome?.count ?? 0) - 1 {
+            if let growth = calculateGrowthDCF(valuation.netIncome, element:indexPath.row) {
+                section4$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
+            }
+        }
+        if indexPath.section == 2 {
             if (valuation.netIncome?[indexPath.row] ?? 0.0) < 0 {
                 color = UIColor(named: "Red")!
-                section4$ = "! " + (section4$ ?? "")
+                section4$ = "! " + (section4$)
             }
         }
 
@@ -592,9 +603,19 @@ class CombinedValuationController: ValuationHelper {
         }
         
 //section 6
-        let section7$: String? = (indexPath.row < (valuation.tFCFo?.count ?? 0) - 1) ? percentFormatter0Digits.string(from: calculateGrowthDCF(valuation.tFCFo, element:indexPath.row)! as NSNumber) : ""
+        var section7$ = ""
+        if indexPath.row < (valuation.tFCFo?.count ?? 0) - 1 {
+            if let growth = calculateGrowthDCF(valuation.tFCFo, element:indexPath.row) {
+                section7$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
+            }
+        }
 
-        let section8$: String? = (indexPath.row < (valuation.capExpend?.count ?? 0) - 1) ? percentFormatter0Digits.string(from: calculateGrowthDCF(valuation.capExpend, element:indexPath.row)! as NSNumber) : ""
+        var section8$ = ""
+        if indexPath.row < (valuation.capExpend?.count ?? 0) - 1 {
+            if let growth = calculateGrowthDCF(valuation.capExpend, element:indexPath.row) {
+                section8$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
+            }
+        }
 
         let section9$: String? = nil
         let section10$: String? = averageGrowthPrediction() != nil ? percentFormatter0Digits.string(from: averageGrowthPrediction()! as NSNumber) : nil
@@ -1087,7 +1108,10 @@ class CombinedValuationController: ValuationHelper {
             return nil
         }
         
-        return (numbers[element] - numbers[element+1]) / abs(numbers[element+1])
+        let result = (numbers[element] - numbers[element+1]) / abs(numbers[element+1])
+
+        
+        return (!result.isNaN && result.isFinite) ? result : nil
                 
     }
  
