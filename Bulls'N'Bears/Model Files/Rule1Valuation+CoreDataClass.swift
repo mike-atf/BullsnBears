@@ -40,8 +40,7 @@ public class Rule1Valuation: NSManagedObject {
         creationDate = Date()
         insiderStocks = Double()
         ceoRating = Double()
-        
-//        let reviewYears = 10
+        adjGrowthEstimates = [Double]()
         
     }
 

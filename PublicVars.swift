@@ -24,6 +24,8 @@ var appBuild: String = {
     } else { return "Build Number not Available" }
 }()
 
+var alertController = AlertController()
+
 
 enum ValuationCellValueFormat {
     case currency
@@ -138,7 +140,7 @@ let percentFormatter0Digits: NumberFormatter = {
 }()
 
 
-let numberFormatterWithFraction: NumberFormatter = {
+let numberFormatterWith1Digit: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
     formatter.maximumFractionDigits = 2
@@ -146,6 +148,17 @@ let numberFormatterWithFraction: NumberFormatter = {
     formatter.usesGroupingSeparator = true
     return formatter
 }()
+
+let numberFormatterDecimals: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .decimal
+//    formatter.maximumFractionDigits = 2
+//    formatter.minimumFractionDigits = 2
+    formatter.minimumIntegerDigits = 1
+    formatter.usesGroupingSeparator = true
+    return formatter
+}()
+
 
 let numberFormatterNoFraction: NumberFormatter = {
     let formatter = NumberFormatter()

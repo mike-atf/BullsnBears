@@ -2,12 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/adav/Dropbox/IOS Xcode Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/ErrorList/ErrorLogListCell.xib">
-   </FileRef>
-   <FileRef
-      location = "group:/Users/adav/Dropbox/IOS Xcode Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/ErrorList/ErrorLogListCell.swift">
-   </FileRef>
-   <FileRef
       location = "self:">
    </FileRef>
 </Workspace>

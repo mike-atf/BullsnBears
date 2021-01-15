@@ -195,7 +195,7 @@ class ChartView: UIView {
             if let existingValuation = ValuationsController.returnDCFValuations(company: stockToShow!.name)?.first {
                 if let fairValue = existingValuation.returnIValue() {
                     let ratio = currentPrice / fairValue
-                    let ratio$ = " DCF " + (numberFormatterWithFraction.string(from: ratio as NSNumber) ?? "") + "x "
+                    let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
 
                     let newLabel: UILabel = {
                         let label = UILabel()
@@ -220,7 +220,7 @@ class ChartView: UIView {
             if let existingValuation = Rule1ValuationController.returnR1Valuations(company: stockToShow!.name)?.first {
                 if let fairValue = existingValuation.stickerPrice() {
                     let ratio = currentPrice / fairValue
-                    let ratio$ = " R1 " + (numberFormatterWithFraction.string(from: ratio as NSNumber) ?? "") + "x "
+                    let ratio$ = " R1 " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
 
                     let newLabel: UILabel = {
                         let label = UILabel()
@@ -364,7 +364,7 @@ class ChartView: UIView {
         
         var text = " \(endPrice$) = \(increase1$) \n From latest: \(increase2$) "
         if let r = correlation {
-            text = text + "\n r=" + numberFormatterWithFraction.string(from: NSNumber(value: r))! + " "
+            text = text + "\n r=" + numberFormatterWith1Digit.string(from: NSNumber(value: r))! + " "
         }
         if let r = reliability {
             text = text + "\n R=" + percentFormatter0Digits.string(from: NSNumber(value: r))! + " "

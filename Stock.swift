@@ -398,34 +398,34 @@ struct Stock {
         return getCorrelation(xArray: xArray, yArray: yArray)
     }
     
-    private func getCorrelation(xArray: [Double], yArray: [Double]) -> Correlation? {
+    func getCorrelation(xArray: [Double]?, yArray: [Double]?) -> Correlation? {
         
-        guard yArray.count > 0 else {
+        guard (yArray ?? []).count > 0 else {
             return nil
         }
         
-        guard xArray.count > 0 else {
+        guard (xArray ?? []).count > 0 else {
             return nil
         }
         
-        guard xArray.count == yArray.count else {
+        guard (xArray ?? []).count == (yArray ?? []).count else {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Error in trend correlation: y.count != x.count")
             return nil
         }
         
-        let ySum = yArray.reduce(0,+)
-        let xSum = xArray.reduce(0,+)
+        let ySum = yArray!.reduce(0,+)
+        let xSum = xArray!.reduce(0,+)
         var xyProductArray = [Double]()
         var x2Array = [Double]()
         var y2Array = [Double]()
         var xySumArray = [Double]()
-        let n: Double = Double(yArray.count)
+        let n: Double = Double(yArray!.count)
 
         var count = 0
-        for y in yArray {
-            xyProductArray.append(y * xArray[count])
-            x2Array.append(xArray[count] * xArray[count])
-            xySumArray.append(y + xArray[count])
+        for y in yArray! {
+            xyProductArray.append(y * xArray![count])
+            x2Array.append(xArray![count] * xArray![count])
+            xySumArray.append(y + xArray![count])
             y2Array.append(y * y)
             count += 1
         }
@@ -447,11 +447,11 @@ struct Stock {
         var ydiff2Sum = Double()
         
 //        count = 0
-        for y in yArray {
+        for y in yArray! {
             let ydiff = y - yMean
             ydiff2Sum += (ydiff * ydiff)
         }
-        for x in xArray {
+        for x in xArray! {
             let xdiff = x - xMean
             xdiff2Sum += (xdiff * xdiff)
         }

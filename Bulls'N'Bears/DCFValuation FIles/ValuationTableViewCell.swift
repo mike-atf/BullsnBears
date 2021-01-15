@@ -40,6 +40,7 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
         detail.text = ""
         textField.text = ""
         indexPath = IndexPath()
+        textField.isEnabled = true
     }
     
     public func configure(title: String, value$: String?, detail: String, indexPath: IndexPath, method: ValuationMethods, delegate: ValuationHelper, valueFormat: ValuationCellValueFormat, detailColor: UIColor? = UIColor.label) {
@@ -55,6 +56,11 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
                                                     attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
         
         textField.attributedPlaceholder = lighterPlaceHolderText
+        if method == .rule1 {
+            if indexPath == IndexPath(row: 2, section: 9) { // proportion debt/ fcf
+                textField.isEnabled = false
+            }
+        }
     }
     
     public func enterTextField() {
@@ -101,14 +107,30 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
                 textField.text = "$ \(numbers)"
             }
             else {
-                textField.text = "$ " + numberFormatterWithFraction.string(from: value as NSNumber)!
+                textField.text = "$ " + numberFormatterDecimals.string(from: value as NSNumber)!
             }
         }
-        else if valueFormat == .numberNoDecimals {
+        else
+        if valueFormat == .numberNoDecimals {
             let numbers = validText.filter("-0123456789.".contains)
             guard let value = (Double(numbers)) else { return }
             let value$ = numberFormatterNoFraction.string(from: value as NSNumber)
             textField.text = value$
+        }
+        if valueFormat == .numberWithDecimals {
+            let numbers = validText.filter("-0123456789.".contains)
+            guard let value = (Double(numbers)) else { return }
+            
+            if (numbers.last == ".") {
+                textField.text = "\(numbers)"
+            }
+            else
+            if String(numbers.suffix(2)) == ".0" {
+                textField.text = "\(numbers)"
+            }
+            else {
+                textField.text = numberFormatterDecimals.string(from: value as NSNumber)!
+            }
         }
     }
 }

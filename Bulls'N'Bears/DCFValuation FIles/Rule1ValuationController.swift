@@ -291,14 +291,14 @@ class Rule1ValuationController: R1ValuationHelper {
                     value$ = percentFormatter2Digits.string(from: number as NSNumber)
                }
                 else if [6,9,11].contains(indexPath.section) {
-                    value$ = numberFormatterWithFraction.string(from: number as NSNumber)
+                    value$ = numberFormatterWith1Digit.string(from: number as NSNumber)
                 }
                 else if [10].contains(indexPath.section) {
                     value$ = numberFormatterNoFraction.string(from: number as NSNumber)
                 }
                 else if [9].contains(indexPath.section) {
                     if indexPath.row == 0 {
-                        value$ = numberFormatterWithFraction.string(from: number as NSNumber)
+                        value$ = numberFormatterWith1Digit.string(from: number as NSNumber)
                     }
                     else {
                         value$ = percentFormatter2Digits.string(from: number as NSNumber)

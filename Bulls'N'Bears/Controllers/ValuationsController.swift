@@ -413,7 +413,7 @@ class ValuationsController : DCFValuationHelper {
                 else {
                     if indexPath == IndexPath(item: 1, section: 1) || indexPath == IndexPath(item: 2, section: 1) {
                         // beta
-                        value$ = numberFormatterWithFraction.string(from: number as NSNumber)
+                        value$ = numberFormatterWith1Digit.string(from: number as NSNumber)
                     } else {
                         value$ = currencyFormatterGapNoPence.string(from: number as NSNumber)
                     }

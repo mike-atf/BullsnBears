@@ -52,7 +52,7 @@ class ValuationListViewController: UITableViewController {
 //        sectionSubtitles = dcfHelper?.dcfSectionSubTitles() ?? r1vHelper?.r1SectionSubTitles()
 //        rowTitles = dcfHelper?.buildRowTitles() ?? r1vHelper?.buildRowTitles()
 // NEW
-        valuationController = CombinedValuationController(stockName: stock.name, valuationMethod: valuationMethod, listView: self)
+        valuationController = CombinedValuationController(stock: stock, valuationMethod: valuationMethod, listView: self)
         self.helper = valuationController
         
         sectionTitles = helper.sectionTitles()
