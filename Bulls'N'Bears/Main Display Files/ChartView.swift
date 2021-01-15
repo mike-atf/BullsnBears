@@ -16,6 +16,7 @@ class ChartView: UIView {
     var yAxisNumbers = [Double]()
     var xAxisLabels = [UILabel]()
     var trendLabels = [UILabel]()
+    var valuationLabels = [UILabel]()
     
     var candleBoxes = UIBezierPath()
     var candleSticks = UIBezierPath()
@@ -192,7 +193,13 @@ class ChartView: UIView {
             currentPriceLine.stroke()
   
 // DCF Label
-            if let existingValuation = ValuationsController.returnDCFValuations(company: stockToShow!.name)?.first {
+            
+            for label in valuationLabels {
+                label.removeFromSuperview()
+            }
+            valuationLabels.removeAll()
+
+            if let existingValuation = CombinedValuationController.returnDCFValuations(company: stockToShow!.name)?.first {
                 if let fairValue = existingValuation.returnIValue() {
                     let ratio = currentPrice / fairValue
                     let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
@@ -211,13 +218,14 @@ class ChartView: UIView {
                         label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
                         return label
                     }()
+                    valuationLabels.append(newLabel)
                     addSubview(newLabel)
                 }
             }
             
 // R1 Label
             // R1 Label
-            if let existingValuation = Rule1ValuationController.returnR1Valuations(company: stockToShow!.name)?.first {
+            if let existingValuation = CombinedValuationController.returnR1Valuations(company: stockToShow!.name)?.first {
                 if let fairValue = existingValuation.stickerPrice() {
                     let ratio = currentPrice / fairValue
                     let ratio$ = " R1 " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
@@ -236,6 +244,7 @@ class ChartView: UIView {
                         label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
                         return label
                     }()
+                    valuationLabels.append(newLabel)
                     addSubview(newLabel)
                 }
             }

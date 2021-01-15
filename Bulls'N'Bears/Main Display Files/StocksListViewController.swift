@@ -127,8 +127,8 @@ class StocksListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
-        let valuation = ValuationsController.returnDCFValuations(company: stocks[indexPath.row].name)
-        let r1valuation = Rule1ValuationController.returnR1Valuations(company: stocks[indexPath.row].name)
+        let valuation = CombinedValuationController.returnDCFValuations(company: stocks[indexPath.row].name)
+        let r1valuation = CombinedValuationController.returnR1Valuations(company: stocks[indexPath.row].name)
         cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row], valuation: valuation?.first, r1Valuation: r1valuation?.first)
         return cell
     }

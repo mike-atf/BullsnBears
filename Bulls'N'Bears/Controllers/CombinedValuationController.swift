@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 protocol ValuationHelper {
     func rowTitles() -> [[String]]
@@ -33,35 +34,100 @@ class CombinedValuationController: ValuationHelper {
         self.method = valuationMethod
         
         if valuationMethod == .rule1 {
-            if let valuation = Rule1ValuationController.returnR1Valuations(company: stock.name)?.first {
+            if let valuation = CombinedValuationController.returnR1Valuations(company: stock.name)?.first {
                 self.valuation = valuation
             }
             else {
-                self.valuation = Rule1ValuationController.createR1Valuation(company: stock.name)
-                if let existingDCFValuation = ValuationsController.returnDCFValuations(company: stock.name)?.first {
+                self.valuation = CombinedValuationController.createR1Valuation(company: stock.name)
+                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.name)?.first {
                     (valuation as? Rule1Valuation)?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
                 }
             }
             
-//            valuesArray = getR1Values()
         }
         else if valuationMethod == .dcf {
             
-            if let valuation = ValuationsController.returnDCFValuations(company: stock.name)?.first {
+            if let valuation = CombinedValuationController.returnDCFValuations(company: stock.name)?.first {
                 self.valuation = valuation
             }
             else {
-                self.valuation = ValuationsController.createDCFValuation(company: stock.name)
-                if let existingR1Valuation = Rule1ValuationController.returnR1Valuations(company: stock.name)?.first {
+                self.valuation = CombinedValuationController.createDCFValuation(company: stock.name)
+                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.name)?.first {
                     (valuation as? DCFValuation)?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
                 }
             }
             
-//            valuesArray = getDCFValues()
         }
-//        recalculateRevenueGrowth()
-//        recalculateIncomeGrowth()
-//        recalculateFCFGrowth()
+    }
+    
+    //MARK: - Class functions
+    
+    static func createR1Valuation(company: String) -> Rule1Valuation? {
+        let newValuation:Rule1Valuation? = {
+            NSEntityDescription.insertNewObject(forEntityName: "Rule1Valuation", into: managedObjectContext) as? Rule1Valuation
+        }()
+        newValuation?.company = company
+        do {
+            try  managedObjectContext.save()
+        } catch {
+            let error = error
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
+        }
+
+        return newValuation
+    }
+    
+    static func returnR1Valuations(company: String? = nil) -> [Rule1Valuation]? {
+        
+        var valuations: [Rule1Valuation]?
+        
+        let fetchRequest = NSFetchRequest<Rule1Valuation>(entityName: "Rule1Valuation")
+        if let validName = company {
+            let predicate = NSPredicate(format: "company BEGINSWITH %@", argumentArray: [validName])
+            fetchRequest.predicate = predicate
+        }
+        
+        do {
+            valuations = try managedObjectContext.fetch(fetchRequest)
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
+        }
+
+        return valuations
+    }
+    
+    static func returnDCFValuations(company: String? = nil) -> [DCFValuation]? {
+        
+        var valuations: [DCFValuation]?
+        
+        let fetchRequest = NSFetchRequest<DCFValuation>(entityName: "DCFValuation")
+        if let validName = company {
+            let predicate = NSPredicate(format: "company BEGINSWITH %@", argumentArray: [validName])
+            fetchRequest.predicate = predicate
+        }
+        
+        do {
+            valuations = try managedObjectContext.fetch(fetchRequest)
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching dcfValuations")
+        }
+
+        return valuations
+    }
+    
+    static func createDCFValuation(company: String) -> DCFValuation? {
+        let newValuation:DCFValuation? = {
+            NSEntityDescription.insertNewObject(forEntityName: "DCFValuation", into: managedObjectContext) as? DCFValuation
+        }()
+        newValuation?.company = company
+        do {
+            try  managedObjectContext.save()
+        } catch {
+            let error = error
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving dcfValuations")
+        }
+
+        return newValuation
     }
     
     //MARK: - Delegate functions
@@ -182,7 +248,7 @@ class CombinedValuationController: ValuationHelper {
             
             if let moatCount = r1MoatParameterCount() {
                 if moatCount < 25 {
-                    alertController.showDialog(title: "Limited number of moat parameters", alertMessage: "You entered only \(moatCount) of 50 possible moat values.\nThe resulting moat score and sticker price may not very reliable")
+                    alertController.showDialog(title: "Limited number of moat parameters", alertMessage: "You entered only \(moatCount) of 50 possible moat values.\nThe resulting moat score and sticker price may not be very reliable")
 
                 }
                 
