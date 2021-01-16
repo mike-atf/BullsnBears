@@ -304,8 +304,8 @@ class ChartView: UIView {
         }
         else {
             // twoPoints
-            let trend = stock.twoPointTrend(properties: trendProperties)
-//            let trend = stock.findMajorTrend2(properties: trendProperties)
+//            let trend = stock.twoPointTrend(properties: trendProperties)
+            guard let trend = stock.lowHighTrend(properties: trendProperties) else { return }
             startPrice = trend.startPrice!
             projectedPrice = startPrice + trend.incline! * dateRange!.last!.timeIntervalSince(trend.startDate)
             startPoint = plotPricePoint(pricePoint: PriceDate(trend.startDate,startPrice))
