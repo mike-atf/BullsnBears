@@ -159,7 +159,7 @@ class CombinedValuationController: ValuationHelper {
         var subtitles = [String]()
         
         if method == .dcf {
-            subtitles = ["General","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "enter negative values (-)","Details > Analysis > Revenue estimate", "", ""]
+            subtitles = ["General","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "values entered will be converted to negative","Details > Analysis > Revenue estimate", "", ""]
         } else
         if method == .rule1 {
             subtitles = ["Creation date","1. Book Value per Share", "2. Earnings per Share", "3. Sales/ Revenue", "4. Free Cash Flow", "5. Return on Invested Capital", "min and max last 5-10 years", "Analysts min and max predictions","Adjust predicted growth rates", "", "", "Between 0 - 10"]
@@ -351,10 +351,9 @@ class CombinedValuationController: ValuationHelper {
         if let updatePaths = rowsToUpdateAfterUserEntry(indexPath) {
             valuationListViewController.helperUpdatedRows(paths: updatePaths)
         }
-        
-        
-//        print("user entered \(value), array now \(valuesArray)")
 
+        valuation.save()
+        
         var jumpToCellPath = IndexPath(row: indexPath.row+1, section: indexPath.section)
         if jumpToCellPath.row > rowtitles[indexPath.section].count-1 {
             jumpToCellPath = IndexPath(row: 0, section: indexPath.section + 1)
@@ -420,6 +419,8 @@ class CombinedValuationController: ValuationHelper {
             ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
         }
         
+        valuation.save()
+        
         if let updatePaths = rowsToUpdateAfterUserEntry(indexPath) {
             valuationListViewController.helperUpdatedRows(paths: updatePaths)
         }
@@ -440,10 +441,6 @@ class CombinedValuationController: ValuationHelper {
             var paths = [IndexPath(row: indexPath.row, section: indexPath.section)]
 
             switch indexPath.section {
-//            case 0:
-//                return nil
-//            case 1:
-//                return nil
             case 2:
                 if indexPath.row > 0 && indexPath.row < (valuation.tRevenueActual!.count) {
                     paths.append(IndexPath(row: indexPath.row-1, section: indexPath.section))
@@ -454,10 +451,11 @@ class CombinedValuationController: ValuationHelper {
                 if indexPath.row > 0 && indexPath.row < (valuation.netIncome!.count) {
                     paths.append(IndexPath(row: indexPath.row-1, section: indexPath.section))
                 }
-//            case 4:
-//                paths.append(IndexPath(row: 1, section: indexPath.section))
+            case 4:
+                if indexPath.row == 1{
+                    paths.append(IndexPath(row: 2, section: 4))
+                }
             case 5:
-//                paths = [indexPath]
                 paths.append(IndexPath(row: 1, section: indexPath.section))
             case 6:
                 if indexPath.row > 0 && indexPath.row < (valuation.tFCFo!.count) {
@@ -689,7 +687,7 @@ class CombinedValuationController: ValuationHelper {
         case 8:
             // 'Adjusted Growth predictions
             if let growth = averageGrowthPrediction() {
-                return (percentFormatter0Digits.string(from: growth as NSNumber), nil)
+                return ("avg. " + (percentFormatter0Digits.string(from: growth as NSNumber) ?? "%"), nil)
             }
 
        case 9:
