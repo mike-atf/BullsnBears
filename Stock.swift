@@ -32,6 +32,15 @@ struct Stock {
         return prices.first!.returnPrice(option: priceOption)
     }
     
+    func findDailyPricesIndexFromDate(_ date: Date) -> Int? {
+        
+        for index in 1..<dailyPrices.count {
+            if dailyPrices[index].tradingDate > date { return index-1 }
+        }
+
+        return nil
+    }
+    
     /*
     public func findMajorTrends(priceOption: PricePointOptions, findOption: FindOptions, changeThreshold: Double) -> [StockTrend] {
     
@@ -66,14 +75,32 @@ struct Stock {
     }
     */
     
+    
     public func longerTrend(_ properties: TrendProperties) -> StockTrend? {
         
         guard let initialTrend = lowHighTrend(properties: properties) else { return nil }
         var newTrend = StockTrend(start: initialTrend.startDate, end: initialTrend.endDate, startPrice: initialTrend.startPrice, endPrice: initialTrend.endPrice)
         
+        let lastDate = dailyPrices.last!.tradingDate
+        let firstDate = dailyPrices.first!.tradingDate
+        
+        var trendDuration = lastDate.timeIntervalSince(firstDate)
+        
+        switch properties.time {
+        case .full:
+            trendDuration = lastDate.timeIntervalSince(firstDate)
+        case .quarter:
+            trendDuration = trendDuration / 4
+        case .half:
+            trendDuration = trendDuration / 2
+        case .month:
+            trendDuration = 30*24*3600
+        case .none:
+            trendDuration = lastDate.timeIntervalSince(firstDate)
+        }
+
         var priceOption: PricePointOptions!
 //        var findOption: FindOptions!
-        
         if properties.type == .bottom {
             priceOption = .low
 //            findOption = .minimum
@@ -88,28 +115,69 @@ struct Stock {
         // if it's not create new trend from the lowest/highest point of this week to the second point of the initialTrend
         // if it is return a new trend based on the new start date
         
-// find the [dailyPrice] element of the initial Trend start
-        var indexOfPreviousTradingDay = 0
-        for day in dailyPrices {
-            if day.tradingDate == initialTrend.startDate { break }
-            indexOfPreviousTradingDay += 1
+        let periodStartDate = initialTrend.startDate
+        guard let startIndex = findDailyPricesIndexFromDate(periodStartDate) else { return newTrend }
+        
+        for index in stride(from: startIndex-1, to: 0, by: -1) {
+            
+            let price = dailyPrices[index].returnPrice(option: priceOption)
+            let date = dailyPrices[index].tradingDate
+            
+//            let calculatedTrendPrice = newTrend.startDate.timeIntervalSince(date) * -newTrend.incline!
+            var tolerance = [newTrend.startPrice! + newTrend.startDate.timeIntervalSince(date) * -newTrend.incline! * 0.8]
+            tolerance.append(newTrend.startPrice! + newTrend.startDate.timeIntervalSince(date) * -newTrend.incline! * 1.2)
+            
+            print()
+            print("price is \(price)")
+            print("price barcket is [\(tolerance.min()!) - \(tolerance.max()!)]")
+            
+            if price > tolerance.min()! && price < tolerance.max()! {
+                newTrend = StockTrend(start: date, end: initialTrend.endDate, startPrice: price, endPrice: initialTrend.endPrice)
+            }
         }
+        
+        return newTrend
 
-        for index in stride(from: indexOfPreviousTradingDay, to: 0, by: -5) {
-            let tradingDay = dailyPrices[index]
-            let oneWeekLater = dailyPrices[index+5]
-            
-            let weekTrend = StockTrend(start: tradingDay.tradingDate, end: oneWeekLater.tradingDate, startPrice: tradingDay.returnPrice(option: priceOption), endPrice: oneWeekLater.returnPrice(option: priceOption))
-            
-            guard let newIncline = weekTrend.incline else { return newTrend }
-            
-            if abs((newIncline - initialTrend.incline!) / initialTrend.incline!) < 0.5 { // less than 50% difference
-                newTrend = StockTrend(start: tradingDay.tradingDate, end: initialTrend.endDate, startPrice: tradingDay.returnPrice(option: priceOption), endPrice: initialTrend.endPrice)
-            }
-            else {
-                return newTrend
-            }
-        }
+        
+// find the [dailyPrice] element of the initial Trend start
+//        var periodStartDate = initialTrend.startDate.addingTimeInterval(-trendDuration)
+//        while periodStartDate >= dailyPrices.first!.tradingDate {
+//
+//            guard let startIndex = findDailyPricesIndexFromDate(periodStartDate) else { return newTrend }
+//            guard let endIndex = findDailyPricesIndexFromDate(periodStartDate.addingTimeInterval(trendDuration)) else { return newTrend }
+//
+//            let pricesInRange = dailyPrices[startIndex..<endIndex]
+//
+//            let sortedPricesInRange = pricesInRange.sorted { (d0, d1) -> Bool in
+//                if findOption == .minimum {
+//                    if d0.returnPrice(option: priceOption) < d1.returnPrice(option: priceOption) { return true }
+//                    else { return false }
+//                }
+//                else {
+//                    if d0.returnPrice(option: priceOption) > d1.returnPrice(option: priceOption) { return true }
+//                    else { return false }
+//                }
+//            }
+//
+//            guard let lowHighPricePoint = sortedPricesInRange.first else {
+//                return newTrend
+//            }
+//
+//            let tempTrend = StockTrend(start: lowHighPricePoint.tradingDate, end: newTrend.startDate, startPrice: lowHighPricePoint.returnPrice(option: priceOption), endPrice: newTrend.endPrice!)
+//
+//            guard let newIncline = tempTrend.incline else { return newTrend }
+//
+//            if abs((newIncline - initialTrend.incline!) / initialTrend.incline!) < 1.0 { // less than 50% difference
+//                newTrend = tempTrend
+//                print("trend difference low = \(abs((newIncline - initialTrend.incline!) / initialTrend.incline!) )")
+//            }
+//            else {
+//                print("trend difference high = \(abs((newIncline - initialTrend.incline!) / initialTrend.incline!) )")
+//                return newTrend
+//            }
+//
+//            periodStartDate = lowHighPricePoint.tradingDate.addingTimeInterval(-trendDuration)
+//        }
 
         return newTrend
         
