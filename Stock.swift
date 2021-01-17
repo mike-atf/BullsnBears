@@ -179,7 +179,7 @@ struct Stock {
 //            periodStartDate = lowHighPricePoint.tradingDate.addingTimeInterval(-trendDuration)
 //        }
 
-        return newTrend
+//        return newTrend
         
     }
     
@@ -263,6 +263,7 @@ struct Stock {
         for pricePoint in dailyPricesInSecondHalf {
             
             let incline = pricePoint.returnIncline(pricePoint: firstPricePoint, priceOption: priceOption)
+            
             if findOption == .maximum {
                 if incline > minOrMax {
                     minOrMax = incline
@@ -277,27 +278,27 @@ struct Stock {
             }
         }
         
-        let initialTrend = StockTrend(start: firstPricePoint.tradingDate, end: secondPricePoint.tradingDate, startPrice: firstPricePoint.returnPrice(option: priceOption), endPrice: secondPricePoint.returnPrice(option: priceOption))
+        var initialTrend = StockTrend(start: firstPricePoint.tradingDate, end: secondPricePoint.tradingDate, startPrice: firstPricePoint.returnPrice(option: priceOption), endPrice: secondPricePoint.returnPrice(option: priceOption))
+
+        // for maxium = green trend check whether two point tredn of maxima in two half has a lower incline
+        // if so, use this
+        if findOption == .maximum {
+            let sorted = dailyPricesInSecondHalf.sorted { (pp1, pp2) -> Bool in
+                if pp1.returnPrice(option: priceOption) > pp2.returnPrice(option: priceOption) { return true }
+                else { return false }
+            }
+            
+            if let topPricePoint = sorted.first {
+                let comparatorTrend = StockTrend(start: firstPricePoint.tradingDate, end: topPricePoint.tradingDate, startPrice: firstPricePoint.returnPrice(option: priceOption), endPrice: topPricePoint.returnPrice(option: priceOption))
+                
+                if (abs(comparatorTrend.incline ?? 0) ) < (abs(initialTrend.incline ?? 0)) {
+                    initialTrend = comparatorTrend
+                }
+            }
+        }
+        
         
         return initialTrend
-//        var indexOfPreviousTradingDay = 0
-//        for day in dailyPrices {
-//            if day.tradingDate == initialTrend.startDate { break }
-//            indexOfPreviousTradingDay += 1
-//        }
-//
-//        let threshold = 0.8
-//        var arrayPosition = 0
-//
-//        for index in stride(from: indexOfPreviousTradingDay, to: 0, by: -5) {
-//            let tradingDay = dailyPrices[index]
-//        }
-//
-//
-//        let finalTrend = StockTrend(start: dailyPrices[arrayPosition].tradingDate, end: initialTrend.endDate, startPrice: dailyPrices[arrayPosition].returnPrice(option: priceOption), endPrice: initialTrend.endPrice!)
-        
-//        return finalTrend
-        
     }
     
     /*
