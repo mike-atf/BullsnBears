@@ -11,6 +11,7 @@ import CoreData
 class StocksListViewController: UITableViewController {
     
     @IBOutlet var addButton: UIBarButtonItem!
+    @IBOutlet var downloadButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,12 +21,21 @@ class StocksListViewController: UITableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
+
+        
         if stocks.count == 0 {
             showWelcomeView()
         }
         
+//        testDownLoad()
+        
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     @IBAction func addButtonAction(_ sender: Any) {
         
         if let docBrowser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DocBrowserView") as? DocumentBrowserViewController {
@@ -104,7 +114,16 @@ class StocksListViewController: UITableViewController {
         }
     }
     
+    @objc
+    func fileDownloaded(_ notification: Notification) {
+
+        if let url = notification.object as? URL {
+            addStock(fileURL: url)
+        }
+    }
+    
     public func addStock(fileURL: URL) {
+        
         if let stock = CSVImporter.csvExtractor(url: fileURL) {
             stocks.append(stock)
         }
@@ -172,6 +191,26 @@ class StocksListViewController: UITableViewController {
         tableView.reloadRows(at: [indexPath], with: .automatic)
     }
     
+    @IBAction func downloadAction(_ sender: Any) {
+        
+        guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSymbolEntry") as? StockSymbolEntry else { return }
+        
+        entryView.loadViewIfNeeded()
+        entryView.rootView = self
+        
+        self.present(entryView, animated: true, completion: nil)
+    }
+    
+    
+    func testDownLoad() {
+        
+        let path = "https://query1.finance.yahoo.com/v7/finance/download/AAPL?period1=1579290108&period2=1610912508&interval=1d&events=history&includeAdjustedClose=true"
+        
+        if let stock = CSVImporter.webCsvExtractor(path: path) {
+            stocks.append(stock)
+            tableView.reloadData()
+        }
+    }
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

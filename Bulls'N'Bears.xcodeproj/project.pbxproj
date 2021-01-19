@@ -77,6 +77,7 @@
 		EAC2FC7B25A240290060F387 /* ValuationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */; };
 		EAC2FC7C25A240290060F387 /* ValuationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */; };
 		EAC2FC7D25A240290060F387 /* ValuationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */; };
+		EAC9B7D825B730FA00E5D7B0 /* StockSymbolEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC9B7D725B730FA00E5D7B0 /* StockSymbolEntry.swift */; };
 		EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */; };
 		EAEA758C25ACF53F008EEC05 /* ErrorLogListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */; };
 		EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */; };
@@ -140,6 +141,7 @@
 		EAC2FC6F25A23FFC0060F387 /* ValuationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationTableViewCell.swift; sourceTree = "<group>"; };
 		EAC2FC7025A23FFC0060F387 /* ValuationTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ValuationTableViewCell.xib; path = TrendMyStocks/ValuationTableViewCell.xib; sourceTree = "<group>"; };
 		EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationListViewController.swift; sourceTree = "<group>"; };
+		EAC9B7D725B730FA00E5D7B0 /* StockSymbolEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockSymbolEntry.swift; sourceTree = "<group>"; };
 		EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
 		EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ErrorLogListCell.xib; sourceTree = "<group>"; };
 		EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsTests.swift"; path = "TrendMyStocksTests/Bulls'N'BearsTests.swift"; sourceTree = SOURCE_ROOT; };
@@ -233,6 +235,7 @@
 		EAED148325A8CED20073C46F /* Bulls'N'Bears */ = {
 			isa = PBXGroup;
 			children = (
+				EAC9B7D725B730FA00E5D7B0 /* StockSymbolEntry.swift */,
 				EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */,
 				EAC07D6525ACEE350045D83B /* ErrorListVC.swift */,
 				EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */,
@@ -458,6 +461,7 @@
 				EAC190D52576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC190EA2577E2E20030B331 /* ChartContainerView.swift in Sources */,
 				EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */,
+				EAC9B7D825B730FA00E5D7B0 /* StockSymbolEntry.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
 				EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,

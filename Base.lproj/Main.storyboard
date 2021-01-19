@@ -216,14 +216,22 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Stock List" id="DtB-UT-kti">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="hqe-cX-e7c">
-                            <connections>
-                                <action selector="addButtonAction:" destination="RUK-Av-gO5" id="Eta-eI-A4Z"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="hqe-cX-e7c">
+                                <connections>
+                                    <action selector="addButtonAction:" destination="RUK-Av-gO5" id="Eta-eI-A4Z"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="square.and.arrow.down" catalog="system" id="DRu-ty-oqd">
+                                <connections>
+                                    <action selector="downloadAction:" destination="RUK-Av-gO5" id="Wf9-wC-yKx"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="addButton" destination="hqe-cX-e7c" id="e8n-8V-PlC"/>
+                        <outlet property="downloadButton" destination="DRu-ty-oqd" id="d22-Cp-4js"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Sbx-mL-E9N" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -493,6 +501,59 @@
             </objects>
             <point key="canvasLocation" x="1303" y="1194"/>
         </scene>
+        <!--Stock Symbol Entry-->
+        <scene sceneID="Pxl-Ka-Cgz">
+            <objects>
+                <viewController storyboardIdentifier="StockSymbolEntry" modalTransitionStyle="crossDissolve" modalPresentationStyle="formSheet" id="gNS-MB-evu" customClass="StockSymbolEntry" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="7aF-eG-CxA">
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="200"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Enter ticker symbol" textAlignment="natural" clearsOnBeginEditing="YES" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="Mps-wk-5kT">
+                                <rect key="frame" x="59.5" y="36" width="181.5" height="28"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters" autocorrectionType="no" returnKeyType="yahoo"/>
+                                <connections>
+                                    <outlet property="delegate" destination="gNS-MB-evu" id="Ho5-jL-pqc"/>
+                                </connections>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Stock search" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="29O-Lf-ECT">
+                                <rect key="frame" x="100.5" y="7" width="99.5" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2vm-ec-rU4">
+                                <rect key="frame" x="129" y="67" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="hNW-IS-7Kn"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="2vm-ec-rU4" firstAttribute="centerX" secondItem="hNW-IS-7Kn" secondAttribute="centerX" id="4pz-cw-yMQ"/>
+                            <constraint firstItem="29O-Lf-ECT" firstAttribute="top" secondItem="hNW-IS-7Kn" secondAttribute="top" constant="7" id="7xS-Ur-5BN"/>
+                            <constraint firstItem="2vm-ec-rU4" firstAttribute="firstBaseline" secondItem="Mps-wk-5kT" secondAttribute="baseline" constant="25" id="Dbc-D6-Trj"/>
+                            <constraint firstItem="Mps-wk-5kT" firstAttribute="centerX" secondItem="hNW-IS-7Kn" secondAttribute="centerX" id="JiN-IZ-5G0"/>
+                            <constraint firstItem="29O-Lf-ECT" firstAttribute="centerX" secondItem="hNW-IS-7Kn" secondAttribute="centerX" id="luq-Nk-UAt"/>
+                            <constraint firstItem="Mps-wk-5kT" firstAttribute="top" secondItem="29O-Lf-ECT" secondAttribute="bottom" constant="8" symbolic="YES" id="qgD-gl-GGx"/>
+                        </constraints>
+                    </view>
+                    <value key="contentSizeForViewInPopover" type="size" width="300" height="200"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <size key="freeformSize" width="300" height="200"/>
+                    <connections>
+                        <outlet property="searchField" destination="Mps-wk-5kT" id="tCA-OI-rWs"/>
+                        <outlet property="textLabel" destination="2vm-ec-rU4" id="DMK-Ll-zzk"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="H5c-J3-luZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2016.6101694915255" y="-463.17073170731709"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="HCm-I9-2PD"/>
@@ -501,6 +562,7 @@
     <resources>
         <image name="exclamationmark.triangle.fill" catalog="system" width="128" height="112"/>
         <image name="info.circle" catalog="system" width="128" height="121"/>
+        <image name="square.and.arrow.down" catalog="system" width="121" height="128"/>
         <image name="xmark.circle" catalog="system" width="128" height="121"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

@@ -291,7 +291,7 @@ struct Stock {
             if let topPricePoint = sorted.first {
                 let comparatorTrend = StockTrend(start: firstPricePoint.tradingDate, end: topPricePoint.tradingDate, startPrice: firstPricePoint.returnPrice(option: priceOption), endPrice: topPricePoint.returnPrice(option: priceOption))
                 
-                if (abs(comparatorTrend.incline ?? 0) ) < (abs(initialTrend.incline ?? 0)) {
+                if (abs(comparatorTrend.incline ?? 0) ) < (abs(initialTrend.incline ?? 00)) {
                     initialTrend = comparatorTrend
                 }
             }

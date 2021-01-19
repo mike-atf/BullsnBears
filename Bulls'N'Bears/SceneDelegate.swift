@@ -54,7 +54,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: error, errorInfo: "Error trying to create new /Inbox folder")
                 }
             }
-
             
             do {
                 let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: inboxFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
