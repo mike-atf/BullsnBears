@@ -39,10 +39,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 return
             }
             
-            guard URL(fileURLWithPath: documentFolder).startAccessingSecurityScopedResource() else {
-                ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: nil, errorInfo: "Accessing App Document Folder was not possible: lacking access rights")
-                return
-            }
+//            guard URL(fileURLWithPath: documentFolder).startAccessingSecurityScopedResource() else {
+//                ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: nil, errorInfo: "Accessing App Document Folder was not possible: lacking access rights")
+//                return
+//            }
 
 
             let inboxFolder = documentFolder + "/Inbox"
@@ -58,10 +58,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             do {
                 let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: inboxFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
                 
-                guard URL(fileURLWithPath: inboxFolder).startAccessingSecurityScopedResource() else {
-                    ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: nil, errorInfo: "Accessing App Document/Inbox Folder was not possible: lacking access rights")
-                    return
-                }
+//                guard URL(fileURLWithPath: inboxFolder).startAccessingSecurityScopedResource() else {
+//                    ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: nil, errorInfo: "Accessing App Document/Inbox Folder was not possible: lacking access rights")
+//                    return
+//                }
 
                 for url in fileURLs {
                     if url.lastPathComponent.contains(".csv") {
@@ -86,7 +86,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "NewFilesArrived"), object: filesImported, userInfo: nil)
             }
             
-            URL(fileURLWithPath: documentFolder).stopAccessingSecurityScopedResource()
+//            URL(fileURLWithPath: documentFolder).stopAccessingSecurityScopedResource()
         }
     } 
     

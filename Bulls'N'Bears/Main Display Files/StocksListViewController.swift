@@ -74,13 +74,13 @@ class StocksListViewController: UITableViewController {
                 
                 for url in fileURLs {
                     if url.lastPathComponent.contains(".csv") {
-                        guard url.startAccessingSecurityScopedResource() else {
-                            continue
-                        }
+//                        guard url.startAccessingSecurityScopedResource() else {
+//                            continue
+//                        }
                         if let stock = CSVImporter.csvExtractor(url: url) {
                             stocks.append(stock)
                         }
-                        url.stopAccessingSecurityScopedResource()
+//                        url.stopAccessingSecurityScopedResource()
                     }
                 }
             } catch let error {

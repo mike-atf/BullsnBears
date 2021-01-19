@@ -15,16 +15,21 @@ class CSVImporter: NSObject {
         if let fileURL = url {
 
             do {
-                if fileURL.startAccessingSecurityScopedResource() {
-                    let content = try String(contentsOf: fileURL, encoding: .utf8)
-                    fileURL.stopAccessingSecurityScopedResource()
-                    return content
-                }
-                else {
-                    print("\(fileURL) access denied ")
-                }
+//                if fileURL.startAccessingSecurityScopedResource() {
+//                    let content = try String(contentsOf: fileURL, encoding: .utf8)
+//                    fileURL.stopAccessingSecurityScopedResource()
+//                    return content
+//                }
+//                else {
+//                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "App access to \(fileURL) denied  by system")
+//                }
+                
+                let content = try String(contentsOf: fileURL, encoding: .utf8)
+//                fileURL.stopAccessingSecurityScopedResource()
+                return content
+
             } catch let error {
-                print("Error reading file content \(error)")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "Can't read file \(fileURL)")
             }
 
         }
@@ -37,7 +42,7 @@ class CSVImporter: NSObject {
                 let content = try String(contentsOf: fileURL, encoding: .utf8)
                 return content
             } catch let error {
-                print("Error reading file content \(error)")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "Can't read file \(fileURL)")
             }
 
         }

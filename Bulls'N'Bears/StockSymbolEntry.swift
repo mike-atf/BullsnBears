@@ -113,8 +113,15 @@ class StockSymbolEntry: UIViewController, UITextFieldDelegate {
                                             create: true)
                 
                 let savedURL = documentsURL.appendingPathComponent(stockName + ".csv")
+                                
+                if FileManager.default.fileExists(atPath: savedURL.path) {
+                    removeFile(savedURL)
+                }
+
+                try FileManager.default.moveItem(at: fileURL, to: savedURL)
                 
-                guard CSVImporter.matchesExpectedFormat(url: savedURL) else {
+                if !CSVImporter.matchesExpectedFormat(url: savedURL) {
+                    removeFile(savedURL)
                     DispatchQueue.main.async {
                         self.textLabel.text = "No matching stock, or file error"
                         self.searchField.text = nil
@@ -122,17 +129,12 @@ class StockSymbolEntry: UIViewController, UITextFieldDelegate {
                         self.searchField.becomeFirstResponder()
                     }
                     return
-                }
-                
-                if FileManager.default.fileExists(atPath: savedURL.path) {
-                    removeFile(savedURL)
-                }
-
-                try FileManager.default.moveItem(at: fileURL, to: savedURL)
-                DispatchQueue.main.async  {
-                    self.dismiss(animated: true, completion: {
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: savedURL, userInfo: nil)
-                    })
+                } else {
+                    DispatchQueue.main.async  {
+                        self.dismiss(animated: true, completion: {
+                            NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: savedURL, userInfo: nil)
+                        })
+                    }
                 }
             } catch {
                 DispatchQueue.main.async {
