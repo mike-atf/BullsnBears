@@ -74,13 +74,10 @@ class StocksListViewController: UITableViewController {
                 
                 for url in fileURLs {
                     if url.lastPathComponent.contains(".csv") {
-//                        guard url.startAccessingSecurityScopedResource() else {
-//                            continue
-//                        }
+                        // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
                         if let stock = CSVImporter.csvExtractor(url: url) {
                             stocks.append(stock)
                         }
-//                        url.stopAccessingSecurityScopedResource()
                     }
                 }
             } catch let error {

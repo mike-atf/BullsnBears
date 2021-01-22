@@ -26,7 +26,6 @@ class CombinedValuationController: ValuationHelper {
     var stock: Stock!
     var method: ValuationMethods!
     var rowtitles: [[String]]!
-//    var valuesArray = [[Any?]]()
 
     init(stock: Stock, valuationMethod: ValuationMethods, listView: ValuationListViewController) {
         
@@ -48,6 +47,7 @@ class CombinedValuationController: ValuationHelper {
         }
         else if valuationMethod == .dcf {
             
+            
             if let valuation = CombinedValuationController.returnDCFValuations(company: stock.name)?.first {
                 self.valuation = valuation
             }
@@ -58,6 +58,7 @@ class CombinedValuationController: ValuationHelper {
                 }
             }
             
+            let dcfDataFinder = DCFWebDataAnalyser(stock: stock, valuation: valuation as! DCFValuation, controller: self)
         }
     }
     
@@ -548,16 +549,22 @@ class CombinedValuationController: ValuationHelper {
             }
         }
         if indexPath.section == 2 {
-            if (valuation.tRevenueActual?[indexPath.row] ?? 0.0) < 0 {
-                color = UIColor(named: "Red")!
-                section3$ = "! " + (section3$)
+            if valuation.tRevenueActual?.count ?? 0 > indexPath.row {
+                if (valuation.tRevenueActual?[indexPath.row] ?? 0.0) < 0 {
+                    color = UIColor(named: "Red")!
+                    section3$ = "! " + (section3$)
+                }
             }
+            else { valuation.tRevenueActual?.append(Double()) }
         }
         var section4$ = ""
-        if indexPath.row < (valuation.netIncome?.count ?? 0) - 1 {
-            if let growth = calculateGrowthDCF(valuation.netIncome, element:indexPath.row) {
-                section4$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
+        if valuation.netIncome?.count ?? 0 > indexPath.row {
+            if indexPath.row < (valuation.netIncome?.count ?? 0) - 1 {
+                if let growth = calculateGrowthDCF(valuation.netIncome, element:indexPath.row) {
+                    section4$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
+                }
             }
+            else { valuation.netIncome?.append(Double()) }
         }
         if indexPath.section == 2 {
             if (valuation.netIncome?[indexPath.row] ?? 0.0) < 0 {

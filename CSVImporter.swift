@@ -13,19 +13,10 @@ class CSVImporter: NSObject {
     class func openCSVFile(url: URL? = nil, fileName: String) -> String? {
         
         if let fileURL = url {
-
+            // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
             do {
-//                if fileURL.startAccessingSecurityScopedResource() {
-//                    let content = try String(contentsOf: fileURL, encoding: .utf8)
-//                    fileURL.stopAccessingSecurityScopedResource()
-//                    return content
-//                }
-//                else {
-//                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "App access to \(fileURL) denied  by system")
-//                }
                 
                 let content = try String(contentsOf: fileURL, encoding: .utf8)
-//                fileURL.stopAccessingSecurityScopedResource()
                 return content
 
             } catch let error {

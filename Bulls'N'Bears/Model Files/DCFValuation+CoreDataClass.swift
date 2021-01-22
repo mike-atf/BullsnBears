@@ -153,21 +153,30 @@ public class DCFValuation: NSManagedObject {
         var fcfToEquity = [Double]()
         var count = 0
         for annualFCF in tFCFo ?? [] {
-            fcfToEquity.append(annualFCF + (capExpend![count])) // capExpend entered as negative
+            if capExpend?.count ?? 0 > count {
+                fcfToEquity.append(annualFCF + (capExpend![count])) // capExpend entered as negative
+            }
+            else { return nil } // error missing value
             count += 1
         }
 // 2
         var fcfToNetIncome = [Double]()
         count = 0
         for  fcfTE in fcfToEquity {
-            fcfToNetIncome.append(fcfTE / netIncome![count])
+            if netIncome?.count ?? 0 > count {
+                fcfToNetIncome.append(fcfTE / netIncome![count])
+            }
+            else { return nil } // error missing value
             count += 1
         }
 // 3
         var netIncomeMargins = [Double]()
         count = 0
         for  income in netIncome ?? [] {
-            netIncomeMargins.append(income / tRevenueActual![count])
+            if tRevenueActual?.count ?? 0 > count {
+                netIncomeMargins.append(income / tRevenueActual![count])
+            }
+            else { return nil } // error missing value
             count += 1
         }
 // 4 + 5

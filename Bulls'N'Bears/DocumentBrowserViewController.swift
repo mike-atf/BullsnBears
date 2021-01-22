@@ -68,12 +68,8 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
             
             let copyToURL = URL(fileURLWithPath: copyFilePath)
             do {
-//                guard url.startAccessingSecurityScopedResource() else {
-//                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Document Browser copying selected file to reources - access denied")
-//                    return
-//                }
+                // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
                 try FileManager.default.copyItem(at: url, to: copyToURL)
-//                url.stopAccessingSecurityScopedResource()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File copying error")
             }

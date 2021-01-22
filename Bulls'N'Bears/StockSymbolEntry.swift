@@ -84,9 +84,6 @@ class StockSymbolEntry: UIViewController, UITextFieldDelegate {
             urlOrNil, responseOrNil, errorOrNil in
             
             guard errorOrNil == nil else {
-//                DispatchQueue.main.async {
-//                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: errorOrNil!, errorInfo: "can't download file \(url)")
-//                }
                 DispatchQueue.main.async {
                     self.textLabel.text = errorOrNil?.localizedDescription
                     self.textLabel.textColor = UIColor(named: "Red")
@@ -98,7 +95,6 @@ class StockSymbolEntry: UIViewController, UITextFieldDelegate {
                 DispatchQueue.main.async {
                     self.textLabel.text = responseOrNil?.textEncodingName
                     self.textLabel.textColor = UIColor(named: "Red")
-//                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: errorOrNil!, errorInfo: "no response from server when trying tp download file \(url)")
                 }
                 return
             }
