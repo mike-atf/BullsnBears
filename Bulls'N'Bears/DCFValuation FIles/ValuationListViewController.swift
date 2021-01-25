@@ -226,12 +226,3 @@ class ValuationListViewController: UITableViewController {
     */
 
 }
-
-//extension ValuationListViewController: CellTextFieldDelegate {
-//    
-//    func userAddedText(textField: UITextField, path: IndexPath) {
-//        print("text entry complete")
-//    }
-//    
-//    
-//}

@@ -36,7 +36,7 @@ class ChartContainerView: UIView {
         return formatter
     }()
     
-    var buttonDelegate: ChartButtonDelegate!
+    var buttonDelegate: ChartButtonDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -76,8 +76,8 @@ class ChartContainerView: UIView {
             let offset = scroll.contentSize.width
             scroll.setContentOffset(CGPoint(x: offset, y: 0), animated: false)
             buttonDelegate = contentView
-            buttonDelegate.timeButtons = [button4, button5, button6]
-            buttonDelegate.typeButtons = [button1, button2, button3]
+            buttonDelegate?.timeButtons = [button4, button5, button6]
+            buttonDelegate?.typeButtons = [button1, button2, button3]
         }
         
     }
@@ -85,7 +85,7 @@ class ChartContainerView: UIView {
     @IBAction func chartButtonAction(_ sender: CheckButton) {
         sender.active.toggle()
         sender.setNeedsDisplay()
-        buttonDelegate.trendButtonPressed(button: sender)
+        buttonDelegate?.trendButtonPressed(button: sender)
     }
     
 }

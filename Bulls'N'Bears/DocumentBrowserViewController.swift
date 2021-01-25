@@ -42,16 +42,20 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         
         guard let sourceURL = documentURLs.first else { return }
         
-        copyFileToDocumentDirectory(url: sourceURL)
-        
-        if let validStockList = stockListVC {
-           validStockList.addStock(fileURL: sourceURL)
-            self.dismiss(animated: true, completion: nil)
+        if sourceURL.startAccessingSecurityScopedResource() {
+            let localURL = copyFileToDocumentDirectory(url: sourceURL)
+            sourceURL.stopAccessingSecurityScopedResource()
+            
+            if let validStockList = stockListVC {
+                if let validUrl = localURL {
+                    validStockList.addStock(fileURL: validUrl)
+                }
+                self.dismiss(animated: true, completion: nil)
+            }
         }
-
     }
     
-    func copyFileToDocumentDirectory(url: URL) {
+    func copyFileToDocumentDirectory(url: URL) -> URL? {
         
         let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         if let documentFolder = appDocumentPaths.first {
@@ -70,11 +74,12 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
             do {
                 // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
                 try FileManager.default.copyItem(at: url, to: copyToURL)
+                return copyToURL
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File copying error")
             }
-                
         }
+        return nil
     }
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didImportDocumentAt sourceURL: URL, toDestinationURL destinationURL: URL) {

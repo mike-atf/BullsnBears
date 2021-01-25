@@ -85,8 +85,6 @@ class StocksListViewController: UITableViewController {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't access contens of directory \(documentFolder)")
                 
             }
-
-            
         }
     }
     
@@ -97,7 +95,6 @@ class StocksListViewController: UITableViewController {
             self.present(docBrowser, animated: true) {
                 docBrowser.openRemoteDocument(remoteURL, importIfNeeded: importIfNeeded)
             }
-
         }
     }
     
@@ -123,11 +120,15 @@ class StocksListViewController: UITableViewController {
         
         if let stock = CSVImporter.csvExtractor(url: fileURL) {
             stocks.append(stock)
+            
+            tableView.reloadData()
+            // causing crash on Hanski's iPad - why???
+    //        tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .top)
+            tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .bottom)
+            tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(item: stocks.count-1, section: 0))
+            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         }
 
-        tableView.reloadData()
-        tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .top)
-        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
     }
     // MARK: - Table view data source
 

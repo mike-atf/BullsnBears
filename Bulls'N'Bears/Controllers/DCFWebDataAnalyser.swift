@@ -12,7 +12,7 @@ class DCFWebDataAnalyser {
     var stock: Stock
     var html$: String?
     var valuation: DCFValuation!
-    var yahooPages = ["key-statistics", "financials"]
+    var yahooPages = ["key-statistics", "financials", "balance-sheet"]
     var controller: CombinedValuationController!
     
     init(stock: Stock, valuation: DCFValuation, controller: CombinedValuationController) {
@@ -69,9 +69,11 @@ class DCFWebDataAnalyser {
             valuation.incomePreTax = stats[">Income before tax</span>"]?.first ?? Double()
             valuation.expenseIncomeTax = stats[">Income tax expense</span>"]?.first ?? Double()
         }
+        else if section == yahooPages[2] {
+            
+        }
         
         valuation.save()
-
     }
     
     func keyStats(_ validWebCode: String) -> [Double] {
@@ -206,6 +208,25 @@ class DCFWebDataAnalyser {
         return incomeValues
     }
     
+    func balanceSheet(_ validWebCode: String) -> [Double] {
+        
+        let rowTerminal = "</span></div></div>"
+        let labelTerminal = "</span></div>"
+        let labelStart = ">"
+        
+        var debtValues = [Double]()
+        var count = -1 // !!
+        
+        for search$ in [">Current debt</span>", ">Long-term debt</span>"] {
+            
+        }
+        
+        return debtValues
+
+    }
+    
+    
+    // Download
     func download(url: URL?, for section: String) {
         
         guard let validURL = url else {
