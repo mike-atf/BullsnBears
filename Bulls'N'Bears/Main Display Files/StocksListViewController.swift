@@ -121,9 +121,8 @@ class StocksListViewController: UITableViewController {
         if let stock = CSVImporter.csvExtractor(url: fileURL) {
             stocks.append(stock)
             
-            tableView.reloadData()
+            tableView.reloadSections([0], with: .automatic)
             // causing crash on Hanski's iPad - why???
-    //        tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .top)
             tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .bottom)
             tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(item: stocks.count-1, section: 0))
             performSegue(withIdentifier: "stockSelectionSegue", sender: nil)

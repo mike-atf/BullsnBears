@@ -177,7 +177,12 @@ class ValuationListViewController: UITableViewController {
     
     @objc
     func dataUpdated() {
-        tableView.reloadData()
+                
+        if (sectionTitles?.count ?? 0) > 0 {
+            tableView.reloadSections([1,2,3,4,5,6,7,8,9,10], with: .none)
+        }
+        
+        alertController.showDialog(title: "Stock valuation data downloaded suuccessfully from Yahoo", alertMessage: "It's recommended to check data and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nMake sure to save after adjusting, using the blue buttons!", viewController: self)
     }
 
     /*

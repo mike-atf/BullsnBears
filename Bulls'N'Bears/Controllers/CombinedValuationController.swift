@@ -23,6 +23,7 @@ class CombinedValuationController: ValuationHelper {
     
     var valuationListViewController: ValuationListViewController!
     var valuation: Any?
+    var webAnalyser: Any?
     var stock: Stock!
     var method: ValuationMethods!
     var rowtitles: [[String]]!
@@ -58,7 +59,7 @@ class CombinedValuationController: ValuationHelper {
                 }
             }
             
-            let dcfDataFinder = DCFWebDataAnalyser(stock: stock, valuation: valuation as! DCFValuation, controller: self)
+            webAnalyser = DCFWebDataAnalyser(stock: stock, valuation: valuation as! DCFValuation, controller: self)
         }
     }
     
@@ -233,12 +234,12 @@ class CombinedValuationController: ValuationHelper {
     
     func saveValuation() {
         if let valuation = self.valuation as? DCFValuation  {
-// check alignment of profit = net income and fcf
+            // check alignment of profit = net income and fcf
             
             if let fcf_netIncome_correlation = stock.getCorrelation(xArray: (valuation.netIncome?.compactMap{ $0 } ?? []), yArray: (valuation.tFCFo?.compactMap{ $0 } ?? []))?.coEfficient {
                 let correlation$ = numberFormatterDecimals.string(from: fcf_netIncome_correlation as NSNumber) ?? ""
             
-                if abs(fcf_netIncome_correlation) < 0.8 {
+                if abs(fcf_netIncome_correlation) < 0.75 {
                     alertController.showDialog(title: "Poor alignment", alertMessage: "The trends of free cash flow and net income are not well aligned (the correlation co-efficient is \(correlation$)")
                 }
             }
@@ -246,7 +247,6 @@ class CombinedValuationController: ValuationHelper {
             valuation.save()
         }
         else if let valuation = self.valuation as? Rule1Valuation  {
-            
             
             if let moatCount = r1MoatParameterCount() {
                 if moatCount < 25 {
@@ -559,17 +559,22 @@ class CombinedValuationController: ValuationHelper {
         }
         var section4$ = ""
         if valuation.netIncome?.count ?? 0 > indexPath.row {
-            if indexPath.row < (valuation.netIncome?.count ?? 0) - 1 {
+//            if indexPath.row < (valuation.netIncome?.count ?? 0) - 1 {
                 if let growth = calculateGrowthDCF(valuation.netIncome, element:indexPath.row) {
                     section4$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
                 }
-            }
-            else { valuation.netIncome?.append(Double()) }
+//            }
+//            else {
+//                valuation.netIncome?.append(Double())
+//                
+//            } // TODO: - possible error
         }
         if indexPath.section == 2 {
-            if (valuation.netIncome?[indexPath.row] ?? 0.0) < 0 {
-                color = UIColor(named: "Red")!
-                section4$ = "! " + (section4$)
+            if valuation.netIncome?.count ?? 0 > indexPath.row {
+                if (valuation.netIncome?[indexPath.row] ?? 0.0) < 0 {
+                    color = UIColor(named: "Red")!
+                    section4$ = "! " + (section4$)
+                }
             }
         }
 
@@ -1069,7 +1074,7 @@ class CombinedValuationController: ValuationHelper {
             
             var revenueGrowthRates = [Double]()
             revenueGrowthRates.append(contentsOf: valuation.revGrowthPred ?? [])
-            for i in 1..<(valuation.revGrowthPred?.count ?? 0) {
+            for i in 1..<(valuation.revGrowthPred?.count ?? 1) {
                 if valuation.revGrowthPred![i] > 0 {
                     let growth = (valuation.tRevenueActual![i-1] - valuation.tRevenueActual![i]) / valuation.tRevenueActual![i]
                     revenueGrowthRates.append(growth)

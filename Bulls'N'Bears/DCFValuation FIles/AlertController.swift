@@ -13,11 +13,13 @@ class AlertController: NSObject {
     
     var alertViewOpen = false
     
-    public func showDialog(title: String, alertMessage: String) {
+    public func showDialog(title: String, alertMessage: String, viewController: UIViewController? = nil) {
         
         DispatchQueue.main.async {
             
-            guard let presentingVC = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first?.rootViewController?.children.first else {
+            let presentingVC = viewController ?? UIApplication.shared.windows.filter({ $0.isKeyWindow }).first?.rootViewController?.children.first
+            
+            guard presentingVC != nil else {
                 return
             }
             
@@ -35,12 +37,16 @@ class AlertController: NSObject {
             }))
             
             // in case the alert is called from a popover presentation controller
-            if presentingVC.popoverPresentationController != nil {
-                let rect = presentingVC.view.frame.insetBy(dx: presentingVC.view.frame.width / 4, dy: presentingVC.view.frame.height / 4)
+            if presentingVC?.popoverPresentationController != nil {
+                let rect = presentingVC!.view.frame.insetBy(dx: presentingVC!.view.frame.width / 4, dy: presentingVC!.view.frame.height / 4)
                     alertController.popoverPresentationController?.sourceRect = rect
             }
+            else if let nav = presentingVC as? UINavigationController {
+                nav.pushViewController(alertController, animated: true)
+                return
+            }
             
-            presentingVC.present(alertController, animated: true, completion: nil)
+            presentingVC?.present(alertController, animated: true, completion: nil)
 
         }
     }

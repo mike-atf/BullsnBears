@@ -12,8 +12,9 @@ class DCFWebDataAnalyser {
     var stock: Stock
     var html$: String?
     var valuation: DCFValuation!
-    var yahooPages = ["key-statistics", "financials", "balance-sheet"]
+    var yahooPages = ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"]
     var controller: CombinedValuationController!
+    var sectionsComplete = [Bool]()
     
     init(stock: Stock, valuation: DCFValuation, controller: CombinedValuationController) {
         self.stock = stock
@@ -30,15 +31,12 @@ class DCFWebDataAnalyser {
         var components: URLComponents?
         
         for section in yahooPages {
-            
+            sectionsComplete.append(false)
             components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.name)/\(section)")
             components?.queryItems = [URLQueryItem(name: "p", value: stock.name)]
             download(url: components?.url, for: section)
         }
         
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil , userInfo: nil)
-        }
     }
     
     
@@ -60,6 +58,7 @@ class DCFWebDataAnalyser {
             valuation.beta = stats[1]
             valuation.marketCap = stats[0]
             valuation.sharesOutstanding = stats[2]
+            sectionsComplete[0] = true
         }
         else if section == yahooPages[1] {
             let stats = incomeStats(validWebCode)
@@ -68,12 +67,48 @@ class DCFWebDataAnalyser {
             valuation.expenseInterest = stats[">Interest expense</span>"]?.first ?? Double()
             valuation.incomePreTax = stats[">Income before tax</span>"]?.first ?? Double()
             valuation.expenseIncomeTax = stats[">Income tax expense</span>"]?.first ?? Double()
+            sectionsComplete[1] = true
+
+//            print(" tRevenueActual = \(stats[">Total revenue</span>"])")
+//            print(" netIncome = \(stats[">Net income</span>"])")
+//            print(" expenseInterest = \(stats[">Interest expense</span>"])")
+//            print(" income Pre Tax = \(stats[">Income before tax</span>"])")
+//            print(" income Tax expense = \(stats[">Income tax expense</span>"])")
         }
         else if section == yahooPages[2] {
-            
+            let stats = balanceSheet(validWebCode)
+            valuation.debtST = stats[">Current debt</span>"]?.first ?? Double()
+            valuation.debtLT = stats[">Long-term debt</span>"]?.first ?? Double()
+            sectionsComplete[2] = true
+
+//            print(" current debt = \(stats[">Current debt</span>"])")
+//            print(" LT debt = \(stats[">Long-term debt</span>"])")
+        }
+        else if section == yahooPages[3] {
+            let stats = cashFlow(validWebCode)
+            valuation.tFCFo = stats[">Operating cash flow</span>"]
+            valuation.capExpend = stats[">Capital expenditure</span>"]
+            sectionsComplete[3] = true
+
+//            print(" tFCFo = \(stats[">Operating cash flow</span>"])")
+//            print(" cap Expend = \(stats[">Capital expenditure</span>"])")
+        }
+        else if section == yahooPages[4] {
+            let stats = analysis(validWebCode)
+            valuation.tRevenuePred = stats[">Avg. Estimate</span>"] ?? [Double]()
+//            print(stats[">Avg. Estimate</span>"])
+            valuation.revGrowthPred = stats[">Sales growth (year/est)</span>"]
+            sectionsComplete[4] = true
+//            print(stats[">Sales growth (year/est)</span>"])
         }
         
-        valuation.save()
+        if !sectionsComplete.contains(false) {
+            valuation.save()
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil , userInfo: nil)
+            }
+        }
+        
     }
     
     func keyStats(_ validWebCode: String) -> [Double] {
@@ -202,29 +237,162 @@ class DCFWebDataAnalyser {
             }
         }
         
-        for value in incomeValues {
-            print("\(value.key) = \(value.value)")
-        }
         return incomeValues
     }
     
-    func balanceSheet(_ validWebCode: String) -> [Double] {
+    func balanceSheet(_ validWebCode: String) -> [String:[Double]] {
         
         let rowTerminal = "</span></div></div>"
         let labelTerminal = "</span></div>"
         let labelStart = ">"
         
-        var debtValues = [Double]()
-        var count = -1 // !!
+        var debtValues = [String:[Double]]()
         
         for search$ in [">Current debt</span>", ">Long-term debt</span>"] {
             
+            var webpage$ = String(validWebCode)
+            debtValues[search$] = [0.0] // use default 0, assuming that if no current or long-term is listed this means 0 debt
+                            
+            guard let titleIndex = webpage$.range(of: search$) else {
+                continue
+            }
+
+            guard let rowEndIndex = webpage$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<webpage$.endIndex, locale: nil) else {
+                continue
+            }
+            webpage$ = String(webpage$[titleIndex.upperBound..<rowEndIndex.lowerBound])
+            
+            for _ in 0..<4 {
+
+                guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                    continue
+                }
+                let value$ = webpage$[labelStartIndex.upperBound...]
+                debtValues[search$] = [Double(value$.filter("-0123456789.".contains)) ?? 0.0] // use 0.0 here as "-" is used for 'no debt'
+                
+                guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                    continue
+                }
+                webpage$.removeSubrange(labelEndIndex.lowerBound...)
+            }
+
+
         }
         
         return debtValues
 
     }
     
+    func cashFlow(_ validWebCode: String) -> [String:[Double]] {
+        
+        let rowTerminal = "</span></div></div>"
+        let labelTerminal = "</span></div>"
+        let labelStart = ">"
+        
+        var cashFlowValues = [String:[Double]]()
+        
+        for search$ in [">Operating cash flow</span>", ">Capital expenditure</span>"] {
+            
+            var webpage$ = String(validWebCode)
+                            
+            guard let titleIndex = webpage$.range(of: search$) else {
+                continue
+            }
+
+            guard let rowEndIndex = webpage$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<webpage$.endIndex, locale: nil) else {
+                continue
+            }
+            webpage$ = String(webpage$[titleIndex.upperBound..<rowEndIndex.lowerBound])
+
+            var valueArray = [Double]()
+            for i in 0..<4 {
+                valueArray.append(Double())
+
+                guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                    continue
+                }
+                let value$ = webpage$[labelStartIndex.upperBound...]
+                valueArray[i] = Double(value$.filter("-0123456789.".contains)) ?? Double()
+                
+                guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                    continue
+                }
+                webpage$.removeSubrange(labelEndIndex.lowerBound...)
+
+            }
+            cashFlowValues[search$] = valueArray.reversed()
+        }
+        
+        return cashFlowValues
+    }
+    
+    func analysis(_ validWebCode: String) -> [String:[Double]] {
+        
+        let rowTerminal = "</span></td></tr>"
+        let labelTerminal = "</span>"
+        let labelStart = ">"
+        
+        var predictionValues = [String:[Double]]()
+        
+        for search$ in [">Avg. Estimate</span>", ">Sales growth (year/est)</span>"] {
+            
+            var webpage$ = String(validWebCode)
+            
+            guard let revenueSection = webpage$.range(of: ">Revenue estimate</span>") else {
+                continue
+            }
+            webpage$ = String(webpage$.suffix(from: revenueSection.upperBound))
+                            
+            guard let titleIndex = webpage$.range(of: search$) else {
+                continue
+            }
+
+            guard let rowEndIndex = webpage$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<webpage$.endIndex, locale: nil) else {
+                continue
+            }
+            webpage$ = String(webpage$[titleIndex.upperBound..<rowEndIndex.lowerBound])
+
+            var valueArray = [Double]()
+            for _ in 0..<2 {
+                guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                    continue
+                }
+                let value$ = webpage$[labelStartIndex.upperBound...]
+
+                var value = Double()
+                if let v = Double(value$.filter("-0123456789.".contains)) {
+                    if value$.last == "T" {
+                        value = v * pow(10.0, 9) // should be 12 but values are entered as '000
+                    } else if value$.last == "B" {
+                        value = v * pow(10.0, 6) // should be 9 but values are entered as '000
+                    }
+                    else if value$.last == "M" {
+                        value = v * pow(10.0, 3) // should be 6 but values are entered as '000
+                    }
+                    else if value$.last == "%" {
+                        value = v / 100.0
+                    }
+                    else if !search$.contains("Beta") {
+                        value = v * pow(10.0, 3)
+                    }
+                    else {
+                        value = v
+                    }
+                }
+                valueArray.append(value)
+                
+                guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                    continue
+                }
+                webpage$.removeSubrange(labelEndIndex.lowerBound...)
+
+            }
+            predictionValues[search$] = valueArray.reversed()
+            valueArray.removeAll()
+        }
+        
+        return predictionValues
+    }
     
     // Download
     func download(url: URL?, for section: String) {
@@ -233,8 +401,6 @@ class DCFWebDataAnalyser {
             print("download failed to to optional only url request")
             return
         }
-        
-        print("trying to download \(validURL)")
         
         let dataTask = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
@@ -256,11 +422,7 @@ class DCFWebDataAnalyser {
             self.html$ = String(decoding: validData, as: UTF8.self)
             
            NotificationCenter.default.post(name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: section , userInfo: nil)
-
-            
         }
         dataTask.resume()
-                
-        
     }
 }

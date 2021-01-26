@@ -82,16 +82,15 @@ public class DCFValuation: NSManagedObject {
     func save() {
         
         guard let context = managedObjectContext else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "no moc available - can't save vauation")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "no moc available - can't save valuation")
             return
         }
         do {
             try  context.save()
         } catch {
             let nserror = error as NSError
-            fatalError("Unresolved error in SiteDetails.save function \(nserror), \(nserror.userInfo)")
+            fatalError("Unresolved error in DCFValuation.save function \(nserror), \(nserror.userInfo)")
         }
-
     }
     
     func delete() {
@@ -181,6 +180,10 @@ public class DCFValuation: NSManagedObject {
         }
 // 4 + 5
         predictedRevenue = tRevenuePred ?? []
+        
+        guard predictedRevenue.last != nil && predictedRevenue.last != nil && revGrowthPredAdj?.first != nil && revGrowthPredAdj?.last != nil else {
+            return nil
+        }
         predictedRevenue.append(predictedRevenue.last! + predictedRevenue.last! * revGrowthPredAdj!.first!)
         predictedRevenue.append(predictedRevenue.last! + predictedRevenue.last! * revGrowthPredAdj!.last!)
 // 6
