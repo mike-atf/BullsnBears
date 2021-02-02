@@ -49,7 +49,7 @@ class StockListCellTableViewCell: UITableViewCell {
         self.stock = stock
         self.cellDelegate = delegate
         
-        title.text = stock.name
+        title.text = stock.symbol
         let timeSinceLastStockDate = Date().timeIntervalSince(stock.dailyPrices.last!.tradingDate)
         detail.text = timeFormatter.string(from: timeSinceLastStockDate)
         

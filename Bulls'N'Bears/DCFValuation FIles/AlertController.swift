@@ -9,11 +9,23 @@ import UIKit
 import UserNotificationsUI
 import UserNotifications
 
+protocol AlertViewDelegate {
+    func alertWasDismissed()
+}
+
 class AlertController: NSObject {
     
     var alertViewOpen = false
+    var delegate: AlertViewDelegate?
     
-    public func showDialog(title: String, alertMessage: String, viewController: UIViewController? = nil) {
+    class func shared() -> AlertController {
+        return alertController
+    }
+
+    
+    public func showDialog(title: String, alertMessage: String, viewController: UIViewController? = nil, delegate: AlertViewDelegate? = nil) {
+        
+        self.delegate = delegate
         
         DispatchQueue.main.async {
             
@@ -34,6 +46,8 @@ class AlertController: NSObject {
             
             alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) -> Void in
                 self.alertViewOpen = false
+                self.delegate?.alertWasDismissed()
+                self.delegate = nil
             }))
             
             // in case the alert is called from a popover presentation controller

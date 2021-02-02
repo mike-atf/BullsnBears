@@ -12,12 +12,32 @@ typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: D
 
 struct Stock {
     
-    var name: String
+    var symbol: String
+    var name_short: String?
+    var name_long: String?
     var dailyPrices: [PricePoint]
     var fileURL: URL?
     
     init(name: String, dailyPrices:[PricePoint], fileURL: URL?) {
-        self.name = name
+        self.symbol = name
+        
+        if let dictionary = stockTickerDictionary {
+            name_long = dictionary[symbol]
+
+            for term in [" Inc", " Ltd"," Corp"] {
+                if let range = name_long?.range(of: term) {
+                    name_short = String(name_long![...range.lowerBound].dropLast())
+                }
+            }
+            
+//            let shortNameComponents = name_short!.split(separator: " ")
+//            var hyphenatedShortName = String(shortNameComponents.first!)
+//            for index in 1..<shortNameComponents.count {
+//                hyphenatedShortName += "-" + String(shortNameComponents[index])
+//            }
+//            print(hyphenatedShortName.lowercased())
+        }
+        
         self.dailyPrices = dailyPrices
         self.fileURL = fileURL
     }

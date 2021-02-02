@@ -29,7 +29,7 @@ public class Rule1Valuation: NSManagedObject {
         bvps = [Double]()
         eps = [Double]()
         revenue = [Double]()
-        oFCF = [Double]()
+        opcs = [Double]()
         roic = [Double]()
         debt = Double()
         hxPE = [Double]()
@@ -41,6 +41,8 @@ public class Rule1Valuation: NSManagedObject {
         insiderStocks = Double()
         ceoRating = Double()
         adjGrowthEstimates = [Double]()
+        opCashFlow = Double()
+        adjFuturePE = Double()
         
     }
 
@@ -77,7 +79,7 @@ public class Rule1Valuation: NSManagedObject {
         years.append(eps?.count ?? 0)
         years.append(roic?.count ?? 0)
         years.append(bvps?.count ?? 0)
-        years.append(oFCF?.count ?? 0)
+        years.append(opcs?.count ?? 0)
         years.append(revenue?.count ?? 0)
 
         return years.min() ?? 0
@@ -97,7 +99,7 @@ public class Rule1Valuation: NSManagedObject {
                 
         count = 0
         for sales in valuation.tFCFo ?? [] {
-            self.oFCF?.insert(sales, at: count)
+            self.opcs?.insert(sales, at: count)
             count += 1
         }
     }
@@ -119,7 +121,7 @@ public class Rule1Valuation: NSManagedObject {
     /// 0-1
     func moatScore() -> Double? {
         
-        let moatArrays = [bvps, eps, revenue, oFCF]
+        let moatArrays = [bvps, eps, revenue, opcs]
         var moatGrowthRates = [[Double]]()
         
         var sumValidRates = 0
@@ -161,34 +163,59 @@ public class Rule1Valuation: NSManagedObject {
         return Double(ratesHigher10) / Double(sumValidRates)
     }
     
-    func stickerPrice() -> Double? {
+    func futureGrowthEstimate() -> Double? {
         
-        let cautionScore = 0.33 // 0-1
-        
-        guard let currentEPS = eps?.first else { return nil }
         guard let endValue = bvps?.first else { return nil }
-        guard bvps?.count ?? 0 > 1 else { return nil }
         
         var bvpsGrowthRates = [Double]()
         for yearsBack in 1..<(bvps?.count ?? 0) {
             bvpsGrowthRates.append(compoundGrowthRate(endValue: endValue, startValue: bvps![yearsBack], years: Double(yearsBack)))
         }
-        let lowBVPSGrowth = bvpsGrowthRates.min()! + cautionScore * (bvpsGrowthRates.max()! - bvpsGrowthRates.min()!)
-        var analystPredictedGrowth: Double?
-        if adjGrowthEstimates?.count ?? 0 > 0 {
-            analystPredictedGrowth = adjGrowthEstimates!.compactMap{ $0 }.reduce(0, +) / Double(adjGrowthEstimates!.compactMap{ $0 }.count)
-        }
-        let growthEstimate = analystPredictedGrowth != nil ? [lowBVPSGrowth,analystPredictedGrowth!].min()! : lowBVPSGrowth
-         
-        let epsIn10Years = futureValue(present: currentEPS, growth: growthEstimate, years: 10.0)
+        let lowBVPSGrowth = bvpsGrowthRates.mean()
+        
+        let analystPredictedGrowth = adjGrowthEstimates?.mean() ?? growthEstimates?.mean()
+        return analystPredictedGrowth != nil ? analystPredictedGrowth! : lowBVPSGrowth
+    }
+    
+    func futureEPS(futureGrowth: Double) -> Double? {
+ 
+        guard let currentEPS = eps?.first else { return nil }
+        return futureValue(present: currentEPS, growth: futureGrowth, years: 10.0)
+    }
+    
+    func futurePER(futureGrowth: Double) -> Double? {
+        
         var averageHxPER: Double?
         if (hxPE?.count ?? 0) > 0 {
-            averageHxPER = hxPE!.reduce(0, +) / Double(hxPE!.count)
+            averageHxPER = hxPE!.mean()!
         }
         
-        let conservativePER = averageHxPER != nil ? [(growthEstimate*2*100),averageHxPER!].min()! : (growthEstimate*2)
+        if adjFuturePE != Double() { return adjFuturePE }
+        else {
+            return averageHxPER != nil ? [(futureGrowth*2*100),averageHxPER!].min()! : (futureGrowth*2*100)
+        }
+    }
+    
+    func stickerPrice() -> Double? {
         
-        let futureStockPrice = epsIn10Years*conservativePER
+
+        guard bvps?.count ?? 0 > 1 else { return nil }
+        
+        guard let futureGrowth = futureGrowthEstimate() else {
+            return nil
+        }
+         
+        guard let epsIn10Years = futureEPS(futureGrowth: futureGrowth) else {
+            return nil
+        }
+        
+        guard let futurePER = futurePER(futureGrowth: futureGrowth) else {
+            return nil
+        }
+
+        let acceptedFuturePER = adjFuturePE != Double() ? adjFuturePE : futurePER
+        
+        let futureStockPrice = epsIn10Years * acceptedFuturePER
         let stickerPrice = presentValue(growth: 0.15, years: 10, endValue: futureStockPrice)
         
         return stickerPrice

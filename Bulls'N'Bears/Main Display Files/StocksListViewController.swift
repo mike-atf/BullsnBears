@@ -62,7 +62,6 @@ class StocksListViewController: UITableViewController {
         
     }
     
-    
     @objc
     func openCSCFilesInDocumentDirectory() {
         
@@ -143,8 +142,8 @@ class StocksListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
-        let valuation = CombinedValuationController.returnDCFValuations(company: stocks[indexPath.row].name)
-        let r1valuation = CombinedValuationController.returnR1Valuations(company: stocks[indexPath.row].name)
+        let valuation = CombinedValuationController.returnDCFValuations(company: stocks[indexPath.row].symbol)
+        let r1valuation = CombinedValuationController.returnR1Valuations(company: stocks[indexPath.row].symbol)
         cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row], valuation: valuation?.first, r1Valuation: r1valuation?.first)
         return cell
     }
@@ -198,36 +197,6 @@ class StocksListViewController: UITableViewController {
         self.present(entryView, animated: true, completion: nil)
     }
     
-    
-    func testDownLoad() {
-        
-        let path = "https://query1.finance.yahoo.com/v7/finance/download/AAPL?period1=1579290108&period2=1610912508&interval=1d&events=history&includeAdjustedClose=true"
-        
-        if let stock = CSVImporter.webCsvExtractor(path: path) {
-            stocks.append(stock)
-            tableView.reloadData()
-        }
-    }
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
     /*
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {

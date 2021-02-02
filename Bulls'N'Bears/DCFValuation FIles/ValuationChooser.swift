@@ -14,13 +14,12 @@ class ValuationChooser: UIViewController {
     @IBOutlet weak var rule1Button: UIButton!
 
     var stock: Stock!
-    var rootView: StocksListViewController!
+    weak var rootView: StocksListViewController!
     var sourceCellPath: IndexPath!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
     }
     
     @IBAction func cancelAction(_ sender: UIButton) {
@@ -33,48 +32,44 @@ class ValuationChooser: UIViewController {
         
         var dcfValuation: DCFValuation!
         
-        if let valuation = CombinedValuationController.returnDCFValuations(company: stock.name)?.first {
+        if let valuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
             dcfValuation = valuation
         }
         else {
-            dcfValuation = CombinedValuationController.createDCFValuation(company: stock.name)
-            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.name)?.first {
+            dcfValuation = CombinedValuationController.createDCFValuation(company: stock.symbol)
+            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
                 dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
             }
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.dcf
-//            tvc.dcfValuation = dcfValuation
             tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
             tvc.stock = stock
             
             self.dismiss(animated: true) {
-                self.rootView.present(tvc, animated: true)
+                self.rootView.navigationController?.present(tvc, animated: true, completion: nil)
             }
-
         }
-        
     }
     
     @IBAction func rule1Action(_ sender: UIButton) {
         
         var r1Valuation: Rule1Valuation!
         
-        if let valuation = CombinedValuationController.returnR1Valuations(company: stock.name)?.first {
+        if let valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
             r1Valuation = valuation
         }
         else {
-            r1Valuation = CombinedValuationController.createR1Valuation(company: stock.name)
-            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.name)?.first {
+            r1Valuation = CombinedValuationController.createR1Valuation(company: stock.symbol)
+            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
                 r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
             }
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.rule1
-//            tvc.r1Valuation = r1Valuation
             tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
             tvc.stock = stock
@@ -106,11 +101,11 @@ class ValuationChooser: UIViewController {
         }
 
     }
-    @IBAction func dcfInfoAction(_ sender: UIButton) {
-        
-    }
-    
-    @IBAction func rule1InfoAction(_ sender: UIButton) {
-        
-    }
+//    @IBAction func dcfInfoAction(_ sender: UIButton) {
+//        
+//    }
+//    
+//    @IBAction func rule1InfoAction(_ sender: UIButton) {
+//        
+//    }
 }

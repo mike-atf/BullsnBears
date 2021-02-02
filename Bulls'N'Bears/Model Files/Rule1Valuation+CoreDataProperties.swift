@@ -19,10 +19,12 @@ extension Rule1Valuation {
     @NSManaged public var bvps: [Double]?
     @NSManaged public var eps: [Double]?
     @NSManaged public var revenue: [Double]?
-    @NSManaged public var oFCF: [Double]?
+    @NSManaged public var opcs: [Double]? // use OPCS = operating cash flow per share in MacroTrends
+    @NSManaged public var opCashFlow: Double // use OPCS = operating cash flow per share in MacroTrends
     @NSManaged public var roic: [Double]?
     @NSManaged public var debt: Double
     @NSManaged public var hxPE: [Double]?
+    @NSManaged public var adjFuturePE: Double
     @NSManaged public var growthEstimates: [Double]?
     @NSManaged public var adjGrowthEstimates: [Double]?
     @NSManaged public var insiderStockBuys: Double

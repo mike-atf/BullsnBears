@@ -1,30 +1,28 @@
 //
-//  ValuationTableViewCell.swift
-//  TrendMyStocks
+//  ValuationSummaryCell.swift
+//  Bulls'N'Bears
 //
-//  Created by aDav on 03/01/2021.
+//  Created by aDav on 02/02/2021.
 //
 
 import UIKit
 
-//protocol CellTextFieldDelegate {
-//    func userAddedText(textField: UITextField, path: IndexPath)
-//}
+protocol ValSummaryCellDelegate {
+    func valueWasChanged(futurePER: Double?, futureGrowth: Double?)
+}
 
-class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
+class ValuationSummaryCell: UITableViewCell, UITextFieldDelegate {
 
-    @IBOutlet var title: UILabel!
-    @IBOutlet var detail: UILabel!
+    @IBOutlet var titleLabel: UILabel!
     @IBOutlet var textField: UITextField!
-        
-    var delegate: ValuationHelper!
+    @IBOutlet var infoButton: UIButton!
+    
     var indexPath: IndexPath!
+    var cellDelegate: ValSummaryCellDelegate!
     var valueFormat: ValuationCellValueFormat!
-    var method: ValuationMethods!
     
     override func awakeFromNib() {
         super.awakeFromNib()
-
         textField.delegate = self
     }
 
@@ -35,42 +33,63 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     }
     
     override func prepareForReuse() {
-        detail.textColor = UIColor.label
-        title.text = ""
-        detail.text = ""
+        titleLabel.text = ""
         textField.text = ""
+        textField.placeholder = ""
         indexPath = IndexPath()
         textField.isEnabled = true
     }
     
-    
-    public func configure(info: ValuationListCellInfo,  indexPath: IndexPath, method: ValuationMethods, delegate: ValuationHelper) {
+    public func configure(title: String, value: Double?, format: ValuationCellValueFormat,indexPath: IndexPath, delegate: ValSummaryCellDelegate) {
         
-        self.method = method
-        self.delegate = delegate
         self.indexPath = indexPath
-        self.title.text = info.title
-        self.valueFormat = info.format
-        self.detail.text = info.cellDetailInfo.text
-        self.detail.textColor = info.cellDetailInfo.color
-        let lighterPlaceHolderText = NSAttributedString(string: info.value$ ?? "",
-                                                    attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-        textField.attributedPlaceholder = lighterPlaceHolderText
-        if method == .rule1 {
-            if indexPath == IndexPath(row: 2, section: 9) { // proportion debt/ fcf
-                textField.isEnabled = false
+        self.titleLabel.text = title
+        self.cellDelegate = delegate
+        self.valueFormat = format
+        
+        if let valid = value {
+            if format == .percent {
+                self.textField.placeholder = percentFormatter0Digits.string(from: valid as NSNumber)
+            } else if format == .currency {
+                self.textField.placeholder = currencyFormatterGapWithPence.string(from: valid as NSNumber)
+            } else {
+                self.textField.placeholder = numberFormatterWith1Digit.string(from: valid as NSNumber)
             }
         }
-
+        else {
+            self.textField.placeholder = "enter your estimate"
+        }
+        
+        if indexPath == IndexPath(row: 0, section: 1) {
+            textField.isEnabled = false
+        }
+        else {
+            textField.isEnabled = true
+        }
     }
     
-    public func enterTextField() {
-        textField.becomeFirstResponder()
+    @IBAction func infoAction(_ sender: Any) {
+        
     }
     
     @IBAction func textEntryComplete(_ sender: UITextField) {
         
-        delegate.userEnteredText(sender: sender, indexPath: indexPath)
+        let newValueS = textField.text?.filter("-0123456789.".contains) ?? ""
+        
+        guard let newValue = Double(newValueS) else { return }
+        
+        var value = newValue
+        if valueFormat == .percent {
+            value = newValue / 100.0
+        }
+        
+        if indexPath.row == 0 {
+            cellDelegate.valueWasChanged(futurePER: nil, futureGrowth: value)
+        }
+        else {
+            cellDelegate.valueWasChanged(futurePER: value, futureGrowth: nil)
+        }
+            
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -78,10 +97,10 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
         if valueFormat == .percent {
             let numbers = textField.text?.filter("-0123456789.".contains)
                 if let value = (Double(numbers ?? "0")) {
-                textField.text = percentFormatter2Digits.string(from: (value / 100.0) as NSNumber)
+                textField.text = percentFormatter0Digits.string(from: (value / 100.0) as NSNumber)
             }
         }
-        
+
         textField.resignFirstResponder()
         return true
     }
@@ -134,4 +153,5 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
             }
         }
     }
+
 }

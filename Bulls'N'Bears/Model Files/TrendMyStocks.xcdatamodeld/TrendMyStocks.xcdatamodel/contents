@@ -20,6 +20,7 @@
         <attribute name="tRevenuePred" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
     </entity>
     <entity name="Rule1Valuation" representedClassName="Rule1Valuation" syncable="YES">
+        <attribute name="adjFuturePE" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" customClassName="Double"/>
         <attribute name="adjGrowthEstimates" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="bvps" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="ceoRating" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
@@ -32,12 +33,13 @@
         <attribute name="insiderStockBuys" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="insiderStocks" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="insiderStockSells" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="oFCF" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="opCashFlow" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="opcs" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="revenue" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="roic" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
     </entity>
     <elements>
         <element name="DCFValuation" positionX="-63" positionY="-18" width="128" height="284"/>
-        <element name="Rule1Valuation" positionX="-54" positionY="108" width="128" height="254"/>
+        <element name="Rule1Valuation" positionX="-54" positionY="108" width="128" height="284"/>
     </elements>
 </model>

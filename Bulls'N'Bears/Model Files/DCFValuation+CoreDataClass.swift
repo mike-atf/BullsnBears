@@ -118,7 +118,7 @@ public class DCFValuation: NSManagedObject {
         }
                 
         count = 0
-        for sales in valuation.oFCF ?? [] {
+        for sales in valuation.opcs ?? [] {
             self.tFCFo?.insert(sales, at: count)
             count += 1
         }
@@ -147,6 +147,45 @@ public class DCFValuation: NSManagedObject {
         // 18 last PVofFutureCF[5] from 'terminalValue' / discountFactors[].last (not 5!)
         // 19 'todaysValue' = sum(PVofFutureCF[+1-5])
         // 20 fairValue = 'todaysValue' / sharesOutstanding (drop last three!)
+        
+// stop crashes on lading when data has been corrupted
+        guard capExpend?.count ?? 0 == 4 else {
+            capExpend = [Double(), Double(), Double(), Double()]
+            save()
+            return nil
+        }
+        guard tRevenueActual?.count == 4 else {
+            tRevenueActual = [Double(), Double(), Double(), Double()]
+            save()
+            return nil
+        }
+        guard netIncome?.count ?? 0 == 4 else {
+            netIncome = [Double(), Double(), Double(), Double()]
+            save()
+            return nil
+        }
+        guard tFCFo?.count ?? 0 == 4 else {
+            tFCFo = [Double(), Double(), Double(), Double()]
+            save()
+            return nil
+        }
+        guard tRevenuePred?.count ?? 0 == 2 else {
+            tRevenuePred = [Double(), Double()]
+            save()
+            return nil
+        }
+        guard revGrowthPred?.count ?? 0 == 2 else {
+            revGrowthPred = [Double(), Double()]
+            save()
+            return nil
+        }
+        guard revGrowthPredAdj?.count ?? 0 == 2 else {
+            revGrowthPredAdj = [Double(), Double()]
+            save()
+            return nil
+        }
+//
+        
         
 // 1
         var fcfToEquity = [Double]()

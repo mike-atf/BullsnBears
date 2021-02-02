@@ -30,6 +30,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
         
+//        buildTickerDictionary()
+        
         var filesImported = [String]()
         let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         
@@ -42,15 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
 
             let inboxFolder = documentFolder + "/Inbox"
-            
-            if !FileManager.default.fileExists(atPath: inboxFolder) {
-                do {
-                    try FileManager.default.createDirectory(atPath: inboxFolder, withIntermediateDirectories: true, attributes: nil)
-                } catch let error {
-                    ErrorController.addErrorLog(errorLocation: "SceneDelagate.sceneDidBecomeActive", systemError: error, errorInfo: "Error trying to create new /Inbox folder")
-                }
-            }
-            
+                        
             do {
                 let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: inboxFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
                 
@@ -72,14 +66,93 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     }
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to move file out of the Inbox into the Document folder ")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error checking the Inbox folder ")
             }
             
             if filesImported.count > 0 {
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "NewFilesArrived"), object: filesImported, userInfo: nil)
             }
         }
-    } 
+    }
+    
+    /*
+    private func buildTickerDictionary() {
+        
+        if let path = tickerDictionaryPath() { // doesn't exist
+            
+            guard let content = CSVImporter.openCSVFile(url: nil, fileName:"StockTickerDictionary") else {
+                ErrorController.addErrorLog(errorLocation: "SceneDelegate.buildTickerDictionary", systemError: nil, errorInfo: "can't find ticker name csv file")
+                return
+            }
+            
+            let rows = content.components(separatedBy: NSMutableCharacterSet.newlines)
+            
+            if rows.count < 1 {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "csvExtraction error - no file content")
+                return
+            }
+
+            let expectedOrder = ["Ticker","Name","Exchange"]
+            var headerError = false
+            if let headerArray = rows.first?.components(separatedBy: ",") {
+                var count = 0
+                headerArray.forEach { (header) in
+                    if header != expectedOrder[count] {
+                        ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: " trying to read .csv file - header not in required format \(expectedOrder).\nInstead is \(headerArray) " )
+                        headerError = true
+                    }
+                    count += 1
+                }
+            }
+            
+            if headerError { return }
+
+            stockTickerDictionary = [String:String]()
+            let dictPath = path + "/StockTickerDictionary.csv"
+            var count = 2 // for reasons beyond me the .csv file has every other line empty, starting with 1,3...
+            while count < rows.count {
+                let array = rows[count].components(separatedBy: ",")
+                stockTickerDictionary![array[0]] = array[1]
+                count += 2
+            }
+            
+            do {
+                let fileData = try NSKeyedArchiver.archivedData(withRootObject: stockTickerDictionary!, requiringSecureCoding: true)
+                try fileData.write(to: URL(fileURLWithPath: dictPath))
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "Error trying to create Stoxk ticker ditionary at path \(dictPath) " )
+            }
+            
+        }
+    }
+    
+    private func tickerDictionaryPath() -> String? {
+
+        if let appSupportDirectoryPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first {
+        
+            do {
+                let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: appSupportDirectoryPath), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                
+                // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
+
+                for url in fileURLs {
+                    if url.path.contains("StockTickerDictionary") {
+                        if let data = FileManager.default.contents(atPath: url.path) {
+                            stockTickerDictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [String: String]
+                            return nil
+                        }
+                    }
+                }
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error checking the Support Directory folder ")
+            }
+            
+            return appSupportDirectoryPath
+        }
+
+        return nil
+    }
+    */
     
     private func removeFile(atPath: String) {
        

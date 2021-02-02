@@ -15,43 +15,52 @@ class DCFWebDataAnalyser {
     var yahooPages = ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"]
     var controller: CombinedValuationController!
     var sectionsComplete = [Bool]()
+    var progressDelegate: ProgressViewDelegate!
+    var completedDownLoadTasks = 0
     
-    init(stock: Stock, valuation: DCFValuation, controller: CombinedValuationController) {
+    init(stock: Stock, valuation: DCFValuation, controller: CombinedValuationController, pDelegate: ProgressViewDelegate) {
         self.stock = stock
         self.valuation = valuation
         self.controller = controller
+        self.progressDelegate = pDelegate
         
         startDCFDataSearch()
         
         NotificationCenter.default.addObserver(self, selector: #selector(downloadCompleted(notification:)), name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: nil)
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     private func startDCFDataSearch() {
         
         var components: URLComponents?
         
+        progressDelegate.progressTasks(tasks: yahooPages.count)
+        
         for section in yahooPages {
             sectionsComplete.append(false)
-            components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.name)/\(section)")
-            components?.queryItems = [URLQueryItem(name: "p", value: stock.name)]
+            components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(section)")
+            components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
             download(url: components?.url, for: section)
         }
-        
     }
-    
     
     @objc
     func downloadCompleted(notification: Notification) {
                         
         guard let validWebCode = html$ else {
-            print("download complete, html string is empty")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
             return
         }
         
         guard let section = notification.object as? String else {
-            print("download complete - notification did not contain section info!!")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete - notification did not contain section info!!")
             return
         }
+        
+        completedDownLoadTasks += 1
         
         if section == yahooPages.first! {
             let stats = keyStats(validWebCode)
@@ -68,43 +77,34 @@ class DCFWebDataAnalyser {
             valuation.incomePreTax = stats[">Income before tax</span>"]?.first ?? Double()
             valuation.expenseIncomeTax = stats[">Income tax expense</span>"]?.first ?? Double()
             sectionsComplete[1] = true
-
-//            print(" tRevenueActual = \(stats[">Total revenue</span>"])")
-//            print(" netIncome = \(stats[">Net income</span>"])")
-//            print(" expenseInterest = \(stats[">Interest expense</span>"])")
-//            print(" income Pre Tax = \(stats[">Income before tax</span>"])")
-//            print(" income Tax expense = \(stats[">Income tax expense</span>"])")
         }
         else if section == yahooPages[2] {
             let stats = balanceSheet(validWebCode)
             valuation.debtST = stats[">Current debt</span>"]?.first ?? Double()
             valuation.debtLT = stats[">Long-term debt</span>"]?.first ?? Double()
             sectionsComplete[2] = true
-
-//            print(" current debt = \(stats[">Current debt</span>"])")
-//            print(" LT debt = \(stats[">Long-term debt</span>"])")
         }
         else if section == yahooPages[3] {
             let stats = cashFlow(validWebCode)
             valuation.tFCFo = stats[">Operating cash flow</span>"]
             valuation.capExpend = stats[">Capital expenditure</span>"]
             sectionsComplete[3] = true
-
-//            print(" tFCFo = \(stats[">Operating cash flow</span>"])")
-//            print(" cap Expend = \(stats[">Capital expenditure</span>"])")
         }
         else if section == yahooPages[4] {
             let stats = analysis(validWebCode)
             valuation.tRevenuePred = stats[">Avg. Estimate</span>"] ?? [Double]()
-//            print(stats[">Avg. Estimate</span>"])
             valuation.revGrowthPred = stats[">Sales growth (year/est)</span>"]
             sectionsComplete[4] = true
-//            print(stats[">Sales growth (year/est)</span>"])
+        }
+        
+        DispatchQueue.main.async {
+            self.progressDelegate.progressUpdate(completedTasks: self.completedDownLoadTasks)
         }
         
         if !sectionsComplete.contains(false) {
-            valuation.save()
+//            valuation.save()
             DispatchQueue.main.async {
+                self.completedDownLoadTasks = 0
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil , userInfo: nil)
             }
         }
@@ -398,24 +398,24 @@ class DCFWebDataAnalyser {
     func download(url: URL?, for section: String) {
         
         guard let validURL = url else {
-            print("download failed to to optional only url request")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "DCF valuation data download failed due to optional only url request")
             return
         }
         
         let dataTask = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
-                print("a download error occurred: \(error!)")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a download error occurred")
                 return
             }
             
             guard urlResponse != nil else {
-                print("a download url response problme occurred: \(urlResponse!)")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a download url response problme occurred: \(urlResponse!)")
                 return
             }
             
             guard let validData = data else {
-                print("a download data problem occurred")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a DCF valuation download data problem occurred")
                 return
             }
 

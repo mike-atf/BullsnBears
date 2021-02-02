@@ -66,7 +66,7 @@ class ChartContainerView: UIView {
 //
         stockToShow = with
         if let validLabel = titleLabel {
-            validLabel.text = stockToShow?.name
+            validLabel.text = stockToShow?.symbol
         }
         if let view = contentView {
             view.configure(stock: with)

@@ -12,6 +12,23 @@ var foreCastTime: TimeInterval = 30*24*3600
 var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 var errorLog: [ErrorLog]?
 
+var stockTickerDictionary: [String:String]? = {
+        
+    guard let fileURL = Bundle.main.url(forResource: "StockTickerDictionary", withExtension: "csv") else {
+        return nil
+    }
+    
+    do {
+        if let data = FileManager.default.contents(atPath: fileURL.path) {
+            return try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [String: String]
+        }
+    } catch let error {
+        ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't read stock ticker dictionary data from Main bundle file")
+    }
+    
+    return nil
+}()
+
 var appVersion:String = {
     if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
         return version

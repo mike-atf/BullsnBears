@@ -7,19 +7,23 @@
 
 import UIKit
 
-class ValuationListViewController: UITableViewController {
+class ValuationListViewController: UITableViewController, AlertViewDelegate {
     
-    var presentingListVC: StocksListViewController!
+    weak var presentingListVC: StocksListViewController!
     var sourceIndexPath: IndexPath!
     var stock: Stock!
     
-    var valuationMethod:ValuationMethods!
+    var valuationMethod: ValuationMethods!
     var sectionSubtitles: [String]?
     var sectionTitles: [String]?
     var rowTitles: [[String]]?
 
     var valuationController: CombinedValuationController!
-    var helper: CombinedValuationController!
+    weak var helper: CombinedValuationController!
+    var progressView: UIProgressView?
+    var downloadTasks: Int?
+    
+    var showDownloadCompleteMessage = false // used because asking alertConotrller to show message in 'dataUpdated' right after reloadData causes 'table view or one of its superviews has not been added to a window' error, assuming that reloading rows still takes place while the alertView is in front. so instead show this when the viewDidLayouSubviews, using this bool
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,6 +47,22 @@ class ValuationListViewController: UITableViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+    
+    override func viewDidLayoutSubviews() {
+        if showDownloadCompleteMessage {
+            var title = String()
+            var message = String()
+            if valuationMethod == .dcf {
+                title = "Stock valuation data downloaded successfully from Yahoo"
+                message = "It's recommended to check data and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nMake sure to save after adjusting, using the blue button at the bottom!"
+            } else {
+                title = "Stock valuation data downloaded successfully from MacroTrends and Yahoo"
+                message = "It's recommended to check data and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nMake sure to save after adjusting, using the blue button at the bottom!"
+            }
+            AlertController.shared().showDialog(title: title, alertMessage: message, viewController: self)
+            showDownloadCompleteMessage = false
+        }
+    }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
 
@@ -64,7 +84,8 @@ class ValuationListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: indexPath) as! ValuationTableViewCell
 
         
-        helper.configureCell(indexPath: indexPath, cell: cell)
+        let info = helper.cellInfo(indexPath: indexPath)
+        cell.configure(info: info, indexPath: indexPath, method: valuationMethod, delegate: helper)
         
         return cell
     }
@@ -131,7 +152,21 @@ class ValuationListViewController: UITableViewController {
         subTitle.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
         subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
         
-        if section == 0 || section == (sectionTitles?.count ?? 0) - 1 {
+        if section == 0 {
+            let donwloadButton = UIButton()
+            donwloadButton.setBackgroundImage(UIImage(systemName: "icloud.and.arrow.down.fill"), for: .normal)
+            donwloadButton.addTarget(self, action: #selector(downloadValuationData), for: .touchUpInside)
+            donwloadButton.translatesAutoresizingMaskIntoConstraints = false
+            header.addSubview(donwloadButton)
+
+            donwloadButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+            donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
+            donwloadButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
+            donwloadButton.widthAnchor.constraint(equalTo: donwloadButton.heightAnchor).isActive = true
+
+        }
+        
+        if section == (sectionTitles?.count ?? 0) - 1 {
             let saveButton = UIButton()
             saveButton.setBackgroundImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
             saveButton.addTarget(self, action: #selector(saveValuation), for: .touchUpInside)
@@ -140,7 +175,7 @@ class ValuationListViewController: UITableViewController {
 
             saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
             saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.75).isActive = true
+            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
             saveButton.widthAnchor.constraint(equalTo: saveButton.heightAnchor).isActive = true
         }
 
@@ -151,13 +186,63 @@ class ValuationListViewController: UITableViewController {
     @objc
     func saveValuation() {
         
-        helper.saveValuation()
+        if let alerts = helper.saveValuation() {
+            AlertController.shared().showDialog(title: alerts.first! , alertMessage: alerts.last!, viewController: self ,delegate: self)
+        } else {
+            self.dismiss(animated: true) {
+                NotificationCenter.default.removeObserver(self)
+                if let vc = self.valuationController.webAnalyser as? R1WebDataAnalyser {
+                    NotificationCenter.default.removeObserver(vc)
+                } else if let vc = self.valuationController.webAnalyser as? DCFWebDataAnalyser {
+                    NotificationCenter.default.removeObserver(vc)
+                }
+                
+                if self.valuationMethod == .rule1 {
+                    if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationSummaryTVC") as? ValuationSummaryTVC {
+                        tvc.presentingVC = self.presentingListVC
+                        if let r1V = self.valuationController.valuation as? Rule1Valuation {
+                            tvc.r1Valuation = r1V
+                            tvc.indexPath = self.sourceIndexPath
+                            
+
+                            self.presentingListVC.present(tvc, animated: true, completion: nil)
+                        }
+                    }
+                }
+                else {
+                    self.presentingListVC.valuationCompleted(indexPath: self.sourceIndexPath)
+                }
+            }
+        }
+    }
+    
+    @objc
+    func downloadValuationData(_ button: UIButton) {
+        
+        button.isEnabled = false
+        progressView = UIProgressView()
+        progressView?.progress = 0.0
+        progressView?.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.view.addSubview(progressView!)
+        
+        let margins = view.layoutMarginsGuide
+
+        progressView?.widthAnchor.constraint(equalTo: margins.widthAnchor, multiplier: 0.8).isActive = true
+        progressView?.centerXAnchor.constraint(equalTo: margins.centerXAnchor).isActive = true
+        progressView?.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.01).isActive = true
+        progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+        
+        helper.startDataDownload()
+        
+    }
+    
+    func alertWasDismissed() {
         
         self.dismiss(animated: true) {
             self.presentingListVC.valuationCompleted(indexPath: self.sourceIndexPath)
         }
     }
-
     
     public func helperUpdatedRows(paths: [IndexPath]) {
         
@@ -179,55 +264,28 @@ class ValuationListViewController: UITableViewController {
     func dataUpdated() {
                 
         if (sectionTitles?.count ?? 0) > 0 {
-            tableView.reloadSections([1,2,3,4,5,6,7,8,9,10], with: .none)
+            tableView.reloadData()
         }
-        
-        alertController.showDialog(title: "Stock valuation data downloaded suuccessfully from Yahoo", alertMessage: "It's recommended to check data and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nMake sure to save after adjusting, using the blue buttons!", viewController: self)
+        showDownloadCompleteMessage = true
     }
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
+
+
+extension ValuationListViewController: ProgressViewDelegate {
+    
+    func progressTasks(tasks: Int) {
+        downloadTasks = tasks
+    }
+    
+    func progressUpdate(completedTasks: Int) {
+            self.progressView?.setProgress(Float(completedTasks) / Float(self.downloadTasks ?? 1), animated: true)
+            if completedTasks >= self.downloadTasks! {
+                self.progressView?.removeFromSuperview()
+                self.downloadTasks = nil
+            }
+    }
+    
+    
+}
+

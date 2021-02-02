@@ -11,17 +11,21 @@ import CoreData
 protocol ValuationHelper {
     func rowTitles() -> [[String]]
     func getValue(indexPath: IndexPath) -> Any?
-    func configureCell(indexPath: IndexPath, cell: ValuationTableViewCell)
+    func cellInfo(indexPath: IndexPath) -> ValuationListCellInfo
     func userEnteredText(sender: UITextField, indexPath: IndexPath)
     func sectionTitles() -> [String]
     func sectionSubTitles() -> [String]
-    func saveValuation()
+    func saveValuation() -> [String]?
 }
 
+protocol ProgressViewDelegate {
+    func progressTasks(tasks:Int)
+    func progressUpdate(completedTasks: Int)    
+}
 
 class CombinedValuationController: ValuationHelper {
     
-    var valuationListViewController: ValuationListViewController!
+    weak  var valuationListViewController: ValuationListViewController!
     var valuation: Any?
     var webAnalyser: Any?
     var stock: Stock!
@@ -35,31 +39,34 @@ class CombinedValuationController: ValuationHelper {
         self.stock = stock
         
         if valuationMethod == .rule1 {
-            if let valuation = CombinedValuationController.returnR1Valuations(company: stock.name)?.first {
+            if let valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
                 self.valuation = valuation
             }
             else {
-                self.valuation = CombinedValuationController.createR1Valuation(company: stock.name)
-                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.name)?.first {
+                self.valuation = CombinedValuationController.createR1Valuation(company: stock.symbol)
+                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
                     (valuation as? Rule1Valuation)?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
                 }
             }
-            
+// make this optional - InApp purchase
+//            webAnalyser = R1WebAnalyser(stock: self.stock, valuation: self.valuation as! Rule1Valuation, controller: self)
+//            webAnalyser = R1WebDataAnalyser(stock: self.stock, valuation: self.valuation as! Rule1Valuation, controller: self)
+//
         }
         else if valuationMethod == .dcf {
             
             
-            if let valuation = CombinedValuationController.returnDCFValuations(company: stock.name)?.first {
+            if let valuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
                 self.valuation = valuation
             }
             else {
-                self.valuation = CombinedValuationController.createDCFValuation(company: stock.name)
-                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.name)?.first {
+                self.valuation = CombinedValuationController.createDCFValuation(company: stock.symbol)
+                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
                     (valuation as? DCFValuation)?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
                 }
             }
-            
-            webAnalyser = DCFWebDataAnalyser(stock: stock, valuation: valuation as! DCFValuation, controller: self)
+// make this optional - InApp purchase
+//            webAnalyser = DCFWebDataAnalyser(stock: stock, valuation: valuation as! DCFValuation, controller: self)
         }
     }
     
@@ -164,7 +171,7 @@ class CombinedValuationController: ValuationHelper {
             subtitles = ["General","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "values entered will be converted to negative","Details > Analysis > Revenue estimate", "", ""]
         } else
         if method == .rule1 {
-            subtitles = ["Creation date","1. Book Value per Share", "2. Earnings per Share", "3. Sales/ Revenue", "4. Free Cash Flow", "5. Return on Invested Capital", "min and max last 5-10 years", "Analysts min and max predictions","Adjust predicted growth rates", "", "", "Between 0 - 10"]
+            subtitles = ["Creation date","1. Book Value per Share", "2. Earnings per Share", "3. Sales/ Revenue", "4. OP. Free Cash Flow Per Share", "5. Return on Invested Capital", "min and max last 5-10 years", "Analysts min and max predictions","Adjust predicted growth rates", "", "", "Between 0 - 10"]
         }
         
         return subtitles
@@ -215,15 +222,17 @@ class CombinedValuationController: ValuationHelper {
         }
     }
 
-    func configureCell(indexPath: IndexPath, cell: ValuationTableViewCell) {
+    func cellInfo(indexPath: IndexPath) -> ValuationListCellInfo {
         
         let value = getValue(indexPath: indexPath)
         let value$ = valueText(value: value, indexPath: indexPath)
         let title = (rowtitles ?? rowTitles())[indexPath.section][indexPath.row]
         let format = valueFormat(indexPath: indexPath)
-        let (detail$, textColor) = getDetail$(indexPath: indexPath)
+//        let (detail$, textColor) = getDetail$(indexPath: indexPath)
         
-        cell.configure(title: title, value$: value$, detail: detail$ ?? "", indexPath: indexPath, method: method, delegate: self, valueFormat: format, detailColor: textColor)
+        return ValuationListCellInfo(value$: value$, title: title, format: format, detailInfo: getDetail$(indexPath: indexPath))
+        
+//        cell.configure(title: title, value$: value$, detail: detail$ ?? "", indexPath: indexPath, method: method, delegate: self, valueFormat: format, detailColor: textColor)
     }
     
     func rowTitles() -> [[String]] {
@@ -232,36 +241,46 @@ class CombinedValuationController: ValuationHelper {
         return rowtitles
     }
     
-    func saveValuation() {
+    func saveValuation() -> [String]? {
+        
         if let valuation = self.valuation as? DCFValuation  {
             // check alignment of profit = net income and fcf
             
+            valuation.save()
             if let fcf_netIncome_correlation = stock.getCorrelation(xArray: (valuation.netIncome?.compactMap{ $0 } ?? []), yArray: (valuation.tFCFo?.compactMap{ $0 } ?? []))?.coEfficient {
                 let correlation$ = numberFormatterDecimals.string(from: fcf_netIncome_correlation as NSNumber) ?? ""
             
                 if abs(fcf_netIncome_correlation) < 0.75 {
-                    alertController.showDialog(title: "Poor alignment", alertMessage: "The trends of free cash flow and net income are not well aligned (the correlation co-efficient is \(correlation$)")
+                    return ["Poor alignment","The trends of free cash flow and net income are not well aligned (the correlation co-efficient is \(correlation$)"]
                 }
             }
-            
-            valuation.save()
         }
         else if let valuation = self.valuation as? Rule1Valuation  {
-            
+            valuation.save()
+
             if let moatCount = r1MoatParameterCount() {
                 if moatCount < 25 {
-                    alertController.showDialog(title: "Limited number of moat parameters", alertMessage: "You entered only \(moatCount) of 50 possible moat values.\nThe resulting moat score and sticker price may not be very reliable")
-
+                    
+                    return ["Limited number of moat parameters", "You entered only \(moatCount) of 50 possible moat values.\nThe resulting moat score and sticker price may not be very reliable"]
                 }
-                
             }
-            
-            valuation.save()
-            
         }
+        return nil
     }
     
     //MARK: - Internal functions
+    
+    public func startDataDownload() {
+        
+        if method == .rule1 {
+            webAnalyser = R1WebDataAnalyser(stock: self.stock, valuation: self.valuation as! Rule1Valuation, controller: self, progressDelegate: self.valuationListViewController)
+
+        }
+        else {
+            webAnalyser = DCFWebDataAnalyser(stock: stock, valuation: valuation as! DCFValuation, controller: self, pDelegate: self.valuationListViewController)
+        }
+        
+    }
     
     internal func convertUserEntryDCF(_ value: Double, indexPath: IndexPath) {
         
@@ -385,7 +404,7 @@ class CombinedValuationController: ValuationHelper {
             valuation.revenue?.add(value: value, index: indexPath.row)
         case 4:
             // 'Moat parameters - FCF
-            valuation.oFCF?.add(value: value, index: indexPath.row)
+            valuation.opcs?.add(value: value, index: indexPath.row)
         case 5:
             // 'Moat parameters - ROIC
             valuation.roic?.add(value: value / 100, index: indexPath.row)
@@ -559,15 +578,9 @@ class CombinedValuationController: ValuationHelper {
         }
         var section4$ = ""
         if valuation.netIncome?.count ?? 0 > indexPath.row {
-//            if indexPath.row < (valuation.netIncome?.count ?? 0) - 1 {
                 if let growth = calculateGrowthDCF(valuation.netIncome, element:indexPath.row) {
                     section4$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
                 }
-//            }
-//            else {
-//                valuation.netIncome?.append(Double())
-//                
-//            } // TODO: - possible error
         }
         if indexPath.section == 2 {
             if valuation.netIncome?.count ?? 0 > indexPath.row {
@@ -674,7 +687,7 @@ class CombinedValuationController: ValuationHelper {
         case 4:
             // 'Moat parameters - FCF
             if indexPath.row == 9 { return (nil, nil) }
-            else if let growth = calculateGrowthR1(valueArray: valuation.oFCF, element: indexPath.row) {
+            else if let growth = calculateGrowthR1(valueArray: valuation.opcs, element: indexPath.row) {
                 let color = growth < 0.1 ? UIColor(named: "Red") : UIColor(named: "Green")
                 return (percentFormatter0Digits.string(from: growth as NSNumber), color)
             }
@@ -699,15 +712,15 @@ class CombinedValuationController: ValuationHelper {
         case 8:
             // 'Adjusted Growth predictions
             if let growth = averageGrowthPrediction() {
-                return ("avg. " + (percentFormatter0Digits.string(from: growth as NSNumber) ?? "%"), nil)
+                return ((percentFormatter0Digits.string(from: growth as NSNumber) ?? "%"), nil)
             }
 
        case 9:
             // 'Debt
             if indexPath.row == 0 { return (nil, nil) }
-            else if let fcf = valuation.oFCF?.first {
-                if fcf > 0 {
-                    let proportion = (valuation.debt) / fcf
+            else if valuation.opCashFlow != Double() {
+                if valuation.opCashFlow > 0 {
+                    let proportion = (valuation.debt) / valuation.opCashFlow
                     return (percentFormatter2Digits.string(from: proportion as NSNumber), nil)
                 }
             }
@@ -1028,7 +1041,7 @@ class CombinedValuationController: ValuationHelper {
         let section2 = valuation.bvps ?? []
         let section3 = valuation.eps ?? []
         let section4 = valuation.revenue ?? []
-        let section5 = valuation.oFCF ?? []
+        let section5 = valuation.opcs ?? []
         let section6 = valuation.roic ?? []
         let section7 = valuation.hxPE ?? []
         
@@ -1039,10 +1052,7 @@ class CombinedValuationController: ValuationHelper {
         let section8 = valuation.growthEstimates ?? averageGrowth
         
         let prediction = averageGrowthPrediction()
-        var section9 = [prediction, prediction]
-        if valuation.adjGrowthEstimates?.count ?? 0 > 1 {
-            section9 = valuation.adjGrowthEstimates!
-        }
+        let section9 = [valuation.adjGrowthEstimates?.first ?? prediction, valuation.adjGrowthEstimates?.last ?? prediction]
         let section10 = [valuation.debt, debtProportion()]
         let section11 = [valuation.insiderStocks, valuation.insiderStockBuys, valuation.insiderStockSells]
         let section12 = [valuation.ceoRating]
@@ -1053,7 +1063,7 @@ class CombinedValuationController: ValuationHelper {
     
     internal func debtProportion() -> Double? {
         
-        if let validFCF = (valuation as? Rule1Valuation)?.oFCF?.first {
+        if let validFCF = (valuation as? Rule1Valuation)?.opCashFlow {
             if validFCF > 0 {
                 if let validDebt = (valuation as? Rule1Valuation)?.debt {
                     return validDebt / validFCF
@@ -1068,7 +1078,7 @@ class CombinedValuationController: ValuationHelper {
         
         if let valuation = self.valuation as? DCFValuation {
             
-            guard valuation.tRevenueActual?.count ?? 0 > 0 || valuation.revGrowthPredAdj?.count ?? 0 > 0 else {
+            guard valuation.tRevenueActual?.count ?? 0 > 1 && valuation.revGrowthPredAdj?.count ?? 0 > 0 else {
                 return nil
             }
             
@@ -1088,20 +1098,19 @@ class CombinedValuationController: ValuationHelper {
         }
         else if let valuation = self.valuation as? Rule1Valuation  {
 
-            guard valuation.bvps?.count ?? 0 > 0 || valuation.growthEstimates?.count ?? 0 > 0 else {
-                return nil
+            if valuation.growthEstimates?.count ?? 0 > 0 {
+                return valuation.growthEstimates?.mean()
             }
             
             var growthRates = [Double]()
-            
-            for i in 1..<valuation.bvps!.count {
-                let rate = (valuation.bvps![i-1] - valuation.bvps![i]) / valuation.bvps![i]
-                growthRates.append(rate)
+            if valuation.bvps?.count ?? 0 > 0 {
+                for i in 1..<valuation.bvps!.count {
+                    let rate = (valuation.bvps![i-1] - valuation.bvps![i]) / valuation.bvps![i]
+                    growthRates.append(rate)
+                }
             }
             
-            growthRates.append(contentsOf: valuation.growthEstimates ?? [])
-            
-            return growthRates.reduce(0, +) / Double(growthRates.count)
+            return growthRates.mean()
         }
         return nil
     }
@@ -1131,11 +1140,15 @@ class CombinedValuationController: ValuationHelper {
             return nil
         }
         
+        guard valueArray![element] > 0 else {
+            return nil
+        }
+        
         guard let endValue = valueArray?.first else {
             return nil
         }
         
-        guard endValue != 0 else {
+        guard endValue > 0 else {
             return nil
         }
         
@@ -1154,7 +1167,7 @@ class CombinedValuationController: ValuationHelper {
             return nil
         }
         
-        let arrays = [v.bvps, v.eps, v.revenue, v.oFCF, v.roic]
+        let arrays = [v.bvps, v.eps, v.revenue, v.opcs, v.roic]
         var countNonZero = 0
         for array in arrays {
             countNonZero += array?.compactMap{ $0 }.filter({ (value) -> Bool in

@@ -160,17 +160,17 @@
         <!--Revenue-->
         <scene sceneID="esG-QI-hKZ">
             <objects>
-                <tableViewController storyboardIdentifier="ValuationListViewController" title="Revenue" extendedLayoutIncludesOpaqueBars="YES" modalTransitionStyle="crossDissolve" id="44u-xA-fyj" customClass="ValuationListViewController" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="ValuationListViewController" title="Revenue" extendedLayoutIncludesOpaqueBars="YES" modalTransitionStyle="crossDissolve" modalPresentationStyle="formSheet" id="44u-xA-fyj" customClass="ValuationListViewController" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="9kl-Gg-cku">
-                        <rect key="frame" x="0.0" y="0.0" width="350" height="660"/>
+                        <rect key="frame" x="0.0" y="0.0" width="550" height="660"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valuationListCell" id="e9i-LB-o3D" customClass="ValuationTableViewCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="16" y="55.5" width="318" height="43.5"/>
+                                <rect key="frame" x="20" y="55.5" width="510" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e9i-LB-o3D" id="Ie0-Ok-DJG">
-                                    <rect key="frame" x="0.0" y="0.0" width="318" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="510" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -180,14 +180,41 @@
                             <outlet property="delegate" destination="44u-xA-fyj" id="TfP-2x-DjM"/>
                         </connections>
                     </tableView>
-                    <value key="contentSizeForViewInPopover" type="size" width="350" height="660"/>
-                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                    <value key="contentSizeForViewInPopover" type="size" width="550" height="660"/>
                     <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="350" height="680"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4di-L7-JI6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="695" y="1553"/>
+            <point key="canvasLocation" x="887" y="1802"/>
+        </scene>
+        <!--Valuation SummaryTVC-->
+        <scene sceneID="Hr3-s8-nxS">
+            <objects>
+                <tableViewController storyboardIdentifier="ValuationSummaryTVC" id="MYg-Pm-fIO" customClass="ValuationSummaryTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="tn8-ZK-c0l">
+                        <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valuationSummaryCell" rowHeight="50" id="Y8f-CK-70c" customClass="ValuationSummaryCell" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                <rect key="frame" x="20" y="55.5" width="1140" height="50"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Y8f-CK-70c" id="z2q-yM-EwP">
+                                    <rect key="frame" x="0.0" y="0.0" width="1140" height="50"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="MYg-Pm-fIO" id="8uM-kn-ZhA"/>
+                            <outlet property="delegate" destination="MYg-Pm-fIO" id="e2v-jF-m6l"/>
+                        </connections>
+                    </tableView>
+                    <value key="contentSizeForViewInPopover" type="size" width="200" height="300"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="YC4-L9-hCb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="888" y="2521"/>
         </scene>
         <!--Stock List-->
         <scene sceneID="gJ5-Jm-dY6">
