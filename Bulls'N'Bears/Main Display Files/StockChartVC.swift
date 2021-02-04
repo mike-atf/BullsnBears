@@ -29,6 +29,8 @@ class StockChartVC: UIViewController {
         }
         
         buildLabel = UIBarButtonItem(title: "Build: " + appBuild, style: .plain, target: nil, action: nil)
+        let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title1) ,NSAttributedString.Key.foregroundColor: UIColor.label]
+        barTitleButton.setTitleTextAttributes(titleAttributes, for: .normal)
         
         self.navigationItem.leftBarButtonItems = [barTitleButton]
         self.navigationItem.rightBarButtonItem = buildLabel
@@ -95,7 +97,7 @@ class StockChartVC: UIViewController {
             if let intrinsicValue = validValuation.returnIValue() {
                 dcfValuationLabrl.text = "DCF -NA-"
                 if intrinsicValue > 0 {
-                    let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber) ?? "-"
+                    let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber) ?? "--"
                     dcfValuationLabrl.text = "DCF: " + iv$
                 }
             }
@@ -103,7 +105,7 @@ class StockChartVC: UIViewController {
         else { dcfValuationLabrl.text = "DCF Valuation: -"}
         
         if let validValuation = r1Valuation {
-            var r1Title = "R1: "
+            var r1Title = "R1 Sticker price: "
             if let stickerPrice = validValuation.stickerPrice() {
                 if stickerPrice > 0 {
                     r1Title += (currencyFormatterNoGapNoPence.string(from: stickerPrice as NSNumber) ?? "--")

@@ -96,7 +96,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         else {
             var components: URLComponents?
                         
-            components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(stock.symbol)/\(hyphenatedShortName!.lowercased())/" + (webView.section ?? ""))
+            components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(stock.symbol)/\(hyphenatedShortName!.lowercased())/" + webView.section)
             
             if let validURL = components?.url {
                 request = URLRequest(url: validURL)
