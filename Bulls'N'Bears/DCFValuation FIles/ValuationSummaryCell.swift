@@ -18,18 +18,12 @@ class ValuationSummaryCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet var infoButton: UIButton!
     
     var indexPath: IndexPath!
-    var cellDelegate: ValSummaryCellDelegate!
+    var cellDelegate: ValSummaryCellDelegate?
     var valueFormat: ValuationCellValueFormat!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         textField.delegate = self
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
     
     override func prepareForReuse() {
@@ -38,6 +32,11 @@ class ValuationSummaryCell: UITableViewCell, UITextFieldDelegate {
         textField.placeholder = ""
         indexPath = IndexPath()
         textField.isEnabled = true
+        cellDelegate = nil
+    }
+    
+    deinit {
+        cellDelegate = nil
     }
     
     public func configure(title: String, value: Double?, format: ValuationCellValueFormat,indexPath: IndexPath, delegate: ValSummaryCellDelegate) {
@@ -84,10 +83,10 @@ class ValuationSummaryCell: UITableViewCell, UITextFieldDelegate {
         }
         
         if indexPath.row == 0 {
-            cellDelegate.valueWasChanged(futurePER: nil, futureGrowth: value)
+            cellDelegate?.valueWasChanged(futurePER: nil, futureGrowth: value)
         }
         else {
-            cellDelegate.valueWasChanged(futurePER: value, futureGrowth: nil)
+            cellDelegate?.valueWasChanged(futurePER: value, futureGrowth: nil)
         }
             
     }

@@ -139,6 +139,16 @@ class ValuationSummaryTVC: UITableViewController {
     func saveValuation() {
         self.dismiss(animated: true) {
             self.r1Valuation.save()
+            // NEW
+            for row in 0..<self.sectionsRowTitles.count {
+                if let cell = self.tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? ValuationSummaryCell {
+                    cell.cellDelegate = nil
+                }
+            }
+            if let cell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 1)) as? ValuationSummaryCell {
+                cell.cellDelegate = nil
+            }
+            //
             self.presentingVC.valuationCompleted(indexPath: self.indexPath)
         }        
     }

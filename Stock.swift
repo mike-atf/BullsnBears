@@ -23,19 +23,20 @@ struct Stock {
         
         if let dictionary = stockTickerDictionary {
             name_long = dictionary[symbol]
-
-            for term in [" Inc", " Ltd"," Corp"] {
-                if let range = name_long?.range(of: term) {
-                    name_short = String(name_long![...range.lowerBound].dropLast())
-                }
-            }
             
-//            let shortNameComponents = name_short!.split(separator: " ")
-//            var hyphenatedShortName = String(shortNameComponents.first!)
-//            for index in 1..<shortNameComponents.count {
-//                hyphenatedShortName += "-" + String(shortNameComponents[index])
-//            }
-//            print(hyphenatedShortName.lowercased())
+            if let longNameComponents = name_long?.split(separator: " ") {
+                let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Group", "Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co."]
+                let replaceTerms = ["S.A.": "sa "]
+                var cleanedName = String()
+                for component in longNameComponents {
+                    if replaceTerms.keys.contains(String(component)) {
+                        cleanedName += replaceTerms[String(component)] ?? ""
+                    } else if !removeTerms.contains(String(component)) {
+                        cleanedName += String(component) + " "
+                    }
+                }
+                name_short = String(cleanedName.dropLast())
+            }
         }
         
         self.dailyPrices = dailyPrices

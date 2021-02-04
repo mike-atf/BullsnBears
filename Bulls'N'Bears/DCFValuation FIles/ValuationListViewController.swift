@@ -189,21 +189,24 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         if let alerts = helper.saveValuation() {
             AlertController.shared().showDialog(title: alerts.first! , alertMessage: alerts.last!, viewController: self ,delegate: self)
         } else {
+            // important - these will otherwise stay in memory
+            if let analyser = self.valuationController.webAnalyser {
+                NotificationCenter.default.removeObserver(analyser)
+            }
+            let r1Valuation = self.valuationController.valuation as? Rule1Valuation // for transfer to ValuationSummaryVC
+            self.valuationController.webAnalyser = nil
+            self.valuationController = nil
+            //
+            
             self.dismiss(animated: true) {
                 NotificationCenter.default.removeObserver(self)
-                if let vc = self.valuationController.webAnalyser as? R1WebDataAnalyser {
-                    NotificationCenter.default.removeObserver(vc)
-                } else if let vc = self.valuationController.webAnalyser as? DCFWebDataAnalyser {
-                    NotificationCenter.default.removeObserver(vc)
-                }
                 
                 if self.valuationMethod == .rule1 {
                     if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationSummaryTVC") as? ValuationSummaryTVC {
                         tvc.presentingVC = self.presentingListVC
-                        if let r1V = self.valuationController.valuation as? Rule1Valuation {
+                        if let r1V = r1Valuation {
                             tvc.r1Valuation = r1V
                             tvc.indexPath = self.sourceIndexPath
-                            
 
                             self.presentingListVC.present(tvc, animated: true, completion: nil)
                         }
@@ -280,7 +283,7 @@ extension ValuationListViewController: ProgressViewDelegate {
     
     func progressUpdate(completedTasks: Int) {
             self.progressView?.setProgress(Float(completedTasks) / Float(self.downloadTasks ?? 1), animated: true)
-            if completedTasks >= self.downloadTasks! {
+            if completedTasks >= self.downloadTasks ?? 1 {
                 self.progressView?.removeFromSuperview()
                 self.downloadTasks = nil
             }

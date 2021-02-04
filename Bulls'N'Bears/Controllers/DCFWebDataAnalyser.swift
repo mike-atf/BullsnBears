@@ -15,7 +15,7 @@ class DCFWebDataAnalyser {
     var yahooPages = ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"]
     var controller: CombinedValuationController!
     var sectionsComplete = [Bool]()
-    var progressDelegate: ProgressViewDelegate!
+    var progressDelegate: ProgressViewDelegate?
     var completedDownLoadTasks = 0
     
     init(stock: Stock, valuation: DCFValuation, controller: CombinedValuationController, pDelegate: ProgressViewDelegate) {
@@ -37,7 +37,7 @@ class DCFWebDataAnalyser {
         
         var components: URLComponents?
         
-        progressDelegate.progressTasks(tasks: yahooPages.count)
+        progressDelegate?.progressTasks(tasks: yahooPages.count)
         
         for section in yahooPages {
             sectionsComplete.append(false)
@@ -98,13 +98,13 @@ class DCFWebDataAnalyser {
         }
         
         DispatchQueue.main.async {
-            self.progressDelegate.progressUpdate(completedTasks: self.completedDownLoadTasks)
+            self.progressDelegate?.progressUpdate(completedTasks: self.completedDownLoadTasks)
         }
         
         if !sectionsComplete.contains(false) {
-//            valuation.save()
             DispatchQueue.main.async {
                 self.completedDownLoadTasks = 0
+                self.progressDelegate = nil
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil , userInfo: nil)
             }
         }

@@ -221,7 +221,6 @@
 				EAC190C0257663200030B331 /* PublicVars.swift */,
 				EAC190CA257663730030B331 /* Stock.swift */,
 				EAC1904F257641160030B331 /* Main.storyboard */,
-				EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */,
 				EA163F76258BA85E000974AB /* StockTrend.swift */,
 				EA7B613825C412860018BA02 /* StockTickerDictionary.csv */,
 				EAFCB95E25C5F0240029AA4F /* MTCookies */,
@@ -327,6 +326,7 @@
 			children = (
 				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
 				EAC190B9257662930030B331 /* StocksListViewController.swift */,
+				EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */,
 				EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */,
 				EAC190D42576731B0030B331 /* StockChartVC.swift */,
 				EAC190E92577E2E20030B331 /* ChartContainerView.swift */,
@@ -768,7 +768,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.2;
+				MARKETING_VERSION = 0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -788,7 +788,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.2;
+				MARKETING_VERSION = 0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

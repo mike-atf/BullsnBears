@@ -201,25 +201,27 @@ class ChartView: UIView {
 
             if let existingValuation = CombinedValuationController.returnDCFValuations(company: stockToShow!.symbol)?.first {
                 if let fairValue = existingValuation.returnIValue() {
-                    let ratio = currentPrice / fairValue
-                    let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
+                    if fairValue > 0 {
+                        let ratio = currentPrice / fairValue
+                        let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
 
-                    let newLabel: UILabel = {
-                        let label = UILabel()
-                        label.numberOfLines = 1
-                        label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                        label.textColor = UIColor(named: "antiLabel")
-                        label.backgroundColor = UIColor.label
-                        label.text = ratio$
-                        label.sizeToFit()
-                        
-                        let labelTop = endPoint.y - label.frame.height - 2
-                        
-                        label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
-                        return label
-                    }()
-                    valuationLabels.append(newLabel)
-                    addSubview(newLabel)
+                        let newLabel: UILabel = {
+                            let label = UILabel()
+                            label.numberOfLines = 1
+                            label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                            label.textColor = UIColor(named: "antiLabel")
+                            label.backgroundColor = UIColor.label
+                            label.text = ratio$
+                            label.sizeToFit()
+                            
+                            let labelTop = endPoint.y - label.frame.height - 2
+                            
+                            label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
+                            return label
+                        }()
+                        valuationLabels.append(newLabel)
+                        addSubview(newLabel)
+                    }
                 }
             }
             
@@ -227,25 +229,27 @@ class ChartView: UIView {
             // R1 Label
             if let existingValuation = CombinedValuationController.returnR1Valuations(company: stockToShow!.symbol)?.first {
                 if let fairValue = existingValuation.stickerPrice() {
-                    let ratio = currentPrice / fairValue
-                    let ratio$ = " R1 " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
+                    if fairValue > 0 {
+                        let ratio = currentPrice / fairValue
+                        let ratio$ = " R1 " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
 
-                    let newLabel: UILabel = {
-                        let label = UILabel()
-                        label.numberOfLines = 1
-                        label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                        label.textColor = UIColor(named: "antiLabel")
-                        label.backgroundColor = UIColor.label
-                        label.text = ratio$
-                        label.sizeToFit()
-                        
-                        let labelTop = endPoint.y + 2
-                        
-                        label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
-                        return label
-                    }()
-                    valuationLabels.append(newLabel)
-                    addSubview(newLabel)
+                        let newLabel: UILabel = {
+                            let label = UILabel()
+                            label.numberOfLines = 1
+                            label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                            label.textColor = UIColor(named: "antiLabel")
+                            label.backgroundColor = UIColor.label
+                            label.text = ratio$
+                            label.sizeToFit()
+                            
+                            let labelTop = endPoint.y + 2
+                            
+                            label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
+                            return label
+                        }()
+                        valuationLabels.append(newLabel)
+                        addSubview(newLabel)
+                    }
                 }
             }
         }

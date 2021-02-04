@@ -16,14 +16,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="859.5" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" text="Stock name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RL9-y0-71P">
-                                <rect key="frame" x="10" y="60" width="172" height="41"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MVz-dh-kgA" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="212" y="64" width="33" height="33"/>
+                                <rect key="frame" x="700.5" y="55" width="33" height="33"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="MVz-dh-kgA" secondAttribute="height" multiplier="1:1" id="5gW-w3-Pb5"/>
@@ -33,7 +27,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pyF-an-nSb" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="265" y="64" width="32.5" height="33"/>
+                                <rect key="frame" x="753.5" y="55" width="32.5" height="33"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="pyF-an-nSb" secondAttribute="height" multiplier="1:1" id="gaw-0U-0y7"/>
@@ -43,7 +37,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vMW-cw-G3E" userLabel="Button3" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="317.5" y="64" width="33" height="33"/>
+                                <rect key="frame" x="806" y="55" width="33" height="33"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="vMW-cw-G3E" secondAttribute="height" multiplier="1:1" id="r58-tf-wky"/>
@@ -53,10 +47,10 @@
                                 </connections>
                             </button>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doh-lM-a4B">
-                                <rect key="frame" x="20" y="111" width="820" height="689"/>
+                                <rect key="frame" x="20" y="141.5" width="820" height="658.5"/>
                                 <subviews>
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="3320" height="689"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="3320" height="658.5"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="3320" id="czG-4M-LQI"/>
@@ -74,7 +68,7 @@
                                 <viewLayoutGuide key="frameLayoutGuide" id="ZAI-FU-kZr"/>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="28E-NM-pCT" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="800.5" y="64" width="33" height="33"/>
+                                <rect key="frame" x="806.5" y="97" width="32.5" height="32.5"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="28E-NM-pCT" secondAttribute="height" multiplier="1:1" id="vRr-eX-9QY"/>
@@ -84,48 +78,64 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hAd-Vi-f51" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="748" y="64" width="32.5" height="33"/>
+                                <rect key="frame" x="753.5" y="97" width="32.5" height="32.5"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="yGM-Sn-b0n"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hrq-ff-sUC" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="695" y="64" width="33" height="33"/>
+                                <rect key="frame" x="701" y="97" width="32.5" height="32.5"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="g4A-rZ-Kbq"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DCF Valuation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A2B-RG-uHy">
+                                <rect key="frame" x="20" y="67" width="124" height="24"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rule # 1 Valuation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miC-j2-Brw">
+                                <rect key="frame" x="20" y="91" width="154.5" height="24"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="HJZ-h8-yHo"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="MVz-dh-kgA" firstAttribute="leading" secondItem="RL9-y0-71P" secondAttribute="trailing" constant="30" id="0dV-2R-HaM"/>
+                            <constraint firstItem="28E-NM-pCT" firstAttribute="centerY" secondItem="hAd-Vi-f51" secondAttribute="centerY" id="0Va-7Y-5Pf"/>
                             <constraint firstItem="Doh-lM-a4B" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="20" id="19E-A6-fxS"/>
-                            <constraint firstItem="hAd-Vi-f51" firstAttribute="centerY" secondItem="28E-NM-pCT" secondAttribute="centerY" id="1bj-V0-nF7"/>
-                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="centerY" secondItem="28E-NM-pCT" secondAttribute="centerY" id="2rX-jv-GpR"/>
-                            <constraint firstItem="hAd-Vi-f51" firstAttribute="leading" secondItem="Hrq-ff-sUC" secondAttribute="trailing" constant="20" id="3Kh-Y7-7Nf"/>
-                            <constraint firstItem="RL9-y0-71P" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="10" id="3Nt-Rb-cUP"/>
-                            <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="28E-NM-pCT" secondAttribute="trailing" constant="26" id="5mS-oH-6KB"/>
+                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="top" secondItem="MVz-dh-kgA" secondAttribute="bottom" constant="9" id="1FK-Of-x3d"/>
                             <constraint firstItem="HJZ-h8-yHo" firstAttribute="bottom" secondItem="Doh-lM-a4B" secondAttribute="bottom" id="7TE-1M-Zc0"/>
+                            <constraint firstItem="28E-NM-pCT" firstAttribute="height" secondItem="DMz-IK-SGN" secondAttribute="height" multiplier="0.04" constant="-0.29999999999999716" id="7l0-A4-FeV"/>
                             <constraint firstItem="pyF-an-nSb" firstAttribute="leading" secondItem="MVz-dh-kgA" secondAttribute="trailing" constant="20" id="886-U6-eXb"/>
+                            <constraint firstItem="hAd-Vi-f51" firstAttribute="centerY" secondItem="28E-NM-pCT" secondAttribute="centerY" id="8yK-ME-WDe"/>
+                            <constraint firstItem="Doh-lM-a4B" firstAttribute="top" secondItem="Hrq-ff-sUC" secondAttribute="bottom" constant="12" id="94w-JU-8ro"/>
                             <constraint firstItem="vMW-cw-G3E" firstAttribute="height" secondItem="pyF-an-nSb" secondAttribute="height" id="B3d-Z0-YSd"/>
                             <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="Doh-lM-a4B" secondAttribute="trailing" constant="19.5" id="BKt-th-gRz"/>
-                            <constraint firstItem="28E-NM-pCT" firstAttribute="height" secondItem="DMz-IK-SGN" secondAttribute="height" multiplier="0.04" id="CId-3k-dEO"/>
-                            <constraint firstItem="pyF-an-nSb" firstAttribute="centerY" secondItem="RL9-y0-71P" secondAttribute="centerY" id="PDr-31-vwb"/>
-                            <constraint firstItem="28E-NM-pCT" firstAttribute="centerY" secondItem="RL9-y0-71P" secondAttribute="centerY" id="PaN-0l-MPO"/>
-                            <constraint firstItem="28E-NM-pCT" firstAttribute="leading" secondItem="hAd-Vi-f51" secondAttribute="trailing" constant="20" id="Q2w-Xj-aq9"/>
+                            <constraint firstItem="28E-NM-pCT" firstAttribute="centerX" secondItem="vMW-cw-G3E" secondAttribute="centerX" id="Kcg-bN-TxM"/>
+                            <constraint firstItem="hAd-Vi-f51" firstAttribute="centerX" secondItem="pyF-an-nSb" secondAttribute="centerX" id="LB6-lX-FJR"/>
+                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="width" secondItem="Hrq-ff-sUC" secondAttribute="height" multiplier="1:1" id="LRo-0g-h00"/>
+                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="centerY" secondItem="28E-NM-pCT" secondAttribute="centerY" id="MP8-dR-Lai"/>
+                            <constraint firstItem="hAd-Vi-f51" firstAttribute="width" secondItem="hAd-Vi-f51" secondAttribute="height" multiplier="1:1" id="OQ0-Q1-4DP"/>
                             <constraint firstItem="pyF-an-nSb" firstAttribute="height" secondItem="MVz-dh-kgA" secondAttribute="height" id="QXf-MA-k0p"/>
                             <constraint firstItem="vMW-cw-G3E" firstAttribute="leading" secondItem="pyF-an-nSb" secondAttribute="trailing" constant="20" id="QwG-G3-Ppu"/>
-                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="width" secondItem="Hrq-ff-sUC" secondAttribute="height" multiplier="1:1" id="V1w-wg-ES1"/>
-                            <constraint firstItem="Doh-lM-a4B" firstAttribute="top" secondItem="RL9-y0-71P" secondAttribute="bottom" constant="10" id="XQT-v1-fbp"/>
-                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="height" secondItem="hAd-Vi-f51" secondAttribute="height" id="YkF-Ak-jyd"/>
-                            <constraint firstItem="hAd-Vi-f51" firstAttribute="width" secondItem="hAd-Vi-f51" secondAttribute="height" multiplier="1:1" id="Z6J-GA-6jQ"/>
-                            <constraint firstItem="RL9-y0-71P" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="10" id="cpx-rl-cMZ"/>
-                            <constraint firstItem="MVz-dh-kgA" firstAttribute="centerY" secondItem="RL9-y0-71P" secondAttribute="centerY" id="h5u-J5-kM8"/>
-                            <constraint firstItem="hAd-Vi-f51" firstAttribute="height" secondItem="28E-NM-pCT" secondAttribute="height" id="ie3-ai-zte"/>
-                            <constraint firstItem="vMW-cw-G3E" firstAttribute="centerY" secondItem="RL9-y0-71P" secondAttribute="centerY" id="lNC-q1-UGj"/>
+                            <constraint firstItem="MVz-dh-kgA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="A2B-RG-uHy" secondAttribute="trailing" constant="10" id="R0M-5n-Bj4"/>
+                            <constraint firstItem="miC-j2-Brw" firstAttribute="leading" secondItem="A2B-RG-uHy" secondAttribute="leading" id="Rlk-pO-N0U"/>
+                            <constraint firstItem="A2B-RG-uHy" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="17" id="SlI-kz-nXJ"/>
+                            <constraint firstItem="A2B-RG-uHy" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="20" id="TZP-1S-w2N"/>
+                            <constraint firstItem="MVz-dh-kgA" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="5" id="VSM-dg-lDx"/>
+                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="miC-j2-Brw" secondAttribute="trailing" constant="10" id="WPV-wB-Xz9"/>
+                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="height" secondItem="hAd-Vi-f51" secondAttribute="height" id="YmY-Ex-1yf"/>
+                            <constraint firstItem="pyF-an-nSb" firstAttribute="centerY" secondItem="MVz-dh-kgA" secondAttribute="centerY" id="aLh-YQ-GEb"/>
+                            <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="vMW-cw-G3E" secondAttribute="trailing" constant="20.5" id="cAM-CS-hJx"/>
+                            <constraint firstItem="miC-j2-Brw" firstAttribute="firstBaseline" secondItem="A2B-RG-uHy" secondAttribute="baseline" constant="24" symbolType="layoutAnchor" id="cjP-nQ-5VO"/>
+                            <constraint firstItem="vMW-cw-G3E" firstAttribute="centerY" secondItem="pyF-an-nSb" secondAttribute="centerY" id="e5v-Ir-beX"/>
+                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="centerX" secondItem="MVz-dh-kgA" secondAttribute="centerX" id="f0c-b1-EHc"/>
+                            <constraint firstItem="hAd-Vi-f51" firstAttribute="height" secondItem="28E-NM-pCT" secondAttribute="height" id="jPa-zE-L8d"/>
+                            <constraint firstItem="hAd-Vi-f51" firstAttribute="centerY" secondItem="Hrq-ff-sUC" secondAttribute="centerY" id="kfg-Y6-wvT"/>
                             <constraint firstItem="MVz-dh-kgA" firstAttribute="height" secondItem="DMz-IK-SGN" secondAttribute="height" multiplier="0.04" id="svt-8A-0ag"/>
                         </constraints>
                         <connections>
@@ -137,20 +147,27 @@
                             <outlet property="button6" destination="28E-NM-pCT" id="bgv-RZ-vEb"/>
                             <outlet property="contentView" destination="B5Z-ih-tAD" id="zk0-qN-Goi"/>
                             <outlet property="scrollView" destination="Doh-lM-a4B" id="aU4-OR-VFs"/>
-                            <outlet property="titleLabel" destination="RL9-y0-71P" id="KeW-NM-aGj"/>
                         </connections>
                     </view>
                     <navigationItem key="navigationItem" id="9tx-0k-L9K">
-                        <barButtonItem key="leftBarButtonItem" image="exclamationmark.triangle.fill" catalog="system" id="Eh7-4A-Kqm">
-                            <color key="tintColor" systemColor="systemYellowColor"/>
-                            <connections>
-                                <action selector="errorButtonAction:" destination="GS7-IZ-4uD" id="d2h-RN-d78"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem title="Company" style="plain" id="xuq-K8-rjS">
+                                <color key="tintColor" systemColor="labelColor"/>
+                            </barButtonItem>
+                            <barButtonItem image="exclamationmark.triangle.fill" catalog="system" id="Eh7-4A-Kqm">
+                                <color key="tintColor" systemColor="systemYellowColor"/>
+                                <connections>
+                                    <action selector="errorButtonAction:" destination="GS7-IZ-4uD" id="d2h-RN-d78"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
                     </navigationItem>
                     <connections>
+                        <outlet property="barTitleButton" destination="xuq-K8-rjS" id="55X-Rh-Ac2"/>
                         <outlet property="chart" destination="DMz-IK-SGN" id="oYm-P0-xbE"/>
+                        <outlet property="dcfValuationLabrl" destination="A2B-RG-uHy" id="MpB-NQ-6aa"/>
                         <outlet property="errorButton" destination="Eh7-4A-Kqm" id="8oy-Nu-S0E"/>
+                        <outlet property="r1ValuationLabel" destination="miC-j2-Brw" id="9JR-jq-c4e"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="R1G-6f-cB6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

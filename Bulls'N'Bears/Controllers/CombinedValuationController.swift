@@ -25,7 +25,7 @@ protocol ProgressViewDelegate {
 
 class CombinedValuationController: ValuationHelper {
     
-    weak  var valuationListViewController: ValuationListViewController!
+    weak var valuationListViewController: ValuationListViewController!
     var valuation: Any?
     var webAnalyser: Any?
     var stock: Stock!
@@ -48,10 +48,6 @@ class CombinedValuationController: ValuationHelper {
                     (valuation as? Rule1Valuation)?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
                 }
             }
-// make this optional - InApp purchase
-//            webAnalyser = R1WebAnalyser(stock: self.stock, valuation: self.valuation as! Rule1Valuation, controller: self)
-//            webAnalyser = R1WebDataAnalyser(stock: self.stock, valuation: self.valuation as! Rule1Valuation, controller: self)
-//
         }
         else if valuationMethod == .dcf {
             
@@ -65,8 +61,6 @@ class CombinedValuationController: ValuationHelper {
                     (valuation as? DCFValuation)?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
                 }
             }
-// make this optional - InApp purchase
-//            webAnalyser = DCFWebDataAnalyser(stock: stock, valuation: valuation as! DCFValuation, controller: self)
         }
     }
     
@@ -716,17 +710,17 @@ class CombinedValuationController: ValuationHelper {
             }
 
        case 9:
-            // 'Debt
-            if indexPath.row == 0 { return (nil, nil) }
-            else if valuation.opCashFlow != Double() {
-                if valuation.opCashFlow > 0 {
-                    let proportion = (valuation.debt) / valuation.opCashFlow
-                    return (percentFormatter2Digits.string(from: proportion as NSNumber), nil)
-                }
-            }
-            else {
+            // 'Debt / percent of FCF shown in TextField
+//            if indexPath.row == 0 { return (nil, nil) }
+//            else if valuation.opCashFlow != Double() {
+//                if valuation.opCashFlow > 0 {
+//                    let proportion = (valuation.debt) / valuation.opCashFlow
+//                    return (percentFormatter2Digits.string(from: proportion as NSNumber), nil)
+//                }
+//            }
+//            else {
                 return (nil, nil)
-            }
+//            }
         case 10:
             // 'Insider Stocks'
             if valuation.insiderStocks == 0.0 { return (nil, nil) }

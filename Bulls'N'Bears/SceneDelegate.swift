@@ -44,6 +44,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
 
             let inboxFolder = documentFolder + "/Inbox"
+            
+            var pointer: ObjCBool = true
+            guard FileManager.default.fileExists(atPath: inboxFolder, isDirectory: &pointer) else {
+                return
+            }
                         
             do {
                 let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: inboxFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
@@ -125,6 +130,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
         }
     }
+    */
     
     private func tickerDictionaryPath() -> String? {
 
@@ -152,7 +158,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         return nil
     }
-    */
     
     private func removeFile(atPath: String) {
        

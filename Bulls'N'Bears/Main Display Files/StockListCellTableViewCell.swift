@@ -44,7 +44,7 @@ class StockListCellTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    public func configureCell(indexPath: IndexPath, delegate: StockListCellDelegate, stock: Stock, valuation: DCFValuation?, r1Valuation: Rule1Valuation?) {
+    public func configureCell(indexPath: IndexPath, delegate: StockListCellDelegate, stock: Stock) {
         self.indexPath = indexPath
         self.stock = stock
         self.cellDelegate = delegate
@@ -53,38 +53,44 @@ class StockListCellTableViewCell: UITableViewCell {
         let timeSinceLastStockDate = Date().timeIntervalSince(stock.dailyPrices.last!.tradingDate)
         detail.text = timeFormatter.string(from: timeSinceLastStockDate)
         
-        var buttonTitle: String?
+//        var buttonTitle: String?
         
-        if let validValuation = valuation {
-            if let intrinsicValue = validValuation.returnIValue() {
-                let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber)
-                buttonTitle = "DCF " + iv$!
-            }
-        }
+//        if let validValuation = valuation {
+//            if let intrinsicValue = validValuation.returnIValue() {
+//                buttonTitle = "DCF -NA-"
+//                if intrinsicValue > 0 {
+//                    let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber) ?? "-"
+//                    buttonTitle = "DCF: " + iv$
+//                }
+//            }
+//        }
         
-        var r1Title = String()
-        if let validValuation = r1Valuation {
-            if let stickerPrice = validValuation.stickerPrice() {
-                r1Title = "R1: " + (currencyFormatterNoGapNoPence.string(from: stickerPrice as NSNumber) ?? "--")
-            }
-            if let score = validValuation.moatScore() {
-                if !score.isNaN {
-                    let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
-                    r1Title = r1Title + " (moat: " + n$ + ")"
-                }
-            }
-            if buttonTitle == nil {
-                buttonTitle = r1Title
-            }
-            else {
-                buttonTitle! = buttonTitle! + "\n" + r1Title
-            }
-        }
-        
-        if let validTitle = buttonTitle {
-            valuationButton.setImage(nil, for: .normal)
-            valuationButton.setTitle(validTitle, for: .normal)
-        }
+//        var r1Title = "R1: "
+//        if let validValuation = r1Valuation {
+//            if let stickerPrice = validValuation.stickerPrice() {
+//                if stickerPrice > 0 {
+//                    r1Title += (currencyFormatterNoGapNoPence.string(from: stickerPrice as NSNumber) ?? "--")
+//                }
+//                else { r1Title += "-NA-"}
+//            }
+//            if let score = validValuation.moatScore() {
+//                if !score.isNaN {
+//                    let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
+//                    r1Title = r1Title + " (moat: " + n$ + ")"
+//                }
+//            }
+//            if buttonTitle == nil {
+//                buttonTitle = r1Title
+//            }
+//            else {
+//                buttonTitle! = buttonTitle! + "\n" + r1Title
+//            }
+//        }
+//
+//        if let validTitle = buttonTitle {
+//            valuationButton.setImage(nil, for: .normal)
+//            valuationButton.setTitle(validTitle, for: .normal)
+//        }
 
     }
     

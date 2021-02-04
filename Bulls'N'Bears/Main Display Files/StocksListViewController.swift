@@ -142,9 +142,9 @@ class StocksListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
-        let valuation = CombinedValuationController.returnDCFValuations(company: stocks[indexPath.row].symbol)
-        let r1valuation = CombinedValuationController.returnR1Valuations(company: stocks[indexPath.row].symbol)
-        cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row], valuation: valuation?.first, r1Valuation: r1valuation?.first)
+//        let valuation = CombinedValuationController.returnDCFValuations(company: stocks[indexPath.row].symbol)
+//        let r1valuation = CombinedValuationController.returnR1Valuations(company: stocks[indexPath.row].symbol)
+        cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row])
         return cell
     }
 
@@ -185,6 +185,8 @@ class StocksListViewController: UITableViewController {
     
     func valuationCompleted(indexPath: IndexPath) {
         tableView.reloadRows(at: [indexPath], with: .automatic)
+        tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
     }
     
     @IBAction func downloadAction(_ sender: Any) {
@@ -221,6 +223,7 @@ class StocksListViewController: UITableViewController {
             if let indexPath = tableView.indexPathForSelectedRow {
                 
                 chartView.stockToShow = stocks[indexPath.row]
+                chartView.configure()
 
             }
         }
