@@ -33,6 +33,7 @@
         <attribute name="insiderStockBuys" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="insiderStocks" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="insiderStockSells" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="netIncome" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="opCashFlow" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="opcs" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="revenue" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
@@ -40,6 +41,6 @@
     </entity>
     <elements>
         <element name="DCFValuation" positionX="-63" positionY="-18" width="128" height="284"/>
-        <element name="Rule1Valuation" positionX="-54" positionY="108" width="128" height="284"/>
+        <element name="Rule1Valuation" positionX="-54" positionY="108" width="128" height="299"/>
     </elements>
 </model>

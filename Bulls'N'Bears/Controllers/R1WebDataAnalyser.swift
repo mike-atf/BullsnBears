@@ -17,7 +17,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
     var html$: String?
     var valuation: Rule1Valuation!
     var controller: CombinedValuationController!
-    var webpages = ["financial-statements", "financial-ratios", "balance-sheet", "pe-ratio","analysis", "cash-flow"]
+    var webpages = ["financial-statements", "financial-ratios", "balance-sheet", "pe-ratio","analysis", "cash-flow","insider-transactions"]
     var sectionsComplete = [Bool]()
     var progressDelegate: ProgressViewDelegate?
     
@@ -222,6 +222,9 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         if section == webpages[0] {
             valuation.revenue = extractRowNumbers(keyPhrase: "Revenue", expectedNumbers: 6)
             valuation.eps = extractRowNumbers(keyPhrase: "EPS - Earnings Per Share", expectedNumbers: 6)
+            if let income = extractRowNumbers(keyPhrase: "Net Income", expectedNumbers: 6)?.first {
+                valuation.netIncome = income * pow(10, 3)
+            }
             sectionsComplete[0] = true
             webView.section = webpages[1]
             DispatchQueue.main.async {
@@ -309,15 +312,27 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             sectionsComplete[5] = true
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(completedTasks: 6)
+            }
+            let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[6])")
+            webView.section = webpages[5]
+            sectionsComplete.append(false)
+            downloadYahoo(url: components?.url, for: webpages[6])
+        } else if section == webpages[6] {
+            let rowTitles = ["Purchases</span>","Sales</span>","Total insider shares held</span>"]
+            if let valueDict = extractYahooData(sectionTitle: "Insider purchases - Last 6 months</span>", rowTitles: rowTitles, numbers: 2) {
+                valuation.insiderStockBuys = (valueDict[rowTitles[0]]?.first ?? Double()) ?? Double()
+                valuation.insiderStockSells = (valueDict[rowTitles[1]]?.first  ?? Double()) ?? Double()
+                valuation.insiderStocks = (valueDict[rowTitles[2]]?.first ?? Double()) ?? Double()
+            }
+            sectionsComplete[6] = true
+            DispatchQueue.main.async {
+                self.progressDelegate?.progressUpdate(completedTasks: 7)
                 self.progressDelegate = nil
             }
- 
         }
         
         if !sectionsComplete.contains(false) {
             DispatchQueue.main.async {
-//                self.webView.uiDelegate = nil
-//                self.webView = nil
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil , userInfo: nil)
             }
         }
@@ -456,6 +471,76 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         }
         return valueArray
     }
+    
+    func extractYahooData(sectionTitle: String, rowTitles: [String], numbers: Int) -> [String: [Double?]]? {
+
+        let rowTerminal = sectionTitle.contains("Insider purchases") ? "</td></tr>" : "</div></div>"
+        let labelTerminal = "</td>"
+        let labelStart = ">"
+            
+        var webpage$ = String(html$ ?? "")
+        
+        guard let revenueSection = webpage$.range(of: sectionTitle) else {
+            return nil
+        }
+        webpage$ = String(webpage$.suffix(from: revenueSection.upperBound))
+        var valueDict = [String : [Double?]]()
+        
+        for rowTitle in rowTitles {
+            
+            var section$ = webpage$
+            
+            guard let titleIndex = webpage$.range(of: rowTitle) else {
+                return nil
+            }
+
+            guard let rowEndIndex = section$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<section$.endIndex, locale: nil) else {
+                return nil
+            }
+            section$ = String(section$[titleIndex.upperBound..<rowEndIndex.lowerBound])
+
+            var valueArray = [Double]()
+            for _ in 0..<numbers {
+                guard let labelStartIndex = section$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                    continue
+                }
+                let value$ = section$[labelStartIndex.upperBound...]
+
+                var value = Double()
+                if let v = Double(value$.filter("-0123456789.".contains)) {
+                    if value$.last == "%" {
+                        value = v / 100.0
+                    }
+                    else if case value$.first = Character("(") {
+                        value = v * -1
+                    } else if value$.uppercased().last == "T" {
+                        value = v * pow(10.0, 12) // should be 12 but values are entered as '000
+                    } else if value$.uppercased().last == "B" {
+                        value = v * pow(10.0, 9) // should be 9 but values are entered as '000
+                    }
+                    else if value$.uppercased().last == "M" {
+                        value = v * pow(10.0, 6) // should be 6 but values are entered as '000
+                    }
+                    else if value$.uppercased().last == "K" {
+                        value = v * pow(10.0, 3) // should be 6 but values are entered as '000
+                    } else {
+                        value = v
+                    }
+                }
+                valueArray.append(value)
+                
+                guard let labelEndIndex = section$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                    continue
+                }
+                section$.removeSubrange(labelEndIndex.lowerBound...)
+
+            }
+            valueDict[rowTitle] = valueArray.reversed()
+        }
+                        
+        return valueDict
+    }
+
     
     func downloadYahoo(url: URL?, for section: String) {
         

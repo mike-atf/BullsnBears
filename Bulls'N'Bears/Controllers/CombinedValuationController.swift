@@ -165,7 +165,7 @@ class CombinedValuationController: ValuationHelper {
             subtitles = ["General","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "values entered will be converted to negative","Details > Analysis > Revenue estimate", "", ""]
         } else
         if method == .rule1 {
-            subtitles = ["Creation date","1. Book Value per Share", "2. Earnings per Share", "3. Sales/ Revenue", "4. OP. Free Cash Flow Per Share", "5. Return on Invested Capital", "min and max last 5-10 years", "Analysts min and max predictions","Adjust predicted growth rates", "", "", "Between 0 - 10"]
+            subtitles = ["Creation date","1. Book Value per Share", "2. Earnings per Share", "3. Sales/ Revenue", "4. OP. Free Cash Flow Per Share", "5. Return on Invested Capital", "min and max last 5-10 years", "Analysts min and max predictions","Adjust predicted growth rates", "", "last 6 months", "Between 0 - 10"]
         }
         
         return subtitles
@@ -711,16 +711,16 @@ class CombinedValuationController: ValuationHelper {
 
        case 9:
             // 'Debt / percent of FCF shown in TextField
-//            if indexPath.row == 0 { return (nil, nil) }
-//            else if valuation.opCashFlow != Double() {
-//                if valuation.opCashFlow > 0 {
-//                    let proportion = (valuation.debt) / valuation.opCashFlow
-//                    return (percentFormatter2Digits.string(from: proportion as NSNumber), nil)
-//                }
-//            }
-//            else {
+            if indexPath.row == 0 { return (nil, nil) }
+            else if valuation.insiderStocks != Double() {
+                if valuation.netIncome > 0 {
+                    let proportion = (valuation.debt) / valuation.netIncome
+                    return (percentFormatter0Digits.string(from: proportion as NSNumber), nil)
+                }
+            }
+            else {
                 return (nil, nil)
-//            }
+            }
         case 10:
             // 'Insider Stocks'
             if valuation.insiderStocks == 0.0 { return (nil, nil) }
@@ -875,7 +875,7 @@ class CombinedValuationController: ValuationHelper {
         let hxPERTitles = ["past PER min" , "past PER max"]
         let growthPredTitles = ["Pred. sales growth min", "Pred. sales growth min"]
         let adjGrowthPredTitles = ["Adj. sales growth min", "Adj. sales growth max"]
-        let debtRowTitles = ["Long term debt", "Debt / FCF"]
+        let debtRowTitles = ["Long term debt", "Debt / income"]
         let insideTradingRowTitles = ["Total insider shares", "Inside share buys", "Inside Share sells"]
         let ceoRatingRowTitle = ["CEO rating"]
 
@@ -1057,10 +1057,10 @@ class CombinedValuationController: ValuationHelper {
     
     internal func debtProportion() -> Double? {
         
-        if let validFCF = (valuation as? Rule1Valuation)?.opCashFlow {
-            if validFCF > 0 {
+        if let validNI = (valuation as? Rule1Valuation)?.netIncome {
+            if validNI > 0 {
                 if let validDebt = (valuation as? Rule1Valuation)?.debt {
-                    return validDebt / validFCF
+                    return validDebt / validNI
                 }
             }
         }

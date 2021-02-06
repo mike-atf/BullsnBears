@@ -42,6 +42,7 @@ public class Rule1Valuation: NSManagedObject {
         ceoRating = Double()
         adjGrowthEstimates = [Double]()
         opCashFlow = Double()
+        netIncome = Double()
         adjFuturePE = Double()
         
     }

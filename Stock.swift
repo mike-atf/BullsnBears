@@ -207,7 +207,8 @@ struct Stock {
     /// find lowest/ highest price in the first half and a second in the second half, with the lowest/ highest resulting ! incline !
     public func lowHighTrend(properties: TrendProperties) -> StockTrend? {
         
-        let lastDate = dailyPrices.last!.tradingDate
+        
+        let lastDate = dailyPrices[dailyPrices.count - 6].tradingDate // exclude last five days to show breakthroughs
         let firstDate = dailyPrices.first!.tradingDate
         
         var trendDuration = lastDate.timeIntervalSince(firstDate)
@@ -227,25 +228,51 @@ struct Stock {
         
         let startDate = lastDate.addingTimeInterval(-trendDuration)
         let halfDate = lastDate.addingTimeInterval(-trendDuration / 2)
+        let threeQDate = lastDate.addingTimeInterval(-trendDuration * 1/4)
         
-        let dailyPricesInFirstHalf = dailyPrices.filter { (pricePoint) -> Bool in
+//        let dailyPricesInFirstHalf = dailyPrices.filter { (pricePoint) -> Bool in
+//            if pricePoint.tradingDate < startDate { return false }
+//            else if pricePoint.tradingDate > halfDate { return false }
+//            else { return true }
+//        }
+        
+        let dailyPricesInFirst3Q = dailyPrices.filter { (pricePoint) -> Bool in
             if pricePoint.tradingDate < startDate { return false }
-            else if pricePoint.tradingDate > halfDate { return false }
+            else if pricePoint.tradingDate > threeQDate { return false }
             else { return true }
         }
+
         
-        let dailyPricesInSecondHalf = dailyPrices.filter { (pricePoint) -> Bool in
-            if pricePoint.tradingDate < halfDate { return false }
-            else { return true }
+//        let dailyPricesInSecondHalf = dailyPrices.filter { (pricePoint) -> Bool in
+//            if pricePoint.tradingDate < halfDate { return false }
+//            else if pricePoint.tradingDate < lastDate { return true } // exclude last five days to show breakthroughs
+//                else { return false }
+//        }
+        
+        let dailyPricesInLastQ = dailyPrices.filter { (pricePoint) -> Bool in
+            if pricePoint.tradingDate < threeQDate { return false }
+            else if pricePoint.tradingDate < lastDate { return true } // exclude last five days to show breakthroughs
+                else { return false }
         }
+
+
         
-        guard  dailyPricesInFirstHalf.count > 1 else {
+//        guard  dailyPricesInFirstHalf.count > 1 else {
+//            return nil
+//        }
+//
+//        guard  dailyPricesInSecondHalf.count > 1 else {
+//            return nil
+//        }
+        
+        guard  dailyPricesInFirst3Q.count > 1 else {
             return nil
         }
         
-        guard  dailyPricesInSecondHalf.count > 1 else {
+        guard  dailyPricesInLastQ.count > 1 else {
             return nil
         }
+
 
         var priceOption: PricePointOptions!
         var findOption: FindOptions!
@@ -263,7 +290,7 @@ struct Stock {
         var firstPricePoint: PricePoint!
         var secondPricePoint: PricePoint!
         
-        for pricePoint in dailyPricesInFirstHalf {
+        for pricePoint in dailyPricesInFirst3Q {
             if findOption == .minimum {
                 if pricePoint.returnPrice(option: priceOption) < minOrMax {
                     minOrMax = pricePoint.returnPrice(option: priceOption)
@@ -281,7 +308,7 @@ struct Stock {
         
         minOrMax = (findOption == .minimum) ? 1000000.0 : -1000000.0
         
-        for pricePoint in dailyPricesInSecondHalf {
+        for pricePoint in dailyPricesInLastQ {
             
             let incline = pricePoint.returnIncline(pricePoint: firstPricePoint, priceOption: priceOption)
             
@@ -304,7 +331,7 @@ struct Stock {
         // for maxium = green trend check whether two point tredn of maxima in two half has a lower incline
         // if so, use this
         if findOption == .maximum {
-            let sorted = dailyPricesInSecondHalf.sorted { (pp1, pp2) -> Bool in
+            let sorted = dailyPricesInLastQ.sorted { (pp1, pp2) -> Bool in
                 if pp1.returnPrice(option: priceOption) > pp2.returnPrice(option: priceOption) { return true }
                 else { return false }
             }
