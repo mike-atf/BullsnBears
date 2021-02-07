@@ -17,6 +17,7 @@ class DCFWebDataAnalyser {
     var sectionsComplete = [Bool]()
     var progressDelegate: ProgressViewDelegate?
     var completedDownLoadTasks = 0
+    var yahooSession: URLSessionDataTask?
     
     init(stock: Stock, valuation: DCFValuation, controller: CombinedValuationController, pDelegate: ProgressViewDelegate) {
         self.stock = stock
@@ -36,9 +37,7 @@ class DCFWebDataAnalyser {
     private func startDCFDataSearch() {
         
         var components: URLComponents?
-        
-        progressDelegate?.progressTasks(tasks: yahooPages.count)
-        
+                
         for section in yahooPages {
             sectionsComplete.append(false)
             components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(section)")
@@ -98,7 +97,7 @@ class DCFWebDataAnalyser {
         }
         
         DispatchQueue.main.async {
-            self.progressDelegate?.progressUpdate(completedTasks: self.completedDownLoadTasks)
+            self.progressDelegate?.progressUpdate(allTasks: self.yahooPages.count, completedTasks: self.completedDownLoadTasks)
         }
         
         if !sectionsComplete.contains(false) {
@@ -402,7 +401,7 @@ class DCFWebDataAnalyser {
             return
         }
         
-        let dataTask = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
+        yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a download error occurred")
@@ -423,6 +422,6 @@ class DCFWebDataAnalyser {
             
            NotificationCenter.default.post(name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: section , userInfo: nil)
         }
-        dataTask.resume()
+        yahooSession?.resume()
     }
 }

@@ -10,7 +10,7 @@ import UIKit
 class ValuationSummaryTVC: UITableViewController {
 
     var sectionHeaderTitles = ["Valuation Summary", "Resulting Sticker price"]
-    var sectionHeaderSubTitles = ["Adjust estimate future growth and PE ratio if necessary", ""]
+    var sectionHeaderSubTitles = ["Adjust numbers if necessary", "(non-editable)"]
     var sectionsRowTitles = [["Future growth", "Future PE ratio"],["Sticker price"]]
     var r1Valuation: Rule1Valuation!
     var indexPath: IndexPath!
@@ -66,8 +66,7 @@ class ValuationSummaryTVC: UITableViewController {
     
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if section == 0 { return 70 }
-        else { return 50 }
+        return 70
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -81,7 +80,7 @@ class ValuationSummaryTVC: UITableViewController {
         header.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: height)
         
         let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 22 : 20
-        let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 18 : 14
+        let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 16 : 12
         
         let titleLabel: UILabel = {
             let label = UILabel()

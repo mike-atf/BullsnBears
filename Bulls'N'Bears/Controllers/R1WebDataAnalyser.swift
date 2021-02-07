@@ -20,6 +20,8 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
     var webpages = ["financial-statements", "financial-ratios", "balance-sheet", "pe-ratio","analysis", "cash-flow","insider-transactions"]
     var sectionsComplete = [Bool]()
     var progressDelegate: ProgressViewDelegate?
+    var request: URLRequest!
+    var yahooSession: URLSessionDataTask?
     
     var macroTrendCookies: [HTTPCookie]? = {
         
@@ -88,7 +90,6 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
 
     func loadView(url: URL? = nil) {
         
-        var request: URLRequest!
         
         if let validURL = url {
             request = URLRequest(url: validURL)
@@ -133,7 +134,6 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
 
             }
         }
-        progressDelegate?.progressTasks(tasks: webpages.count)
         webView.load(request)
         sectionsComplete.append(false)
     }
@@ -228,7 +228,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             sectionsComplete[0] = true
             webView.section = webpages[1]
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(completedTasks: 1)
+                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count, completedTasks: 1)
             }
             loadView()
         }
@@ -243,31 +243,10 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             sectionsComplete[1] = true
             webView.section = webpages[2]
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(completedTasks: 2)
+                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count, completedTasks: 2)
             }
             loadView()
         }
-//        else if section == webpages[2] {
-//            if let oCF = extractRowNumbers(keyPhrase: "Cash Flow From Operating Activities", expectedNumbers: 6) {
-//                if let capEx = extractRowNumbers(keyPhrase: "Cash Flow From Investing Activities", expectedNumbers: 6) {
-//                    var i = 0
-//                    var fCF = [Double]()
-//                    for element in oCF {
-//                        fCF.append(element - capEx[i])
-//                        i += 1
-//                    }
-//                    valuation.oFCF = fCF
-//                    sectionsComplete[2] = true
-//                }
-//            }
-//            webView.section = webpages[3]
-//            DispatchQueue.main.async {
-//                print("download 3 complete")
-//                self.progressDelegate.progressUpdate(completedTasks: 3)
-//            }
-//
-//            loadView()
-//        }
         else if section == webpages[2] {
             if let ltDebt = extractRowNumbers(keyPhrase: "Long Term Debt", expectedNumbers: 6)?.first {
                 valuation.debt = ltDebt * 1000
@@ -275,7 +254,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             sectionsComplete[2] = true
             webView.section = webpages[3]
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(completedTasks: 3)
+                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 3)
             }
             loadView()
         }
@@ -289,7 +268,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             webView.section = webpages[4]
             sectionsComplete.append(false)
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(completedTasks: 4)
+                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 4)
             }
             downloadYahoo(url: components?.url, for: webpages[4])
         }
@@ -299,7 +278,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
             sectionsComplete[4] = true
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(completedTasks: 5)
+                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 5)
             }
             let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[5])")
             webView.section = webpages[5]
@@ -311,7 +290,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
             sectionsComplete[5] = true
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(completedTasks: 6)
+                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 6)
             }
             let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[6])")
             webView.section = webpages[5]
@@ -326,7 +305,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
             sectionsComplete[6] = true
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(completedTasks: 7)
+                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 7)
                 self.progressDelegate = nil
             }
         }
@@ -549,7 +528,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             return
         }
         
-        let dataTask = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
+        yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a download error occurred")
@@ -570,7 +549,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             
            NotificationCenter.default.post(name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: section , userInfo: nil)
         }
-        dataTask.resume()
+        yahooSession?.resume()
     }
 
 

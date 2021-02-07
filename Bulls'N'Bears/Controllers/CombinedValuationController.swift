@@ -18,10 +18,6 @@ protocol ValuationHelper {
     func saveValuation() -> [String]?
 }
 
-protocol ProgressViewDelegate {
-    func progressTasks(tasks:Int)
-    func progressUpdate(completedTasks: Int)    
-}
 
 class CombinedValuationController: ValuationHelper {
     
@@ -301,6 +297,26 @@ class CombinedValuationController: ValuationHelper {
             webAnalyser = DCFWebDataAnalyser(stock: stock, valuation: valuation as! DCFValuation, controller: self, pDelegate: self.valuationListViewController)
         }
         
+    }
+    
+    public func stopDownload() {
+        NotificationCenter.default.removeObserver(webAnalyser as Any)
+        
+        if let analyser = webAnalyser as? R1WebDataAnalyser {
+            analyser.webView.stopLoading()
+            analyser.yahooSession?.cancel()
+            analyser.progressDelegate = nil
+            analyser.request = nil
+            analyser.yahooSession = nil
+            analyser.webView = nil
+        }
+        else if let analyser = webAnalyser as? DCFWebDataAnalyser {
+            analyser.yahooSession?.cancel()
+            analyser.yahooSession = nil
+            analyser.progressDelegate = nil
+        }
+        
+        webAnalyser = nil
     }
     
     internal func convertUserEntryDCF(_ value: Double, indexPath: IndexPath) {

@@ -23,7 +23,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="value" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="9xb-P1-5p6">
-                        <rect key="frame" x="211" y="36.5" width="199" height="34"/>
+                        <rect key="frame" x="291" y="36.5" width="199" height="34"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="9xb-P1-5p6" secondAttribute="height" multiplier="199:34" id="d8z-PT-UL8"/>
                         </constraints>
@@ -34,34 +34,21 @@
                             <action selector="textWasChanged" destination="KGk-i7-Jjw" eventType="editingChanged" id="XAS-tm-10E"/>
                         </connections>
                     </textField>
-                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="luH-hG-TRr">
-                        <rect key="frame" x="465" y="44.5" width="20" height="19"/>
-                        <state key="normal" backgroundImage="info.circle" catalog="system"/>
-                        <connections>
-                            <action selector="infoAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="IRo-Y3-1j7"/>
-                        </connections>
-                    </button>
                 </subviews>
                 <constraints>
+                    <constraint firstAttribute="trailing" secondItem="9xb-P1-5p6" secondAttribute="trailing" constant="10" id="29N-R9-Ik7"/>
                     <constraint firstItem="9xb-P1-5p6" firstAttribute="firstBaseline" secondItem="lg8-2H-Z36" secondAttribute="firstBaseline" id="M6L-pg-MKz"/>
                     <constraint firstItem="lg8-2H-Z36" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="Opt-6F-Xpk"/>
-                    <constraint firstItem="luH-hG-TRr" firstAttribute="leading" secondItem="9xb-P1-5p6" secondAttribute="trailing" constant="55" id="V8Z-nr-hON"/>
-                    <constraint firstItem="luH-hG-TRr" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="WFp-v4-Amx"/>
-                    <constraint firstAttribute="trailing" secondItem="luH-hG-TRr" secondAttribute="trailing" constant="15" id="g0d-cp-9tB"/>
                     <constraint firstItem="lg8-2H-Z36" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" symbolic="YES" id="kyP-VH-eqV"/>
                     <constraint firstItem="9xb-P1-5p6" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="lg8-2H-Z36" secondAttribute="trailing" constant="10" id="wjj-6S-JVx"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
-                <outlet property="infoButton" destination="luH-hG-TRr" id="cnT-QJ-eJT"/>
                 <outlet property="textField" destination="9xb-P1-5p6" id="8jg-Hv-bUf"/>
                 <outlet property="titleLabel" destination="lg8-2H-Z36" id="xpA-dh-Mtw"/>
             </connections>
             <point key="canvasLocation" x="194.20289855072465" y="101.11607142857143"/>
         </tableViewCell>
     </objects>
-    <resources>
-        <image name="info.circle" catalog="system" width="128" height="121"/>
-    </resources>
 </document>

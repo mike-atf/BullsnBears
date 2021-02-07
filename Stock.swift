@@ -227,7 +227,7 @@ struct Stock {
         }
         
         let startDate = lastDate.addingTimeInterval(-trendDuration)
-        let halfDate = lastDate.addingTimeInterval(-trendDuration / 2)
+//        let halfDate = lastDate.addingTimeInterval(-trendDuration / 2)
         let threeQDate = lastDate.addingTimeInterval(-trendDuration * 1/4)
         
 //        let dailyPricesInFirstHalf = dailyPrices.filter { (pricePoint) -> Bool in

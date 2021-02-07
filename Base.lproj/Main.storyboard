@@ -207,17 +207,17 @@
         <!--Valuation SummaryTVC-->
         <scene sceneID="Hr3-s8-nxS">
             <objects>
-                <tableViewController storyboardIdentifier="ValuationSummaryTVC" id="MYg-Pm-fIO" customClass="ValuationSummaryTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="ValuationSummaryTVC" modalPresentationStyle="formSheet" id="MYg-Pm-fIO" customClass="ValuationSummaryTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="tn8-ZK-c0l">
-                        <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
+                        <rect key="frame" x="0.0" y="0.0" width="500" height="330"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valuationSummaryCell" rowHeight="50" id="Y8f-CK-70c" customClass="ValuationSummaryCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="20" y="55.5" width="1140" height="50"/>
+                                <rect key="frame" x="20" y="55.5" width="460" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Y8f-CK-70c" id="z2q-yM-EwP">
-                                    <rect key="frame" x="0.0" y="0.0" width="1140" height="50"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="460" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -227,11 +227,13 @@
                             <outlet property="delegate" destination="MYg-Pm-fIO" id="e2v-jF-m6l"/>
                         </connections>
                     </tableView>
-                    <value key="contentSizeForViewInPopover" type="size" width="200" height="300"/>
+                    <value key="contentSizeForViewInPopover" type="size" width="500" height="350"/>
+                    <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="500" height="350"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YC4-L9-hCb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="888" y="2521"/>
+            <point key="canvasLocation" x="1394" y="1726"/>
         </scene>
         <!--Stock List-->
         <scene sceneID="gJ5-Jm-dY6">
@@ -543,7 +545,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gdc-Dz-99x" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1303" y="1194"/>
+            <point key="canvasLocation" x="1394" y="1186"/>
         </scene>
         <!--Stock Symbol Entry-->
         <scene sceneID="Pxl-Ka-Cgz">

@@ -20,8 +20,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
     var valuationController: CombinedValuationController!
     weak var helper: CombinedValuationController!
-    var progressView: UIProgressView?
-    var downloadTasks: Int?
+    var progressView: DownloadProgressView?
     
     var showDownloadCompleteMessage = false // used because asking alertConotrller to show message in 'dataUpdated' right after reloadData causes 'table view or one of its superviews has not been added to a window' error, assuming that reloading rows still takes place while the alertView is in front. so instead show this when the viewDidLayouSubviews, using this bool
     
@@ -57,7 +56,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
                 message = "Check the numbers, and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nSave after adjusting, using the blue button at the bottom!"
             } else {
                 title = "Stock valuation data downloaded successfully from MacroTrends and Yahoo"
-                message = "Check the numbers and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nMSave after adjusting, using the blue button at the bottom!"
+                message = "Check the numbers and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nSave after adjusting, using the blue button at the bottom!"
             }
             AlertController.shared().showDialog(title: title, alertMessage: message, viewController: self)
             showDownloadCompleteMessage = false
@@ -111,7 +110,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         header.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: height)
         
         let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 22 : 20
-        let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 18 : 14
+        let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 16 : 12
         
         let titleLabel: UILabel = {
             let label = UILabel()
@@ -227,18 +226,35 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     func downloadValuationData(_ button: UIButton) {
         
         button.isEnabled = false
-        progressView = UIProgressView()
-        progressView?.progress = 0.0
-        progressView?.translatesAutoresizingMaskIntoConstraints = false
         
+        progressView = DownloadProgressView.instanceFromNib()
+//        progressView?.backgroundColor = UIColor.systemBackground
+        progressView?.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(progressView!)
         
         let margins = view.layoutMarginsGuide
 
         progressView?.widthAnchor.constraint(equalTo: margins.widthAnchor, multiplier: 0.8).isActive = true
         progressView?.centerXAnchor.constraint(equalTo: margins.centerXAnchor).isActive = true
-        progressView?.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.01).isActive = true
+        progressView?.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.2).isActive = true
         progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+
+        progressView?.delegate = self
+        progressView?.title.text = "Trying public data acquisition..."
+        
+        // OLD
+//        progressView = UIProgressView()
+//        progressView?.progress = 0.0
+//        progressView?.translatesAutoresizingMaskIntoConstraints = false
+//
+//        self.view.addSubview(progressView!)
+//
+//        let margins = view.layoutMarginsGuide
+//
+//        progressView?.widthAnchor.constraint(equalTo: margins.widthAnchor, multiplier: 0.8).isActive = true
+//        progressView?.centerXAnchor.constraint(equalTo: margins.centerXAnchor).isActive = true
+//        progressView?.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.01).isActive = true
+//        progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
         
         helper.startDataDownload()
         
@@ -275,22 +291,24 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         }
         showDownloadCompleteMessage = true
     }
-
 }
 
 
 extension ValuationListViewController: ProgressViewDelegate {
     
-    func progressTasks(tasks: Int) {
-        downloadTasks = tasks
+    func cancelRequested() {
+        downloadComplete()
+        helper.stopDownload()
+    }
+        
+    func progressUpdate(allTasks: Int, completedTasks: Int) {
+        self.progressView?.updateProgress(tasks: allTasks, completed: completedTasks)
     }
     
-    func progressUpdate(completedTasks: Int) {
-            self.progressView?.setProgress(Float(completedTasks) / Float(self.downloadTasks ?? 1), animated: true)
-            if completedTasks >= self.downloadTasks ?? 1 {
-                self.progressView?.removeFromSuperview()
-                self.downloadTasks = nil
-            }
+    func downloadComplete() {
+        self.progressView?.delegate = nil
+        progressView?.removeFromSuperview()
+        progressView = nil
     }
     
     

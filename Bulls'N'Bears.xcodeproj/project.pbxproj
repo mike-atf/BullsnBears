@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EA06251325D079310015FA6E /* DownloadProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA06251225D079310015FA6E /* DownloadProgressView.xib */; };
+		EA06251425D079310015FA6E /* DownloadProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA06251225D079310015FA6E /* DownloadProgressView.xib */; };
+		EA06251525D079310015FA6E /* DownloadProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA06251225D079310015FA6E /* DownloadProgressView.xib */; };
+		EA06251A25D07A230015FA6E /* DownloadProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA06251925D07A230015FA6E /* DownloadProgressView.swift */; };
+		EA06251B25D07A230015FA6E /* DownloadProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA06251925D07A230015FA6E /* DownloadProgressView.swift */; };
+		EA06251C25D07A230015FA6E /* DownloadProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA06251925D07A230015FA6E /* DownloadProgressView.swift */; };
 		EA163F77258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA163F78258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA163F79258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
@@ -129,6 +135,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EA06251225D079310015FA6E /* DownloadProgressView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DownloadProgressView.xib; sourceTree = SOURCE_ROOT; };
+		EA06251925D07A230015FA6E /* DownloadProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadProgressView.swift; sourceTree = "<group>"; };
 		EA163F76258BA85E000974AB /* StockTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockTrend.swift; sourceTree = "<group>"; };
 		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = R1WebDataAnalyser.swift; sourceTree = "<group>"; };
@@ -270,6 +278,8 @@
 		EAED148325A8CED20073C46F /* Bulls'N'Bears */ = {
 			isa = PBXGroup;
 			children = (
+				EA06251225D079310015FA6E /* DownloadProgressView.xib */,
+				EA06251925D07A230015FA6E /* DownloadProgressView.swift */,
 				EAC9B7D725B730FA00E5D7B0 /* StockSymbolEntry.swift */,
 				EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */,
 				EAC07D6525ACEE350045D83B /* ErrorListVC.swift */,
@@ -441,6 +451,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAFCB98B25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */,
+				EA06251325D079310015FA6E /* DownloadProgressView.xib in Resources */,
 				EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */,
 				EAEA758C25ACF53F008EEC05 /* ErrorLogListCell.xib in Resources */,
 				EAC19056257641180030B331 /* Assets.xcassets in Resources */,
@@ -461,6 +472,7 @@
 				EAFCB96025C5F0240029AA4F /* MTCookies in Resources */,
 				EA7B613A25C412860018BA02 /* StockTickerDictionary.csv in Resources */,
 				EAC2FC5425A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
+				EA06251425D079310015FA6E /* DownloadProgressView.xib in Resources */,
 				EAC2FC7525A23FFC0060F387 /* ValuationTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -474,6 +486,7 @@
 				EAFCB96125C5F0240029AA4F /* MTCookies in Resources */,
 				EA7B613B25C412860018BA02 /* StockTickerDictionary.csv in Resources */,
 				EAC2FC5525A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
+				EA06251525D079310015FA6E /* DownloadProgressView.xib in Resources */,
 				EAC2FC7625A23FFC0060F387 /* ValuationTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -534,6 +547,7 @@
 				EAC2FC3F25A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
 				EAC2FC3C25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */,
 				EAC07B6F25B8950E00B6C898 /* DCFWebDataAnalyser.swift in Sources */,
+				EA06251A25D07A230015FA6E /* DownloadProgressView.swift in Sources */,
 				EAC2FC7B25A240290060F387 /* ValuationListViewController.swift in Sources */,
 				EAC190B3257661F60030B331 /* MasterSplitView.swift in Sources */,
 				EAC190CB257663730030B331 /* Stock.swift in Sources */,
@@ -552,6 +566,7 @@
 				EAFCB98925C9A4DE0029AA4F /* ValuationSummaryCell.swift in Sources */,
 				EAC190BB257662930030B331 /* StocksListViewController.swift in Sources */,
 				EAC190F52577E3B60030B331 /* ChartView.swift in Sources */,
+				EA06251B25D07A230015FA6E /* DownloadProgressView.swift in Sources */,
 				EAC190EB2577E2E20030B331 /* ChartContainerView.swift in Sources */,
 				EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */,
 				EAC190CC257663730030B331 /* Stock.swift in Sources */,
@@ -582,6 +597,7 @@
 				EAFCB98A25C9A4DE0029AA4F /* ValuationSummaryCell.swift in Sources */,
 				EAC190BC257662930030B331 /* StocksListViewController.swift in Sources */,
 				EAC190F62577E3B60030B331 /* ChartView.swift in Sources */,
+				EA06251C25D07A230015FA6E /* DownloadProgressView.swift in Sources */,
 				EAC190EC2577E2E20030B331 /* ChartContainerView.swift in Sources */,
 				EAC190CD257663730030B331 /* Stock.swift in Sources */,
 				EAC190D72576731B0030B331 /* StockChartVC.swift in Sources */,

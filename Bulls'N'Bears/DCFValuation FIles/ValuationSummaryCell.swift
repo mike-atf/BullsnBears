@@ -15,7 +15,6 @@ class ValuationSummaryCell: UITableViewCell, UITextFieldDelegate {
 
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var textField: UITextField!
-    @IBOutlet var infoButton: UIButton!
     
     var indexPath: IndexPath!
     var cellDelegate: ValSummaryCellDelegate?
@@ -49,10 +48,13 @@ class ValuationSummaryCell: UITableViewCell, UITextFieldDelegate {
         if let valid = value {
             if format == .percent {
                 self.textField.placeholder = percentFormatter0Digits.string(from: valid as NSNumber)
+                self.textField.text = percentFormatter0Digits.string(from: valid as NSNumber)
             } else if format == .currency {
                 self.textField.placeholder = currencyFormatterGapWithPence.string(from: valid as NSNumber)
+//                self.textField.text = currencyFormatterGapWithPence.string(from: valid as NSNumber)
             } else {
                 self.textField.placeholder = numberFormatterWith1Digit.string(from: valid as NSNumber)
+                self.textField.text = numberFormatterWith1Digit.string(from: valid as NSNumber)
             }
         }
         else {
@@ -65,10 +67,6 @@ class ValuationSummaryCell: UITableViewCell, UITextFieldDelegate {
         else {
             textField.isEnabled = true
         }
-    }
-    
-    @IBAction func infoAction(_ sender: Any) {
-        
     }
     
     @IBAction func textEntryComplete(_ sender: UITextField) {
