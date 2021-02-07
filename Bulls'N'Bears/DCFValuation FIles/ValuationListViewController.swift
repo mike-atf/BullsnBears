@@ -284,11 +284,24 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     }
     
     @objc
-    func dataUpdated() {
+    func dataUpdated(_ notifcation: Notification) {
                 
         if (sectionTitles?.count ?? 0) > 0 {
             tableView.reloadData()
         }
+        
+        if let errorList = notifcation.object as? [String] {
+            
+            if errorList.count > 0 {
+                var message = errorList.first!
+                for error in errorList {
+                    message += "\n " + error
+                }
+                AlertController.shared().showDialog(title: "Some data search errors occurred", alertMessage: message, viewController: self)
+                return
+            }
+        }
+        
         showDownloadCompleteMessage = true
     }
 }

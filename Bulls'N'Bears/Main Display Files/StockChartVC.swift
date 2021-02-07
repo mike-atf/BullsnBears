@@ -70,7 +70,7 @@ class StockChartVC: UIViewController {
                     dcfValuationLabrl.text = "DCF value: " + iv$
                 }
                 else {
-                    dcfValuationLabrl.text = "DCF value: neagtive"
+                    dcfValuationLabrl.text = "DCF value: negative"
                 }
             }
         }

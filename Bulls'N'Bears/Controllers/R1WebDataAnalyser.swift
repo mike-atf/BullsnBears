@@ -22,6 +22,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
     var progressDelegate: ProgressViewDelegate?
     var request: URLRequest!
     var yahooSession: URLSessionDataTask?
+    var downloadErrors = [String]()
     
     var macroTrendCookies: [HTTPCookie]? = {
         
@@ -312,7 +313,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         
         if !sectionsComplete.contains(false) {
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil , userInfo: nil)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: self.downloadErrors , userInfo: nil)
             }
         }
 
@@ -329,10 +330,12 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         
         // 1 Remove leading and trailing parts of the html code
         guard sectionHTML$ != nil else {
+            downloadErrors.append("Downloaded empty webpage")
             return nil
         }
         
         guard let titleIndex = sectionHTML$!.range(of: rowTitleSearch$) else {
+            downloadErrors.append("Did not find section \(keyPhrase) on MT website")
             return nil
         }
 
@@ -340,6 +343,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         rowEndIndex = sectionHTML$!.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<sectionHTML$!.endIndex, locale: nil) ?? sectionHTML$!.range(of: tableTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<sectionHTML$!.endIndex, locale: nil)
         
         guard rowEndIndex != nil else {
+            downloadErrors.append("Did not find end of a row in section \(keyPhrase) on MT website")
             return nil
         }
         sectionHTML$ = String(sectionHTML$![titleIndex.upperBound..<rowEndIndex!.lowerBound])
@@ -348,12 +352,14 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         var valueArray = [Double]()
         for _ in 0..<expectedNumbers {
             guard let labelStartIndex = sectionHTML$!.range(of: numberStart, options: .backwards, range: nil, locale: nil) else {
+                downloadErrors.append("Did not find number start in \(keyPhrase) on MT website")
                 continue
             }
             let value$ = sectionHTML$![labelStartIndex.upperBound...]
             valueArray.append(Double(value$.filter("-0123456789.".contains)) ?? Double())
             
             guard let labelEndIndex = sectionHTML$!.range(of: numberTerminal, options: .backwards, range: nil, locale: nil) else {
+                downloadErrors.append("Did not find number end in \(keyPhrase) on MT website")
                 continue
             }
             sectionHTML$!.removeSubrange(labelEndIndex.lowerBound...)
@@ -371,12 +377,14 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         var sectionHTML$ = String(html$ ?? "")
         
         guard let titleIndex = sectionHTML$.range(of: tableHeader) else {
+            downloadErrors.append("Did not find section \(keyPhrase) on MT website")
             return nil
         }
 
         let tableEndIndex = sectionHTML$.range(of: tableTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<sectionHTML$.endIndex, locale: nil)
         
         guard tableEndIndex != nil else {
+            downloadErrors.append("Did not find table end in section \(keyPhrase) on MT website")
             return nil
         }
         sectionHTML$ = String(sectionHTML$[titleIndex.upperBound..<tableEndIndex!.lowerBound])
@@ -397,6 +405,9 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 sectionHTML$.removeSubrange(rowEndIndex!.lowerBound...)
                 count += 1
             }
+            else {
+                downloadErrors.append("Did not find row end in section \(keyPhrase) on MT website")
+            }
         }  while rowEndIndex != nil
         
         return valueArray
@@ -411,15 +422,18 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         var webpage$ = String(html$ ?? "")
         
         guard let revenueSection = webpage$.range(of: sectionTitle) else {
+            downloadErrors.append("Did not find section \(sectionTitle) on MT website")
             return nil
         }
         webpage$ = String(webpage$.suffix(from: revenueSection.upperBound))
                         
         guard let titleIndex = webpage$.range(of: rowTitle) else {
+            downloadErrors.append("Did not find title \(rowTitle) in section \(sectionTitle) on MT website")
             return nil
         }
 
         guard let rowEndIndex = webpage$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<webpage$.endIndex, locale: nil) else {
+            downloadErrors.append("Did not find row end for title \(rowTitle) in section \(sectionTitle) on MT website")
             return nil
         }
         webpage$ = String(webpage$[titleIndex.upperBound..<rowEndIndex.lowerBound])
@@ -427,6 +441,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         var valueArray = [Double]()
         for _ in 0..<numbers {
             guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                downloadErrors.append("Did not find number start in \(sectionTitle) on MT website")
                 continue
             }
             let value$ = webpage$[labelStartIndex.upperBound...]
@@ -443,6 +458,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             valueArray.append(value)
             
             guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                downloadErrors.append("Did not find number end in \(sectionTitle) on MT website")
                 continue
             }
             webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -460,6 +476,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         var webpage$ = String(html$ ?? "")
         
         guard let revenueSection = webpage$.range(of: sectionTitle) else {
+            downloadErrors.append("Did not find section \(sectionTitle) on YahooFin")
             return nil
         }
         webpage$ = String(webpage$.suffix(from: revenueSection.upperBound))
@@ -470,10 +487,12 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             var section$ = webpage$
             
             guard let titleIndex = webpage$.range(of: rowTitle) else {
+                downloadErrors.append("Did not find row \(rowTitle) in section \(sectionTitle) on YahooFin")
                 return nil
             }
 
             guard let rowEndIndex = section$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<section$.endIndex, locale: nil) else {
+                downloadErrors.append("Did not find row end of \(rowTitle) in section \(sectionTitle) on YahooFin")
                 return nil
             }
             section$ = String(section$[titleIndex.upperBound..<rowEndIndex.lowerBound])
@@ -481,6 +500,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             var valueArray = [Double]()
             for _ in 0..<numbers {
                 guard let labelStartIndex = section$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                    downloadErrors.append("Did not find number start in \(sectionTitle) on MT website")
                     continue
                 }
                 let value$ = section$[labelStartIndex.upperBound...]
@@ -509,6 +529,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 valueArray.append(value)
                 
                 guard let labelEndIndex = section$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                    downloadErrors.append("Did not find number end in \(sectionTitle) on MT website")
                     continue
                 }
                 section$.removeSubrange(labelEndIndex.lowerBound...)
@@ -524,24 +545,27 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
     func downloadYahoo(url: URL?, for section: String) {
         
         guard let validURL = url else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "DCF valuation data download failed due to optional only url request")
+            downloadErrors.append("DCF valuation data download failed. No website address")
             return
         }
         
         yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a download error occurred")
+//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a download error occurred")
+                self.downloadErrors.append("Download error \(error!.localizedDescription) occurred")
                 return
             }
             
             guard urlResponse != nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a download url response problem occurred: \(urlResponse!)")
+//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a download url response problem occurred: \(urlResponse!)")
+                self.downloadErrors.append("Download error \(urlResponse!) occurred")
                 return
             }
             
             guard let validData = data else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a DCF valuation download data problem occurred")
+//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a DCF valuation download data problem occurred")
+                self.downloadErrors.append("Download error occurred: invalid website data")
                 return
             }
 
@@ -550,6 +574,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
            NotificationCenter.default.post(name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: section , userInfo: nil)
         }
         yahooSession?.resume()
+
     }
 
 

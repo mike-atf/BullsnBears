@@ -18,6 +18,7 @@ class DCFWebDataAnalyser {
     var progressDelegate: ProgressViewDelegate?
     var completedDownLoadTasks = 0
     var yahooSession: URLSessionDataTask?
+    var downloadErrors = [String]()
     
     init(stock: Stock, valuation: DCFValuation, controller: CombinedValuationController, pDelegate: ProgressViewDelegate) {
         self.stock = stock
@@ -50,12 +51,14 @@ class DCFWebDataAnalyser {
     func downloadCompleted(notification: Notification) {
                         
         guard let validWebCode = html$ else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
+//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
+            downloadErrors.append("download complete, html string is empty")
             return
         }
         
         guard let section = notification.object as? String else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete - notification did not contain section info!!")
+//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete - notification did not contain section info!!")
+            downloadErrors.append("download complete - notification did not contain section info!!")
             return
         }
         
@@ -104,7 +107,7 @@ class DCFWebDataAnalyser {
             DispatchQueue.main.async {
                 self.completedDownLoadTasks = 0
                 self.progressDelegate = nil
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil , userInfo: nil)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: self.downloadErrors, userInfo: nil)
             }
         }
         
@@ -121,20 +124,24 @@ class DCFWebDataAnalyser {
             var webpage$ = String(validWebCode)
                             
             guard let index1 = webpage$.range(of: search$) else {
+                downloadErrors.append("can't find \(search$) on webpage")
                 continue
             }
 
             guard let index3 = webpage$.range(of: "</tr>",options: [NSString.CompareOptions.literal], range: index1.upperBound..<webpage$.endIndex, locale: nil) else {
+                downloadErrors.append("can't find row in \(search$) on webpage")
                 continue
             }
             
             webpage$ = String(webpage$[index1.upperBound..<index3.lowerBound])
             guard let index4 = webpage$.range(of: "</td>", options: .backwards, range: nil, locale: nil) else {
+                downloadErrors.append("can't find rown end in \(search$) on webpage")
                 continue
             }
             webpage$.removeSubrange(index4.lowerBound...)
 
             guard let index5 = webpage$.range(of: ">", options: .backwards, range: nil, locale: nil) else {
+                downloadErrors.append("can't find nu ber start in \(search$) on webpage")
                 continue
             }
             
@@ -163,15 +170,6 @@ class DCFWebDataAnalyser {
             }
             keyStatValues[count] = value
             
-// temp - remove
-//            do {
-//                let plainText = try NSAttributedString(data: search$.data(using: .utf8) ?? Data(), options: [NSAttributedString.DocumentReadingOptionKey.documentType : NSAttributedString.DocumentType.html], documentAttributes: nil)
-//                print("\(plainText.string) = \(currencyFormatterGapWithOptionalPence.string(from: value as NSNumber) ?? "-")")
-//
-//            } catch let error {
-//                print(error)
-//            }
-// temp - remove
         }
         return keyStatValues
     }
@@ -192,10 +190,12 @@ class DCFWebDataAnalyser {
             var webpage$ = String(validWebCode)
                             
             guard let titleIndex = webpage$.range(of: search$) else {
+                downloadErrors.append("can't find \(search$) on webpage")
                 continue
             }
 
             guard let rowEndIndex = webpage$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<webpage$.endIndex, locale: nil) else {
+                downloadErrors.append("can't find end of row in \(search$) on webpage")
                 continue
             }
             webpage$ = String(webpage$[titleIndex.upperBound..<rowEndIndex.lowerBound])
@@ -206,12 +206,14 @@ class DCFWebDataAnalyser {
                     valueArray.append(Double())
 
                     guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                        downloadErrors.append("can't find start of number in \(search$) on webpage")
                         continue
                     }
                     let value$ = webpage$[labelStartIndex.upperBound...]
                     valueArray[i] = Double(value$.filter("-0123456789.".contains)) ?? Double()
                     
                     guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                        downloadErrors.append("can't find end of number in \(search$) on webpage")
                         continue
                     }
                     webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -223,12 +225,14 @@ class DCFWebDataAnalyser {
                 for _ in 0..<4 {
 
                     guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                        downloadErrors.append("can't find start of number in \(search$) on webpage")
                         continue
                     }
                     let value$ = webpage$[labelStartIndex.upperBound...]
                     incomeValues[search$] = [Double(value$.filter("-0123456789.".contains)) ?? Double()]
                     
                     guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                        downloadErrors.append("can't find end of number in \(search$) on webpage")
                         continue
                     }
                     webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -253,10 +257,12 @@ class DCFWebDataAnalyser {
             debtValues[search$] = [0.0] // use default 0, assuming that if no current or long-term is listed this means 0 debt
                             
             guard let titleIndex = webpage$.range(of: search$) else {
+                downloadErrors.append("can't find \(search$) on webpage")
                 continue
             }
 
             guard let rowEndIndex = webpage$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<webpage$.endIndex, locale: nil) else {
+                downloadErrors.append("can't find row end for \(search$) on webpage")
                 continue
             }
             webpage$ = String(webpage$[titleIndex.upperBound..<rowEndIndex.lowerBound])
@@ -264,22 +270,21 @@ class DCFWebDataAnalyser {
             for _ in 0..<4 {
 
                 guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                    downloadErrors.append("can't find number start in \(search$) on webpage")
                     continue
                 }
                 let value$ = webpage$[labelStartIndex.upperBound...]
                 debtValues[search$] = [Double(value$.filter("-0123456789.".contains)) ?? 0.0] // use 0.0 here as "-" is used for 'no debt'
                 
                 guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                    downloadErrors.append("can't find number end in \(search$) on webpage")
                     continue
                 }
                 webpage$.removeSubrange(labelEndIndex.lowerBound...)
             }
-
-
         }
         
         return debtValues
-
     }
     
     func cashFlow(_ validWebCode: String) -> [String:[Double]] {
@@ -295,10 +300,12 @@ class DCFWebDataAnalyser {
             var webpage$ = String(validWebCode)
                             
             guard let titleIndex = webpage$.range(of: search$) else {
+                downloadErrors.append("can't find \(search$) on webpage")
                 continue
             }
 
             guard let rowEndIndex = webpage$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<webpage$.endIndex, locale: nil) else {
+                downloadErrors.append("can't find row end in \(search$) on webpage")
                 continue
             }
             webpage$ = String(webpage$[titleIndex.upperBound..<rowEndIndex.lowerBound])
@@ -308,12 +315,14 @@ class DCFWebDataAnalyser {
                 valueArray.append(Double())
 
                 guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                    downloadErrors.append("can't find start of number in \(search$) on webpage")
                     continue
                 }
                 let value$ = webpage$[labelStartIndex.upperBound...]
                 valueArray[i] = Double(value$.filter("-0123456789.".contains)) ?? Double()
                 
                 guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                    downloadErrors.append("can't find end of number in \(search$) on webpage")
                     continue
                 }
                 webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -338,15 +347,18 @@ class DCFWebDataAnalyser {
             var webpage$ = String(validWebCode)
             
             guard let revenueSection = webpage$.range(of: ">Revenue estimate</span>") else {
+                downloadErrors.append("can't find 'Revenue estimate' on webpage")
                 continue
             }
             webpage$ = String(webpage$.suffix(from: revenueSection.upperBound))
                             
             guard let titleIndex = webpage$.range(of: search$) else {
+                downloadErrors.append("can't find \(search$) on webpage")
                 continue
             }
 
             guard let rowEndIndex = webpage$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<webpage$.endIndex, locale: nil) else {
+                downloadErrors.append("can't find row end in \(search$) on webpage")
                 continue
             }
             webpage$ = String(webpage$[titleIndex.upperBound..<rowEndIndex.lowerBound])
@@ -354,6 +366,7 @@ class DCFWebDataAnalyser {
             var valueArray = [Double]()
             for _ in 0..<2 {
                 guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
+                    downloadErrors.append("can't find number start in \(search$) on webpage")
                     continue
                 }
                 let value$ = webpage$[labelStartIndex.upperBound...]
@@ -381,6 +394,7 @@ class DCFWebDataAnalyser {
                 valueArray.append(value)
                 
                 guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
+                    downloadErrors.append("can't find number end in \(search$) on webpage")
                     continue
                 }
                 webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -397,24 +411,28 @@ class DCFWebDataAnalyser {
     func download(url: URL?, for section: String) {
         
         guard let validURL = url else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "DCF valuation data download failed due to optional only url request")
+//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "DCF valuation data download failed due to optional only url request")
+            downloadErrors.append("Download failed - empty url")
             return
         }
         
         yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a download error occurred")
+//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a download error occurred")
+                self.downloadErrors.append("Download error \(error!.localizedDescription)")
                 return
             }
             
             guard urlResponse != nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a download url response problme occurred: \(urlResponse!)")
+//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a download url response problme occurred: \(urlResponse!)")
+                self.downloadErrors.append("Download failed - \(urlResponse!)")
                 return
             }
             
             guard let validData = data else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a DCF valuation download data problem occurred")
+//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a DCF valuation download data problem occurred")
+                self.downloadErrors.append("Download failed - data error")
                 return
             }
 
