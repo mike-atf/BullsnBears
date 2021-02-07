@@ -189,7 +189,7 @@ class ChartView: UIView {
             currentPriceLine.move(to: startPoint)
             currentPriceLine.addLine(to: endPoint)
             
-            UIColor.white.setStroke()
+            UIColor.label.setStroke()
             currentPriceLine.stroke()
   
 // DCF Label

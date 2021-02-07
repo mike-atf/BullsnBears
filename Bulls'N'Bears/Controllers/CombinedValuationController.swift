@@ -239,25 +239,52 @@ class CombinedValuationController: ValuationHelper {
         
         if let valuation = self.valuation as? DCFValuation  {
             // check alignment of profit = net income and fcf
+            var alerts:[String]?
             
             valuation.save()
+            
+            for income in valuation.netIncome ?? [] {
+                if income < 0 {
+                    alerts = [String]()
+                    alerts?.append("Non-profitable at some point in the last 3 years.")
+                }
+            }
+            
             if let fcf_netIncome_correlation = stock.getCorrelation(xArray: (valuation.netIncome?.compactMap{ $0 } ?? []), yArray: (valuation.tFCFo?.compactMap{ $0 } ?? []))?.coEfficient {
                 let correlation$ = numberFormatterDecimals.string(from: fcf_netIncome_correlation as NSNumber) ?? ""
             
                 if abs(fcf_netIncome_correlation) < 0.75 {
-                    return ["Poor alignment","The trends of free cash flow and net income are not well aligned (the correlation co-efficient is \(correlation$)"]
+                    if alerts == nil {
+                        alerts = [String]()
+                    }
+                    alerts?.append("Free cash flow and net income are not well aligned (correlation: \(correlation$))")
                 }
             }
+            return alerts
         }
         else if let valuation = self.valuation as? Rule1Valuation  {
             valuation.save()
+            
+            var alerts:[String]?
+
 
             if let moatCount = r1MoatParameterCount() {
                 if moatCount < 25 {
-                    
-                    return ["Limited number of moat parameters", "You entered only \(moatCount) of 50 possible moat values.\nThe resulting moat score and sticker price may not be very reliable"]
+                    if alerts == nil {
+                        alerts = [String]()
+                    }
+                    alerts?.append("There are \(moatCount)/ 50 possible moat values.\nThe moat score and sticker price may not be very reliable")
                 }
             }
+            
+            if (valuation.debtProportion() ?? 0) > 0.3 {
+                alerts?.append("High long-term debt!")
+            }
+            
+            if (valuation.insiderSalesProportion() ?? 0) > 0.1 {
+                alerts?.append("More than 10% of insider stocks sold in last 6 months!")
+            }
+            return alerts
         }
         return nil
     }
@@ -715,7 +742,8 @@ class CombinedValuationController: ValuationHelper {
             else if valuation.insiderStocks != Double() {
                 if valuation.netIncome > 0 {
                     let proportion = (valuation.debt) / valuation.netIncome
-                    return (percentFormatter0Digits.string(from: proportion as NSNumber), nil)
+                    let color = proportion > 3.0 ? UIColor(named: "Red") : UIColor(named: "Green")
+                    return (percentFormatter0Digits.string(from: proportion as NSNumber), color)
                 }
             }
             else {
@@ -724,6 +752,7 @@ class CombinedValuationController: ValuationHelper {
         case 10:
             // 'Insider Stocks'
             if valuation.insiderStocks == 0.0 { return (nil, nil) }
+            
             if indexPath.row == 0 {
                 return (nil, nil)
 
@@ -748,8 +777,6 @@ class CombinedValuationController: ValuationHelper {
         }
         
         return (nil, nil)
-
-
     }
         
     internal func dcfRowTitles() -> [[String]] {
@@ -1047,25 +1074,12 @@ class CombinedValuationController: ValuationHelper {
         
         let prediction = averageGrowthPrediction()
         let section9 = [valuation.adjGrowthEstimates?.first ?? prediction, valuation.adjGrowthEstimates?.last ?? prediction]
-        let section10 = [valuation.debt, debtProportion()]
+        let section10 = [valuation.debt, valuation.debtProportion()]
         let section11 = [valuation.insiderStocks, valuation.insiderStockBuys, valuation.insiderStockSells]
         let section12 = [valuation.ceoRating]
 
         return [section1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11, section12]
 
-    }
-    
-    internal func debtProportion() -> Double? {
-        
-        if let validNI = (valuation as? Rule1Valuation)?.netIncome {
-            if validNI > 0 {
-                if let validDebt = (valuation as? Rule1Valuation)?.debt {
-                    return validDebt / validNI
-                }
-            }
-        }
-            
-        return nil
     }
     
     internal func averageGrowthPrediction() -> Double? {

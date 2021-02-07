@@ -54,10 +54,10 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
             var message = String()
             if valuationMethod == .dcf {
                 title = "Stock valuation data downloaded successfully from Yahoo"
-                message = "It's recommended to check data and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nMake sure to save after adjusting, using the blue button at the bottom!"
+                message = "Check the numbers, and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nSave after adjusting, using the blue button at the bottom!"
             } else {
                 title = "Stock valuation data downloaded successfully from MacroTrends and Yahoo"
-                message = "It's recommended to check data and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nMake sure to save after adjusting, using the blue button at the bottom!"
+                message = "Check the numbers and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nMSave after adjusting, using the blue button at the bottom!"
             }
             AlertController.shared().showDialog(title: title, alertMessage: message, viewController: self)
             showDownloadCompleteMessage = false
@@ -187,7 +187,11 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     func saveValuation() {
         
         if let alerts = helper.saveValuation() {
-            AlertController.shared().showDialog(title: alerts.first! , alertMessage: alerts.last!, viewController: self ,delegate: self)
+            var message = alerts.first!
+            for i in 1..<alerts.count {
+                message = message + "\n\n" + alerts[i]
+            }
+            AlertController.shared().showDialog(title: "Caution" , alertMessage: message, viewController: self ,delegate: self)
         } else {
             // important - these will otherwise stay in memory
             if let analyser = self.valuationController.webAnalyser {

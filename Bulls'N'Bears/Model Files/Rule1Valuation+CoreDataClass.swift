@@ -119,6 +119,31 @@ public class Rule1Valuation: NSManagedObject {
         return endValue * (1 / pow(1+growth, years))
     }
     
+    func debtProportion() -> Double? {
+        
+        if netIncome != Double() {
+            if netIncome > 0 {
+                if debt != Double() {
+                    return debt / netIncome
+                }
+            }
+        }
+            
+        return nil
+    }
+    
+    func insiderSalesProportion() -> Double? {
+        
+        if insiderStocks != Double() {
+            if insiderStockSells != Double() {
+                return (insiderStockSells) / insiderStocks
+            }
+        }
+        return nil
+    }
+
+
+    
     /// 0-1
     func moatScore() -> Double? {
         
