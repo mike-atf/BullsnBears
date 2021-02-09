@@ -304,7 +304,10 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
            
             result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Revenue estimate</span>", rowTitle: ">Sales growth (year/est)</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>")
             downloadErrors.append(contentsOf: result.errors)
-            if let growth = result.array {
+            let a1 = result.array?.dropFirst()
+            let a2 = a1?.dropFirst()
+            
+            if let growth = a2 {
                 valuation.growthEstimates = [growth.min()!, growth.max()!]
             }
 

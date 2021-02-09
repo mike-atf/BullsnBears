@@ -761,6 +761,9 @@ class CombinedValuationController: ValuationHelper {
                     let color = proportion > 3.0 ? UIColor(named: "Red") : UIColor(named: "Green")
                     return (percentFormatter0Digits.string(from: proportion as NSNumber), color)
                 }
+                else {
+                    return ("neg inc.", UIColor(named: "Red")!)
+                }
             }
             else {
                 return (nil, nil)
