@@ -1102,7 +1102,7 @@ class CombinedValuationController: ValuationHelper {
         
         if let valuation = self.valuation as? DCFValuation {
             
-            guard valuation.tRevenueActual?.count ?? 0 > 1 && valuation.revGrowthPredAdj?.count ?? 0 > 0 else {
+            guard valuation.tRevenueActual?.count ?? 0 > 1 && valuation.revGrowthPred?.count ?? 0 > 0 else {
                 return nil
             }
             

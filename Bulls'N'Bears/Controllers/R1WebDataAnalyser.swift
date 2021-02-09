@@ -81,16 +81,17 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
 
         NotificationCenter.default.addObserver(self, selector: #selector(downloadCompleted(_:)), name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: nil)
     
-        webView.section = webpages.first!
-        loadView()
+        for _ in webpages {
+            sectionsComplete.append(false)
+        }
+        loadView(section: webpages.first!)
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
 
-    func loadView(url: URL? = nil) {
-        
+    func loadView(url: URL? = nil, section: String) {
         
         if let validURL = url {
             request = URLRequest(url: validURL)
@@ -98,7 +99,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         else {
             var components: URLComponents?
                         
-            components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(stock.symbol)/\(hyphenatedShortName!.lowercased())/" + webView.section)
+            components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(stock.symbol)/\(hyphenatedShortName!.lowercased())/" + section)
             
             if let validURL = components?.url {
                 request = URLRequest(url: validURL)
@@ -135,8 +136,9 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
 
             }
         }
+        webView.section = section
         webView.load(request)
-        sectionsComplete.append(false)
+//        sectionsComplete.append(false)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -222,11 +224,6 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         
         var result:(array: [Double]?, errors: [String])
         if section == webpages[0] {
-//            valuation.revenue = extractRowNumbers(keyPhrase: "Revenue", expectedNumbers: 6)
-//            valuation.eps = extractRowNumbers(keyPhrase: "EPS - Earnings Per Share", expectedNumbers: 6)
-//            if let income = extractRowNumbers(keyPhrase: "Net Income", expectedNumbers: 6)?.first {
-//                valuation.netIncome = income * pow(10, 3)
-//            }
             
             result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "Revenue")
             downloadErrors.append(contentsOf: result.errors)
@@ -243,20 +240,12 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
             
             sectionsComplete[0] = true
-            webView.section = webpages[1]
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count, completedTasks: 1)
             }
-            loadView()
+            loadView(section: webpages[1])
         }
         else if section == webpages[1] {
-//            var roicPct = [Double]()
-//            for number in extractRowNumbers(keyPhrase: "ROI - Return On Investment", expectedNumbers: 6) ?? [] {
-//                roicPct.append(number/100)
-//            }
-//            valuation.roic = roicPct
-//            valuation.bvps = extractRowNumbers(keyPhrase: "Book Value Per Share", expectedNumbers: 6)
-//            valuation.opcs = extractRowNumbers(keyPhrase: "Operating Cash Flow Per Share", expectedNumbers: 6)
             
             result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "ROI - Return On Investment")
             downloadErrors.append(contentsOf: result.errors)
@@ -275,16 +264,12 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             valuation.opcs = result.array
 
             sectionsComplete[1] = true
-            webView.section = webpages[2]
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count, completedTasks: 2)
             }
-            loadView()
+            loadView(section: webpages[2])
         }
         else if section == webpages[2] {
-//            if let ltDebt = extractRowNumbers(keyPhrase: "Long Term Debt", expectedNumbers: 6)?.first {
-//                valuation.debt = ltDebt * 1000
-//            }
             
             result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
             downloadErrors.append(contentsOf: result.errors)
@@ -293,17 +278,12 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
 
             sectionsComplete[2] = true
-            webView.section = webpages[3]
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 3)
             }
-            loadView()
+            loadView(section: webpages[3])
         }
         else if section == webpages[3] {
-//            if let pastPERatios = extractColumnNumbers(keyPhrase: "PE Ratio Historical Data</th>")?.sorted() {
-//                let withoutExtremes = pastPERatios.excludeQuintiles()
-//                valuation.hxPE = [withoutExtremes.min()!, withoutExtremes.max()!]
-//            }
             
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
             downloadErrors.append(contentsOf: result.errors)
@@ -315,17 +295,13 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             sectionsComplete[3] = true
             let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[4])")
             webView.section = webpages[4]
-            sectionsComplete.append(false)
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 4)
             }
             downloadYahoo(url: components?.url, for: webpages[4])
         }
         else if section == webpages[4] {
-//            if let growth = extractAnalysis(sectionTitle: ">Revenue estimate</span>", rowTitle: ">Sales growth (year/est)</span>", numbers: 2) {
-//                valuation.growthEstimates = [growth.min()!, growth.max()!]
-//            }
-            
+           
             result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Revenue estimate</span>", rowTitle: ">Sales growth (year/est)</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>")
             downloadErrors.append(contentsOf: result.errors)
             if let growth = result.array {
@@ -338,12 +314,8 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
             let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[5])")
             webView.section = webpages[5]
-            sectionsComplete.append(false)
             downloadYahoo(url: components?.url, for: webpages[5])
         } else if section == webpages[5] {
-//            if let growth = extractAnalysis(sectionTitle: ">Cash flow</span>", rowTitle: ">Operating cash flow</span>", numbers: 5)?.first {
-//                valuation.opCashFlow = growth
-//            }
 
             result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Cash flow</span>", rowTitle: ">Operating cash flow</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>")
             downloadErrors.append(contentsOf: result.errors)
@@ -355,16 +327,9 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
             let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[6])")
             webView.section = webpages[5]
-            sectionsComplete.append(false)
             downloadYahoo(url: components?.url, for: webpages[6])
         } else if section == webpages[6] {
             let rowTitles = ["Purchases</span>","Sales</span>","Total insider shares held</span>"]
-            
-//            if let valueDict = extractYahooData(sectionTitle: "Insider purchases - Last 6 months</span>", rowTitles: rowTitles, numbers: 2) {
-//                valuation.insiderStockBuys = (valueDict[rowTitles[0]]?.first ?? Double()) ?? Double()
-//                valuation.insiderStockSells = (valueDict[rowTitles[1]]?.first  ?? Double()) ?? Double()
-//                valuation.insiderStocks = (valueDict[rowTitles[2]]?.first ?? Double()) ?? Double()
-//            }
             
             for rtitle in rowTitles {
                 result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Insider purchases - Last 6 months</span>", rowTitle: rtitle, rowTerminal: "</td></tr>", numberTerminal: "</td>")
@@ -395,6 +360,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
 
     }
     
+    /*
     func extractRowNumbers(keyPhrase: String, expectedNumbers: Int) -> [Double]? {
         
         let rowTitleSearch$ = ">" + keyPhrase + "</a></div></div>"
@@ -616,7 +582,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                         
         return valueDict
     }
-
+    */
     
     func downloadYahoo(url: URL?, for section: String) {
         
@@ -628,19 +594,16 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
-//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a download error occurred")
                 self.downloadErrors.append("Download error \(error!.localizedDescription) occurred")
                 return
             }
             
             guard urlResponse != nil else {
-//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a download url response problem occurred: \(urlResponse!)")
                 self.downloadErrors.append("Download error \(urlResponse!) occurred")
                 return
             }
             
             guard let validData = data else {
-//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a DCF valuation download data problem occurred")
                 self.downloadErrors.append("Download error occurred: invalid website data")
                 return
             }
@@ -650,8 +613,5 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
            NotificationCenter.default.post(name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: section , userInfo: nil)
         }
         yahooSession?.resume()
-
     }
-
-
 }

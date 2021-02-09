@@ -26,7 +26,7 @@ class DCFWebDataAnalyser {
         self.controller = controller
         self.progressDelegate = pDelegate
         
-        startDCFDataSearch()
+        startDCFDataSearch(section: yahooPages.first!)
         
         NotificationCenter.default.addObserver(self, selector: #selector(downloadCompleted(notification:)), name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: nil)
     }
@@ -35,29 +35,25 @@ class DCFWebDataAnalyser {
         NotificationCenter.default.removeObserver(self)
     }
     
-    private func startDCFDataSearch() {
+    private func startDCFDataSearch(section: String) {
         
         var components: URLComponents?
                 
-        for section in yahooPages {
-            sectionsComplete.append(false)
-            components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(section)")
-            components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
-            download(url: components?.url, for: section)
-        }
+        sectionsComplete.append(false)
+        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(section)")
+        components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
+        download(url: components?.url, for: section)
     }
     
     @objc
     func downloadCompleted(notification: Notification) {
                         
         guard let validWebCode = html$ else {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
             downloadErrors.append("download complete, html string is empty")
             return
         }
         
         guard let section = notification.object as? String else {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete - notification did not contain section info!!")
             downloadErrors.append("download complete - notification did not contain section info!!")
             return
         }
@@ -66,103 +62,114 @@ class DCFWebDataAnalyser {
         
         var result:(array: [Double]?, errors: [String])
         if section == yahooPages.first! {
-//            let stats = keyStats(validWebCode)
-//            valuation.beta = stats[1]
-//            valuation.marketCap = stats[0]
-//            valuation.sharesOutstanding = stats[2]
+// Key stats
             
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Market cap (intra-day)</span>" , rowTerminal: "</tr>", numberTerminal: "</td>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Market cap (intra-day)</span>" , rowTerminal: "</tr>", numberTerminal: "</td>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.marketCap = result.array?.first ?? Double()
             
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Beta (5Y monthly)</span>" , rowTerminal: "</tr>", numberTerminal: "</td>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Beta (5Y monthly)</span>" , rowTerminal: "</tr>", numberTerminal: "</td>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.beta = result.array?.first ?? Double()
             
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Shares outstanding</span>" , rowTerminal: "</tr>", numberTerminal: "</td>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Shares outstanding</span>" , rowTerminal: "</tr>", numberTerminal: "</td>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.sharesOutstanding = result.array?.first ?? Double()
 
             sectionsComplete[0] = true
+            startDCFDataSearch(section: yahooPages[1])
         }
         else if section == yahooPages[1] {
-//            let stats = incomeStats(validWebCode)
-//            valuation.tRevenueActual = stats[">Total revenue</span>"]
-//            valuation.netIncome = stats[">Net income</span>"]
-//            valuation.expenseInterest = stats[">Interest expense</span>"]?.first ?? Double()
-//            valuation.incomePreTax = stats[">Income before tax</span>"]?.first ?? Double()
-//            valuation.expenseIncomeTax = stats[">Income tax expense</span>"]?.first ?? Double()
-            
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Total revenue</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+// Income
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Total revenue</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.tRevenueActual = Array(result.array?.dropFirst() ?? []) // remove TTM column
 
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Net income</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Net income</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.netIncome = Array(result.array?.dropFirst() ?? [])
 
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Interest expense</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Interest expense</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.expenseInterest = result.array?.first ?? Double()
             
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Income before tax</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Income before tax</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.incomePreTax = result.array?.first ?? Double()
 
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Income tax expense</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Income tax expense</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.expenseIncomeTax = result.array?.first ?? Double()
 
             sectionsComplete[1] = true
+            startDCFDataSearch(section: yahooPages[2])
         }
         else if section == yahooPages[2] {
-//            let stats = balanceSheet(validWebCode)
-//            valuation.debtST = stats[">Current debt</span>"]?.first ?? Double()
-//            valuation.debtLT = stats[">Long-term debt</span>"]?.first ?? Double()
+// Balance sheet
             
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Current debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Current debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.debtST = result.array?.first ?? Double()
 
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Long-term debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Long-term debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
-            valuation.debtLT = result.array?.first ?? Double()
+            if result.errors.count > 0 {
+                
+                var components = URLComponents(string: "https://finance.yahoo.com/quote/\(stock.symbol)/\(section)")
+                components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
+                download(url: components?.url, for: "Yahoo LT Debt")
+            }
+            else {
+                valuation.debtLT = result.array?.first ?? Double()
+                sectionsComplete[2] = true            }
 
-            sectionsComplete[2] = true
+            startDCFDataSearch(section: yahooPages[3])
         }
         else if section == yahooPages[3] {
-//            let stats = cashFlow(validWebCode)
-//            valuation.tFCFo = stats[">Operating cash flow</span>"]
-//            valuation.capExpend = stats[">Capital expenditure</span>"]
+// Cash flow
             
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Operating cash flow</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Operating cash flow</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.tFCFo = Array(result.array?.dropFirst() ?? [])
             
-            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Capital expenditure</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Capital expenditure</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.capExpend = Array(result.array?.dropFirst() ?? [])
 
             sectionsComplete[3] = true
+            startDCFDataSearch(section: yahooPages[4])
         }
         else if section == yahooPages[4] {
-            let stats = analysis(validWebCode)
-            valuation.tRevenuePred = stats[">Avg. Estimate</span>"] ?? [Double]()
-            valuation.revGrowthPred = stats[">Sales growth (year/est)</span>"]
+// Analysis
             
-            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Revenue estimate</span>" ,rowTitle: ">Avg. Estimate</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, sectionHeader: "Revenue estimate</span>" ,rowTitle: ">Avg. Estimate</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             let a1 = result.array?.dropFirst()
             let a2 = a1?.dropFirst()
             valuation.tRevenuePred = Array(a2 ?? [])
 
-            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Revenue estimate</span>" , rowTitle: ">Sales growth (year/est)</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>")
+            result = WebpageScraper.scrapeRow(html$: validWebCode, sectionHeader: "Revenue estimate</span>" , rowTitle: ">Sales growth (year/est)</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             let b1 = result.array?.dropFirst()
             let b2 = b1?.dropFirst()
             valuation.revGrowthPred = Array(b2 ?? [])
 
             sectionsComplete[4] = true
+        }
+        else if section == "Yahoo LT Debt" {
+            
+            // extra if 'Long-term debt not included in Financial > balance sheet
+            // use 'Total debt' instead
+            result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Total Debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.debtLT = result.array?.first ?? Double()
+            sectionsComplete[2] = true
+            
+            
+            downloadErrors = downloadErrors.filter({ (error) -> Bool in
+                if error.contains("Long-term debt") { return false }
+                else { return true }
+            })
         }
         
         DispatchQueue.main.async {
@@ -179,6 +186,7 @@ class DCFWebDataAnalyser {
         
     }
     
+    /*
     func keyStats(_ validWebCode: String) -> [Double] {
         
         var keyStatValues = [Double]()
@@ -472,12 +480,12 @@ class DCFWebDataAnalyser {
         
         return predictionValues
     }
+    */
     
     // Download
     func download(url: URL?, for section: String) {
         
         guard let validURL = url else {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "DCF valuation data download failed due to optional only url request")
             downloadErrors.append("Download failed - empty url")
             return
         }
@@ -485,19 +493,16 @@ class DCFWebDataAnalyser {
         yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
-//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a download error occurred")
                 self.downloadErrors.append("Download error \(error!.localizedDescription)")
                 return
             }
             
             guard urlResponse != nil else {
-//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a download url response problme occurred: \(urlResponse!)")
                 self.downloadErrors.append("Download failed - \(urlResponse!)")
                 return
             }
             
             guard let validData = data else {
-//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a DCF valuation download data problem occurred")
                 self.downloadErrors.append("Download failed - data error")
                 return
             }

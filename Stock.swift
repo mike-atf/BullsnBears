@@ -62,41 +62,6 @@ struct Stock {
         return nil
     }
     
-    /*
-    public func findMajorTrends(priceOption: PricePointOptions, findOption: FindOptions, changeThreshold: Double) -> [StockTrend] {
-    
-        let microTrends = findTrends(priceOption: priceOption, findOption: findOption)
-        var macroTrends = [StockTrend]()
-        
-        
-        var previous = microTrends.first!
-        var startTrendDate = microTrends.first!.startDate
-        var startTrendPrice = microTrends.first!.startPrice
-        for i in 1..<microTrends.count {
-            let current = microTrends[i]
-            
-            if abs(current.incline!) * changeThreshold > abs(previous.incline!) {
-                let newTrend = StockTrend(start: startTrendDate, end: current.endDate, startPrice: startTrendPrice, endPrice: current.endPrice!)
-                macroTrends.append(newTrend)
-                startTrendDate = current.startDate
-                startTrendPrice = current.startPrice!
-            }
-            
-            previous = current
-        }
-        var lastTrend = macroTrends.last!
-        macroTrends.removeLast()
-        lastTrend.endPrice = dailyPrices.last!.returnPrice(option: priceOption)
-        lastTrend.endDate = dailyPrices.last!.tradingDate
-        let trend = StockTrend(start: lastTrend.startDate, end: lastTrend.endDate, startPrice: lastTrend.startPrice, endPrice: lastTrend.endPrice)
-
-        macroTrends.append(trend)
-        return macroTrends
-    
-    }
-    */
-    
-    
     public func longerTrend(_ properties: TrendProperties) -> StockTrend? {
         
         guard let initialTrend = lowHighTrend(properties: properties) else { return nil }
@@ -158,49 +123,6 @@ struct Stock {
         }
         
         return newTrend
-
-        
-// find the [dailyPrice] element of the initial Trend start
-//        var periodStartDate = initialTrend.startDate.addingTimeInterval(-trendDuration)
-//        while periodStartDate >= dailyPrices.first!.tradingDate {
-//
-//            guard let startIndex = findDailyPricesIndexFromDate(periodStartDate) else { return newTrend }
-//            guard let endIndex = findDailyPricesIndexFromDate(periodStartDate.addingTimeInterval(trendDuration)) else { return newTrend }
-//
-//            let pricesInRange = dailyPrices[startIndex..<endIndex]
-//
-//            let sortedPricesInRange = pricesInRange.sorted { (d0, d1) -> Bool in
-//                if findOption == .minimum {
-//                    if d0.returnPrice(option: priceOption) < d1.returnPrice(option: priceOption) { return true }
-//                    else { return false }
-//                }
-//                else {
-//                    if d0.returnPrice(option: priceOption) > d1.returnPrice(option: priceOption) { return true }
-//                    else { return false }
-//                }
-//            }
-//
-//            guard let lowHighPricePoint = sortedPricesInRange.first else {
-//                return newTrend
-//            }
-//
-//            let tempTrend = StockTrend(start: lowHighPricePoint.tradingDate, end: newTrend.startDate, startPrice: lowHighPricePoint.returnPrice(option: priceOption), endPrice: newTrend.endPrice!)
-//
-//            guard let newIncline = tempTrend.incline else { return newTrend }
-//
-//            if abs((newIncline - initialTrend.incline!) / initialTrend.incline!) < 1.0 { // less than 50% difference
-//                newTrend = tempTrend
-//                print("trend difference low = \(abs((newIncline - initialTrend.incline!) / initialTrend.incline!) )")
-//            }
-//            else {
-//                print("trend difference high = \(abs((newIncline - initialTrend.incline!) / initialTrend.incline!) )")
-//                return newTrend
-//            }
-//
-//            periodStartDate = lowHighPricePoint.tradingDate.addingTimeInterval(-trendDuration)
-//        }
-
-//        return newTrend
         
     }
     
@@ -348,102 +270,6 @@ struct Stock {
         
         return initialTrend
     }
-    
-    /*
-    public func findTrends(from: Date? = nil, to: Date? = nil, priceOption: PricePointOptions, findOption: FindOptions, changeThreshold: Double? = nil) -> [StockTrend] {
-        
-        let lastDate = to ?? dailyPrices.last!.tradingDate
-        let firstDate = from ?? dailyPrices.first!.tradingDate
-        var trends = [StockTrend]()
-        
-        // find turning point by identifying high and low points:
-        // from dailyPrice to dailyPrice: check trend to previous price: upward or downward
-        // compare with price to next price. If up/downward != previous trend = 'turning point'
-        // trends are between turning points
-        
-        
-        let dailyPricesInRange = dailyPrices.filter { (pricePoint) -> Bool in
-            if pricePoint.tradingDate < firstDate { return false }
-            else if pricePoint.tradingDate > lastDate { return false }
-            else { return true }
-        }
-        
-        var trendChangePoints = [dailyPricesInRange.first!]
-        
-        for index in 1..<dailyPricesInRange.count-1 {
-            
-            let previous = dailyPricesInRange[index-1].returnPrice(option: priceOption)
-            let current = dailyPricesInRange[index].returnPrice(option: priceOption)
-            let next = dailyPricesInRange[index+1].returnPrice(option: priceOption)
-            
-            let trendToCurrent = current - previous
-            let trendToNext = next - current
-            
-            if (trendToCurrent != 0 && trendToNext != 0) {
-                let trendToCurrentDirection = (trendToCurrent / abs(trendToCurrent)) // 1 or -1
-                let trendToNextDirection = (trendToNext / abs(trendToNext))
-                
-                if let validThreshold = changeThreshold {
-                    if (abs(trendToCurrent) - abs(trendToNext)) > (1.0 + validThreshold) {
-                        trendChangePoints.append(dailyPricesInRange[index])
-                    }
-                }
-                else if trendToCurrentDirection + trendToNextDirection == 0 {
-                    trendChangePoints.append(dailyPricesInRange[index])
-                }
-            }
-        }
-        trendChangePoints.append(dailyPricesInRange.last!)
-        
-        for index in 0..<trendChangePoints.count - 1 {
-            let newTrend = StockTrend(start: trendChangePoints[index].tradingDate, end: trendChangePoints[index+1].tradingDate, startPrice: trendChangePoints[index].returnPrice(option: priceOption), endPrice: trendChangePoints[index+1].returnPrice(option: priceOption))
-            trends.append(newTrend)
-        }
- 
-        return trends
-    }
-    */
-    
-    /*
-    public func longerTrends(from: Date? = nil, to: Date? = nil, priceOption: PricePointOptions, findOption: FindOptions, threshold: Double? = nil) -> [StockTrend] {
-        
-        let lastDate = to ?? dailyPrices.last!.tradingDate
-        let firstDate = from ?? dailyPrices.first!.tradingDate
-        let validThreshold = 1.0 - (threshold ?? 0)
-        var trends = [StockTrend]()
-        
-        let dailyPricesInRange = dailyPrices.filter { (pricePoint) -> Bool in
-            if pricePoint.tradingDate < firstDate { return false }
-            else if pricePoint.tradingDate > lastDate { return false }
-            else { return true }
-        }
-        
-        var currentTrendStart = dailyPricesInRange.first!.tradingDate
-        var currentTrendIncline: Double = 0
-        var currentTrendStartPrice = dailyPricesInRange.first!.returnPrice(option: priceOption)
-        
-        for index in 1..<dailyPricesInRange.count-1 {
-            
-            let previous = dailyPricesInRange[index-1].returnPrice(option: priceOption)
-            let current = dailyPricesInRange[index].returnPrice(option: priceOption)
-            
-            let expectedValue = previous + currentTrendIncline * dailyPricesInRange[index].tradingDate.timeIntervalSince(currentTrendStart) * validThreshold
-            if abs(expectedValue) > abs(current) {
-                let newTrend = StockTrend(start: currentTrendStart, end: dailyPricesInRange[index-1].tradingDate, startPrice: currentTrendStartPrice, endPrice: dailyPricesInRange[index-1].returnPrice(option: priceOption))
-                currentTrendStart = dailyPricesInRange[index-1].tradingDate
-                currentTrendStartPrice = dailyPricesInRange[index-1].returnPrice(option: priceOption)
-                trends.append(newTrend)
-            }
-            else {
-                currentTrendIncline = (dailyPricesInRange[index].returnPrice(option: priceOption) - currentTrendStartPrice) / dailyPricesInRange[index].tradingDate.timeIntervalSince(currentTrendStart)
-            }
-        }
-        let lastTrend = StockTrend(start: currentTrendStart, end: dailyPricesInRange.last!.tradingDate, startPrice: currentTrendStartPrice, endPrice: dailyPricesInRange.last!.returnPrice(option: priceOption))
-        trends.append(lastTrend)
-        
-        return trends
-    }
-    */
 
     public func twoPointTrend(properties: TrendProperties) -> StockTrend {
         
@@ -702,14 +528,6 @@ struct Stock {
             guard predictionPeriodPrices.count > 1 else {
                 continue
             }
-            
-//            var firstPrice = Double()
-//
-//            if priceOption == .low {
-//                firstPrice = predictionPeriodPrices.first!.low
-//            } else {
-//                firstPrice = predictionPeriodPrices.first!.high
-//            }
 
             let predictedPrice = correlation.yIntercept + correlation.incline * (foreCastTime)
 
@@ -1005,29 +823,5 @@ struct Stock {
         return [inclinesInRange.min()!, inclinesInRange.max()!]
 
     }
-    
-    /*
-    public func recentWeightedTrend(trends: [StockTrend], priceOption: PricePointOptions, minOrMax: FindOptions,_ from: Date? = nil, _ to: Date? = nil) -> Double? {
-
-        var descendingTrends = trends.sorted { (t0, t1) -> Bool in
-            if t0.startDate > t1.startDate { return true }
-            else { return false }
-        }
-        
-        if let validFrom = from {
-            descendingTrends = descendingTrends.filter { (trend) -> Bool in
-                if trend.endDate < validFrom { return false }
-                if trend.startDate > to! { return false }
-                return true
-            }
-        }
-        
-        let lastDate = descendingTrends.first!.startDate
-        let totalTrendTime = descendingTrends.last!.endDate.timeIntervalSince(descendingTrends.first!.startDate)
-        let recentWeightedTrend = trends.compactMap { $0.recentWeightedIncline(totalTrendTime, lastDate: lastDate) }
-        return (recentWeightedTrend.reduce(0,+)) / Double(recentWeightedTrend.count)
-    }
-    */
-        
 }
 

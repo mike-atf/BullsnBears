@@ -9,11 +9,12 @@ import Foundation
 
 class WebpageScraper {
     
-    class func scrapeRow(html$: String?, sectionHeader: String?=nil, rowTitle: String, sectionTerminal: String? = nil, rowTerminal: String? = nil, numberTerminal: String? = nil, numberStarter: String? = nil) -> ([Double]?, [String]) {
+    /// webpageExponent = the exponent used by the webpage to listing financial figures, e.g. 'thousands' on yahoo = 3.0
+    class func scrapeRow(html$: String?, sectionHeader: String?=nil, rowTitle: String, sectionTerminal: String? = nil, rowTerminal: String? = nil, numberTerminal: String? = nil, numberStarter: String? = nil, webpageExponent: Double?=nil) -> ([Double]?, [String]) {
         
         var pageText = html$
-        var sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
-        let sectionTerminal = sectionTerminal ?? "</div></div></div></div></div>"
+        let sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
+//        let sectionTerminal = sectionTerminal ?? "</div></div></div></div></div>"
         let rowTerminal = rowTerminal ?? "</div></div></div><div role=\"row\""
         let numberTerminal = numberTerminal ?? "</div></div><div role=\"gridcell\""
         let numberStarter = numberStarter ?? ">"
@@ -38,7 +39,7 @@ class WebpageScraper {
                         
 // B Find beginning of row
         guard let rowStartIndex = pageText?.range(of: rowTitle) else {
-            errors.append("Did not find title \(rowTitle) on webpage")
+            errors.append("Did not find row titled \(rowTitle) on webpage")
             return (nil, errors)
         }
 // C Find end of row - or if last row end of table - and reduce pageText to this row
@@ -80,8 +81,11 @@ class WebpageScraper {
                     else if value$.uppercased().last == "K" {
                         value = v * pow(10.0, 3) // should be 6 but values are entered as '000
                     }
-                    else {
+                    else if rowTitle.contains("Beta") {
                         value = v
+                    }
+                    else {
+                        value = v * (pow(10.0, webpageExponent ?? 0.0))
                     }
                     
                     if value$.last == ")" {
@@ -89,6 +93,9 @@ class WebpageScraper {
                     }
                 }
                 valueArray.append(value)
+            }
+            else if value$.contains("N/A") {
+                valueArray.append(Double())
             }
             
             labelEndIndex = pageText!.range(of: numberTerminal, options: .backwards, range: nil, locale: nil)
