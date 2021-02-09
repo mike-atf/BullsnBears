@@ -818,7 +818,7 @@ class CombinedValuationController: ValuationHelper {
         var section6Titles = ["Adj. sales growth"]
         
         let generalSectionTitles = ["Date", "US 10y Treasure Bond rate", "Perpetual growth rate", "Exp. LT Market return"]
-        let keyStatsTitles = ["Market cap", "beta", "Shares outstdg. (in thousands)"]
+        let keyStatsTitles = ["Market cap", "beta", "Shares outstdg.(tds)"]
         let singleIncomeSectionTitles = ["Interest expense","Pre-Tax income","Income tax expend."]
         let balanceSheetSectionTitles = ["Current debt","Long term debt"]
 

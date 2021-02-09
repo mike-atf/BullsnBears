@@ -220,12 +220,28 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             return
         }
         
+        var result:(array: [Double]?, errors: [String])
         if section == webpages[0] {
-            valuation.revenue = extractRowNumbers(keyPhrase: "Revenue", expectedNumbers: 6)
-            valuation.eps = extractRowNumbers(keyPhrase: "EPS - Earnings Per Share", expectedNumbers: 6)
-            if let income = extractRowNumbers(keyPhrase: "Net Income", expectedNumbers: 6)?.first {
+//            valuation.revenue = extractRowNumbers(keyPhrase: "Revenue", expectedNumbers: 6)
+//            valuation.eps = extractRowNumbers(keyPhrase: "EPS - Earnings Per Share", expectedNumbers: 6)
+//            if let income = extractRowNumbers(keyPhrase: "Net Income", expectedNumbers: 6)?.first {
+//                valuation.netIncome = income * pow(10, 3)
+//            }
+            
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "Revenue")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.revenue = result.array
+            
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "EPS - Earnings Per Share")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.eps = result.array
+            
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "Net Income")
+            downloadErrors.append(contentsOf: result.errors)
+            if let income = result.array?.first {
                 valuation.netIncome = income * pow(10, 3)
             }
+            
             sectionsComplete[0] = true
             webView.section = webpages[1]
             DispatchQueue.main.async {
@@ -234,13 +250,30 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             loadView()
         }
         else if section == webpages[1] {
+//            var roicPct = [Double]()
+//            for number in extractRowNumbers(keyPhrase: "ROI - Return On Investment", expectedNumbers: 6) ?? [] {
+//                roicPct.append(number/100)
+//            }
+//            valuation.roic = roicPct
+//            valuation.bvps = extractRowNumbers(keyPhrase: "Book Value Per Share", expectedNumbers: 6)
+//            valuation.opcs = extractRowNumbers(keyPhrase: "Operating Cash Flow Per Share", expectedNumbers: 6)
+            
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "ROI - Return On Investment")
+            downloadErrors.append(contentsOf: result.errors)
             var roicPct = [Double]()
-            for number in extractRowNumbers(keyPhrase: "ROI - Return On Investment", expectedNumbers: 6) ?? [] {
+            for number in result.array ?? [] {
                 roicPct.append(number/100)
             }
             valuation.roic = roicPct
-            valuation.bvps = extractRowNumbers(keyPhrase: "Book Value Per Share", expectedNumbers: 6)
-            valuation.opcs = extractRowNumbers(keyPhrase: "Operating Cash Flow Per Share", expectedNumbers: 6)
+            
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "Book Value Per Share")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.bvps = result.array
+
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "Operating Cash Flow Per Share")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.opcs = result.array
+
             sectionsComplete[1] = true
             webView.section = webpages[2]
             DispatchQueue.main.async {
@@ -249,9 +282,16 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             loadView()
         }
         else if section == webpages[2] {
-            if let ltDebt = extractRowNumbers(keyPhrase: "Long Term Debt", expectedNumbers: 6)?.first {
-                valuation.debt = ltDebt * 1000
+//            if let ltDebt = extractRowNumbers(keyPhrase: "Long Term Debt", expectedNumbers: 6)?.first {
+//                valuation.debt = ltDebt * 1000
+//            }
+            
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
+            downloadErrors.append(contentsOf: result.errors)
+            if let debt = result.array?.first {
+                valuation.debt = debt * 1000
             }
+
             sectionsComplete[2] = true
             webView.section = webpages[3]
             DispatchQueue.main.async {
@@ -260,10 +300,18 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             loadView()
         }
         else if section == webpages[3] {
-            if let pastPERatios = extractColumnNumbers(keyPhrase: "PE Ratio Historical Data</th>")?.sorted() {
-                let withoutExtremes = pastPERatios.excludeQuintiles()
+//            if let pastPERatios = extractColumnNumbers(keyPhrase: "PE Ratio Historical Data</th>")?.sorted() {
+//                let withoutExtremes = pastPERatios.excludeQuintiles()
+//                valuation.hxPE = [withoutExtremes.min()!, withoutExtremes.max()!]
+//            }
+            
+            result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
+            downloadErrors.append(contentsOf: result.errors)
+            if let pastPER = result.array?.sorted() {
+                let withoutExtremes = pastPER.excludeQuintiles()
                 valuation.hxPE = [withoutExtremes.min()!, withoutExtremes.max()!]
             }
+            
             sectionsComplete[3] = true
             let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[4])")
             webView.section = webpages[4]
@@ -274,9 +322,16 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             downloadYahoo(url: components?.url, for: webpages[4])
         }
         else if section == webpages[4] {
-            if let growth = extractAnalysis(sectionTitle: ">Revenue estimate</span>", rowTitle: ">Sales growth (year/est)</span>", numbers: 2) {
+//            if let growth = extractAnalysis(sectionTitle: ">Revenue estimate</span>", rowTitle: ">Sales growth (year/est)</span>", numbers: 2) {
+//                valuation.growthEstimates = [growth.min()!, growth.max()!]
+//            }
+            
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Revenue estimate</span>", rowTitle: ">Sales growth (year/est)</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>")
+            downloadErrors.append(contentsOf: result.errors)
+            if let growth = result.array {
                 valuation.growthEstimates = [growth.min()!, growth.max()!]
             }
+
             sectionsComplete[4] = true
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 5)
@@ -286,9 +341,14 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             sectionsComplete.append(false)
             downloadYahoo(url: components?.url, for: webpages[5])
         } else if section == webpages[5] {
-            if let growth = extractAnalysis(sectionTitle: ">Cash flow</span>", rowTitle: ">Operating cash flow</span>", numbers: 5)?.first {
-                valuation.opCashFlow = growth
-            }
+//            if let growth = extractAnalysis(sectionTitle: ">Cash flow</span>", rowTitle: ">Operating cash flow</span>", numbers: 5)?.first {
+//                valuation.opCashFlow = growth
+//            }
+
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Cash flow</span>", rowTitle: ">Operating cash flow</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.opCashFlow = result.array?.first ?? Double()
+
             sectionsComplete[5] = true
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 6)
@@ -299,11 +359,27 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             downloadYahoo(url: components?.url, for: webpages[6])
         } else if section == webpages[6] {
             let rowTitles = ["Purchases</span>","Sales</span>","Total insider shares held</span>"]
-            if let valueDict = extractYahooData(sectionTitle: "Insider purchases - Last 6 months</span>", rowTitles: rowTitles, numbers: 2) {
-                valuation.insiderStockBuys = (valueDict[rowTitles[0]]?.first ?? Double()) ?? Double()
-                valuation.insiderStockSells = (valueDict[rowTitles[1]]?.first  ?? Double()) ?? Double()
-                valuation.insiderStocks = (valueDict[rowTitles[2]]?.first ?? Double()) ?? Double()
+            
+//            if let valueDict = extractYahooData(sectionTitle: "Insider purchases - Last 6 months</span>", rowTitles: rowTitles, numbers: 2) {
+//                valuation.insiderStockBuys = (valueDict[rowTitles[0]]?.first ?? Double()) ?? Double()
+//                valuation.insiderStockSells = (valueDict[rowTitles[1]]?.first  ?? Double()) ?? Double()
+//                valuation.insiderStocks = (valueDict[rowTitles[2]]?.first ?? Double()) ?? Double()
+//            }
+            
+            for rtitle in rowTitles {
+                result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Insider purchases - Last 6 months</span>", rowTitle: rtitle, rowTerminal: "</td></tr>", numberTerminal: "</td>")
+                downloadErrors.append(contentsOf: result.errors)
+                if rtitle.contains("Purchases") {
+                    valuation.insiderStockBuys = result.array?.first ?? Double()
+                }
+                if rtitle.contains("Sales") {
+                    valuation.insiderStockSells = result.array?.first ?? Double()
+                }
+                else {
+                    valuation.insiderStocks = result.array?.first ?? Double()
+                }
             }
+
             sectionsComplete[6] = true
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 7)
@@ -359,7 +435,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             valueArray.append(Double(value$.filter("-0123456789.".contains)) ?? Double())
             
             guard let labelEndIndex = sectionHTML$!.range(of: numberTerminal, options: .backwards, range: nil, locale: nil) else {
-                downloadErrors.append("Did not find number end in \(keyPhrase) on MT website")
+//                downloadErrors.append("Did not find number end in \(keyPhrase) on MT website")
                 continue
             }
             sectionHTML$!.removeSubrange(labelEndIndex.lowerBound...)
@@ -405,9 +481,9 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 sectionHTML$.removeSubrange(rowEndIndex!.lowerBound...)
                 count += 1
             }
-            else {
-                downloadErrors.append("Did not find row end in section \(keyPhrase) on MT website")
-            }
+//            else {
+//                downloadErrors.append("Did not find row end in section \(keyPhrase) on MT website")
+//            }
         }  while rowEndIndex != nil
         
         return valueArray
@@ -422,18 +498,18 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         var webpage$ = String(html$ ?? "")
         
         guard let revenueSection = webpage$.range(of: sectionTitle) else {
-            downloadErrors.append("Did not find section \(sectionTitle) on MT website")
+            downloadErrors.append("Did not find section \(sectionTitle)")
             return nil
         }
         webpage$ = String(webpage$.suffix(from: revenueSection.upperBound))
                         
         guard let titleIndex = webpage$.range(of: rowTitle) else {
-            downloadErrors.append("Did not find title \(rowTitle) in section \(sectionTitle) on MT website")
+            downloadErrors.append("Did not find title \(rowTitle) in section \(sectionTitle) on webpage")
             return nil
         }
 
         guard let rowEndIndex = webpage$.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<webpage$.endIndex, locale: nil) else {
-            downloadErrors.append("Did not find row end for title \(rowTitle) in section \(sectionTitle) on MT website")
+            downloadErrors.append("Did not find row end for title \(rowTitle) in section \(sectionTitle) on webpage")
             return nil
         }
         webpage$ = String(webpage$[titleIndex.upperBound..<rowEndIndex.lowerBound])
@@ -441,7 +517,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         var valueArray = [Double]()
         for _ in 0..<numbers {
             guard let labelStartIndex = webpage$.range(of: labelStart, options: .backwards, range: nil, locale: nil) else {
-                downloadErrors.append("Did not find number start in \(sectionTitle) on MT website")
+                downloadErrors.append("Did not find number start in \(sectionTitle) on webpage")
                 continue
             }
             let value$ = webpage$[labelStartIndex.upperBound...]
@@ -458,7 +534,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             valueArray.append(value)
             
             guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
-                downloadErrors.append("Did not find number end in \(sectionTitle) on MT website")
+//                downloadErrors.append("Did not find number end in \(sectionTitle) on MT website")
                 continue
             }
             webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -529,7 +605,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 valueArray.append(value)
                 
                 guard let labelEndIndex = section$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
-                    downloadErrors.append("Did not find number end in \(sectionTitle) on MT website")
+//                    downloadErrors.append("Did not find number end in \(sectionTitle) on MT website")
                     continue
                 }
                 section$.removeSubrange(labelEndIndex.lowerBound...)

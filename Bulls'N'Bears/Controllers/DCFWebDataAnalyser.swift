@@ -64,38 +64,104 @@ class DCFWebDataAnalyser {
         
         completedDownLoadTasks += 1
         
+        var result:(array: [Double]?, errors: [String])
         if section == yahooPages.first! {
-            let stats = keyStats(validWebCode)
-            valuation.beta = stats[1]
-            valuation.marketCap = stats[0]
-            valuation.sharesOutstanding = stats[2]
+//            let stats = keyStats(validWebCode)
+//            valuation.beta = stats[1]
+//            valuation.marketCap = stats[0]
+//            valuation.sharesOutstanding = stats[2]
+            
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Market cap (intra-day)</span>" , rowTerminal: "</tr>", numberTerminal: "</td>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.marketCap = result.array?.first ?? Double()
+            
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Beta (5Y monthly)</span>" , rowTerminal: "</tr>", numberTerminal: "</td>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.beta = result.array?.first ?? Double()
+            
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Shares outstanding</span>" , rowTerminal: "</tr>", numberTerminal: "</td>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.sharesOutstanding = result.array?.first ?? Double()
+
             sectionsComplete[0] = true
         }
         else if section == yahooPages[1] {
-            let stats = incomeStats(validWebCode)
-            valuation.tRevenueActual = stats[">Total revenue</span>"]
-            valuation.netIncome = stats[">Net income</span>"]
-            valuation.expenseInterest = stats[">Interest expense</span>"]?.first ?? Double()
-            valuation.incomePreTax = stats[">Income before tax</span>"]?.first ?? Double()
-            valuation.expenseIncomeTax = stats[">Income tax expense</span>"]?.first ?? Double()
+//            let stats = incomeStats(validWebCode)
+//            valuation.tRevenueActual = stats[">Total revenue</span>"]
+//            valuation.netIncome = stats[">Net income</span>"]
+//            valuation.expenseInterest = stats[">Interest expense</span>"]?.first ?? Double()
+//            valuation.incomePreTax = stats[">Income before tax</span>"]?.first ?? Double()
+//            valuation.expenseIncomeTax = stats[">Income tax expense</span>"]?.first ?? Double()
+            
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Total revenue</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.tRevenueActual = Array(result.array?.dropFirst() ?? []) // remove TTM column
+
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Net income</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.netIncome = Array(result.array?.dropFirst() ?? [])
+
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Interest expense</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.expenseInterest = result.array?.first ?? Double()
+            
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Income before tax</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.incomePreTax = result.array?.first ?? Double()
+
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Income tax expense</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.expenseIncomeTax = result.array?.first ?? Double()
+
             sectionsComplete[1] = true
         }
         else if section == yahooPages[2] {
-            let stats = balanceSheet(validWebCode)
-            valuation.debtST = stats[">Current debt</span>"]?.first ?? Double()
-            valuation.debtLT = stats[">Long-term debt</span>"]?.first ?? Double()
+//            let stats = balanceSheet(validWebCode)
+//            valuation.debtST = stats[">Current debt</span>"]?.first ?? Double()
+//            valuation.debtLT = stats[">Long-term debt</span>"]?.first ?? Double()
+            
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Current debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.debtST = result.array?.first ?? Double()
+
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Long-term debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.debtLT = result.array?.first ?? Double()
+
             sectionsComplete[2] = true
         }
         else if section == yahooPages[3] {
-            let stats = cashFlow(validWebCode)
-            valuation.tFCFo = stats[">Operating cash flow</span>"]
-            valuation.capExpend = stats[">Capital expenditure</span>"]
+//            let stats = cashFlow(validWebCode)
+//            valuation.tFCFo = stats[">Operating cash flow</span>"]
+//            valuation.capExpend = stats[">Capital expenditure</span>"]
+            
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Operating cash flow</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.tFCFo = Array(result.array?.dropFirst() ?? [])
+            
+            result = WebpageScraper.scrapeRow(html$: html$, rowTitle: ">Capital expenditure</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation.capExpend = Array(result.array?.dropFirst() ?? [])
+
             sectionsComplete[3] = true
         }
         else if section == yahooPages[4] {
             let stats = analysis(validWebCode)
             valuation.tRevenuePred = stats[">Avg. Estimate</span>"] ?? [Double]()
             valuation.revGrowthPred = stats[">Sales growth (year/est)</span>"]
+            
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Revenue estimate</span>" ,rowTitle: ">Avg. Estimate</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>")
+            downloadErrors.append(contentsOf: result.errors)
+            let a1 = result.array?.dropFirst()
+            let a2 = a1?.dropFirst()
+            valuation.tRevenuePred = Array(a2 ?? [])
+
+            result = WebpageScraper.scrapeRow(html$: html$, sectionHeader: "Revenue estimate</span>" , rowTitle: ">Sales growth (year/est)</span>", rowTerminal: "</span></td></tr>", numberTerminal: "</span>")
+            downloadErrors.append(contentsOf: result.errors)
+            let b1 = result.array?.dropFirst()
+            let b2 = b1?.dropFirst()
+            valuation.revGrowthPred = Array(b2 ?? [])
+
             sectionsComplete[4] = true
         }
         
@@ -213,7 +279,7 @@ class DCFWebDataAnalyser {
                     valueArray[i] = Double(value$.filter("-0123456789.".contains)) ?? Double()
                     
                     guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
-                        downloadErrors.append("can't find end of number in \(search$) on webpage")
+//                        downloadErrors.append("can't find end of number in \(search$) on webpage")
                         continue
                     }
                     webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -232,7 +298,7 @@ class DCFWebDataAnalyser {
                     incomeValues[search$] = [Double(value$.filter("-0123456789.".contains)) ?? Double()]
                     
                     guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
-                        downloadErrors.append("can't find end of number in \(search$) on webpage")
+//                        downloadErrors.append("can't find end of number in \(search$) on webpage")
                         continue
                     }
                     webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -277,7 +343,7 @@ class DCFWebDataAnalyser {
                 debtValues[search$] = [Double(value$.filter("-0123456789.".contains)) ?? 0.0] // use 0.0 here as "-" is used for 'no debt'
                 
                 guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
-                    downloadErrors.append("can't find number end in \(search$) on webpage")
+//                    downloadErrors.append("can't find number end in \(search$) on webpage")
                     continue
                 }
                 webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -322,7 +388,7 @@ class DCFWebDataAnalyser {
                 valueArray[i] = Double(value$.filter("-0123456789.".contains)) ?? Double()
                 
                 guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
-                    downloadErrors.append("can't find end of number in \(search$) on webpage")
+//                    downloadErrors.append("can't find end of number in \(search$) on webpage")
                     continue
                 }
                 webpage$.removeSubrange(labelEndIndex.lowerBound...)
@@ -394,7 +460,7 @@ class DCFWebDataAnalyser {
                 valueArray.append(value)
                 
                 guard let labelEndIndex = webpage$.range(of: labelTerminal, options: .backwards, range: nil, locale: nil) else {
-                    downloadErrors.append("can't find number end in \(search$) on webpage")
+//                    downloadErrors.append("can't find number end in \(search$) on webpage")
                     continue
                 }
                 webpage$.removeSubrange(labelEndIndex.lowerBound...)

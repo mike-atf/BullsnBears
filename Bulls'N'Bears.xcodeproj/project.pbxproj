@@ -18,6 +18,7 @@
 		EA163F79258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */; };
 		EA39A44725C5BF5300DE0FF9 /* R1WebDataAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */; };
+		EA52EDC825D18D760000155F /* WebpageScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA52EDC725D18D760000155F /* WebpageScraper.swift */; };
 		EA5FDBE325B1EE34008918C8 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5FDBE225B1EE34008918C8 /* AlertController.swift */; };
 		EA7B613925C412860018BA02 /* StockTickerDictionary.csv in Resources */ = {isa = PBXBuildFile; fileRef = EA7B613825C412860018BA02 /* StockTickerDictionary.csv */; };
 		EA7B613A25C412860018BA02 /* StockTickerDictionary.csv in Resources */ = {isa = PBXBuildFile; fileRef = EA7B613825C412860018BA02 /* StockTickerDictionary.csv */; };
@@ -140,6 +141,7 @@
 		EA163F76258BA85E000974AB /* StockTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockTrend.swift; sourceTree = "<group>"; };
 		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = R1WebDataAnalyser.swift; sourceTree = "<group>"; };
+		EA52EDC725D18D760000155F /* WebpageScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpageScraper.swift; sourceTree = "<group>"; };
 		EA5FDBE225B1EE34008918C8 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AlertController.swift; path = "Bulls'N'Bears/DCFValuation FIles/AlertController.swift"; sourceTree = SOURCE_ROOT; };
 		EA7B613825C412860018BA02 /* StockTickerDictionary.csv */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = StockTickerDictionary.csv; sourceTree = "<group>"; };
 		EAA099C32588020B00DBB93C /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
@@ -268,6 +270,7 @@
 				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
 				EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */,
 				EAC07B6E25B8950E00B6C898 /* DCFWebDataAnalyser.swift */,
+				EA52EDC725D18D760000155F /* WebpageScraper.swift */,
 				EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */,
 				EAF5D74225B06F2E00E7A681 /* Extensions.swift */,
 				EAAA06AF25AA01A00077A972 /* ErrorController.swift */,
@@ -554,6 +557,7 @@
 				EAC2FC5025A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
 				EAC190F42577E3B60030B331 /* ChartView.swift in Sources */,
 				EAC2FC6325A232780060F387 /* ValuationChooser.swift in Sources */,
+				EA52EDC825D18D760000155F /* WebpageScraper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -784,7 +788,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
+				MARKETING_VERSION = 0.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -804,7 +808,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
+				MARKETING_VERSION = 0.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
