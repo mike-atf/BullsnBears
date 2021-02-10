@@ -13,22 +13,19 @@ class StocksListViewController: UITableViewController {
     @IBOutlet var addButton: UIBarButtonItem!
     @IBOutlet var downloadButton: UIBarButtonItem!
     
+    var controller: StocksController?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.register(UINib(nibName: "StockListCellTableViewCell", bundle: nil), forCellReuseIdentifier: "stockListCell")
-        openCSCFilesInDocumentDirectory()
+        
+        controller = StocksController(delegate: self)
+        controller?.loadStockFiles()
         
         NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
-
-        
-        if stocks.count == 0 {
-            showWelcomeView()
-        }
-        
-//        testDownLoad()
         
     }
 
@@ -54,7 +51,7 @@ class StocksListViewController: UITableViewController {
         
         self.present(welcomeView, animated: true) {
             if let textView = welcomeView.view.viewWithTag(10) as? UITextView {
-                let text = "Thank you for trying Bulls 'N' Bears\n\nThe App displays candle stick charts from .csv files you need to import, and calculates and displays various price trends.\n\nIt also allows calculating a fair share price estimate from data you enter.\n\nHow does it work?\n1. Go to Yahoo Finance, select a stock, and download 'Historical Data' as .csv file.\n2. Inside this App, tap + to import the csv. file from where you downloaded it to on our device.\n\n3.Select trends by toggling color and time buttons\n(A = all, 3 = 3 months, 1 = 1 month\n4. To get a fair price estimate tap the '$' of a stock listed, then chose a valuation method.\n5. Then enter all required data from Yahoo finance or another source, and save."
+                let text = "Thank you for trying Bulls 'N' Bears\n\nThe App displays candle stick charts from .csv files you need to download or import from the Files App, and shows various price trends you select (color buttons).\n\nIt calculates fair share price estimates from data you enter or download from public websites.\n\nHow does it work?\n1. Add a stock using the download button at the top of the list (or import csv files with '+' which you download from 'Yahoo finance' > 'Historical Data').\n2.Select trends by toggling color and time buttons\n(A = all, 3 = 3 months, 1 = 1 month\n4. To get a fair price estimate tap the '$' of a stock listed, then chose a valuation method.\n5. Either let Bulls'N'Bears try to download required data, or enter these from Yahoo finance, MacroTrends or another source, and then adapt predicted values and save."
                 textView.text = text
             }
 
@@ -62,7 +59,7 @@ class StocksListViewController: UITableViewController {
         
     }
     
-    @objc
+    /*
     func openCSCFilesInDocumentDirectory() {
         
         let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
@@ -75,17 +72,33 @@ class StocksListViewController: UITableViewController {
                     if url.lastPathComponent.contains(".csv") {
                         // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
                         if let stock = CSVImporter.csvExtractor(url: url) {
+                            stock.delegate = self
                             stocks.append(stock)
+                            
+                            if Date().timeIntervalSince(stock.dailyPrices.last?.tradingDate ?? Date()) > 24*3600 {
+                                stock.needsUpdate = true
+                                stock.startPriceUpdate()
+                            }
+                            else {
+                                stock.needsUpdate = false
+                            }
                         }
-                    }
+                   }
                 }
             } catch let error {
                print(error)
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't access contens of directory \(documentFolder)")
                 
             }
+            self.tableView.reloadData()
+            if stocks.count > 0 {
+                tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .top)
+                performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+            }
+
         }
     }
+    */
     
     public func openDocumentBrowser(with remoteURL: URL, importIfNeeded: Bool) {
         
@@ -115,12 +128,34 @@ class StocksListViewController: UITableViewController {
         }
     }
     
+//    func updateStocks() {
+//        
+//        for stock in stocks {
+//            stock.startPriceUpdate()
+//        }
+//    }
+    
+//    @objc
+//    func stockPriceUpdateDownloaded(_ notification: Notification) {
+//
+//        if let stockSymbol = notification.object as? String {
+//            var index = 0
+//            for stock in stocks {
+//                if stock.symbol == stockSymbol {
+//                    stock.extractPriceData()
+//                    tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+//                }
+//                index += 1
+//            }
+//        }
+//    }
+    
     public func addStock(fileURL: URL) {
         
         if let stock = CSVImporter.csvExtractor(url: fileURL) {
             stocks.append(stock)
             
-            tableView.reloadSections([0], with: .automatic)
+            tableView.reloadData()
             // causing crash on Hanski's iPad - why???
             tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .bottom)
             tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(item: stocks.count-1, section: 0))
@@ -131,7 +166,8 @@ class StocksListViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        
+        return stocks.count < 1 ? 0 : 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -142,8 +178,6 @@ class StocksListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
-//        let valuation = CombinedValuationController.returnDCFValuations(company: stocks[indexPath.row].symbol)
-//        let r1valuation = CombinedValuationController.returnR1Valuations(company: stocks[indexPath.row].symbol)
         cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row])
         return cell
     }
@@ -198,22 +232,6 @@ class StocksListViewController: UITableViewController {
         
         self.present(entryView, animated: true, completion: nil)
     }
-    
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
 
     // MARK: - Navigation
 
@@ -254,6 +272,30 @@ extension StocksListViewController: StockListCellDelegate {
         }
 
     }
+}
+
+extension StocksListViewController: StockControllerDelegate {
     
+    func updateStocksComplete() {
+        self.tableView.reloadData()
+        if stocks.count > 0 {
+            if tableView.indexPathForSelectedRow == nil {
+                tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .top)
+            }
+            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+        }
+    }
+    
+    func openStocksComplete() {
+        
+        if stocks.count > 0 {
+            self.tableView.reloadData()
+            tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .top)
+            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+        }
+        else {
+            showWelcomeView()
+        }
+    }
     
 }

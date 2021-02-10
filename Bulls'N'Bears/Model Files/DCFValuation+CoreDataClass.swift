@@ -124,7 +124,7 @@ public class DCFValuation: NSManagedObject {
         }
     }
     
-    public func returnIValue() -> Double? {
+    public func returnIValue() -> (Double?, String?) {
         
         // 1 calculate 'FCF_to_equity' from fFCFo + capExpend
         // 2 calculate 'FCF / netIncome[]' from FCF_t_e / netIncome
@@ -152,37 +152,37 @@ public class DCFValuation: NSManagedObject {
         guard capExpend?.count ?? 0 == 4 else {
             capExpend = [Double(), Double(), Double(), Double()]
             save()
-            return nil
+            return (nil,"not enough cap. expend. data")
         }
         guard tRevenueActual?.count == 4 else {
             tRevenueActual = [Double(), Double(), Double(), Double()]
             save()
-            return nil
+            return (nil,"not enough revenue data")
         }
         guard netIncome?.count ?? 0 == 4 else {
             netIncome = [Double(), Double(), Double(), Double()]
             save()
-            return nil
+            return (nil,"not enough net income data")
         }
         guard tFCFo?.count ?? 0 == 4 else {
             tFCFo = [Double(), Double(), Double(), Double()]
             save()
-            return nil
+            return (nil,"not enough cash flow data")
         }
         guard tRevenuePred?.count ?? 0 == 2 else {
             tRevenuePred = [Double(), Double()]
             save()
-            return nil
+            return (nil,"not enough pred. revenue data")
         }
         guard revGrowthPred?.count ?? 0 == 2 else {
             revGrowthPred = [Double(), Double()]
             save()
-            return nil
+            return (nil,"not enough pred. growth data")
         }
         guard revGrowthPredAdj?.count ?? 0 == 2 else {
             revGrowthPredAdj = [Double(), Double()]
             save()
-            return nil
+            return (nil,"not enough adj. pred. growth data")
         }
 //
         
@@ -194,7 +194,7 @@ public class DCFValuation: NSManagedObject {
             if capExpend?.count ?? 0 > count {
                 fcfToEquity.append(annualFCF + (capExpend![count])) // capExpend entered as negative
             }
-            else { return nil } // error missing value
+            else { return (nil,"not enough cap. expend. data") } // error missing value
             count += 1
         }
 // 2
@@ -204,7 +204,7 @@ public class DCFValuation: NSManagedObject {
             if netIncome?.count ?? 0 > count {
                 fcfToNetIncome.append(fcfTE / netIncome![count])
             }
-            else { return nil } // error missing value
+            else { return (nil,"not enough net income data") } // error missing value
             count += 1
         }
 // 3
@@ -214,14 +214,14 @@ public class DCFValuation: NSManagedObject {
             if tRevenueActual?.count ?? 0 > count {
                 netIncomeMargins.append(income / tRevenueActual![count])
             }
-            else { return nil } // error missing value
+            else { return (nil,"not enough revenue data") } // error missing value
             count += 1
         }
 // 4 + 5
         predictedRevenue = tRevenuePred ?? []
         
         guard predictedRevenue.last != nil && predictedRevenue.last != nil && revGrowthPredAdj?.first != nil && revGrowthPredAdj?.last != nil else {
-            return nil
+            return (nil,"essential data missing")
         }
         predictedRevenue.append(predictedRevenue.last! + predictedRevenue.last! * revGrowthPredAdj!.first!)
         predictedRevenue.append(predictedRevenue.last! + predictedRevenue.last! * revGrowthPredAdj!.last!)
@@ -279,7 +279,7 @@ public class DCFValuation: NSManagedObject {
             fairValue = todaysValue / sharesOutstanding
         }
         
-        return fairValue
+        return (fairValue,nil)
     }
     
 }

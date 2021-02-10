@@ -63,7 +63,8 @@ class StockChartVC: UIViewController {
     
     func setValuationTexts() {
         if let validValuation = dcfValuation {
-            if let intrinsicValue = validValuation.returnIValue() {
+            let (value, error) = validValuation.returnIValue()
+            if let intrinsicValue = value {
                 dcfValuationLabrl.text = "DCF value:"
                 if intrinsicValue > 0 {
                     let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber) ?? "--"
@@ -72,6 +73,9 @@ class StockChartVC: UIViewController {
                 else {
                     dcfValuationLabrl.text = "DCF value: negative"
                 }
+            }
+            else {
+                dcfValuationLabrl.text = "DCF value: " + (error ?? "invalid")
             }
         }
         else { dcfValuationLabrl.text = "DCF value: no data"}

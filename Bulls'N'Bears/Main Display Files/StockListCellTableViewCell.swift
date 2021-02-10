@@ -21,27 +21,26 @@ class StockListCellTableViewCell: UITableViewCell {
     var cellDelegate: StockListCellDelegate!
     var stock: Stock!
     
-    let timeFormatter: DateComponentsFormatter = {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.day]
-        formatter.unitsStyle = .brief
-        formatter.zeroFormattingBehavior = .pad
-        formatter.maximumUnitCount = 3
-        formatter.includesApproximationPhrase = false
+//    let timeFormatter: DateComponentsFormatter = {
+//        let formatter = DateComponentsFormatter()
+//        formatter.allowedUnits = [.day]
+//        formatter.unitsStyle = .full
+//        formatter.zeroFormattingBehavior = .pad
+//        formatter.maximumUnitCount = 3
+//        formatter.includesApproximationPhrase = false
+//        return formatter
+//    }()
+    
+    let timeFormatter: RelativeDateTimeFormatter = {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.dateTimeStyle = .numeric
+        formatter.unitsStyle = .abbreviated
         return formatter
     }()
         
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
         valuationButton.titleLabel?.numberOfLines = 0
-
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
     
     public func configureCell(indexPath: IndexPath, delegate: StockListCellDelegate, stock: Stock) {
@@ -50,48 +49,9 @@ class StockListCellTableViewCell: UITableViewCell {
         self.cellDelegate = delegate
         
         title.text = stock.symbol
-        let timeSinceLastStockDate = Date().timeIntervalSince(stock.dailyPrices.last!.tradingDate)
-        detail.text = timeFormatter.string(from: timeSinceLastStockDate)
+//        let timeSinceLastStockDate = Date().timeIntervalSince(stock.dailyPrices.last!.tradingDate)
+        detail.text = timeFormatter.localizedString(for: stock.dailyPrices.last!.tradingDate, relativeTo: Date())
         
-//        var buttonTitle: String?
-        
-//        if let validValuation = valuation {
-//            if let intrinsicValue = validValuation.returnIValue() {
-//                buttonTitle = "DCF -NA-"
-//                if intrinsicValue > 0 {
-//                    let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber) ?? "-"
-//                    buttonTitle = "DCF: " + iv$
-//                }
-//            }
-//        }
-        
-//        var r1Title = "R1: "
-//        if let validValuation = r1Valuation {
-//            if let stickerPrice = validValuation.stickerPrice() {
-//                if stickerPrice > 0 {
-//                    r1Title += (currencyFormatterNoGapNoPence.string(from: stickerPrice as NSNumber) ?? "--")
-//                }
-//                else { r1Title += "-NA-"}
-//            }
-//            if let score = validValuation.moatScore() {
-//                if !score.isNaN {
-//                    let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
-//                    r1Title = r1Title + " (moat: " + n$ + ")"
-//                }
-//            }
-//            if buttonTitle == nil {
-//                buttonTitle = r1Title
-//            }
-//            else {
-//                buttonTitle! = buttonTitle! + "\n" + r1Title
-//            }
-//        }
-//
-//        if let validTitle = buttonTitle {
-//            valuationButton.setImage(nil, for: .normal)
-//            valuationButton.setTitle(validTitle, for: .normal)
-//        }
-
     }
     
     @IBAction func valuationButtonAction(_ sender: UIButton) {

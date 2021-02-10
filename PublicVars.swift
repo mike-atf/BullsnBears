@@ -176,6 +176,13 @@ let numberFormatterDecimals: NumberFormatter = {
     return formatter
 }()
 
+let numberFormatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.maximumFractionDigits = 0
+    formatter.minimumIntegerDigits = 1
+    return formatter
+}()
+
 
 let numberFormatterNoFraction: NumberFormatter = {
     let formatter = NumberFormatter()
