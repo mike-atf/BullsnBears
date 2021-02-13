@@ -28,6 +28,10 @@ class StocksListViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
         
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        controller?.updateStockFiles()
+    }
 
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -58,48 +62,7 @@ class StocksListViewController: UITableViewController {
         }
         
     }
-    
-    /*
-    func openCSCFilesInDocumentDirectory() {
         
-        let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        if let documentFolder = appDocumentPaths.first {
-            
-            do {
-                let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: documentFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-                
-                for url in fileURLs {
-                    if url.lastPathComponent.contains(".csv") {
-                        // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
-                        if let stock = CSVImporter.csvExtractor(url: url) {
-                            stock.delegate = self
-                            stocks.append(stock)
-                            
-                            if Date().timeIntervalSince(stock.dailyPrices.last?.tradingDate ?? Date()) > 24*3600 {
-                                stock.needsUpdate = true
-                                stock.startPriceUpdate()
-                            }
-                            else {
-                                stock.needsUpdate = false
-                            }
-                        }
-                   }
-                }
-            } catch let error {
-               print(error)
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't access contens of directory \(documentFolder)")
-                
-            }
-            self.tableView.reloadData()
-            if stocks.count > 0 {
-                tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .top)
-                performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
-            }
-
-        }
-    }
-    */
-    
     public func openDocumentBrowser(with remoteURL: URL, importIfNeeded: Bool) {
         
         if let docBrowser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DocBrowserView") as?  DocumentBrowserViewController {
@@ -127,28 +90,6 @@ class StocksListViewController: UITableViewController {
             addStock(fileURL: url)
         }
     }
-    
-//    func updateStocks() {
-//        
-//        for stock in stocks {
-//            stock.startPriceUpdate()
-//        }
-//    }
-    
-//    @objc
-//    func stockPriceUpdateDownloaded(_ notification: Notification) {
-//
-//        if let stockSymbol = notification.object as? String {
-//            var index = 0
-//            for stock in stocks {
-//                if stock.symbol == stockSymbol {
-//                    stock.extractPriceData()
-//                    tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
-//                }
-//                index += 1
-//            }
-//        }
-//    }
     
     public func addStock(fileURL: URL) {
         
@@ -178,7 +119,7 @@ class StocksListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
-        cell.configureCell(indexPath: indexPath, delegate: self, stock: stocks[indexPath.row])
+        cell.configureCell(indexPath: indexPath, stock: stocks[indexPath.row])
         return cell
     }
 
@@ -225,12 +166,16 @@ class StocksListViewController: UITableViewController {
     
     @IBAction func downloadAction(_ sender: Any) {
         
-        guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSymbolEntry") as? StockSymbolEntry else { return }
+//        guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSymbolEntry") as? StockSymbolEntry else { return }
+//
+//        entryView.loadViewIfNeeded()
+//        entryView.rootView = self
+        guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSearchTVC") as? StockSearchTVC else { return }
+
+        entryView.callingVC = self
         
-        entryView.loadViewIfNeeded()
-        entryView.rootView = self
-        
-        self.present(entryView, animated: true, completion: nil)
+        navigationController?.pushViewController(entryView, animated: true)
+//        self.present(entryView, animated: true, completion: nil)
     }
 
     // MARK: - Navigation
@@ -258,21 +203,21 @@ class StocksListViewController: UITableViewController {
 
 }
 
-extension StocksListViewController: StockListCellDelegate {
-    
-    func valuationButtonPressed(indexpath: IndexPath) {
-                
-        if let choser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationChoser") as? ValuationChooser {
-            choser.loadViewIfNeeded()
-            choser.stock = stocks[indexpath.row]
-            choser.rootView = self
-            choser.sourceCellPath = indexpath
-            
-            self.present(choser, animated: true)
-        }
-
-    }
-}
+//extension StocksListViewController: StockListCellDelegate {
+//
+//    func valuationButtonPressed(indexpath: IndexPath) {
+//
+//        if let choser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationChoser") as? ValuationChooser {
+//            choser.loadViewIfNeeded()
+//            choser.stock = stocks[indexpath.row]
+//            choser.rootView = self
+//            choser.sourceCellPath = indexpath
+//
+//            self.present(choser, animated: true)
+//        }
+//
+//    }
+//}
 
 extension StocksListViewController: StockControllerDelegate {
     

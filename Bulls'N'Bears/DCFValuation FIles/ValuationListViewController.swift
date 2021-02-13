@@ -7,9 +7,15 @@
 
 import UIKit
 
+protocol ValuationListDelegate: AnyObject {
+    func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?)
+}
+
 class ValuationListViewController: UITableViewController, AlertViewDelegate {
     
-    weak var presentingListVC: StocksListViewController!
+//    weak var presentingListVC: StocksListViewController!
+//    weak var presentingVC: UIViewController!
+    var delegate: ValuationListDelegate?
     var sourceIndexPath: IndexPath!
     var stock: Stock!
     
@@ -195,30 +201,14 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
             // important - these will otherwise stay in memory
             if let analyser = self.valuationController.webAnalyser {
                 NotificationCenter.default.removeObserver(analyser)
+                NotificationCenter.default.removeObserver(self)
             }
-            let r1Valuation = self.valuationController.valuation as? Rule1Valuation // for transfer to ValuationSummaryVC
+//            let r1Valuation = self.valuationController.valuation as? Rule1Valuation // for transfer to ValuationSummaryVC
             self.valuationController.webAnalyser = nil
-            self.valuationController = nil
             //
             
-            self.dismiss(animated: true) {
-                NotificationCenter.default.removeObserver(self)
-                
-                if self.valuationMethod == .rule1 {
-                    if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationSummaryTVC") as? ValuationSummaryTVC {
-                        tvc.presentingVC = self.presentingListVC
-                        if let r1V = r1Valuation {
-                            tvc.r1Valuation = r1V
-                            tvc.indexPath = self.sourceIndexPath
-
-                            self.presentingListVC.present(tvc, animated: true, completion: nil)
-                        }
-                    }
-                }
-                else {
-                    self.presentingListVC.valuationCompleted(indexPath: self.sourceIndexPath)
-                }
-            }
+            delegate?.valuationComplete(listView: self, r1Valuation: (valuationController.valuation as? Rule1Valuation))
+            //            self.valuationController = nil
         }
     }
     
@@ -262,9 +252,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     
     func alertWasDismissed() {
         
-        self.dismiss(animated: true) {
-            self.presentingListVC.valuationCompleted(indexPath: self.sourceIndexPath)
-        }
+        delegate?.valuationComplete(listView: self, r1Valuation: valuationController.valuation as? Rule1Valuation)
     }
     
     public func helperUpdatedRows(paths: [IndexPath]) {
@@ -284,13 +272,15 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     }
     
     @objc
-    func dataUpdated(_ notifcation: Notification) {
+    func dataUpdated(_ notification: Notification) {
                 
+        self.valuationController.webAnalyser = nil
+        
         if (sectionTitles?.count ?? 0) > 0 {
             tableView.reloadData()
         }
         
-        if let errorList = notifcation.object as? [String] {
+        if let errorList = notification.object as? [String] {
             
             if errorList.count > 0 {
                 var message = errorList.first!
@@ -298,11 +288,12 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
                     message += "\n " + error
                 }
                 AlertController.shared().showDialog(title: "Some data search errors occurred", alertMessage: message, viewController: self)
-                return
+            }
+            else {
+                showDownloadCompleteMessage = true
             }
         }
         
-        showDownloadCompleteMessage = true
     }
 }
 

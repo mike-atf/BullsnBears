@@ -18,11 +18,13 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
     var valuation: Rule1Valuation!
     var controller: CombinedValuationController!
     var webpages = ["financial-statements", "financial-ratios", "balance-sheet", "pe-ratio","analysis", "cash-flow","insider-transactions"]
-    var sectionsComplete = [Bool]()
-    var progressDelegate: ProgressViewDelegate?
+//    var sectionsComplete = [Bool]()
+    weak var progressDelegate: ProgressViewDelegate?
     var request: URLRequest!
     var yahooSession: URLSessionDataTask?
     var downloadErrors = [String]()
+    var downloadTasks = 0
+    var downloadTasksComplete = 0
     
     var macroTrendCookies: [HTTPCookie]? = {
         
@@ -81,9 +83,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
 
         NotificationCenter.default.addObserver(self, selector: #selector(downloadCompleted(_:)), name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: nil)
     
-        for _ in webpages {
-            sectionsComplete.append(false)
-        }
+        downloadTasks = webpages.count
         loadView(section: webpages.first!)
     }
     
@@ -138,7 +138,6 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         }
         webView.section = section
         webView.load(request)
-//        sectionsComplete.append(false)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -212,6 +211,8 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
     @objc
     func downloadCompleted(_ notification: Notification) {
         
+        downloadTasksComplete += 1
+        
         guard html$ != nil else {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
             return
@@ -239,7 +240,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 valuation.netIncome = income * pow(10, 3)
             }
             
-            sectionsComplete[0] = true
+//            sectionsComplete[0] = true
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count, completedTasks: 1)
             }
@@ -263,7 +264,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             downloadErrors.append(contentsOf: result.errors)
             valuation.opcs = result.array
 
-            sectionsComplete[1] = true
+//            sectionsComplete[1] = true
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count, completedTasks: 2)
             }
@@ -277,7 +278,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 valuation.debt = debt * 1000
             }
 
-            sectionsComplete[2] = true
+//            sectionsComplete[2] = true
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 3)
             }
@@ -292,7 +293,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 valuation.hxPE = [withoutExtremes.min()!, withoutExtremes.max()!]
             }
             
-            sectionsComplete[3] = true
+//            sectionsComplete[3] = true
             let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[4])")
             webView.section = webpages[4]
             DispatchQueue.main.async {
@@ -311,7 +312,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 valuation.growthEstimates = [growth.min()!, growth.max()!]
             }
 
-            sectionsComplete[4] = true
+//            sectionsComplete[4] = true
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 5)
             }
@@ -324,7 +325,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             downloadErrors.append(contentsOf: result.errors)
             valuation.opCashFlow = result.array?.first ?? Double()
 
-            sectionsComplete[5] = true
+//            sectionsComplete[5] = true
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 6)
             }
@@ -348,20 +349,114 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 }
             }
 
-            sectionsComplete[6] = true
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 7)
-                self.progressDelegate = nil
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksComplete)
             }
         }
         
-        if !sectionsComplete.contains(false) {
+        if downloadTasksComplete == downloadTasks {
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: self.downloadErrors , userInfo: nil)
             }
         }
 
     }
+    
+    /*
+    func scrubWebData() -> String? {
+        // webdata will contain an empty Double() as placeholder if no valid number can be found
+        // also, not all arrays may have the same number of elements
+        
+        var error: String?
+        var predictionArrays = [valuation.hxPE!, valuation.growthEstimates!, valuation.adjGrowthEstimates!]
+        
+        for i in 0..<predictionArrays.count {
+            predictionArrays[i] = predictionArrays[i].filter({ (element) -> Bool in
+                if element != Double() { return true }
+                else { return false }
+            })
+        }
+
+        var firstValidValues = [Int?]()
+        var valueArrays = [valuation.bvps!, valuation.eps!, valuation.roic!, valuation.opcs!, valuation.revenue!]
+        
+        var count = 0
+        var validElements = [Int]()
+        var allElements = [Int]()
+        for array in  valueArrays { // bvps is created as [Double]() in insert
+            count = 0
+
+            allElements.append(array.count)
+
+            validElements.append(array.filter({ (element) -> Bool in
+                if element != Double() { return true }
+                else { return false }
+            }).count)
+            
+            for value in array {
+                if value != Double() {
+                    firstValidValues.append(count)
+                    break
+                }
+                count += 1
+            }
+        }
+        
+        let minimumValidElements = validElements.min() ?? 0
+        let maximumValidElements = allElements.max() ?? 0
+        
+        if minimumValidElements != maximumValidElements {
+            // assuming leading! elements for most recent years are missing in some arrays
+            // may give wrong results if elements from earlier years are missing
+            error = "limited data set due to gaps"
+
+            for i in 0..<valueArrays.count {
+                let elementCount = valueArrays[i].count
+                valueArrays[i].removeSubrange(0..<(elementCount - minimumValidElements))
+            }
+            // dont' return yet - check below wehther more invalid elements need to be removed
+        }
+        
+        // if one array contains empty Double() elements only return empty arrays
+        guard !firstValidValues.contains(nil) else {
+            return "essential valuation data missing"
+        }
+        
+        // no usable non-empty element in at least one array
+        guard let firstUsableValueIndex = firstValidValues.compactMap({ $0 }).max() else {
+            valuation.bvps = [Double]()
+            valuation.eps = [Double]()
+            valuation.roic = [Double]()
+            valuation.opcs = [Double]()
+            valuation.revenue = [Double]()
+            return "essential valuation data missing"
+        }
+                
+        if firstUsableValueIndex == 0 { return error } // the first element of all arrays is valid, as expected
+        else if ((maximumValidElements - minimumValidElements) - 1) < firstUsableValueIndex {
+            // initial elements of some arrays are invalid and need to be removed
+            // some leading elements may already have been removed above if arrays have different elements counts
+            // all arrays have the same element count here but this may here be equal or less than the firstUsableValueIndex
+            // i.e. invalid elements may have already been removed
+            error = "limited data set due to gaps"
+        }
+        else {
+            let removeToIndex = firstUsableValueIndex - ((maximumValidElements - minimumValidElements) - 1)
+            for i in 0..<valueArrays.count {
+                valueArrays[i].removeSubrange(0...removeToIndex)
+            }
+            error = "limited data set due to gaps"
+        }
+        
+        valuation.bvps = valueArrays[0]
+        valuation.eps = valueArrays[1]
+        valuation.roic = valueArrays[2]
+        valuation.opcs = valueArrays[3]
+        valuation.revenue = valueArrays[4]
+        
+        return error
+    }
+    */
     
     /*
     func extractRowNumbers(keyPhrase: String, expectedNumbers: Int) -> [Double]? {

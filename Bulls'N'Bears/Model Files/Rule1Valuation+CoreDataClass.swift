@@ -189,13 +189,13 @@ public class Rule1Valuation: NSManagedObject {
         return Double(ratesHigher10) / Double(sumValidRates)
     }
     
-    func futureGrowthEstimate() -> Double? {
+    func futureGrowthEstimate(cleanedBVPS: [Double]) -> Double? {
         
-        guard let endValue = bvps?.first else { return nil }
+        guard let endValue = cleanedBVPS.first else { return nil }
         
         var bvpsGrowthRates = [Double]()
-        for yearsBack in 1..<(bvps?.count ?? 0) {
-            bvpsGrowthRates.append(compoundGrowthRate(endValue: endValue, startValue: bvps![yearsBack], years: Double(yearsBack)))
+        for yearsBack in 1..<(cleanedBVPS.count) {
+            bvpsGrowthRates.append(compoundGrowthRate(endValue: endValue, startValue: cleanedBVPS[yearsBack], years: Double(yearsBack)))
         }
         let lowBVPSGrowth = bvpsGrowthRates.mean()
         
@@ -203,9 +203,9 @@ public class Rule1Valuation: NSManagedObject {
         return analystPredictedGrowth != nil ? analystPredictedGrowth! : lowBVPSGrowth
     }
     
-    func futureEPS(futureGrowth: Double) -> Double? {
+    func futureEPS(futureGrowth: Double, cleanedEPS: [Double]) -> Double? {
  
-        guard let currentEPS = eps?.first else { return nil }
+        guard let currentEPS = cleanedEPS.first else { return nil }
         return futureValue(present: currentEPS, growth: futureGrowth, years: 10.0)
     }
     
@@ -222,21 +222,49 @@ public class Rule1Valuation: NSManagedObject {
         }
     }
     
-    func stickerPrice() -> Double? {
+    func stickerPrice() -> (Double?, [String]?) {
         
+        var errors:[String]?
+        
+        let dataArrays = [bvps!, eps!]
+        let (cleanedArrays,error) = ValuationDataCleaner.cleanValuationData(dataArrays: dataArrays, method: .rule1)
+        
+        if let validError = error {
+            errors = [validError]
+        }
+        let cleanedBVPS = cleanedArrays[0]
+        let cleanedEPS = cleanedArrays[1]
 
-        guard bvps?.count ?? 0 > 1 else { return nil }
+        guard cleanedBVPS.count > 1 else {
+            if errors == nil {
+                errors = [String]()
+            }
+            errors?.append("no book value per share figure available.")
+            return (nil, errors)
+        }
         
-        guard let futureGrowth = futureGrowthEstimate() else {
-            return nil
+        guard let futureGrowth = futureGrowthEstimate(cleanedBVPS: cleanedBVPS) else {
+            if errors == nil {
+                errors = [String]()
+            }
+            errors?.append("can't calculate future growth from book values per share.")
+            return (nil, errors)
         }
          
-        guard let epsIn10Years = futureEPS(futureGrowth: futureGrowth) else {
-            return nil
+        guard let epsIn10Years = futureEPS(futureGrowth: futureGrowth, cleanedEPS: cleanedEPS) else {
+            if errors == nil {
+                errors = [String]()
+            }
+            errors?.append("can't calculate future eps from earnings per share.")
+            return (nil, errors)
         }
         
         guard let futurePER = futurePER(futureGrowth: futureGrowth) else {
-            return nil
+            if errors == nil {
+                errors = [String]()
+            }
+            errors?.append("can't calculate future P/E ratio")
+            return (nil, errors)
         }
 
         let acceptedFuturePER = adjFuturePE != Double() ? adjFuturePE : futurePER
@@ -244,7 +272,7 @@ public class Rule1Valuation: NSManagedObject {
         let futureStockPrice = epsIn10Years * acceptedFuturePER
         let stickerPrice = presentValue(growth: 0.15, years: 10, endValue: futureStockPrice)
         
-        return stickerPrice
+        return (stickerPrice, errors)
     }
 
 }

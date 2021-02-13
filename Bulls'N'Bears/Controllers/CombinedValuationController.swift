@@ -136,10 +136,10 @@ class CombinedValuationController: ValuationHelper {
         var titles = [String]()
         
         if method == .dcf {
-            titles = ["General","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
+            titles = ["DCF Valuation - \(stock.symbol)","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
         } else
         if method == .rule1 {
-            titles = ["General",
+            titles = ["Rule 1 Valuation - \(stock.symbol)",
             "Moat parameters: Values 5-10 years back",
             "", "", "", "",
             "PE Ratios", "Growth predictions",

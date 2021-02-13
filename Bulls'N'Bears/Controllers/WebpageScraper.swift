@@ -14,7 +14,6 @@ class WebpageScraper {
         
         var pageText = html$
         let sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
-//        let sectionTerminal = sectionTerminal ?? "</div></div></div></div></div>"
         let rowTerminal = rowTerminal ?? "</div></div></div><div role=\"row\""
         let numberTerminal = numberTerminal ?? "</div></div><div role=\"gridcell\""
         let numberStarter = numberStarter ?? ">"
@@ -31,7 +30,10 @@ class WebpageScraper {
 // A Find section header
         if sectionTitle != nil {
             guard let sectionIndex = pageText?.range(of: sectionTitle!) else {
-                errors.append("Did not find section \(sectionTitle!) on webpage")
+                let error = "Did not find section \(sectionTitle!) on webpage"
+                if !errors.contains(error) {
+                    errors.append(error)
+                }
                 return (nil, errors)
             }
             pageText = String(pageText!.suffix(from: sectionIndex.upperBound))
@@ -39,7 +41,10 @@ class WebpageScraper {
                         
 // B Find beginning of row
         guard let rowStartIndex = pageText?.range(of: rowTitle) else {
-            errors.append("Did not find row titled \(rowTitle) on webpage")
+            let error = "Did not find row titled \(rowTitle) on webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
             return (nil, errors)
         }
 // C Find end of row - or if last row end of table - and reduce pageText to this row
@@ -49,16 +54,24 @@ class WebpageScraper {
             pageText = String(pageText![rowStartIndex.upperBound..<tableEndIndex.lowerBound])
         }
         else {
-            errors.append("Did not find row end for title \(rowTitle) on webpage")
+            let error = "Did not find row end for title \(rowTitle) on webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
             return (nil, errors)
         }
 
         var valueArray = [Double]()
         var labelEndIndex: Range<String.Index>?
         
+        print("\(rowTitle) row text = \(pageText!)")
+        
         repeat {
             guard let labelStartIndex = pageText!.range(of: numberStarter, options: .backwards, range: nil, locale: nil) else {
-                errors.append("Did not find number start in \(rowTitle) on webpage")
+                let error = "Did not find number start in \(rowTitle) on webpage"
+                if !errors.contains(error) {
+                    errors.append(error)
+                }
                 continue
             }
             let value$ = pageText![labelStartIndex.upperBound...]
@@ -91,8 +104,19 @@ class WebpageScraper {
                     if value$.last == ")" {
                         value = v * -1
                     }
+                    
                 }
-                valueArray.append(value)
+                if let last = valueArray.last {
+                    if last == value { // avoid adding the same value twice if Yahoo column 'last year' = TTM vakue
+                        valueArray.append(Double())
+                    }
+                    else {
+                        valueArray.append(value)
+                    }
+                } else {
+                    valueArray.append(value)
+                }
+
             }
             else if value$.contains("N/A") {
                 valueArray.append(Double())
@@ -153,4 +177,5 @@ class WebpageScraper {
         return (valueArray, errors)
 
     }
+    
 }

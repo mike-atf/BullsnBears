@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol ProgressViewDelegate {
+protocol ProgressViewDelegate: AnyObject {
     func progressUpdate(allTasks: Int, completedTasks: Int)
     func cancelRequested()
     func downloadComplete()

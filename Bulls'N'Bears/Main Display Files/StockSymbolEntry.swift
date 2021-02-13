@@ -39,23 +39,6 @@ class StockSymbolEntry: UIViewController, UITextFieldDelegate {
             return
         }
 
-// NEW
-//        let newStock = Stock(name: name, dailyPrices: [], fileURL: nil)
-//        newStock.updatePrices()
-//        stocks.append(newStock)
-//
-//        self.dismiss(animated: true, completion: {
-//            self.rootView.tableView.reloadData()
-//        })
-//
-        
-//        let numberFormatter: NumberFormatter = {
-//            let formatter = NumberFormatter()
-//            formatter.maximumFractionDigits = 0
-//            formatter.minimumIntegerDigits = 1
-//            return formatter
-//        }()
-//
         let calendar = Calendar.current
         let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
         var dateComponents = calendar.dateComponents(components, from: Date())

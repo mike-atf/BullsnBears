@@ -124,7 +124,7 @@ public class DCFValuation: NSManagedObject {
         }
     }
     
-    public func returnIValue() -> (Double?, String?) {
+    public func returnIValue() -> (Double?, [String]) {
         
         // 1 calculate 'FCF_to_equity' from fFCFo + capExpend
         // 2 calculate 'FCF / netIncome[]' from FCF_t_e / netIncome
@@ -148,101 +148,98 @@ public class DCFValuation: NSManagedObject {
         // 19 'todaysValue' = sum(PVofFutureCF[+1-5])
         // 20 fairValue = 'todaysValue' / sharesOutstanding (drop last three!)
         
-// stop crashes on lading when data has been corrupted
-        guard capExpend?.count ?? 0 == 4 else {
-            capExpend = [Double(), Double(), Double(), Double()]
-            save()
-            return (nil,"not enough cap. expend. data")
+        var errors = [String]()
+        let dataArrays = [tRevenueActual!, capExpend!, netIncome!, tFCFo!]
+        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: dataArrays, method: .dcf)
+        if let validError = error {
+            errors.append(validError)
         }
-        guard tRevenueActual?.count == 4 else {
-            tRevenueActual = [Double(), Double(), Double(), Double()]
-            save()
-            return (nil,"not enough revenue data")
-        }
-        guard netIncome?.count ?? 0 == 4 else {
-            netIncome = [Double(), Double(), Double(), Double()]
-            save()
-            return (nil,"not enough net income data")
-        }
-        guard tFCFo?.count ?? 0 == 4 else {
-            tFCFo = [Double(), Double(), Double(), Double()]
-            save()
-            return (nil,"not enough cash flow data")
-        }
-        guard tRevenuePred?.count ?? 0 == 2 else {
-            tRevenuePred = [Double(), Double()]
-            save()
-            return (nil,"not enough pred. revenue data")
-        }
-        guard revGrowthPred?.count ?? 0 == 2 else {
-            revGrowthPred = [Double(), Double()]
-            save()
-            return (nil,"not enough pred. growth data")
-        }
-        guard revGrowthPredAdj?.count ?? 0 == 2 else {
-            revGrowthPredAdj = [Double(), Double()]
-            save()
-            return (nil,"not enough adj. pred. growth data")
-        }
-//
         
-        
+        let revenueCleaned = cleanedData[0]
+        let capExpendCleaned = cleanedData[1]
+        let netIncomeCleaned = cleanedData[2]
+        let fcfCleaned = cleanedData[3]
 // 1
-        var fcfToEquity = [Double]()
+        var fcfToEquity = [Double]() // to accomodate missing figures from website harvesting
         var count = 0
-        for annualFCF in tFCFo ?? [] {
-            if capExpend?.count ?? 0 > count {
-                fcfToEquity.append(annualFCF + (capExpend![count])) // capExpend entered as negative
-            }
-            else { return (nil,"not enough cap. expend. data") } // error missing value
+        for annualFCF in fcfCleaned {
+                fcfToEquity.append(annualFCF + (capExpendCleaned[count])) // capExpend entered as negative
             count += 1
         }
 // 2
         var fcfToNetIncome = [Double]()
         count = 0
         for  fcfTE in fcfToEquity {
-            if netIncome?.count ?? 0 > count {
-                fcfToNetIncome.append(fcfTE / netIncome![count])
-            }
-            else { return (nil,"not enough net income data") } // error missing value
+            fcfToNetIncome.append(fcfTE / netIncomeCleaned[count])
             count += 1
         }
 // 3
         var netIncomeMargins = [Double]()
         count = 0
-        for  income in netIncome ?? [] {
-            if tRevenueActual?.count ?? 0 > count {
-                netIncomeMargins.append(income / tRevenueActual![count])
-            }
-            else { return (nil,"not enough revenue data") } // error missing value
+        for  income in netIncomeCleaned {
+            netIncomeMargins.append(income / revenueCleaned[count])
             count += 1
         }
 // 4 + 5
         predictedRevenue = tRevenuePred ?? []
         
         guard predictedRevenue.last != nil && predictedRevenue.last != nil && revGrowthPredAdj?.first != nil && revGrowthPredAdj?.last != nil else {
-            return (nil,"essential data missing")
+            errors.append("essential data missing")
+            return (nil,errors)
         }
-        predictedRevenue.append(predictedRevenue.last! + predictedRevenue.last! * revGrowthPredAdj!.first!)
-        predictedRevenue.append(predictedRevenue.last! + predictedRevenue.last! * revGrowthPredAdj!.last!)
+        let cleanedAdjGrowth = revGrowthPredAdj?.filter({ (element) -> Bool in
+            if element == Double() { return false }
+            else { return true }
+        })
+        
+        let growth = [cleanedAdjGrowth?.first ?? revGrowthPred?.first, cleanedAdjGrowth?.last ?? revGrowthPred?.last]
+        
+        predictedRevenue.append(predictedRevenue.last! + predictedRevenue.last! * growth.first!!)
+        predictedRevenue.append(predictedRevenue.last! + predictedRevenue.last! * growth.last!!)
 // 6
+        var incomeMarginValue = netIncomeMargins.min()
+        if incomeMarginValue == nil {
+            errors.append("can't calculate minimum net income margin. Value may be too high - use with caution!")
+            incomeMarginValue = netIncomeMargins.mean()
+            guard incomeMarginValue != nil else {
+                errors.append("can't calculate any net income margin.")
+                return (nil,errors)
+            }
+        }
+        
         var predNetIncome = [Double]()
-        count = 0
         for  revenue in predictedRevenue {
-            predNetIncome.append(revenue * netIncomeMargins.min()!)
-            count += 1
+            predNetIncome.append(revenue * incomeMarginValue!)
         }
 // 7
+        // excluding negative FCF values - which would give a negative minimum value and negative intrinsic value
+        
+        var fcfToNetIncomeValue = fcfToNetIncome.min()
+        if fcfToNetIncomeValue == nil {
+            errors.append("can't find an essential minimum 'FCF / net income' value.")
+            return (nil,errors)
+        }
+        else if (fcfToNetIncomeValue ?? 0.0) < 0 {
+            errors.append("the minimum 'FCF / net income' value is negative; using mean value instead. Resulting value may be too high - use with caution!")
+            fcfToNetIncomeValue = fcfToNetIncome.mean()
+            guard fcfToNetIncomeValue ?? 0.0 > 0.0 else {
+                errors.removeLast()
+                errors.append("the minimum and mean 'FCF / net income' values are negative. The resulting price estimate is negative")
+                return (nil,errors)
+            }
+        }
+        
         var predFCF = [Double]()
-        count = 0
         for  income in predNetIncome {
-            predFCF.append(income * fcfToNetIncome.min()!)
-            count += 1
+            predFCF.append(income * fcfToNetIncomeValue!)
         }
 // 8
-//        let totalDebtRate = expenseInterest / (debtST + debtLT)
+
 // 9
-        let taxRate = expenseIncomeTax / incomePreTax
+        var taxRate = 0.0
+        if incomePreTax != 0.0 {
+            taxRate = abs(expenseIncomeTax) / incomePreTax
+        }
 // 10
         let totalCompanyValue = marketCap + (debtST + debtLT)
 // 11
@@ -268,18 +265,22 @@ public class DCFValuation: NSManagedObject {
         }
 // 17
         let ppGrowthRate = UserDefaults.standard.value(forKey: "PerpetualGrowthRate") as! Double
-        let terminalValue = (predFCF.last! * (1 - ppGrowthRate)) / (wtAvgCostOfCapital - ppGrowthRate)
-// 18
-        pvOfFutureCF.append(terminalValue / discountFactors.last!)
-// 19
-        let todaysValue = pvOfFutureCF.reduce(0, +)
-// 20
-        var fairValue: Double?
-        if sharesOutstanding > 0 {
-            fairValue = todaysValue / sharesOutstanding
+        if  let latestPredFCF = predFCF.last {
+            let terminalValue = (latestPredFCF * (1 - ppGrowthRate)) / (wtAvgCostOfCapital - ppGrowthRate)
+    // 18
+            pvOfFutureCF.append(terminalValue / discountFactors.last!)
+    // 19
+            let todaysValue = pvOfFutureCF.compactMap{ $0 }.reduce(0, +)
+    // 20
+            var fairValue: Double?
+            if sharesOutstanding > 0 {
+                fairValue = todaysValue / sharesOutstanding
+            }
+            
+            return (fairValue,errors)
         }
-        
-        return (fairValue,nil)
+        errors.append("data gaps - can't calculate last predicted FCF")
+        return (nil, errors)
     }
     
 }

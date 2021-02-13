@@ -55,8 +55,6 @@ class Stock {
     //MARK: - File update download function
     func startPriceUpdate(yahooRefDate: Date) {
         
-        print("Price update requested for \(symbol)...")
-        
         let nowSinceRefDate = Date().timeIntervalSince(yahooRefDate)
         let start = nowSinceRefDate - TimeInterval(3600 * 24 * 366)
         
@@ -151,8 +149,6 @@ class Stock {
     
     func extractPriceData(url: URL) {
         
-        print("...Price was updated for \(symbol)")
-
         if let updatedPrices = CSVImporter.extractPriceData(url: fileURL, symbol: symbol) {
             self.dailyPrices = updatedPrices
             self.fileURL = url

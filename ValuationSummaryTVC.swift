@@ -7,14 +7,18 @@
 
 import UIKit
 
+protocol ValuationSummaryDelegate: AnyObject {
+    func valuationComplete(toDismiss: ValuationSummaryTVC?)
+}
+
 class ValuationSummaryTVC: UITableViewController {
 
     var sectionHeaderTitles = ["Valuation Summary", "Resulting Sticker price"]
     var sectionHeaderSubTitles = ["Adjust numbers if necessary", "(non-editable)"]
     var sectionsRowTitles = [["Future growth", "Future PE ratio"],["Sticker price"]]
     var r1Valuation: Rule1Valuation!
-    var indexPath: IndexPath!
-    weak var presentingVC: StocksListViewController!
+//    var indexPath: IndexPath!
+    weak var delegate: ValuationSummaryDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,13 +53,16 @@ class ValuationSummaryTVC: UITableViewController {
                 format = .percent
             }
             else if indexPath.row == 1 {
-                if let futureGrowth = r1Valuation.futureGrowthEstimate() {
+                let dataArrays = [r1Valuation.bvps!, r1Valuation.eps!]
+                let (cleanedArrays, _) = ValuationDataCleaner.cleanValuationData(dataArrays: dataArrays, method: .rule1)
+                
+                if let futureGrowth = r1Valuation.futureGrowthEstimate(cleanedBVPS: cleanedArrays[0]) {
                     value = r1Valuation.futurePER(futureGrowth: futureGrowth)
                     format = .numberWithDecimals
                 }
             }
         } else {
-            value = r1Valuation.stickerPrice()
+            (value,_) = r1Valuation.stickerPrice()
             format = .currency
         }
         
@@ -140,7 +147,7 @@ class ValuationSummaryTVC: UITableViewController {
     
     @objc
     func saveValuation() {
-        self.dismiss(animated: true) {
+//        self.dismiss(animated: true) { [self] in
             self.r1Valuation.save()
             // NEW
             for row in 0..<self.sectionsRowTitles.count {
@@ -151,10 +158,10 @@ class ValuationSummaryTVC: UITableViewController {
             if let cell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 1)) as? ValuationSummaryCell {
                 cell.cellDelegate = nil
             }
-            //
-            self.presentingVC.valuationCompleted(indexPath: self.indexPath)
-        }        
-    }
+
+            delegate?.valuationComplete(toDismiss: self)
+        }
+//    }
 
 }
 

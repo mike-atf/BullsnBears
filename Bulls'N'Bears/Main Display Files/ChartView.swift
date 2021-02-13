@@ -200,7 +200,7 @@ class ChartView: UIView {
             valuationLabels.removeAll()
 
             if let existingValuation = CombinedValuationController.returnDCFValuations(company: stockToShow!.symbol)?.first {
-                let (fairValue, _) = existingValuation.returnIValue()
+                let (fairValue, errors) = existingValuation.returnIValue()
                 if (fairValue ?? 0.0) > 0 {
                     let ratio = currentPrice / fairValue!
                     let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
@@ -210,7 +210,7 @@ class ChartView: UIView {
                         label.numberOfLines = 1
                         label.font = UIFont.preferredFont(forTextStyle: .footnote)
                         label.textColor = UIColor(named: "antiLabel")
-                        label.backgroundColor = UIColor.label
+                        label.backgroundColor = (errors.count == 0) ? UIColor.label : UIColor.systemYellow
                         label.text = ratio$
                         label.sizeToFit()
                         
@@ -227,9 +227,9 @@ class ChartView: UIView {
 // R1 Label
             // R1 Label
             if let existingValuation = CombinedValuationController.returnR1Valuations(company: stockToShow!.symbol)?.first {
-                if let fairValue = existingValuation.stickerPrice() {
-                    if fairValue > 0 {
-                        let ratio = currentPrice / fairValue
+                let (fairValue,errors) = existingValuation.stickerPrice()
+                    if (fairValue ?? 0) > 0 {
+                        let ratio = currentPrice / fairValue!
                         let ratio$ = " R1 " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
 
                         let newLabel: UILabel = {
@@ -237,7 +237,7 @@ class ChartView: UIView {
                             label.numberOfLines = 1
                             label.font = UIFont.preferredFont(forTextStyle: .footnote)
                             label.textColor = UIColor(named: "antiLabel")
-                            label.backgroundColor = UIColor.label
+                            label.backgroundColor = (errors == nil) ? UIColor.label : UIColor.systemYellow
                             label.text = ratio$
                             label.sizeToFit()
                             
@@ -249,7 +249,7 @@ class ChartView: UIView {
                         valuationLabels.append(newLabel)
                         addSubview(newLabel)
                     }
-                }
+
             }
         }
         

@@ -7,18 +7,13 @@
 
 import UIKit
 
-protocol StockListCellDelegate {
-    func valuationButtonPressed(indexpath: IndexPath)
-}
 
 class StockListCellTableViewCell: UITableViewCell {
 
     @IBOutlet var title: UILabel!
     @IBOutlet var detail: UILabel!
-    @IBOutlet var valuationButton: UIButton!
     
     var indexPath: IndexPath!
-    var cellDelegate: StockListCellDelegate!
     var stock: Stock!
     
 //    let timeFormatter: DateComponentsFormatter = {
@@ -40,21 +35,14 @@ class StockListCellTableViewCell: UITableViewCell {
         
     override func awakeFromNib() {
         super.awakeFromNib()
-        valuationButton.titleLabel?.numberOfLines = 0
     }
     
-    public func configureCell(indexPath: IndexPath, delegate: StockListCellDelegate, stock: Stock) {
+    public func configureCell(indexPath: IndexPath, stock: Stock) {
         self.indexPath = indexPath
         self.stock = stock
-        self.cellDelegate = delegate
         
         title.text = stock.symbol
-//        let timeSinceLastStockDate = Date().timeIntervalSince(stock.dailyPrices.last!.tradingDate)
         detail.text = timeFormatter.localizedString(for: stock.dailyPrices.last!.tradingDate, relativeTo: Date())
         
-    }
-    
-    @IBAction func valuationButtonAction(_ sender: UIButton) {
-        cellDelegate.valuationButtonPressed(indexpath: self.indexPath)
     }
 }

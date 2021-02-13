@@ -14,12 +14,11 @@ class ValuationChooser: UIViewController {
     @IBOutlet weak var rule1Button: UIButton!
 
     var stock: Stock!
-    weak var rootView: StocksListViewController!
+    weak var rootView: StocksListViewController?
     var sourceCellPath: IndexPath!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
     }
     
     @IBAction func cancelAction(_ sender: UIButton) {
@@ -44,12 +43,13 @@ class ValuationChooser: UIViewController {
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.dcf
-            tvc.presentingListVC = rootView
+//            tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
             tvc.stock = stock
             
             self.dismiss(animated: true) {
-                self.rootView.navigationController?.present(tvc, animated: true, completion: nil)
+                self.rootView?.navigationController?.present(tvc, animated: true, completion: nil)
+                self.rootView = nil
             }
         }
     }
@@ -70,12 +70,14 @@ class ValuationChooser: UIViewController {
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.rule1
-            tvc.presentingListVC = rootView
+//            tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
             tvc.stock = stock
             
+            
             self.dismiss(animated: true) {
-                self.rootView.present(tvc, animated: true)
+                self.rootView?.present(tvc, animated: true)
+                self.rootView = nil
             }
 
         }

@@ -14,9 +14,10 @@ class DCFWebDataAnalyser {
     var valuation: DCFValuation!
     var yahooPages = ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"]
     var controller: CombinedValuationController!
-    var sectionsComplete = [Bool]()
-    var progressDelegate: ProgressViewDelegate?
+//    var sectionsComplete = [Bool]()
+    weak var progressDelegate: ProgressViewDelegate?
     var completedDownLoadTasks = 0
+    var downloadTasks = 0
     var yahooSession: URLSessionDataTask?
     var downloadErrors = [String]()
     
@@ -39,7 +40,8 @@ class DCFWebDataAnalyser {
         
         var components: URLComponents?
                 
-        sectionsComplete.append(false)
+//        sectionsComplete.append(false)
+        downloadTasks = yahooPages.count
         components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(section)")
         components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
         download(url: components?.url, for: section)
@@ -48,6 +50,8 @@ class DCFWebDataAnalyser {
     @objc
     func downloadCompleted(notification: Notification) {
                         
+        completedDownLoadTasks += 1
+        
         guard let validWebCode = html$ else {
             downloadErrors.append("download complete, html string is empty")
             return
@@ -57,9 +61,7 @@ class DCFWebDataAnalyser {
             downloadErrors.append("download complete - notification did not contain section info!!")
             return
         }
-        
-        completedDownLoadTasks += 1
-        
+                
         var result:(array: [Double]?, errors: [String])
         if section == yahooPages.first! {
 // Key stats
@@ -76,18 +78,18 @@ class DCFWebDataAnalyser {
             downloadErrors.append(contentsOf: result.errors)
             valuation.sharesOutstanding = result.array?.first ?? Double()
 
-            sectionsComplete[0] = true
+//            sectionsComplete[0] = true
             startDCFDataSearch(section: yahooPages[1])
         }
         else if section == yahooPages[1] {
 // Income
             result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Total revenue</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
-            valuation.tRevenueActual = Array(result.array?.dropFirst() ?? []) // remove TTM column
+            valuation.tRevenueActual = result.array // Array(result.array?.dropFirst() ?? []) // remove TTM column
 
             result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Net income</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
-            valuation.netIncome = Array(result.array?.dropFirst() ?? [])
+            valuation.netIncome = result.array // Array(result.array?.dropFirst() ?? [])
 
             result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Interest expense</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
@@ -101,7 +103,7 @@ class DCFWebDataAnalyser {
             downloadErrors.append(contentsOf: result.errors)
             valuation.expenseIncomeTax = result.array?.first ?? Double()
 
-            sectionsComplete[1] = true
+//            sectionsComplete[1] = true
             startDCFDataSearch(section: yahooPages[2])
         }
         else if section == yahooPages[2] {
@@ -114,15 +116,15 @@ class DCFWebDataAnalyser {
             result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Long-term debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             if result.errors.count > 0 {
-                
+                downloadTasks += 1
                 var components = URLComponents(string: "https://finance.yahoo.com/quote/\(stock.symbol)/\(section)")
                 components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
                 download(url: components?.url, for: "Yahoo LT Debt")
             }
             else {
                 valuation.debtLT = result.array?.first ?? Double()
-                sectionsComplete[2] = true            }
-
+//                sectionsComplete[2] = true            }
+            }
             startDCFDataSearch(section: yahooPages[3])
         }
         else if section == yahooPages[3] {
@@ -130,13 +132,13 @@ class DCFWebDataAnalyser {
             
             result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Operating cash flow</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
-            valuation.tFCFo = Array(result.array?.dropFirst() ?? [])
+            valuation.tFCFo = result.array // Array(result.array?.dropFirst() ?? [])
             
             result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Capital expenditure</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
-            valuation.capExpend = Array(result.array?.dropFirst() ?? [])
+            valuation.capExpend = result.array // Array(result.array?.dropFirst() ?? [])
 
-            sectionsComplete[3] = true
+//            sectionsComplete[3] = true
             startDCFDataSearch(section: yahooPages[4])
         }
         else if section == yahooPages[4] {
@@ -154,7 +156,7 @@ class DCFWebDataAnalyser {
             let b2 = b1?.dropFirst()
             valuation.revGrowthPred = Array(b2 ?? [])
 
-            sectionsComplete[4] = true
+//            sectionsComplete[4] = true
         }
         else if section == "Yahoo LT Debt" {
             
@@ -163,7 +165,7 @@ class DCFWebDataAnalyser {
             result = WebpageScraper.scrapeRow(html$: validWebCode, rowTitle: ">Total Debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
             downloadErrors.append(contentsOf: result.errors)
             valuation.debtLT = result.array?.first ?? Double()
-            sectionsComplete[2] = true
+//            sectionsComplete[2] = true
             
             
             downloadErrors = downloadErrors.filter({ (error) -> Bool in
@@ -173,18 +175,113 @@ class DCFWebDataAnalyser {
         }
         
         DispatchQueue.main.async {
-            self.progressDelegate?.progressUpdate(allTasks: self.yahooPages.count, completedTasks: self.completedDownLoadTasks)
+            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.completedDownLoadTasks)
         }
         
-        if !sectionsComplete.contains(false) {
+        if completedDownLoadTasks == downloadTasks {
             DispatchQueue.main.async {
-                self.completedDownLoadTasks = 0
-                self.progressDelegate = nil
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: self.downloadErrors, userInfo: nil)
             }
         }
         
     }
+    
+    /*
+    func scrubWebData() -> String? {
+        // webdata will contain an empty Double() as placeholder if no valid number can be found
+        
+        var error: String?
+        var predictionArrays = [valuation.tRevenuePred!, valuation.revGrowthPred!, valuation.revGrowthPredAdj!]
+        
+        for i in 0..<predictionArrays.count {
+            predictionArrays[i] = predictionArrays[i].filter({ (element) -> Bool in
+                if element != Double() { return true }
+                else { return false }
+            })
+        }
+        
+        var firstValidValues = [Int?]()
+        var valueArrays = [valuation.tRevenueActual!, valuation.tFCFo!, valuation.netIncome!, valuation.capExpend!]
+        
+        // if one array contains leading empty Double() elements remove these and all corresponding elements in other array
+        var count = 0
+        var validElements = [Int]()
+        var allElements = [Int]()
+        for array in  valueArrays { // bvps is created as [Double]() in insert
+            count = 0
+
+            allElements.append(array.count)
+
+            validElements.append(array.filter({ (element) -> Bool in
+                if element != Double() { return true }
+                else { return false }
+            }).count)
+            
+            for value in array {
+                if value != Double() {
+                    firstValidValues.append(count)
+                    break
+                }
+                count += 1
+            }
+        }
+        
+        let minimumValidElements = validElements.min() ?? 0
+        let maximumValidElements = allElements.max() ?? 0
+        
+        if minimumValidElements != maximumValidElements {
+            // assuming leading! elements for most recent years are missing in some arrays
+            // may give wrong results if elements from earlier years are missing
+            error = "limited data set due to gaps"
+
+            for i in 0..<valueArrays.count {
+                let elementCount = valueArrays[i].count
+                valueArrays[i].removeSubrange(0..<(elementCount - minimumValidElements))
+            }
+            // dont' return yet - check below wehther more invalid elements need to be removed
+        }
+        
+        // if one array contains empty Double() elements only return empty arrays
+        guard !firstValidValues.contains(nil) else {
+            return "essential valuation data missing"
+        }
+        
+        // no usable non-empty element in at least one array
+        guard let firstUsableValueIndex = firstValidValues.compactMap({ $0 }).max() else {
+            valuation.tRevenueActual = [Double]()
+            valuation.tFCFo = [Double]()
+            valuation.netIncome = [Double]()
+            valuation.capExpend = [Double]()
+            return "essential valuation data missing"
+        }
+                
+        if firstUsableValueIndex == 0 { return error } // the first element of all arrays is valid, as expected
+        else if ((maximumValidElements - minimumValidElements) - 1) < firstUsableValueIndex {
+            // initial elements of some arrays are invalid and need to be removed
+            // some leading elements may already have been removed above if arrays have different elements counts
+            // all arrays have the same element count here but this may here be equal or less than the firstUsableValueIndex
+            // i.e. invalid elements may have already been removed
+            print(valueArrays)
+            error = "limited data set due to gaps"
+        }
+        else {
+            let removeToIndex = firstUsableValueIndex - ((maximumValidElements - minimumValidElements) - 1)
+            for i in 0..<valueArrays.count {
+                valueArrays[i].removeSubrange(0...removeToIndex)
+                print(valueArrays[i])
+            }
+            error = "limited data set due to gaps"
+        }
+        
+        valuation.tRevenueActual = valueArrays[0]
+        valuation.tFCFo = valueArrays[1]
+        valuation.netIncome = valueArrays[2]
+        valuation.capExpend = valueArrays[3]
+        
+        return error
+
+    }
+    */
     
     /*
     func keyStats(_ validWebCode: String) -> [Double] {
@@ -490,6 +587,7 @@ class DCFWebDataAnalyser {
             return
         }
         
+        print("DCF downloading \(section)...")
         yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {

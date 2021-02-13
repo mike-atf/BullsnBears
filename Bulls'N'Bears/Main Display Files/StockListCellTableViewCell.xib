@@ -4,7 +4,6 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -29,27 +28,10 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s5V-FW-Vej">
-                        <rect key="frame" x="120" y="12" width="110" height="37"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="s5V-FW-Vej" secondAttribute="height" multiplier="3:1" id="jtn-oL-aZc"/>
-                        </constraints>
-                        <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
-                        <color key="tintColor" systemColor="systemOrangeColor"/>
-                        <state key="normal" image="dollarsign.circle" catalog="system">
-                            <color key="titleColor" systemColor="systemOrangeColor"/>
-                        </state>
-                        <connections>
-                            <action selector="valuationButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="d0V-KR-odH"/>
-                        </connections>
-                    </button>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="s5V-FW-Vej" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="Cat-EH-tPJ"/>
                     <constraint firstItem="Wei-cZ-Jf6" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="Dbk-Cb-NmG"/>
-                    <constraint firstItem="s5V-FW-Vej" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.6" id="Gfd-S3-SIY"/>
                     <constraint firstItem="Wei-cZ-Jf6" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="SFQ-sc-QWq"/>
-                    <constraint firstItem="s5V-FW-Vej" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="YSz-0d-TM7"/>
                     <constraint firstItem="sIC-VG-f5n" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="an1-BH-vYf"/>
                     <constraint firstAttribute="trailing" secondItem="sIC-VG-f5n" secondAttribute="trailing" constant="10" id="uSl-3u-mpY"/>
                 </constraints>
@@ -58,15 +40,8 @@
             <connections>
                 <outlet property="detail" destination="sIC-VG-f5n" id="L1X-ZI-haI"/>
                 <outlet property="title" destination="Wei-cZ-Jf6" id="FqK-RQ-cey"/>
-                <outlet property="valuationButton" destination="s5V-FW-Vej" id="u1E-ZA-aQI"/>
             </connections>
             <point key="canvasLocation" x="108.69565217391305" y="89.397321428571431"/>
         </tableViewCell>
     </objects>
-    <resources>
-        <image name="dollarsign.circle" catalog="system" width="128" height="121"/>
-        <systemColor name="systemOrangeColor">
-            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-    </resources>
 </document>

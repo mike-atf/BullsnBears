@@ -52,10 +52,6 @@ class StocksController: StockDelegate {
                         if let stock = CSVImporter.csvExtractor(url: url) {
                             stock.delegate = self
                             stocks.append(stock)
-                            
-                            if stock.needsUpdate {
-                                stock.startPriceUpdate(yahooRefDate: self.yahooRefDate)
-                            }
                         }
                    }
                 }
@@ -64,6 +60,15 @@ class StocksController: StockDelegate {
                     ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't access contens of directory \(documentFolder)")
                 }
                 self.delegate?.openStocksComplete()
+            }
+        }
+    }
+    
+    func updateStockFiles() {
+        
+        for stock in stocks {
+            if stock.needsUpdate {
+                stock.startPriceUpdate(yahooRefDate: yahooRefDate)
             }
         }
     }
