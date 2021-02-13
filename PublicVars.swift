@@ -43,6 +43,10 @@ var appBuild: String = {
 
 var alertController = AlertController()
 
+enum Website {
+    case yahoo
+    case macrotrends
+}
 
 enum ValuationCellValueFormat {
     case currency

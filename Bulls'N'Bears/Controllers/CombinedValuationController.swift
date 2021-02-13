@@ -218,11 +218,8 @@ class CombinedValuationController: ValuationHelper {
         let value$ = valueText(value: value, indexPath: indexPath)
         let title = (rowtitles ?? rowTitles())[indexPath.section][indexPath.row]
         let format = valueFormat(indexPath: indexPath)
-//        let (detail$, textColor) = getDetail$(indexPath: indexPath)
         
         return ValuationListCellInfo(value$: value$, title: title, format: format, detailInfo: getDetail$(indexPath: indexPath))
-        
-//        cell.configure(title: title, value$: value$, detail: detail$ ?? "", indexPath: indexPath, method: method, delegate: self, valueFormat: format, detailColor: textColor)
     }
     
     func rowTitles() -> [[String]] {
@@ -537,29 +534,11 @@ class CombinedValuationController: ValuationHelper {
             var paths = [IndexPath(row: indexPath.row, section: indexPath.section)]
 
             switch indexPath.section {
-//            case 0:
-//                return nil
             case 1:
                 if indexPath.row > 0 && indexPath.row < (valuation.bvps!.count) {
                     paths.append(IndexPath(row: 0, section: 7))
                     paths.append(IndexPath(row: 1, section: 7))
                 }
-//            case 2:
-//                if indexPath.row > 0 && indexPath.row < (valuation.eps!.count) {
-//                    paths = [indexPath]
-//                }
-//            case 3:
-//                if indexPath.row > 0 && indexPath.row < (valuation.revenue!.count) {
-//                    paths = [indexPath]
-//                }
-//            case 4:
-//                if indexPath.row > 0 && indexPath.row < (valuation.oFCF!.count) {
-//                    paths = [indexPath]
-//                }
-//            case 5:
-//                paths = [indexPath]
-//            case 6:
-//                return nil
             case 7:
                 // Analyst predcited growht rates
                 paths.append(IndexPath(row: 0, section: 8))
@@ -569,11 +548,6 @@ class CombinedValuationController: ValuationHelper {
                 if indexPath.row == 0 {
                     paths.append(IndexPath(row: indexPath.row+1, section: indexPath.section))
                 }
-//            case 10:
-//                // 'Insider trading
-//                if indexPath.row > 0 {
-//                    paths = [indexPath]
-//                }
             default:
                 return paths
             }
