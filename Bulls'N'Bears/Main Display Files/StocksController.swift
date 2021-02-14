@@ -66,6 +66,10 @@ class StocksController: StockDelegate {
     
     func updateStockFiles() {
         
+        guard (Calendar.current.component(.weekday, from: Date()) > 2) else {
+            return
+        }
+        
         for stock in stocks {
             if stock.needsUpdate {
                 stock.startPriceUpdate(yahooRefDate: yahooRefDate)

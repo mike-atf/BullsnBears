@@ -10,7 +10,7 @@ import Foundation
 class WebpageScraper {
     
     /// webpageExponent = the exponent used by the webpage to listing financial figures, e.g. 'thousands' on yahoo = 3.0
-    class func scrapeRow(website: Website, html$: String?, sectionHeader: String?=nil, rowTitle: String, sectionTerminal: String? = nil, rowTerminal: String? = nil, numberTerminal: String? = nil, numberStarter: String? = nil, webpageExponent: Double?=nil) -> ([Double]?, [String]) {
+    class func scrapeRow(website: Website, html$: String?, sectionHeader: String?=nil, rowTitle: String, rowTerminal: String? = nil, numberTerminal: String? = nil, webpageExponent: Double?=nil) -> ([Double]?, [String]) {
         
         var pageText = html$
         let sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
@@ -69,6 +69,9 @@ class WebpageScraper {
             return (nil, errors)
         }
         
+//        print()
+//        print("website text:")
+//        print(html$ ?? "none")
         
         if website == .macrotrends {
             let (valueArray, errors) = macrotrendsRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, exponent: webpageExponent)
@@ -78,28 +81,6 @@ class WebpageScraper {
             let (valueArray, errors) = yahooRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal, exponent: webpageExponent)
             return (valueArray, errors)
         }
-//        repeat {
-//            guard let labelStartIndex = pageText!.range(of: numberStarter, options: .backwards, range: nil, locale: nil) else {
-//                let error = "Did not find number start in \(rowTitle) on webpage"
-//                if !errors.contains(error) {
-//                    errors.append(error)
-//                }
-//                continue
-//            }
-//            let value$ = pageText![labelStartIndex.upperBound...]
-//
-//            let value = numberFromText(value$: String(value$), rowTitle: rowTitle, exponent: webpageExponent)
-//            valueArray.append(value)
-//
-//
-//            labelEndIndex = pageText!.range(of: numberTerminal, options: .backwards, range: nil, locale: nil)
-//            if let index = labelEndIndex {
-//                pageText!.removeSubrange(index.lowerBound...)
-//            }
-//
-//        } while labelEndIndex != nil && (pageText?.count ?? 0) > 1
-
-//        return (valueArray.reversed() ,errors)
     }
     
     class func macrotrendsRowExtraction(table$: String, rowTitle: String, exponent: Double?=nil) -> ([Double], [String]) {
@@ -143,15 +124,13 @@ class WebpageScraper {
         let numberStarter = ">"
         var tableText = table$
         
-//        print()
-//        print("\(rowTitle) row text:")
-//        print("\(tableText)")
-//
         var labelEndIndex = tableText.range(of: numberTerminal, options: .backwards, range: nil, locale: nil)
         if let index = labelEndIndex {
             tableText.removeSubrange(index.lowerBound...)
         }
 
+//        print("row text:")
+//        print(tableText)
         repeat {
             guard let labelStartIndex = tableText.range(of: numberStarter, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil) else {
                 let error = "Did not find number start in \(rowTitle) on webpage"
@@ -162,7 +141,7 @@ class WebpageScraper {
             }
             
             let value$ = tableText[labelStartIndex.upperBound...]
-//            print("value$ extracted = \(value$)")
+//            print("value$ extracted: \(value$)")
             let value = numberFromText(value$: String(value$), rowTitle: rowTitle, exponent: exponent)
             valueArray.append(value)
             
@@ -171,13 +150,12 @@ class WebpageScraper {
             if let index = labelEndIndex {
                 tableText.removeSubrange(index.lowerBound...)
             }
-//            print("remaining row text = \(tableText)")
 
         } while labelEndIndex != nil && (tableText.count > 1)
 
-//        print("extracted values \(valueArray)")
-//        print("===================================++++++++++")
-
+//        print("values extracted: \(valueArray)")
+//        print("======================================="
+//        )
         return (valueArray, errors)
     }
     
@@ -262,6 +240,5 @@ class WebpageScraper {
         
         return (valueArray, errors)
 
-    }
-    
+    }    
 }
