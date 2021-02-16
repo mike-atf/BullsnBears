@@ -43,6 +43,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if UserDefaults.standard.value(forKey: "LongTermMarketReturn") as? Double == nil {
             UserDefaults.standard.set(0.1, forKey: "LongTermMarketReturn")
         }
+        if UserDefaults.standard.value(forKey: "LongTermCoporateInterestRate") as? Double == nil {
+            UserDefaults.standard.set(0.021, forKey: "LongTermCoporateInterestRate")
+        }
+        
     }
         
     // MARK: - Core Data stack

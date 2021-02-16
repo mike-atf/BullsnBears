@@ -53,7 +53,7 @@ class ValuationDataCleaner {
             return (valueArrays, "some data were discarded due to gaps. Interpret value with caution")
         }
         
-        else if method == .rule1 {
+        else if method == .rule1 || method == .wb {
             
             var elementsToRemoveFromAllArrays = [Int]()
             for i in 0..<valueArrays.count {
@@ -65,7 +65,9 @@ class ValuationDataCleaner {
             for i in 0..<valueArrays.count {
                 for j in 0..<valueArrays[i].count {
                     if elementsToRemoveFromAllArrays.contains(j) {
-                        valueArrays[i].remove(at: j)
+                        if valueArrays[i].count > j {
+                            valueArrays[i].remove(at: j)
+                        }
                     }
                 }
             }

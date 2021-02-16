@@ -25,7 +25,11 @@ class Stock {
     var needsUpdate: Bool {
         return Date().timeIntervalSince(dailyPrices.last?.tradingDate ?? Date()) > 24*3600 ? true : false
     }
-    
+    var html$: String?
+    var peRatio: Double?
+    var eps: Double?
+    var beta: Double?
+
     init(name: String, dailyPrices:[PricePoint], fileURL: URL?, delegate: StockDelegate?) {
         self.symbol = name
         self.delegate = delegate
@@ -48,8 +52,12 @@ class Stock {
             }
         }
         
+
         self.dailyPrices = dailyPrices
         self.fileURL = fileURL
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyratioDownloadComplete(notification:)), name: Notification.Name(rawValue: "KeyRatioDownloadComplete"), object: nil)
+
     }
     
     //MARK: - File update download function
@@ -156,17 +164,86 @@ class Stock {
         }
     }
     
-    //MARK: - internal functions
+    func downloadKeyRatios() {
+        
+        var components: URLComponents?
+                
+        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/key-statistics")
+        components?.queryItems = [URLQueryItem(name: "p", value: symbol), URLQueryItem(name: ".tsrc", value: "fin-srch")]
+            
+        
+        guard let validURL = components?.url else {
+            return
+        }
+        
+        let yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
+            
+            guard error == nil else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock keyratio download error")
+                return
+            }
+            
+            guard urlResponse != nil else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error \(urlResponse.debugDescription)")
+                return
+            }
+            
+            guard let validData = data else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
+                return
+            }
+
+            self.html$ = String(decoding: validData, as: UTF8.self)
+            
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "KeyRatioDownloadComplete"), object: self.symbol , userInfo: nil)
+        }
+        yahooSession.resume()
+    }
     
-//    public func priceOnDate(date: Date, priceOption: PricePointOptions) -> Double {
-//
-//        let prices = dailyPrices.filter { (pricePoint) -> Bool in
-//            if pricePoint.tradingDate >= date { return true }
-//            else { return false }
-//        }
-//
-//        return prices.first!.returnPrice(option: priceOption)
-//    }
+    @objc
+    func keyratioDownloadComplete(notification: Notification) {
+        
+        guard let stockSymbol = notification.object as? String else {
+            return
+        }
+        
+        guard stockSymbol == symbol else {
+            html$ = nil
+            return
+        }
+        
+        guard let webpageText = html$ else {
+            return
+        }
+        
+        let rowTitles = ["Beta (5Y monthly)", "Trailing P/E", "Diluted EPS"] // titles differ from the ones displayed on webpage!
+        var loaderrors = [String]()
+        
+        for title in rowTitles {
+            
+            let pageText = String(webpageText)
+            
+            let (values, errors) = WebpageScraper.scrapeRow(website: .yahoo, html$: pageText, rowTitle: title , rowTerminal: "</tr>", numberTerminal: "</td>")
+            loaderrors.append(contentsOf: errors)
+            
+            if title.starts(with: "Beta") {
+                beta = values?.first
+            } else if title.starts(with: "Trailing") {
+                peRatio = values?.first
+            } else if title.starts(with: "Diluted") {
+                eps = values?.first
+            }
+        }
+        
+        for error in loaderrors {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
+        }
+        
+        html$ = nil
+        
+    }
+    
+    //MARK: - internal functions
     
     func findDailyPricesIndexFromDate(_ date: Date) -> Int? {
         
@@ -176,68 +253,7 @@ class Stock {
 
         return nil
     }
-    
-    //MARK: - trend functions
-    
-//    public func longerTrend(_ properties: TrendProperties) -> StockTrend? {
-//
-//        guard let initialTrend = lowHighTrend(properties: properties) else { return nil }
-//        var newTrend = StockTrend(start: initialTrend.startDate, end: initialTrend.endDate, startPrice: initialTrend.startPrice, endPrice: initialTrend.endPrice)
-//
-//        let lastDate = dailyPrices.last!.tradingDate
-//        let firstDate = dailyPrices.first!.tradingDate
-//
-//        var trendDuration = lastDate.timeIntervalSince(firstDate)
-//
-//        switch properties.time {
-//        case .full:
-//            trendDuration = lastDate.timeIntervalSince(firstDate)
-//        case .quarter:
-//            trendDuration = trendDuration / 4
-//        case .half:
-//            trendDuration = trendDuration / 2
-//        case .month:
-//            trendDuration = 30*24*3600
-//        case .none:
-//            trendDuration = lastDate.timeIntervalSince(firstDate)
-//        }
-//
-//        var priceOption: PricePointOptions!
-////        var findOption: FindOptions!
-//        if properties.type == .bottom {
-//            priceOption = .low
-////            findOption = .minimum
-//        }
-//        else if properties.type == .ceiling {
-//            priceOption = .high
-////            findOption = .maximum
-//        }
-//
-//        // go backwards in weekly (5point) steps from start of this trend
-//        // determine the trend for this week and check wether it's different from the initialTrend
-//        // if it's not create new trend from the lowest/highest point of this week to the second point of the initialTrend
-//        // if it is return a new trend based on the new start date
-//
-//        let periodStartDate = initialTrend.startDate
-//        guard let startIndex = findDailyPricesIndexFromDate(periodStartDate) else { return newTrend }
-//
-//        for index in stride(from: startIndex-1, to: 0, by: -1) {
-//
-//            let price = dailyPrices[index].returnPrice(option: priceOption)
-//            let date = dailyPrices[index].tradingDate
-//
-//            var tolerance = [newTrend.startPrice! + newTrend.startDate.timeIntervalSince(date) * -newTrend.incline! * 0.8]
-//            tolerance.append(newTrend.startPrice! + newTrend.startDate.timeIntervalSince(date) * -newTrend.incline! * 1.2)
-//
-//            if price > tolerance.min()! && price < tolerance.max()! {
-//                newTrend = StockTrend(start: date, end: initialTrend.endDate, startPrice: price, endPrice: initialTrend.endPrice)
-//            }
-//        }
-//
-//        return newTrend
-//
-//    }
-    
+        
     /// find lowest/ highest price in the first half and a second in the second half, with the lowest/ highest resulting ! incline !
     public func lowHighTrend(properties: TrendProperties) -> StockTrend? {
         
@@ -359,90 +375,6 @@ class Stock {
         return initialTrend
     }
 
-//    public func twoPointTrend(properties: TrendProperties) -> StockTrend {
-//
-//        let lastDate = dailyPrices.last!.tradingDate
-//        let firstDate = dailyPrices.first!.tradingDate
-//
-//        var trendDuration = lastDate.timeIntervalSince(firstDate)
-//
-//        switch properties.time {
-//        case .full:
-//            trendDuration = lastDate.timeIntervalSince(firstDate)
-//        case .quarter:
-//            trendDuration = trendDuration / 4
-//        case .half:
-//            trendDuration = trendDuration / 2
-//        case .month:
-//            trendDuration = 30*24*3600
-//        case .none:
-//            trendDuration = lastDate.timeIntervalSince(firstDate)
-//        }
-//
-//        let startDate = lastDate.addingTimeInterval(-trendDuration)
-//        let halfDate = lastDate.addingTimeInterval(-trendDuration / 2)
-//
-//        let dailyPricesInFirstHalf = dailyPrices.filter { (pricePoint) -> Bool in
-//            if pricePoint.tradingDate < startDate { return false }
-//            else if pricePoint.tradingDate > halfDate { return false }
-//            else { return true }
-//        }
-//
-//        let dailyPricesInSecondtHalf = dailyPrices.filter { (pricePoint) -> Bool in
-//            if pricePoint.tradingDate > halfDate { return true }
-//            else { return false }
-//        }
-//
-//        var priceOption: PricePointOptions!
-//        var findOption: FindOptions!
-//
-//        if properties.type == .bottom {
-//            priceOption = .low
-//            findOption = .minimum
-//        }
-//        else if properties.type == .ceiling {
-//            priceOption = .high
-//            findOption = .maximum
-//        }
-//
-//        let h1Sorted = dailyPricesInFirstHalf.sorted { (p0, p1) -> Bool in
-//            if findOption == .minimum {
-//                if p0.returnPrice(option: priceOption) < p1.returnPrice(option: priceOption) {
-//                    return true
-//                } else {
-//                    return false
-//                }
-//            }
-//            else {
-//                if p0.returnPrice(option: priceOption) > p1.returnPrice(option: priceOption) {
-//                    return true
-//                } else {
-//                    return false
-//                }
-//            }
-//        }
-//
-//        let h2Sorted = dailyPricesInSecondtHalf.sorted { (p0, p1) -> Bool in
-//            if findOption == .minimum {
-//                if p0.returnPrice(option: priceOption) < p1.returnPrice(option: priceOption) {
-//                    return true
-//                } else {
-//                    return false
-//                }
-//            }
-//            else {
-//                if p0.returnPrice(option: priceOption) > p1.returnPrice(option: priceOption) {
-//                    return true
-//                } else {
-//                    return false
-//                }
-//            }
-//        }
-//
-//        let trend = StockTrend(start: h1Sorted.first!.tradingDate, end: h2Sorted.first!.tradingDate, startPrice: h1Sorted.first!.returnPrice(option: priceOption), endPrice: h2Sorted.first!.returnPrice(option: priceOption))
-//
-//        return trend
-//    }
     
     public func correlationTrend2(properties: TrendProperties) -> Correlation? {
         
@@ -757,86 +689,6 @@ class Stock {
         }
     }
     
-//    public func findPricePoints(_ days: TimeInterval, priceOption: PricePointOptions, findOption: FindOptions) -> [PriceDate] {
-//        // extract prices and their tradingDates for all 30 day intervals
-//        // starting from most recent, so date decending
-//
-//        var pricePoints = [PriceDate]()
-//        var endDate = dailyPrices.last!.tradingDate
-//        let lastDate = dailyPrices.first!.tradingDate
-//
-//        while endDate >= lastDate {
-//            let startDate = endDate.addingTimeInterval(-days*24*3600)
-//
-//            var dailyPriceInRange = dailyPrices.filter( { (element) -> Bool in
-//                if element.tradingDate < startDate { return false }
-//                if element.tradingDate > endDate { return false }
-//                return true
-//            })
-//
-//            dailyPriceInRange.sort { (p0, p1) -> Bool in
-//
-//                if (p0.returnPrice(option: priceOption)) < (p1.returnPrice(option: priceOption)) { return true }
-//                else { return false }
-//            }
-//
-//            var newPriceDate: PriceDate!
-//
-//            if findOption == .minimum {
-//                newPriceDate = (dailyPriceInRange.first!.tradingDate, dailyPriceInRange.first!.returnPrice(option: priceOption))
-//
-//            }
-//            else {
-//                newPriceDate = (dailyPriceInRange.last!.tradingDate, dailyPriceInRange.last!.returnPrice(option: priceOption))
-//            }
-//
-//            pricePoints.append(newPriceDate)
-//            endDate = endDate.addingTimeInterval(-days*24*3600)
-//        }
-//        return pricePoints
-//    }
-    
-//    public func findPrice(lowOrHigh: FindOptions, priceOption: PricePointOptions ,_ from: Date? = nil,_ to: Date? = nil) -> PriceDate? {
-//        
-//        var pricesInRange: [PricePoint]!
-//        
-//        if let validFrom = from {
-//            pricesInRange = dailyPrices.filter({ (element) -> Bool in
-//                if element.tradingDate < validFrom {
-//                    return false
-//                }
-//                if element.tradingDate > to! {
-//                    return false
-//                }
-//                
-//                return true
-//            })
-//        }
-//        else {
-//            pricesInRange = dailyPrices
-//        }
-//        
-//        var maxPriceDate = PriceDate(date: Date(), price: 0)
-//        var minPriceDate = PriceDate(date: Date(), price: 10000000)
-//        
-//        for pricePoint in pricesInRange {
-//            let price = pricePoint.returnPrice(option: priceOption)
-//            if price > maxPriceDate.price {
-//                maxPriceDate.price = price
-//                maxPriceDate.date = pricePoint.tradingDate
-//            }
-//            if price < minPriceDate.price {
-//                minPriceDate.price = price
-//                minPriceDate.date = pricePoint.tradingDate
-//            }
-//            
-//        }
-////        let pricesInQuestion = pricesInRange.compactMap { $0.returnPrice(option: priceOption), $0.tradingDate }
-//
-//        if lowOrHigh == .minimum { return minPriceDate}
-//        else { return maxPriceDate }
-//        
-//    }
     
     public func lowestPrice(_ from: Date? = nil,_ to: Date? = nil) -> Double? {
         

@@ -155,7 +155,14 @@ class StocksListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+        
+        guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
+
+        wbValuationView.stock = stocks[indexPath.row]
+        
+        navigationController?.pushViewController(wbValuationView, animated: true)
     }
     
     func valuationCompleted(indexPath: IndexPath) {
@@ -166,16 +173,11 @@ class StocksListViewController: UITableViewController {
     
     @IBAction func downloadAction(_ sender: Any) {
         
-//        guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSymbolEntry") as? StockSymbolEntry else { return }
-//
-//        entryView.loadViewIfNeeded()
-//        entryView.rootView = self
         guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSearchTVC") as? StockSearchTVC else { return }
 
         entryView.callingVC = self
         
         navigationController?.pushViewController(entryView, animated: true)
-//        self.present(entryView, animated: true, completion: nil)
     }
 
     // MARK: - Navigation

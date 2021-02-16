@@ -70,9 +70,16 @@ class StocksController: StockDelegate {
             return
         }
         
+ // TODO: - TEMP remove
+        for stock in stocks {
+            stock.downloadKeyRatios()
+        }
+ //
+        
         for stock in stocks {
             if stock.needsUpdate {
                 stock.startPriceUpdate(yahooRefDate: yahooRefDate)
+                stock.downloadKeyRatios()
             }
         }
     }

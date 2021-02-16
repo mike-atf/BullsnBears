@@ -13,8 +13,6 @@ protocol ValuationListDelegate: AnyObject {
 
 class ValuationListViewController: UITableViewController, AlertViewDelegate {
     
-//    weak var presentingListVC: StocksListViewController!
-//    weak var presentingVC: UIViewController!
     var delegate: ValuationListDelegate?
     var sourceIndexPath: IndexPath!
     var stock: Stock!

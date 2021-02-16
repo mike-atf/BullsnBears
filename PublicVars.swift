@@ -60,6 +60,7 @@ enum ValuationCellValueFormat {
 enum ValuationMethods {
     case dcf
     case rule1
+    case wb
 }
 
 enum FindOptions {
@@ -92,6 +93,13 @@ enum TrendTimeOption {
     case quarter
     case full
     case month
+}
+
+struct UserDefaultTerms {
+    let longTermCoporateInterestRate = "LongTermCoporateInterestRate"
+    let treasuryBondRate = "10YUSTreasuryBondRate"
+    let perpetualGrowthRate = "PerpetualGrowthRate"
+    let longTermMarketReturn = "LongTermMarketReturn"
 }
 
 let currencyFormatterGapNoPence: NumberFormatter = {

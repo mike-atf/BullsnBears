@@ -26,9 +26,9 @@ class DCFWebDataAnalyser {
         self.controller = controller
         self.progressDelegate = pDelegate
         
-        startDCFDataSearch(section: yahooPages.first!)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(downloadCompleted(notification:)), name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: nil)
+        
+        startDCFDataSearch(section: yahooPages.first!)
     }
     
     deinit {

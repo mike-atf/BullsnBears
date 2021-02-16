@@ -148,6 +148,10 @@ public class DCFValuation: NSManagedObject {
         // 19 'todaysValue' = sum(PVofFutureCF[+1-5])
         // 20 fairValue = 'todaysValue' / sharesOutstanding (drop last three!)
         
+        guard tRevenueActual != nil && capExpend != nil && netIncome != nil && tFCFo != nil else {
+            return (nil, ["revenue, cap expend, net income or FCF data missing"])
+        }
+        
         var errors = [String]()
         let dataArrays = [tRevenueActual!, capExpend!, netIncome!, tFCFo!]
         let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: dataArrays, method: .dcf)

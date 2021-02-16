@@ -106,18 +106,18 @@ public class Rule1Valuation: NSManagedObject {
     }
 
     
-    internal func compoundGrowthRate(endValue: Double, startValue: Double, years: Double) -> Double {
-        
-        return (pow((endValue / startValue) , (1/years)) - 1)
-    }
-
-    internal func futureValue(present: Double, growth: Double, years: Double) -> Double {
-        return present * pow((1+growth), years)
-    }
-    
-    internal func presentValue(growth: Double, years: Double, endValue: Double) -> Double {
-        return endValue * (1 / pow(1+growth, years))
-    }
+//    internal func compoundGrowthRate(endValue: Double, startValue: Double, years: Double) -> Double {
+//
+//        return (pow((endValue / startValue) , (1/years)) - 1)
+//    }
+//
+//    internal func futureValue(present: Double, growth: Double, years: Double) -> Double {
+//        return present * pow((1+growth), years)
+//    }
+//
+//    internal func presentValue(growth: Double, years: Double, endValue: Double) -> Double {
+//        return endValue * (1 / pow(1+growth, years))
+//    }
     
     func debtProportion() -> Double? {
         
@@ -156,7 +156,7 @@ public class Rule1Valuation: NSManagedObject {
             if let endValue = moatArray?.first {
                 for yearBack in 1..<(moatArray?.count ?? 0) {
                     if let startValue = moatArray?[yearBack] {
-                        moatGrowthArray.append(compoundGrowthRate(endValue: endValue, startValue: startValue, years: Double(yearBack)))
+                        moatGrowthArray.append(Calculator.compoundGrowthRate(endValue: endValue, startValue: startValue, years: Double(yearBack)))
                         sumValidRates += 1
                     }
                     else {
@@ -195,7 +195,7 @@ public class Rule1Valuation: NSManagedObject {
         
         var bvpsGrowthRates = [Double]()
         for yearsBack in 1..<(cleanedBVPS.count) {
-            bvpsGrowthRates.append(compoundGrowthRate(endValue: endValue, startValue: cleanedBVPS[yearsBack], years: Double(yearsBack)))
+            bvpsGrowthRates.append(Calculator.compoundGrowthRate(endValue: endValue, startValue: cleanedBVPS[yearsBack], years: Double(yearsBack)))
         }
         let lowBVPSGrowth = bvpsGrowthRates.mean()
         
@@ -206,7 +206,7 @@ public class Rule1Valuation: NSManagedObject {
     func futureEPS(futureGrowth: Double, cleanedEPS: [Double]) -> Double? {
  
         guard let currentEPS = cleanedEPS.first else { return nil }
-        return futureValue(present: currentEPS, growth: futureGrowth, years: 10.0)
+        return Calculator.futureValue(present: currentEPS, growth: futureGrowth, years: 10.0)
     }
     
     func futurePER(futureGrowth: Double) -> Double? {
@@ -270,7 +270,7 @@ public class Rule1Valuation: NSManagedObject {
         let acceptedFuturePER = adjFuturePE != Double() ? adjFuturePE : futurePER
         
         let futureStockPrice = epsIn10Years * acceptedFuturePER
-        let stickerPrice = presentValue(growth: 0.15, years: 10, endValue: futureStockPrice)
+        let stickerPrice = Calculator.presentValue(growth: 0.15, years: 10, endValue: futureStockPrice)
         
         return (stickerPrice, errors)
     }

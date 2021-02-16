@@ -71,6 +71,23 @@ extension Array where Element == Double {
         }
         else { return nil }
     }
+    
+    /// calculates growth rates from current to preceding element
+    /// should have elemetns in time-ascending order!
+    /// return n-1 elements
+    func growthRates() -> [Double]? {
+        
+        guard self.count > 1 else {
+            return nil
+        }
+        
+        var rates = [Double]()
+        for i in 0..<self.count - 1 {
+            rates.append((self[i+1] - self[i]) / self[i])
+        }
+        
+        return rates
+    }
 
 }
 

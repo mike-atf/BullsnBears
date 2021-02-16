@@ -647,6 +647,34 @@
             </objects>
             <point key="canvasLocation" x="2122" y="-299"/>
         </scene>
+        <!--ValuationTVC-->
+        <scene sceneID="FXe-pG-TYJ">
+            <objects>
+                <tableViewController storyboardIdentifier="WBValuationTVC" id="ZSB-xG-Tlv" customClass="WBValuationTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="hpQ-li-PXk">
+                        <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="wbValuationCell" id="r18-9v-cRb" customClass="WBValuationCell" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                <rect key="frame" x="20" y="55.5" width="1140" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="r18-9v-cRb" id="omy-jA-CVr">
+                                    <rect key="frame" x="0.0" y="0.0" width="1140" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="ZSB-xG-Tlv" id="8lE-ag-mAI"/>
+                            <outlet property="delegate" destination="ZSB-xG-Tlv" id="GQX-yM-KFI"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="2b0-Yc-vx3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2860" y="-299"/>
+        </scene>
         <!--Valuation ErrorsTVC-->
         <scene sceneID="KpQ-Cs-cch">
             <objects>
