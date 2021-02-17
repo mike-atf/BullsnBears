@@ -8,7 +8,7 @@
 import UIKit
 import WebKit
 
-class R1WebView: WKWebView {
+class HiddenWebView: WKWebView {
 
     var section = String()
     

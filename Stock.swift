@@ -14,6 +14,10 @@ protocol StockDelegate {
     func priceUpdateComplete(symbol: String)
 }
 
+protocol StockKeyratioDownloadDelegate {
+    func keyratioDownloadComplete(errors: [String])
+}
+
 class Stock {
     
     var symbol: String
@@ -164,7 +168,7 @@ class Stock {
         }
     }
     
-    func downloadKeyRatios() {
+    func downloadKeyRatios(delegate: StockKeyratioDownloadDelegate) {
         
         var components: URLComponents?
                 
@@ -195,7 +199,7 @@ class Stock {
 
             self.html$ = String(decoding: validData, as: UTF8.self)
             
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "KeyRatioDownloadComplete"), object: self.symbol , userInfo: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "KeyRatioDownloadComplete"), object: delegate, userInfo: ["Stock" : self.symbol])
         }
         yahooSession.resume()
     }
@@ -203,7 +207,11 @@ class Stock {
     @objc
     func keyratioDownloadComplete(notification: Notification) {
         
-        guard let stockSymbol = notification.object as? String else {
+        guard let stockSymbol = notification.userInfo?["Stock"] as? String else {
+            return
+        }
+        
+        guard let delegate = notification.object as? StockKeyratioDownloadDelegate else {
             return
         }
         
@@ -238,6 +246,8 @@ class Stock {
         for error in loaderrors {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
         }
+        
+        delegate.keyratioDownloadComplete(errors: loaderrors)
         
         html$ = nil
         

@@ -19,6 +19,7 @@
 		EA1F86D725DC247C006791BD /* WBValuationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1F86D625DC247C006791BD /* WBValuationController.swift */; };
 		EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */; };
 		EA39A44725C5BF5300DE0FF9 /* R1WebDataAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */; };
+		EA4B5F0625DD53900070CC70 /* WebDataDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */; };
 		EA50DEF225D427B10005B23A /* StocksController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA50DEF125D427B10005B23A /* StocksController.swift */; };
 		EA52EDC825D18D760000155F /* WebpageScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA52EDC725D18D760000155F /* WebpageScraper.swift */; };
 		EA5FDBE325B1EE34008918C8 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5FDBE225B1EE34008918C8 /* AlertController.swift */; };
@@ -132,9 +133,9 @@
 		EAFCB95F25C5F0240029AA4F /* MTCookies in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB95E25C5F0240029AA4F /* MTCookies */; };
 		EAFCB96025C5F0240029AA4F /* MTCookies in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB95E25C5F0240029AA4F /* MTCookies */; };
 		EAFCB96125C5F0240029AA4F /* MTCookies in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB95E25C5F0240029AA4F /* MTCookies */; };
-		EAFCB96925C72DDB0029AA4F /* R1WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96825C72DDB0029AA4F /* R1WebView.swift */; };
-		EAFCB96A25C72DDB0029AA4F /* R1WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96825C72DDB0029AA4F /* R1WebView.swift */; };
-		EAFCB96B25C72DDB0029AA4F /* R1WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96825C72DDB0029AA4F /* R1WebView.swift */; };
+		EAFCB96925C72DDB0029AA4F /* HiddenWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */; };
+		EAFCB96A25C72DDB0029AA4F /* HiddenWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */; };
+		EAFCB96B25C72DDB0029AA4F /* HiddenWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */; };
 		EAFCB97025C807A80029AA4F /* ValuationListCellData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */; };
 		EAFCB97125C807A80029AA4F /* ValuationListCellData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */; };
 		EAFCB97225C807A80029AA4F /* ValuationListCellData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */; };
@@ -173,6 +174,7 @@
 		EA1F86D625DC247C006791BD /* WBValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBValuationController.swift; sourceTree = "<group>"; };
 		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = R1WebDataAnalyser.swift; sourceTree = "<group>"; };
+		EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDataDownloader.swift; sourceTree = "<group>"; };
 		EA50DEF125D427B10005B23A /* StocksController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksController.swift; sourceTree = "<group>"; };
 		EA52EDC725D18D760000155F /* WebpageScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpageScraper.swift; sourceTree = "<group>"; };
 		EA5FDBE225B1EE34008918C8 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AlertController.swift; path = "Bulls'N'Bears/DCFValuation FIles/AlertController.swift"; sourceTree = SOURCE_ROOT; };
@@ -230,7 +232,7 @@
 		EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedValuationController.swift; sourceTree = "<group>"; };
 		EAF5D74225B06F2E00E7A681 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		EAFCB95E25C5F0240029AA4F /* MTCookies */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = MTCookies; sourceTree = "<group>"; };
-		EAFCB96825C72DDB0029AA4F /* R1WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = R1WebView.swift; sourceTree = SOURCE_ROOT; };
+		EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenWebView.swift; sourceTree = SOURCE_ROOT; };
 		EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationListCellData.swift; sourceTree = SOURCE_ROOT; };
 		EAFCB97C25C9A4060029AA4F /* ValuationSummaryTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationSummaryTVC.swift; sourceTree = SOURCE_ROOT; };
 		EAFCB98625C9A4DE0029AA4F /* ValuationSummaryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationSummaryCell.swift; sourceTree = "<group>"; };
@@ -307,13 +309,14 @@
 		EAC2FCA025A256B80060F387 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				EAFCB96825C72DDB0029AA4F /* R1WebView.swift */,
+				EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */,
 				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
 				EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */,
 				EAC07B6E25B8950E00B6C898 /* DCFWebDataAnalyser.swift */,
 				EA52EDC725D18D760000155F /* WebpageScraper.swift */,
 				EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */,
 				EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */,
+				EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */,
 				EAF5D74225B06F2E00E7A681 /* Extensions.swift */,
 				EAAA06AF25AA01A00077A972 /* ErrorController.swift */,
 			);
@@ -586,6 +589,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAC19054257641160030B331 /* TrendMyStocks.xcdatamodeld in Sources */,
+				EA4B5F0625DD53900070CC70 /* WebDataDownloader.swift in Sources */,
 				EAC190BA257662930030B331 /* StocksListViewController.swift in Sources */,
 				EAFCB97D25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
 				EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */,
@@ -595,7 +599,7 @@
 				EAD835FB25DC16470015C93A /* WBValuationCell.swift in Sources */,
 				EAFCB97025C807A80029AA4F /* ValuationListCellData.swift in Sources */,
 				EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */,
-				EAFCB96925C72DDB0029AA4F /* R1WebView.swift in Sources */,
+				EAFCB96925C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
 				EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
@@ -661,7 +665,7 @@
 				EAD835FC25DC16470015C93A /* WBValuationCell.swift in Sources */,
 				EAD835E825DC10700015C93A /* ValueListTVC.swift in Sources */,
 				EAC2FC5125A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
-				EAFCB96A25C72DDB0029AA4F /* R1WebView.swift in Sources */,
+				EAFCB96A25C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EAD835F025DC12000015C93A /* ValueListCell.swift in Sources */,
 				EA163F78258BA85E000974AB /* StockTrend.swift in Sources */,
 				EAC2FC3D25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */,
@@ -699,7 +703,7 @@
 				EAD835FD25DC16470015C93A /* WBValuationCell.swift in Sources */,
 				EAD835E925DC10700015C93A /* ValueListTVC.swift in Sources */,
 				EAC2FC5225A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
-				EAFCB96B25C72DDB0029AA4F /* R1WebView.swift in Sources */,
+				EAFCB96B25C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EAD835F125DC12000015C93A /* ValueListCell.swift in Sources */,
 				EA163F79258BA85E000974AB /* StockTrend.swift in Sources */,
 				EAC2FC3E25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */,

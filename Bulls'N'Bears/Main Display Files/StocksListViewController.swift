@@ -156,11 +156,15 @@ class StocksListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
-        
         guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
 
         wbValuationView.stock = stocks[indexPath.row]
+        
+        if stocks[indexPath.row].peRatio == nil {
+            stocks[indexPath.row].downloadKeyRatios(delegate: wbValuationView)
+        }
+
+        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         
         navigationController?.pushViewController(wbValuationView, animated: true)
     }

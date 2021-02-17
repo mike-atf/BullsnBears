@@ -91,7 +91,7 @@ class WBValuationController {
             switch path.row {
             case 0:
                 if let valid = stock.peRatio {
-                    value$ = currencyFormatterGapWithPence.string(from: valid as NSNumber)
+                    value$ = numberFormatterDecimals.string(from: valid as NSNumber)
                 }
             case 1:
                 if let valid = stock.eps {
@@ -136,15 +136,14 @@ class WBValuationController {
     
     private func buildRowTitles() -> [[String]] {
         
-//        var rowTitles = [[String]]()
-//
-//        let titles = [["P/E ratio", "EPS", "beta"], ["Intrinsic value"]]
-//        for _ in sectionTitles {
-//            rowTitles.append(titles)
-//        }
-//
         return [["P/E ratio", "EPS", "beta"], ["Intrinsic value"]]
     }
     
+    
+    // MARK: - Data download functions
+    
+    private func downloadWBValuationData() {
+        
+    }
 
 }

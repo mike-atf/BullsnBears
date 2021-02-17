@@ -300,17 +300,19 @@ class CombinedValuationController: ValuationHelper {
         NotificationCenter.default.removeObserver(webAnalyser as Any)
         
         if let analyser = webAnalyser as? R1WebDataAnalyser {
-            analyser.webView.stopLoading()
-            analyser.yahooSession?.cancel()
+            analyser.downloader.webView?.stopLoading()
+            analyser.downloader.yahooSession?.cancel()
+            analyser.downloader.yahooSession = nil
             analyser.progressDelegate = nil
-            analyser.request = nil
-            analyser.yahooSession = nil
-            analyser.webView = nil
+            analyser.downloader.request = nil
+            analyser.downloader.webView = nil
+            analyser.downloader = nil
         }
         else if let analyser = webAnalyser as? DCFWebDataAnalyser {
-            analyser.yahooSession?.cancel()
-            analyser.yahooSession = nil
+            analyser.downloader.yahooSession?.cancel()
+            analyser.downloader.yahooSession = nil
             analyser.progressDelegate = nil
+            analyser.downloader = nil
         }
         
         webAnalyser = nil

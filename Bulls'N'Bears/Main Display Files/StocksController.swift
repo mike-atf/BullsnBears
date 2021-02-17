@@ -69,17 +69,11 @@ class StocksController: StockDelegate {
         guard (Calendar.current.component(.weekday, from: Date()) > 2) else {
             return
         }
-        
- // TODO: - TEMP remove
-        for stock in stocks {
-            stock.downloadKeyRatios()
-        }
- //
-        
+                
         for stock in stocks {
             if stock.needsUpdate {
                 stock.startPriceUpdate(yahooRefDate: yahooRefDate)
-                stock.downloadKeyRatios()
+//                stock.downloadKeyRatios()
             }
         }
     }

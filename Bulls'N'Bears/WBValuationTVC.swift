@@ -192,3 +192,14 @@ class WBValuationTVC: UITableViewController {
     */
 
 }
+
+extension WBValuationTVC: StockKeyratioDownloadDelegate {
+    
+    func keyratioDownloadComplete(errors: [String]) {
+        DispatchQueue.main.async {
+            self.tableView.reloadSections([0], with: .none)
+
+        }
+    }
+    
+}

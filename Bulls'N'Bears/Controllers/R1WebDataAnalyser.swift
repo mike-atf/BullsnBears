@@ -10,50 +10,22 @@ import WebKit
 
 class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         
-    var webView: R1WebView!
-    var view = UIView()
     var stock: Stock!
-    var hyphenatedShortName: String?
-    var html$: String?
     var valuation: Rule1Valuation!
     var controller: CombinedValuationController!
     var webpages = ["financial-statements", "financial-ratios", "balance-sheet", "pe-ratio","analysis", "cash-flow","insider-transactions"]
     weak var progressDelegate: ProgressViewDelegate?
-    var request: URLRequest!
-    var yahooSession: URLSessionDataTask?
     var downloadErrors = [String]()
     var downloadTasks = 0
     var downloadTasksComplete = 0
     
-    var macroTrendCookies: [HTTPCookie]? = {
-        
-        guard let fileURL = Bundle.main.url(forResource: "MTCookies", withExtension: nil) else {
-            return nil
-        }
-     
-        if let data = FileManager.default.contents(atPath: fileURL.path) {
-            do {
-                if let dataArray = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Data] {
-                    var mtCookies = [HTTPCookie]()
-                    for data in dataArray {
-                        if let newCookie = HTTPCookie.loadCookie(using: data) {
-                            mtCookies.append(newCookie)
-                        }
-                    }
-                    return (mtCookies.count > 0) ? mtCookies : nil
-                }
-            } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't convert stored MT cookies back to usable format.")
-            }
-        }
-        return nil
-    }()
+    var downloader: WebDataDownloader!
     
     init(stock: Stock, valuation: Rule1Valuation, controller: CombinedValuationController, progressDelegate: ProgressViewDelegate) {
         
         super.init()
             
-        guard let shortName = stock.name_short else {
+        guard stock.name_short != nil else {
             alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
             return
         }
@@ -63,152 +35,25 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         self.valuation = valuation
         self.controller = controller
         
-        let webConfiguration = WKWebViewConfiguration()
-        let viewFrame =  controller.valuationListViewController.view.frame
-        webView = R1WebView(frame: viewFrame, configuration: webConfiguration)
-        webView.uiDelegate = self
-        webView.navigationDelegate = self
+        downloader = WebDataDownloader(stock: stock, delegate: self)
+        let macroTrendPageNames = ["financial-statements", "financial-ratios", "balance-sheet", "pe-ratio"]
+        let yahooPageNames = ["analysis", "cash-flow","insider-transactions"]
+        downloader.macroTrendsDownload(pageTitles: macroTrendPageNames)
+        downloader.yahooDownload(pageTitles: yahooPageNames)
+        downloadTasks = macroTrendPageNames.count + yahooPageNames.count
         
-        let shortNameComponents = shortName.split(separator: " ")
-        hyphenatedShortName = String(shortNameComponents.first!)
-        for index in 1..<shortNameComponents.count {
-            hyphenatedShortName! += "-" + String(shortNameComponents[index])
-        }
-
-        guard hyphenatedShortName != nil else {
-            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't construct a stock term for the macrotrends website.")
-            return
-        }
-
-        NotificationCenter.default.addObserver(self, selector: #selector(downloadCompleted(_:)), name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: nil)
-    
-        downloadTasks = webpages.count
-        loadView(section: webpages.first!)
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-
-    func loadView(url: URL? = nil, section: String) {
-        
-        if let validURL = url {
-            request = URLRequest(url: validURL)
-        }
-        else {
-            var components: URLComponents?
-                        
-            components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(stock.symbol)/\(hyphenatedShortName!.lowercased())/" + section)
-            
-            if let validURL = components?.url {
-                request = URLRequest(url: validURL)
-                
-    //            if let cookies = macroTrendCookies {
-    //                let headers = HTTPCookie.requestHeaderFields(with: cookies)
-    //                for (name, value) in headers {
-    //                    request.addValue(value, forHTTPHeaderField: name)
-    //                }
-    //            }
-                
-    //            if let appSupportDirectoryPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first {
-    //
-    //                if let data = FileManager.default.contents(atPath: appSupportDirectoryPath + "/" + "MTCookies") {
-    //
-    //                    do {
-    //                        if let dataArray = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Data] {
-    //                            var mtCookies = [HTTPCookie]()
-    //                            for data in dataArray {
-    //                                if let newCookie = HTTPCookie.loadCookie(using: data) {
-    //                                    mtCookies.append(newCookie)
-    //                                }
-    //                            }
-    //                            let headers = HTTPCookie.requestHeaderFields(with: mtCookies)
-    //                            for (name, value) in headers {
-    //                                request.addValue(value, forHTTPHeaderField: name)
-    //                            }
-    //                        }
-    //                    } catch let error {
-    //                        ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't convert stored MT cookies back to usable format.")
-    //                    }
-    //                }
-    //            }
-
-            }
-        }
-        webView.section = section
-        webView.load(request)
+        downloader = nil
     }
     
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        
-//        webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { (cookies) in
-//            let appSupportDirectoryPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first
-//            var dataArray = [Data]()
-//            for cookie in cookies {
-//                if let cookieData = cookie.archive() {
-//                    dataArray.append(cookieData)
-//                }
-//            }
-//
-//            do {
-//                let fileData = try NSKeyedArchiver.archivedData(withRootObject: dataArray, requiringSecureCoding: false)
-//                try fileData.write(to: URL(fileURLWithPath: appSupportDirectoryPath! + "/" + "MTCookies"))
-//            } catch let error {
-//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into storage object for re-use")
-//            }
-//        }
+}
 
-        webView.evaluateJavaScript("document.documentElement.outerHTML.toString()", completionHandler: { (html: Any?, error: Error?) in
-            if error == nil {
-                self.html$ = html as? String
-                let section = (webView as! R1WebView).section
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: section , userInfo: nil)
-
-            }
-            else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error cpaturing html string from website: \(String(describing: webView.url))")
-            }
-        })
-    }
+extension R1WebDataAnalyser: DataDownloaderDelegate {
     
-    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        
-        guard let response = navigationResponse.response as? HTTPURLResponse,
-            let url = navigationResponse.response.url else {
-            decisionHandler(.cancel)
-            return
-          }
-
-          if let headerFields = response.allHeaderFields as? [String: String] {
-            let cookies = HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url)
-            cookies.forEach { cookie in
-              webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
-            }
-            
-//            webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { (cookies) in
-//                let appSupportDirectoryPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first
-//                var dataArray = [Data]()
-//                for cookie in cookies {
-//                    if let cookieData = cookie.archive() {
-//                        dataArray.append(cookieData)
-//                    }
-//                }
-//
-//                do {
-//                    let fileData = try NSKeyedArchiver.archivedData(withRootObject: dataArray, requiringSecureCoding: false)
-//                    try fileData.write(to: URL(fileURLWithPath: appSupportDirectoryPath! + "/" + "MTCookies"))
-//                } catch let error {
-//                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into storage object for re-use")
-//                }
-//            }
-            
-          }
-          
-          decisionHandler(.allow)
-    }
-    
-    @objc
-    func downloadCompleted(_ notification: Notification) {
+    func downloadComplete(html$: String?, pageTitle: String?) {
         
         downloadTasksComplete += 1
         
@@ -217,7 +62,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             return
         }
         
-        guard let section = notification.object as? String else {
+        guard let section = pageTitle else {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete - notification did not contain section info!!")
             return
         }
@@ -239,9 +84,8 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
             
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count, completedTasks: 1)
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksComplete)
             }
-            loadView(section: webpages[1])
         }
         else if section == webpages[1] {
             
@@ -262,9 +106,8 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             valuation.opcs = result.array
 
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count, completedTasks: 2)
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksComplete)
             }
-            loadView(section: webpages[2])
         }
         else if section == webpages[2] {
             
@@ -278,9 +121,9 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
 
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 3)
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks,completedTasks: self.downloadTasksComplete)
             }
-            loadView(section: webpages[3])
+
         }
         else if section == webpages[3] {
             
@@ -291,12 +134,9 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
                 valuation.hxPE = [withoutExtremes.min()!, withoutExtremes.max()!]
             }
             
-            let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[4])")
-            webView.section = webpages[4]
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 4)
+                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: self.downloadTasksComplete)
             }
-            downloadYahoo(url: components?.url, for: webpages[4])
         }
         else if section == webpages[4] {
            
@@ -311,11 +151,8 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             }
             
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 5)
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks,completedTasks: self.downloadTasksComplete)
             }
-            let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[5])")
-            webView.section = webpages[5]
-            downloadYahoo(url: components?.url, for: webpages[5])
         } else if section == webpages[5] {
 
             result = WebpageScraper.scrapeRow(website: .yahoo, html$: html$, sectionHeader: "Cash flow</span>", rowTitle: "Operating cash flow")
@@ -323,11 +160,8 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
             valuation.opCashFlow = result.array?.first ?? Double()
 
             DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.webpages.count,completedTasks: 6)
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks,completedTasks: self.downloadTasksComplete)
             }
-            let components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(webpages[6])")
-            webView.section = webpages[5]
-            downloadYahoo(url: components?.url, for: webpages[6])
         } else if section == webpages[6] {
             let rowTitles = ["Purchases","Sales","Total insider shares held"]
             
@@ -358,34 +192,5 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
 
     }
     
-    func downloadYahoo(url: URL?, for section: String) {
-        
-        guard let validURL = url else {
-            downloadErrors.append("DCF valuation data download failed. No website address")
-            return
-        }
-        
-        yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
-            
-            guard error == nil else {
-                self.downloadErrors.append("Download error \(error!.localizedDescription) occurred")
-                return
-            }
-            
-            guard urlResponse != nil else {
-                self.downloadErrors.append("Download error \(urlResponse!) occurred")
-                return
-            }
-            
-            guard let validData = data else {
-                self.downloadErrors.append("Download error occurred: invalid website data")
-                return
-            }
-
-            self.html$ = String(decoding: validData, as: UTF8.self)
-            
-           NotificationCenter.default.post(name: Notification.Name(rawValue: "WebDataDownloadComplete"), object: section , userInfo: nil)
-        }
-        yahooSession?.resume()
-    }
+    
 }
