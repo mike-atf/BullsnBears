@@ -98,6 +98,62 @@ public class WBValuation: NSManagedObject {
 
     }
     
+    public func rAndDProportion() -> ([Double], [String]?) {
+        
+        guard grossProfit != nil && rAndDexpense != nil else {
+            return ([Double()], ["there are no gross profit and R&D expense data"])
+        }
+        
+        let rawData = [grossProfit!, rAndDexpense!]
+        
+        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+        
+        guard cleanedData[0].count == cleanedData[1].count else {
+            return ([Double()], ["insufficient gross profit and R&D expense data"])
+        }
+        
+        var proportions = [Double]()
+        var errorList: [String]?
+        for i in 0..<cleanedData[0].count {
+            proportions.append(cleanedData[1][i] / cleanedData[0][i])
+        }
+        
+        if let validError = error {
+            errorList = [validError]
+        }
+        return (proportions, errorList)
+
+    }
+    
+    public func netIncomeProportion() -> ([Double], [String]?) {
+        
+        guard revenue != nil && netEarnings != nil else {
+            return ([Double()], ["there are no revenue and net income data"])
+        }
+        
+        let rawData = [revenue!, netEarnings!]
+        
+        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+        
+        guard cleanedData[0].count == cleanedData[1].count else {
+            return ([Double()], ["insufficient revenue and net income data"])
+        }
+        
+        var proportions = [Double]()
+        var errorList: [String]?
+        for i in 0..<cleanedData[0].count {
+            proportions.append(cleanedData[1][i] / cleanedData[0][i])
+        }
+        
+        if let validError = error {
+            errorList = [validError]
+        }
+        return (proportions, errorList)
+
+    }
+
+
+    
     public func ivalue() -> (Double?, [String] ){
         
          guard let stock = stocks.filter({ (stock) -> Bool in

@@ -28,7 +28,7 @@ class ValueListTVC: UITableViewController {
         
         let components: Set<Calendar.Component> = [.year]
         let dateComponents = Calendar.current.dateComponents(components, from: Date())
-        mostRecentYear = dateComponents.year
+        mostRecentYear = dateComponents.year! - 1
     }
     
     override func viewDidAppear(_ animated: Bool) {

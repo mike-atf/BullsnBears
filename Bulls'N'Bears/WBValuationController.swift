@@ -144,6 +144,25 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     else { color = UIColor(named: "Red") }
                 }
                 return (value$, color, errors)
+            case 2:
+                let (proportions, es$) = valuation!.rAndDProportion()
+                errors = es$
+                if let average = proportions.mean() {
+                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+                }
+
+                return (value$, nil, errors)
+            case 3:
+                let (proportions, es$) = valuation!.netIncomeProportion()
+                errors = es$
+                if let average = proportions.mean() {
+                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+                    if average > 0.2 { color = UIColor(named: "Green") }
+                    else if average > 0.1 { color = UIColor.systemYellow }
+                    else { color = UIColor(named: "Red") }
+                }
+
+                return (value$, color, errors)
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
             }
@@ -177,7 +196,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     private func buildRowTitles() -> [[String]] {
         
-        return [["P/E ratio", "EPS", "beta"], ["profit margin","SGA / Rev."]]
+        return [["P/E ratio", "EPS", "beta"], ["profit margin","SGA / Rev.", "R&D / profit", "Net inc./ Rev."]]
     }
         
     // MARK: - Data download functions

@@ -241,6 +241,24 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.proportions = margins
                     destination.gradingLimits = [0.3,0.9]
                 }
+                else if selectedPath.row == 2 {
+                    arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["R&D, % of profit", "Profit"])
+                    destination.formatter = currencyFormatterGapNoPence
+                    let (margins, errors) = controller.valuation!.rAndDProportion()
+                    destination.proportions = margins
+                    destination.gradingLimits = nil
+                }
+                else if selectedPath.row == 3 {
+                    arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.revenue ?? []]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["net income, % of revenue", "Revenue"])
+                    destination.formatter = currencyFormatterGapNoPence
+                    let (margins, errors) = controller.valuation!.netIncomeProportion()
+                    destination.proportions = margins
+                    destination.gradingLimits = [0.2,0.1]
+                }
 
             }
             
