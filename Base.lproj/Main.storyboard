@@ -651,18 +651,21 @@
         <scene sceneID="FXe-pG-TYJ">
             <objects>
                 <tableViewController storyboardIdentifier="WBValuationTVC" id="ZSB-xG-Tlv" customClass="WBValuationTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="hpQ-li-PXk">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="hpQ-li-PXk">
                         <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="wbValuationCell" id="r18-9v-cRb" customClass="WBValuationCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="20" y="55.5" width="1140" height="43.5"/>
+                                <rect key="frame" x="0.0" y="55.5" width="1180" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="r18-9v-cRb" id="omy-jA-CVr">
-                                    <rect key="frame" x="0.0" y="0.0" width="1140" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="1180" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="ipA-Iu-yjR" kind="show" identifier="valueListSegue" id="jxp-Dy-cB3"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -674,6 +677,35 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2b0-Yc-vx3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2860" y="-299"/>
+        </scene>
+        <!--Value ListTVC-->
+        <scene sceneID="cPe-0p-bLx">
+            <objects>
+                <tableViewController id="ipA-Iu-yjR" customClass="ValueListTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="fhc-Vv-kri">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="780"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valueListCell" id="O30-oB-vcb" customClass="ValueListCell" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="28" width="704" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="O30-oB-vcb" id="TXc-cn-z1H">
+                                    <rect key="frame" x="0.0" y="0.0" width="704" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="ipA-Iu-yjR" id="8Tq-ms-R7L"/>
+                            <outlet property="delegate" destination="ipA-Iu-yjR" id="A2N-R3-Mop"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="pU5-Z1-z2C"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AlD-YP-yMe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3640" y="-299"/>
         </scene>
         <!--Valuation ErrorsTVC-->
         <scene sceneID="KpQ-Cs-cch">
@@ -715,7 +747,7 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="HCm-I9-2PD"/>
-        <segue reference="Kjm-sZ-WT1"/>
+        <segue reference="mBp-dp-A5V"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="dollarsign.square.fill" catalog="system" width="128" height="114"/>

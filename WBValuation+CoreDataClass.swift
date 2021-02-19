@@ -32,6 +32,21 @@ public class WBValuation: NSManagedObject {
 
     }
     
+    func save() {
+        
+        guard let context = managedObjectContext else {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "no moc available - can't save valuation")
+            return
+        }
+        do {
+            try  context.save()
+        } catch {
+            let nserror = error as NSError
+            fatalError("Unresolved error in WBValuation.save function \(nserror), \(nserror.userInfo)")
+        }
+    }
+
+    
     public func grossProfitMargins() -> ([Double], [String]?) {
         
         guard revenue != nil && grossProfit != nil else {
@@ -40,14 +55,47 @@ public class WBValuation: NSManagedObject {
         
         let rawData = [revenue!, grossProfit!]
         
-        let (cleanedData, errors) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
         
         var margins = [Double]()
+        var errors: [String]?
         for i in 0..<cleanedData[0].count {
-            margins.append(cleanedData[1][i] / cleanedData[2][i])
+            margins.append(cleanedData[1][i] / cleanedData[0][i])
         }
         
-        return (margins, [errors ?? String()])
+        if let validError = error {
+            errors = [validError]
+        }
+        return (margins, errors)
+    }
+    
+    public func sgaProportion() -> ([Double], [String]?) {
+        
+        guard grossProfit != nil && sgaExpense != nil else {
+            return ([Double()], ["there are no gross profit and SGA expense data"])
+        }
+        
+        let rawData = [grossProfit!, sgaExpense!]
+        
+        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+        
+        guard cleanedData[0].count == cleanedData[1].count else {
+            return ([Double()], ["insufficient gross profit and SGA expense data"])
+        }
+        
+        var margins = [Double]()
+        var errorList: [String]?
+        for i in 0..<cleanedData[0].count {
+            margins.append(cleanedData[1][i] / cleanedData[0][i])
+        }
+        
+        if let validError = error {
+            errorList = [validError]
+        }
+
+        
+        return (margins, errorList)
+
     }
     
     public func ivalue() -> (Double?, [String] ){

@@ -209,22 +209,6 @@ class StocksListViewController: UITableViewController {
 
 }
 
-//extension StocksListViewController: StockListCellDelegate {
-//
-//    func valuationButtonPressed(indexpath: IndexPath) {
-//
-//        if let choser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationChoser") as? ValuationChooser {
-//            choser.loadViewIfNeeded()
-//            choser.stock = stocks[indexpath.row]
-//            choser.rootView = self
-//            choser.sourceCellPath = indexpath
-//
-//            self.present(choser, animated: true)
-//        }
-//
-//    }
-//}
-
 extension StocksListViewController: StockControllerDelegate {
     
     func updateStocksComplete() {
@@ -232,6 +216,7 @@ extension StocksListViewController: StockControllerDelegate {
         if stocks.count > 0 {
             if tableView.indexPathForSelectedRow == nil {
                 tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .top)
+                tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: true)
             }
             performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         }
@@ -242,7 +227,9 @@ extension StocksListViewController: StockControllerDelegate {
         if stocks.count > 0 {
             self.tableView.reloadData()
             tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .top)
+            tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: true)
             performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+            tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: true)
         }
         else {
             showWelcomeView()

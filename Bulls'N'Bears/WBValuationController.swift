@@ -7,19 +7,30 @@
 
 import Foundation
 import CoreData
+import WebKit
 
-class WBValuationController {
+class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
-    var sectionTitles = ["Key ratios","WB Value"]
-    var sectionSubTitles = ["from Yahoo finance",""]
+    var sectionTitles = ["Key ratios","Income statement"]
+    var sectionSubTitles = ["from Yahoo finance","from MacroTrends"]
     var rowTitles: [[String]]!
-    var stock: Stock
+    var stock: Stock!
     var valuation: WBValuation?
+    weak var progressDelegate: ProgressViewDelegate?
+    var downloadTasks = 0
+    var downloadTasksCompleted = 0
+    var downloadErrors = [String]()
+    var downloader: WebDataDownloader?
+
     
     //MARK: - init
 
-    init(stock: Stock) {
+    init(stock: Stock, progressDelegate: ProgressViewDelegate) {
+        
+        super.init()
+        
         self.stock = stock
+        self.progressDelegate = progressDelegate
         
         if let valuation = WBValuationController.returnWBValuations(company: stock.symbol)?.first {
             self.valuation = valuation
@@ -78,20 +89,22 @@ class WBValuationController {
         return (sectionTitles[section], sectionSubTitles[section])
     }
 
-    public func value$(path: IndexPath) -> (String,[String]?) {
+    public func value$(path: IndexPath) -> (String, UIColor?, [String]?) {
         
         guard valuation != nil else {
-            return ("--", ["no valuation"])
+            return ("--", nil, ["no valuation"])
         }
         
         var value$: String?
         var errors: [String]?
+        var color: UIColor?
         
         if path.section == 0 {
             switch path.row {
             case 0:
                 if let valid = stock.peRatio {
                     value$ = numberFormatterDecimals.string(from: valid as NSNumber)
+                    color = valid > 40.0 ? UIColor(named: "Red") : UIColor(named: "Green")
                 }
             case 1:
                 if let valid = stock.eps {
@@ -105,30 +118,58 @@ class WBValuationController {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
             }
             
-            return (value$ ?? "no value", nil)
+            return (value$ ?? "no value", color, nil)
         }
-        
-        if path.section == 1 {
+        else if path.section == 1 {
+            
+            var value$ = "-"
+            switch path.row {
+            case 0:
+                let (margins, es$) = valuation!.grossProfitMargins()
+                errors = es$
+                if let averageMargin = margins.mean() {
+                    value$ = percentFormatter0Digits.string(from: averageMargin as NSNumber) ?? "-"
+                    if averageMargin > 0.4 { color = UIColor(named: "Green") }
+                    else if averageMargin > 0.2 { color = UIColor.systemYellow }
+                    else { color = UIColor(named: "Red") }
+                }
+                return (value$,color,errors)
+            case 1:
+                let (proportions, es$) = valuation!.sgaProportion()
+                errors = es$
+                if let average = proportions.mean() {
+                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+                    if average <= 0.3 { color = UIColor(named: "Green") }
+                    else if average < 100 { color = UIColor.systemYellow }
+                    else { color = UIColor(named: "Red") }
+                }
+                return (value$, color, errors)
+            default:
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
+            }
+            
+        }
+        else  if path.section == 2 {
             let (value, errors) = valuation!.ivalue()
             if errors.count == 0 {
                 if let valid = value {
-                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", nil)
+                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", color, nil)
                 }
                 else {
-                    return ("no value", nil)
+                    return ("no value", color, nil)
                 }
             }
             else { // errors
                 if let valid = value {
-                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", errors)
+                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", color, errors)
                 }
                 else {
-                    return ("no value", errors)
+                    return ("no value", color, errors)
                 }
             }
         }
         
-        return ("no value", nil)
+        return ("no value", color, nil)
         
     }
     
@@ -136,14 +177,99 @@ class WBValuationController {
     
     private func buildRowTitles() -> [[String]] {
         
-        return [["P/E ratio", "EPS", "beta"], ["Intrinsic value"]]
+        return [["P/E ratio", "EPS", "beta"], ["profit margin","SGA / Rev."]]
     }
-    
-    
+        
     // MARK: - Data download functions
     
-    private func downloadWBValuationData() {
+    func downloadWBValuationData() {
         
+        let webPageNames = ["financial-statements"]
+        
+        guard stock.name_short != nil else {
+            alertController.showDialog(title: "Unable to load WB valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
+            return
+        }
+                
+        downloader = WebDataDownloader(stock: stock, delegate: self)
+        downloader?.macroTrendsDownload(pageTitles: webPageNames)
+        downloadTasks = webPageNames.count
+
+    }
+    
+    public func stopDownload() {
+        NotificationCenter.default.removeObserver(self)
+        
+        downloader?.webView?.stopLoading()
+        downloader?.yahooSession?.cancel()
+        downloader?.yahooSession = nil
+        progressDelegate = nil
+        downloader?.request = nil
+        downloader?.webView = nil
+        downloader = nil
     }
 
+
+}
+
+extension WBValuationController: DataDownloaderDelegate {
+    
+    func downloadComplete(html$: String?, pageTitle: String?) {
+        
+        downloadTasksCompleted += 1
+        
+        guard html$ != nil else {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
+            return
+        }
+        
+        guard let section = pageTitle else {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete - notification did not contain section info!!")
+            return
+        }
+        
+        var result:(array: [Double]?, errors: [String])
+
+        if section == "financial-statements" {
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Revenue")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.revenue = result.array
+            
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Gross Profit")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.grossProfit = result.array
+            
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Research And Development Expenses")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.rAndDexpense = result.array
+
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "SG&amp;A Expenses")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.sgaExpense = result.array
+            
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Net Income")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.netEarnings = result.array
+            
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Operating Income")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.operatingIncome = result.array
+            
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "EPS - Earnings Per Share")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.eps = result.array
+
+            DispatchQueue.main.async {
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
+            }
+        }
+        
+        if downloadTasksCompleted == downloadTasks {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: self.downloadErrors , userInfo: nil)
+            }
+        }
+    }
+    
+    
 }

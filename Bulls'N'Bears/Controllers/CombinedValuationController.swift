@@ -60,6 +60,19 @@ class CombinedValuationController: ValuationHelper {
         }
     }
     
+    public func removeObjectsFromMemory() {
+        if let analyser = webAnalyser as? DCFWebDataAnalyser {
+            analyser.downloader.webView = nil
+            analyser.downloader.delegate = nil
+            analyser.downloader = nil
+        }
+        else if let analyser = webAnalyser as? R1WebDataAnalyser {
+            analyser.downloader.webView = nil
+            analyser.downloader.delegate = nil
+            analyser.downloader = nil
+        }
+    }
+    
     //MARK: - Class functions
     
     static func createR1Valuation(company: String) -> Rule1Valuation? {
@@ -242,8 +255,8 @@ class CombinedValuationController: ValuationHelper {
                     alerts?.append("Non-profitable at some point in the last 3 years.")
                 }
             }
-            
-            if let fcf_netIncome_correlation = stock.getCorrelation(xArray: (valuation.netIncome?.compactMap{ $0 } ?? []), yArray: (valuation.tFCFo?.compactMap{ $0 } ?? []))?.coEfficient {
+            let coefficient = Calculator.correlation(xArray: (valuation.netIncome?.compactMap{ $0 } ?? []), yArray: (valuation.tFCFo?.compactMap{ $0 } ?? []))?.coEfficient
+            if let fcf_netIncome_correlation = coefficient {
                 let correlation$ = numberFormatterDecimals.string(from: fcf_netIncome_correlation as NSNumber) ?? ""
             
                 if abs(fcf_netIncome_correlation) < 0.75 {

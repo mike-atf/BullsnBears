@@ -46,6 +46,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        downloader.webView = nil
         downloader = nil
     }
     

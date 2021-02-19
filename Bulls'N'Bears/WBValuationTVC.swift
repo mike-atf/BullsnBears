@@ -7,11 +7,12 @@
 
 import UIKit
 
-class WBValuationTVC: UITableViewController {
+class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     var downloadButton: UIBarButtonItem!
     var controller: WBValuationController!
     var stock: Stock!
+    var progressView: DownloadProgressView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,7 +23,7 @@ class WBValuationTVC: UITableViewController {
         self.navigationController?.title = stock.name_short
         tableView.register(UINib(nibName: "WBValuationCell", bundle: nil), forCellReuseIdentifier: "wbValuationCell")
         
-        controller = WBValuationController(stock: stock)
+        controller = WBValuationController(stock: stock, progressDelegate: self)
 
     }
 
@@ -41,9 +42,9 @@ class WBValuationTVC: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "wbValuationCell", for: indexPath) as! WBValuationCell
 
-        let (value$, errors) = controller.value$(path: indexPath)
+        let (value$, color, errors) = controller.value$(path: indexPath)
         
-        cell.configure(title: controller.rowTitle(path: indexPath), detail: value$, infoText: errors)
+        cell.configure(title: controller.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self)
         
         if indexPath.section == 0 {
             cell.accessoryType = .none
@@ -139,13 +140,32 @@ class WBValuationTVC: UITableViewController {
         return header
         
     }
-
     
     @objc
     func startDownload() {
+                
+        progressView = DownloadProgressView.instanceFromNib()
+        progressView?.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(progressView!)
         
+        let margins = view.layoutMarginsGuide
+
+        progressView?.widthAnchor.constraint(equalTo: margins.widthAnchor, multiplier: 0.8).isActive = true
+        progressView?.centerXAnchor.constraint(equalTo: margins.centerXAnchor).isActive = true
+        progressView?.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.2).isActive = true
+        progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+
+        progressView?.delegate = self
+        progressView?.title.text = "Trying public data acquisition..."
+
+        controller.downloadWBValuationData()
     }
 
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        performSegue(withIdentifier: "valueListSegue", sender: nil)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -181,25 +201,99 @@ class WBValuationTVC: UITableViewController {
     }
     */
 
-    /*
+
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+           
+        guard let selectedPath = self.tableView.indexPathForSelectedRow else {
+            return
+        }
+        
+        // section one has P/E, EPS and beta - no details to show
+        guard selectedPath.section > 0 else {
+            return
+        }
+        
+        if let destination = segue.destination as? ValueListTVC {
+            
+            destination.loadViewIfNeeded()
+            destination.valuation = controller.valuation
+            var arrays: [[Double]]?
+            
+            if selectedPath.section == 1 {
+                if selectedPath.row == 0 {
+                    arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["Gross profit, % of revenue", "Revenue"])
+                    destination.formatter = currencyFormatterGapNoPence
+                    let (margins, errors) = controller.valuation!.grossProfitMargins()
+                    destination.proportions = margins
+                    destination.gradingLimits = [0.4,0.2]
+                }
+                else if selectedPath.row == 1 {
+                    arrays = [controller.valuation?.sgaExpense ?? [], controller.valuation?.grossProfit ?? []]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["SGA, % of profit", "Profit"])
+                    destination.formatter = currencyFormatterGapNoPence
+                    let (margins, errors) = controller.valuation!.sgaProportion()
+                    destination.proportions = margins
+                    destination.gradingLimits = [0.3,0.9]
+                }
+
+            }
+            
+        }
     }
-    */
+
+    
+    func progressUpdate(allTasks: Int, completedTasks: Int) {
+        self.progressView?.updateProgress(tasks: allTasks, completed: completedTasks)
+    }
+    
+    func cancelRequested() {
+        controller.stopDownload()
+    }
+    
+    func downloadComplete() {
+        self.progressView?.delegate = nil
+        progressView?.removeFromSuperview()
+        progressView = nil
+        controller.valuation?.save()
+        tableView.reloadSections([1], with: .automatic)
+    }
+
 
 }
 
-extension WBValuationTVC: StockKeyratioDownloadDelegate {
+extension WBValuationTVC: StockKeyratioDownloadDelegate, WBValuationCellDelegate {
     
     func keyratioDownloadComplete(errors: [String]) {
         DispatchQueue.main.async {
-            self.tableView.reloadSections([0], with: .none)
+            self.tableView.reloadSections([0], with: .automatic)
 
         }
     }
     
+    func infoButtonAction(errors: [String]?, sender: UIButton) {
+        
+        if let errorsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {
+            
+            errorsView.modalPresentationStyle = .popover
+            errorsView.preferredContentSize = CGSize(width: self.view.frame.width * 0.9, height: self.view.frame.height * 0.5)
+
+            let popUpController = errorsView.popoverPresentationController
+            popUpController!.permittedArrowDirections = .any
+            popUpController!.sourceView = sender
+            errorsView.loadViewIfNeeded()
+            
+            errorsView.errors = errors ?? ["no errors occurred"]
+            
+            present(errorsView, animated: true, completion:  nil)
+        }
+    }
+
+    
 }
+

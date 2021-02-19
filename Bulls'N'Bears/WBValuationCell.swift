@@ -7,13 +7,19 @@
 
 import UIKit
 
+protocol WBValuationCellDelegate: NSObject {
+    func infoButtonAction(errors: [String]?, sender: UIButton)
+    
+}
+
 class WBValuationCell: UITableViewCell {
 
     @IBOutlet var title: UILabel!
     @IBOutlet var detail: UILabel!
     @IBOutlet var infoButton: UIButton!
     
-    var infoText: String?
+    var errors: [String]?
+    weak var delegate: WBValuationCellDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -29,21 +35,19 @@ class WBValuationCell: UITableViewCell {
     override func prepareForReuse() {
         self.title.text = ""
         self.detail.text = ""
-        self.infoText = nil
+        self.errors = nil
         self.infoButton.isHidden = false
     }
     
-    public func configure(title: String, detail: String, infoText: [String]?) {
+    public func configure(title: String, detail: String, detailColor: UIColor?=nil, errors: [String]?, delegate: WBValuationCellDelegate) {
         self.title.text = title
         self.detail.text = detail
+        self.detail.textColor = detailColor ?? UIColor.label
+        self.delegate = delegate
+        self.errors = errors
         
-        if let errors = infoText {
-//            infoButton.setImage(UIImage(systemName: "exclamationmark.triangle"), for: .normal)
-//            infoButton.tintColor = UIColor.systemYellow
-            self.infoText = String()
-            for text in errors {
-                self.infoText! += text + "\n"
-            }
+        if errors != nil {
+            infoButton.isHidden = false
         }
         else {
             infoButton.isHidden = true
@@ -52,8 +56,8 @@ class WBValuationCell: UITableViewCell {
         
     }
     
-    @IBAction func infoButtonAction(_ sender: Any) {
-        
+    @IBAction func infoButtonAction(_ sender: UIButton) {
+        delegate?.infoButtonAction(errors: self.errors, sender: sender)
     }
     
 }

@@ -5,7 +5,7 @@
 //  Created by aDav on 14/01/2021.
 //
 
-import Foundation
+import UIKit
 
 extension Array where Element == Double {
     
@@ -89,6 +89,25 @@ extension Array where Element == Double {
         return rates
     }
 
+}
+
+extension UILabel {
+    /// Sets the attributedText property of UILabel with an attributed string
+    /// that displays the characters of the text at the given indices in subscript.
+    func setAttributedTextWithSuperscripts(text: String, indicesOfSuperscripts: [Int]) {
+        let font = self.font!
+        let subscriptFont = font.withSize(font.pointSize * 0.7)
+        let subscriptOffset = font.pointSize * 0.3
+        let attributedString = NSMutableAttributedString(string: text,
+                                                         attributes: [.font : font])
+        for index in indicesOfSuperscripts {
+            let range = NSRange(location: index, length: 1)
+            attributedString.setAttributes([.font: subscriptFont,
+                                            .baselineOffset: subscriptOffset],
+                                           range: range)
+        }
+        self.attributedText = attributedString
+    }
 }
 
 //

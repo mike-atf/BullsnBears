@@ -147,8 +147,11 @@ class StockChartVC: UIViewController {
     
     @objc
     func activateErrorButton() {
-        self.navigationItem.leftBarButtonItems = [barTitleButton,errorButton]
-        view.setNeedsLayout()
+        
+        DispatchQueue.main.async {
+            self.navigationItem.leftBarButtonItems = [self.barTitleButton,self.errorButton]
+            self.view.setNeedsLayout()
+        }
 
     }
 

@@ -429,78 +429,78 @@ class Stock {
         let yArray = dailyPricesInRange.compactMap { $0.returnPrice(option: priceOption) }
         let xArray = dailyPricesInRange.compactMap { $0.tradingDate.timeIntervalSince(dailyPricesInRange.first!.tradingDate)}
         
-        return getCorrelation(xArray: xArray, yArray: yArray)
+        return Calculator.correlation(xArray: xArray, yArray: yArray)
     }
     
-    func getCorrelation(xArray: [Double]?, yArray: [Double]?) -> Correlation? {
-        
-        guard (yArray ?? []).count > 0 else {
-            return nil
-        }
-        
-        guard (xArray ?? []).count > 0 else {
-            return nil
-        }
-        
-        guard (xArray ?? []).count == (yArray ?? []).count else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Error in trend correlation: y.count != x.count")
-            return nil
-        }
-        
-        let ySum = yArray!.reduce(0,+)
-        let xSum = xArray!.reduce(0,+)
-        var xyProductArray = [Double]()
-        var x2Array = [Double]()
-        var y2Array = [Double]()
-        var xySumArray = [Double]()
-        let n: Double = Double(yArray!.count)
-
-        var count = 0
-        for y in yArray! {
-            xyProductArray.append(y * xArray![count])
-            x2Array.append(xArray![count] * xArray![count])
-            xySumArray.append(y + xArray![count])
-            y2Array.append(y * y)
-            count += 1
-        }
-        
-        let xyProductSum = xyProductArray.reduce(0,+)
-        let x2Sum = x2Array.reduce(0,+)
-        let y2Sum = y2Array.reduce(0,+)
-        
-        let numerator = n * xyProductSum - xSum * ySum
-        let denom = (n * x2Sum - (xSum * xSum)) * (n * y2Sum - (ySum * ySum))
-
-// Pearson correlation coefficient
-        let  r = numerator / sqrt(denom)
-        
-        let xMean = xSum / n
-        let yMean = ySum / n
-        
-        var xdiff2Sum = Double()
-        var ydiff2Sum = Double()
-        
-//        count = 0
-        for y in yArray! {
-            let ydiff = y - yMean
-            ydiff2Sum += (ydiff * ydiff)
-        }
-        for x in xArray! {
-            let xdiff = x - xMean
-            xdiff2Sum += (xdiff * xdiff)
-        }
-        
-        let xSD = sqrt(xdiff2Sum / n)
-        let ySD = sqrt(ydiff2Sum / n)
-        
-// m = incline of regression line
-        let m = r * (ySD / xSD)
-        
-// b = y axis intercept of regression line
-        let b = yMean - m * xMean
-
-        return Correlation(m: m, b: b, r: r)
-    }
+//    func getCorrelation(xArray: [Double]?, yArray: [Double]?) -> Correlation? {
+//
+//        guard (yArray ?? []).count > 0 else {
+//            return nil
+//        }
+//
+//        guard (xArray ?? []).count > 0 else {
+//            return nil
+//        }
+//
+//        guard (xArray ?? []).count == (yArray ?? []).count else {
+//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Error in trend correlation: y.count != x.count")
+//            return nil
+//        }
+//
+//        let ySum = yArray!.reduce(0,+)
+//        let xSum = xArray!.reduce(0,+)
+//        var xyProductArray = [Double]()
+//        var x2Array = [Double]()
+//        var y2Array = [Double]()
+//        var xySumArray = [Double]()
+//        let n: Double = Double(yArray!.count)
+//
+//        var count = 0
+//        for y in yArray! {
+//            xyProductArray.append(y * xArray![count])
+//            x2Array.append(xArray![count] * xArray![count])
+//            xySumArray.append(y + xArray![count])
+//            y2Array.append(y * y)
+//            count += 1
+//        }
+//
+//        let xyProductSum = xyProductArray.reduce(0,+)
+//        let x2Sum = x2Array.reduce(0,+)
+//        let y2Sum = y2Array.reduce(0,+)
+//
+//        let numerator = n * xyProductSum - xSum * ySum
+//        let denom = (n * x2Sum - (xSum * xSum)) * (n * y2Sum - (ySum * ySum))
+//
+//// Pearson correlation coefficient
+//        let  r = numerator / sqrt(denom)
+//
+//        let xMean = xSum / n
+//        let yMean = ySum / n
+//
+//        var xdiff2Sum = Double()
+//        var ydiff2Sum = Double()
+//
+////        count = 0
+//        for y in yArray! {
+//            let ydiff = y - yMean
+//            ydiff2Sum += (ydiff * ydiff)
+//        }
+//        for x in xArray! {
+//            let xdiff = x - xMean
+//            xdiff2Sum += (xdiff * xdiff)
+//        }
+//
+//        let xSD = sqrt(xdiff2Sum / n)
+//        let ySD = sqrt(ydiff2Sum / n)
+//
+//// m = incline of regression line
+//        let m = r * (ySD / xSD)
+//
+//// b = y axis intercept of regression line
+//        let b = yMean - m * xMean
+//
+//        return Correlation(m: m, b: b, r: r)
+//    }
     
     public func testRegressionReliability(_covering timePeriod: TimeInterval, trendType: TrendType) -> Double? {
         
@@ -542,7 +542,7 @@ class Stock {
             let yArray = dailyPricesInTest.compactMap { $0.returnPrice(option: priceOption) }
             let xArray = dailyPricesInTest.compactMap { $0.tradingDate.timeIntervalSince(dailyPricesInTest.first!.tradingDate)}
             
-            guard let correlation = getCorrelation(xArray: xArray, yArray: yArray) else {
+            guard let correlation = Calculator.correlation(xArray: xArray, yArray: yArray) else {
                continue
             }
             

@@ -202,11 +202,10 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
                 NotificationCenter.default.removeObserver(self)
             }
 //            let r1Valuation = self.valuationController.valuation as? Rule1Valuation // for transfer to ValuationSummaryVC
-            self.valuationController.webAnalyser = nil
+            self.valuationController.removeObjectsFromMemory()
             //
             
             delegate?.valuationComplete(listView: self, r1Valuation: (valuationController.valuation as? Rule1Valuation))
-            //            self.valuationController = nil
         }
     }
     
@@ -216,7 +215,6 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         button.isEnabled = false
         
         progressView = DownloadProgressView.instanceFromNib()
-//        progressView?.backgroundColor = UIColor.systemBackground
         progressView?.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(progressView!)
         
@@ -229,21 +227,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
         progressView?.delegate = self
         progressView?.title.text = "Trying public data acquisition..."
-        
-        // OLD
-//        progressView = UIProgressView()
-//        progressView?.progress = 0.0
-//        progressView?.translatesAutoresizingMaskIntoConstraints = false
-//
-//        self.view.addSubview(progressView!)
-//
-//        let margins = view.layoutMarginsGuide
-//
-//        progressView?.widthAnchor.constraint(equalTo: margins.widthAnchor, multiplier: 0.8).isActive = true
-//        progressView?.centerXAnchor.constraint(equalTo: margins.centerXAnchor).isActive = true
-//        progressView?.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.01).isActive = true
-//        progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-        
+                
         helper.startDataDownload()
         
     }

@@ -16,13 +16,19 @@
                 <rect key="frame" x="0.0" y="0.0" width="467" height="97"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="value" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="kaD-IM-kJF">
-                        <rect key="frame" x="213.5" y="31" width="233.5" height="34"/>
+                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="value" textAlignment="right" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="kaD-IM-kJF">
+                        <rect key="frame" x="195" y="31" width="187" height="34"/>
                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                        <textInputTraits key="textInputTraits"/>
+                        <textInputTraits key="textInputTraits" spellCheckingType="no" returnKeyType="done"/>
                     </textField>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sbo-QJ-i2A">
                         <rect key="frame" x="20" y="38" width="42" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F8d-Ij-SAm">
+                        <rect key="frame" x="405.5" y="38" width="41.5" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -31,14 +37,18 @@
                 <constraints>
                     <constraint firstItem="kaD-IM-kJF" firstAttribute="firstBaseline" secondItem="Sbo-QJ-i2A" secondAttribute="firstBaseline" id="3n2-Qj-n6G"/>
                     <constraint firstItem="Sbo-QJ-i2A" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="5RH-fT-AQN"/>
+                    <constraint firstItem="F8d-Ij-SAm" firstAttribute="firstBaseline" secondItem="kaD-IM-kJF" secondAttribute="firstBaseline" id="VLs-Aj-wAs"/>
+                    <constraint firstAttribute="trailing" secondItem="kaD-IM-kJF" secondAttribute="trailing" constant="85" id="Vmj-CE-bpW"/>
                     <constraint firstItem="Sbo-QJ-i2A" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" symbolic="YES" id="YgF-bn-JKl"/>
-                    <constraint firstAttribute="trailing" secondItem="kaD-IM-kJF" secondAttribute="trailing" constant="20" symbolic="YES" id="edv-7O-zji"/>
-                    <constraint firstItem="kaD-IM-kJF" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.5" id="g5H-L0-kmb"/>
-                    <constraint firstItem="kaD-IM-kJF" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Sbo-QJ-i2A" secondAttribute="trailing" constant="10" id="wUQ-b4-jSm"/>
+                    <constraint firstItem="kaD-IM-kJF" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.4" id="g5H-L0-kmb"/>
+                    <constraint firstItem="F8d-Ij-SAm" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="kaD-IM-kJF" secondAttribute="trailing" constant="5" id="s62-aj-7aM"/>
+                    <constraint firstItem="kaD-IM-kJF" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Sbo-QJ-i2A" secondAttribute="trailing" constant="5" id="wUQ-b4-jSm"/>
+                    <constraint firstAttribute="trailing" secondItem="F8d-Ij-SAm" secondAttribute="trailing" constant="20" symbolic="YES" id="xGd-IW-3ir"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
+                <outlet property="detail" destination="F8d-Ij-SAm" id="C7Q-Zj-YW3"/>
                 <outlet property="textField" destination="kaD-IM-kJF" id="Cjc-si-nvh"/>
                 <outlet property="title" destination="Sbo-QJ-i2A" id="Syb-D3-kjS"/>
             </connections>

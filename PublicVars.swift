@@ -168,6 +168,16 @@ let percentFormatter0Digits: NumberFormatter = {
     return formatter
 }()
 
+let percentFormatter2DigitsPositive: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .percent
+    formatter.positivePrefix = "+"
+//    formatter.positiveFormat =
+    formatter.maximumFractionDigits = 2
+    formatter.minimumIntegerDigits = 1
+    return formatter
+}()
+
 
 let numberFormatterWith1Digit: NumberFormatter = {
     let formatter = NumberFormatter()
@@ -181,7 +191,7 @@ let numberFormatterWith1Digit: NumberFormatter = {
 let numberFormatterDecimals: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
-//    formatter.maximumFractionDigits = 2
+    formatter.maximumFractionDigits = 2
 //    formatter.minimumFractionDigits = 2
     formatter.minimumIntegerDigits = 1
     formatter.usesGroupingSeparator = true
@@ -239,6 +249,14 @@ struct Correlation {
         self.incline = m
         self.yIntercept = b
         self.coEfficient = r
+    }
+    
+    /// increase/ decline in % from yIntercept to endpoint using timeInterval as x-axis
+    public func growth(timeInterval: TimeInterval) -> Double {
+        let endPoint = incline * timeInterval + yIntercept
+        let change = (endPoint - yIntercept) / yIntercept
+        
+        return change
     }
 }
 
