@@ -50,7 +50,7 @@ public class WBValuation: NSManagedObject {
     public func grossProfitMargins() -> ([Double], [String]?) {
         
         guard revenue != nil && grossProfit != nil else {
-            return ([Double()], ["there are no revenue and gross profit data"])
+            return ([Double()], ["there are no revenue and/or gross profit data"])
         }
         
         let rawData = [revenue!, grossProfit!]
@@ -72,7 +72,7 @@ public class WBValuation: NSManagedObject {
     public func sgaProportion() -> ([Double], [String]?) {
         
         guard grossProfit != nil && sgaExpense != nil else {
-            return ([Double()], ["there are no gross profit and SGA expense data"])
+            return ([Double()], ["there are no gross profit and/or SGA expense data"])
         }
         
         let rawData = [grossProfit!, sgaExpense!]
@@ -101,7 +101,7 @@ public class WBValuation: NSManagedObject {
     public func rAndDProportion() -> ([Double], [String]?) {
         
         guard grossProfit != nil && rAndDexpense != nil else {
-            return ([Double()], ["there are no gross profit and R&D expense data"])
+            return ([Double()], ["there are no gross profit and/or R&D expense data"])
         }
         
         let rawData = [grossProfit!, rAndDexpense!]
@@ -128,7 +128,7 @@ public class WBValuation: NSManagedObject {
     public func netIncomeProportion() -> ([Double], [String]?) {
         
         guard revenue != nil && netEarnings != nil else {
-            return ([Double()], ["there are no revenue and net income data"])
+            return ([Double()], ["there are no revenue and/or net income data"])
         }
         
         let rawData = [revenue!, netEarnings!]
@@ -149,8 +149,35 @@ public class WBValuation: NSManagedObject {
             errorList = [validError]
         }
         return (proportions, errorList)
+    }
+    
+    public func longtermDebtProportion() -> ([Double], [String]?) {
+        
+        guard debtLT != nil && netEarnings != nil else {
+            return ([Double()], ["there are no net income and/or long-term debt data"])
+        }
+        
+        let rawData = [netEarnings!, debtLT!]
+        
+        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+        
+        guard cleanedData[0].count == cleanedData[1].count else {
+            return ([Double()], ["insufficient net income and long-term debt data"])
+        }
+        
+        var proportions = [Double]()
+        var errorList: [String]?
+        for i in 0..<cleanedData[0].count {
+            proportions.append(cleanedData[1][i] / cleanedData[0][i])
+        }
+        
+        if let validError = error {
+            errorList = [validError]
+        }
+        return (proportions, errorList)
 
     }
+
 
 
     

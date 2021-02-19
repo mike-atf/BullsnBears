@@ -36,7 +36,7 @@ class ValueListTVC: UITableViewController {
         meanToDisplay = proportions?.mean()
         proportions = Calculator.proportions(array1: values?.first, array0: values?.last)
         var years = [Double]()
-        var count = 1.0
+        var count = 0.0
         for _ in proportions ?? [] {
             years.append(count)
             count += 1.0
@@ -44,7 +44,7 @@ class ValueListTVC: UITableViewController {
 
         if let trend = Calculator.correlation(xArray: years, yArray: proportions?.reversed()) {
             let endY =  trend.yIntercept + trend.incline * (count)
-            trendToDisplay = (endY - trend.yIntercept) / trend.yIntercept
+            trendToDisplay = (endY - trend.yIntercept) / abs(trend.yIntercept)
             correlationToDisplay = trend.coEfficient
         }
         

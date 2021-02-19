@@ -163,6 +163,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
 
                 return (value$, color, errors)
+            case 4:
+                let (proportions, es$) = valuation!.longtermDebtProportion()
+                errors = es$
+                if let average = proportions.mean() {
+                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+                    if average < 3.0 { color = UIColor(named: "Green") }
+                    else if average < 4.0 { color = UIColor.systemYellow }
+                    else { color = UIColor(named: "Red") }
+                }
+
+                return (value$, color, errors)
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
             }
@@ -196,14 +207,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     private func buildRowTitles() -> [[String]] {
         
-        return [["P/E ratio", "EPS", "beta"], ["profit margin","SGA / Rev.", "R&D / profit", "Net inc./ Rev."]]
+        return [["P/E ratio", "EPS", "beta"], ["profit margin","SGA / Rev.", "R&D / profit", "Net inc./ Rev.", "LT Debt / net inc"]]
     }
         
     // MARK: - Data download functions
     
     func downloadWBValuationData() {
         
-        let webPageNames = ["financial-statements"]
+        let webPageNames = ["financial-statements", "balance-sheet"]
         
         guard stock.name_short != nil else {
             alertController.showDialog(title: "Unable to load WB valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
@@ -282,6 +293,28 @@ extension WBValuationController: DataDownloaderDelegate {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
             }
         }
+        else if section == "balance-sheet" {
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.debtLT = result.array
+            
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Propoerty, Plant, And Equipment")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.ppe = result.array
+            
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Retained Earnings (Accumulated Deficit)")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.equityRepurchased = result.array
+
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Share Holder Equity")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.shareholdersEquity = result.array
+            
+            DispatchQueue.main.async {
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
+            }
+        }
+
         
         if downloadTasksCompleted == downloadTasks {
             DispatchQueue.main.async {

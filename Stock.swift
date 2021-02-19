@@ -42,7 +42,7 @@ class Stock {
             name_long = dictionary[symbol]
             
             if let longNameComponents = name_long?.split(separator: " ") {
-                let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Group", "Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co."]
+                let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co."] // "Group", 
                 let replaceTerms = ["S.A.": "sa "]
                 var cleanedName = String()
                 for component in longNameComponents {

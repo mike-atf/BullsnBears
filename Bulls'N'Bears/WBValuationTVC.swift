@@ -259,6 +259,15 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.proportions = margins
                     destination.gradingLimits = [0.2,0.1]
                 }
+                else if selectedPath.row == 4 {
+                    arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["LT debt, % of net income", "Net income"])
+                    destination.formatter = currencyFormatterGapNoPence
+                    let (margins, errors) = controller.valuation!.longtermDebtProportion()
+                    destination.proportions = margins
+                    destination.gradingLimits = [3.0,4.0]
+                }
 
             }
             

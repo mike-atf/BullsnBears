@@ -73,7 +73,9 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         for index in 1..<shortNameComponents.count {
-            hyphenatedShortName! += "-" + String(shortNameComponents[index])
+            if !shortNameComponents[index].contains("(") {
+                hyphenatedShortName! += "-" + String(shortNameComponents[index])
+            }
         }
 
         
