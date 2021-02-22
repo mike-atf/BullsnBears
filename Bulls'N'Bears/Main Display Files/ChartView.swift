@@ -9,7 +9,6 @@ import UIKit
 
 class ChartView: UIView {
     
-    
     @IBOutlet var widthConstraint: NSLayoutConstraint!
     
     var yAxisLabels = [UILabel]()

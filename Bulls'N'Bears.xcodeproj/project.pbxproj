@@ -20,6 +20,8 @@
 		EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */; };
 		EA39A44725C5BF5300DE0FF9 /* R1WebDataAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */; };
 		EA4B5F0625DD53900070CC70 /* WebDataDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */; };
+		EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */; };
+		EA4B5F2825E2E9800070CC70 /* ValueChartVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F2725E2E9800070CC70 /* ValueChartVC.swift */; };
 		EA50DEF225D427B10005B23A /* StocksController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA50DEF125D427B10005B23A /* StocksController.swift */; };
 		EA52EDC825D18D760000155F /* WebpageScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA52EDC725D18D760000155F /* WebpageScraper.swift */; };
 		EA5FDBE325B1EE34008918C8 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5FDBE225B1EE34008918C8 /* AlertController.swift */; };
@@ -175,6 +177,8 @@
 		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = R1WebDataAnalyser.swift; sourceTree = "<group>"; };
 		EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDataDownloader.swift; sourceTree = "<group>"; };
+		EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueChart.swift; sourceTree = "<group>"; };
+		EA4B5F2725E2E9800070CC70 /* ValueChartVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueChartVC.swift; sourceTree = "<group>"; };
 		EA50DEF125D427B10005B23A /* StocksController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksController.swift; sourceTree = "<group>"; };
 		EA52EDC725D18D760000155F /* WebpageScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpageScraper.swift; sourceTree = "<group>"; };
 		EA5FDBE225B1EE34008918C8 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AlertController.swift; path = "Bulls'N'Bears/DCFValuation FIles/AlertController.swift"; sourceTree = SOURCE_ROOT; };
@@ -406,6 +410,8 @@
 				EAC190E92577E2E20030B331 /* ChartContainerView.swift */,
 				EAA099C32588020B00DBB93C /* CheckButton.swift */,
 				EAC190F32577E3B60030B331 /* ChartView.swift */,
+				EA4B5F2725E2E9800070CC70 /* ValueChartVC.swift */,
+				EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */,
 			);
 			path = "Main Display Files";
 			sourceTree = "<group>";
@@ -598,12 +604,14 @@
 				EA1F86D725DC247C006791BD /* WBValuationController.swift in Sources */,
 				EAD835FB25DC16470015C93A /* WBValuationCell.swift in Sources */,
 				EAFCB97025C807A80029AA4F /* ValuationListCellData.swift in Sources */,
+				EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */,
 				EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */,
 				EAFCB96925C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
 				EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
 				EA163F77258BA85E000974AB /* StockTrend.swift in Sources */,
+				EA4B5F2825E2E9800070CC70 /* ValueChartVC.swift in Sources */,
 				EAC2FC4525A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
 				EAD835D625DC015E0015C93A /* WBValuation+CoreDataClass.swift in Sources */,
 				EAC1904A257641160030B331 /* AppDelegate.swift in Sources */,

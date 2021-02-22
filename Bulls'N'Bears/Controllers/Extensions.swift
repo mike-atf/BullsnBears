@@ -72,6 +72,32 @@ extension Array where Element == Double {
         else { return nil }
     }
     
+    /// assumes (time) ordered array
+    /// with element given the largest weights first and the smallest last
+    /// (time) distance between array elements are assumed to be equal (e.g. one year)
+    func weightedMean() -> Double? {
+        
+        guard self.count > 0 else {
+            return nil
+        }
+        
+        var sum = 0.0
+        let n = self.count + 1
+        var i = self.count
+        var weight = 1.0
+        
+        for element in self {
+            weight = Double((i / n))
+            sum += element * weight
+            i -= 1
+        }
+        
+        if count > 0 {
+            return sum / Double(self.count)
+        }
+        else { return nil }
+    }
+    
     /// calculates growth rates from current to preceding element
     /// should have elemetns in time-ascending order!
     /// return n-1 elements
@@ -82,8 +108,9 @@ extension Array where Element == Double {
         }
         
         var rates = [Double]()
+        
         for i in 0..<self.count - 1 {
-            rates.append((self[i+1] - self[i]) / self[i])
+            rates.append((self[i] - self[i+1]) / abs(self[i+1]))
         }
         
         return rates

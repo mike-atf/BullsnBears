@@ -15,8 +15,14 @@ class MasterSplitView: UISplitViewController, UISplitViewControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        
         preferredDisplayMode = .oneBesideSecondary
         delegate = self
+        
+        let minimumWidth = min(view.bounds.width, view.bounds.height)
+        self.minimumPrimaryColumnWidth = minimumWidth * 0.5
+        self.maximumPrimaryColumnWidth = minimumWidth
+
         
         for vc in viewControllers {
             if let lv = vc as? StocksListViewController {

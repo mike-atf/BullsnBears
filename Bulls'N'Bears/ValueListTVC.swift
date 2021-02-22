@@ -9,7 +9,7 @@ import UIKit
 
 class ValueListTVC: UITableViewController {
 
-    var values: [[Double]]?
+    var values: [[Double]?]?
     var sectionTitles = ["Summary"]
     var rowTitles = [String]()
     var formatter: NumberFormatter!
@@ -33,26 +33,50 @@ class ValueListTVC: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         
-        meanToDisplay = proportions?.mean()
-        proportions = Calculator.proportions(array1: values?.first, array0: values?.last)
-        var years = [Double]()
-        var count = 0.0
-        for _ in proportions ?? [] {
-            years.append(count)
-            count += 1.0
+        if values?.count ?? 0  == 2 {
+            meanToDisplay = proportions?.mean()
+            proportions = Calculator.proportions(array1: values?.first!, array0: values?.last!)
+            let proportionsNoGaps = proportions?.filter({ (element) -> Bool in
+                if element != 0.0 { return true }
+                else { return false }
+            })
+            
+            var years = [Double]()
+            var count = 0.0
+            for _ in proportionsNoGaps ?? [] {
+                years.append(count)
+                count += 1.0
+            }
+            
+            if let trend = Calculator.correlation(xArray: years, yArray: proportionsNoGaps?.reversed()) {
+                let endY =  trend.yIntercept + trend.incline * (count)
+                trendToDisplay = (endY - trend.yIntercept) / abs(trend.yIntercept)
+                correlationToDisplay = trend.coEfficient
+            }
         }
-
-        if let trend = Calculator.correlation(xArray: years, yArray: proportions?.reversed()) {
-            let endY =  trend.yIntercept + trend.incline * (count)
-            trendToDisplay = (endY - trend.yIntercept) / abs(trend.yIntercept)
-            correlationToDisplay = trend.coEfficient
+        else if values?.count ?? 0 == 1 {
+            meanToDisplay = values!.first!?.mean()
+            var years = [Double]()
+            var count = 0.0
+            for _ in values?.first! ?? [] {
+                years.append(count)
+                count += 1.0
+            }
+ 
+            if let trend = Calculator.correlation(xArray: years, yArray: values!.first!?.reversed()) {
+                let endY =  trend.yIntercept + trend.incline * (count)
+                trendToDisplay = (endY - trend.yIntercept) / abs(trend.yIntercept)
+                correlationToDisplay = trend.coEfficient
+            }
         }
-        
         
         tableView.reloadSections([0], with: .automatic)
-
     }
 
+    func refreshTableView() {
+        self.tableView.reloadSections([1,2], with: .automatic)
+    }
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -64,7 +88,7 @@ class ValueListTVC: UITableViewController {
         if section == 0 {
             return 3
         } else {
-            return values?[section-1].count ?? 0
+            return values?[section-1]?.count ?? 0
         }
     }
 
@@ -74,7 +98,12 @@ class ValueListTVC: UITableViewController {
 
         if indexPath.section == 0 {
             if indexPath.row == 0 {
-                cell.configure(title: "Avg", value: meanToDisplay, detail: "", formatter: percentFormatter0Digits)
+                if values?.count ?? 0 == 2 {
+                    cell.configure(title: "Avg growth", value: meanToDisplay, detail: "", formatter: percentFormatter0Digits)
+                }
+                else if values?.count ?? 0 == 1 {
+                    cell.configure(title: "Avg growth", value: meanToDisplay, detail: "", formatter: numberFormatterNoFraction)
+                }
             }
             else if indexPath.row == 2 {
                 cell.configure(title: "R2", attributedTitle: "R2", superscriptLetterIndex: 1 ,value: correlationToDisplay, detail: "", formatter: numberFormatterDecimals)
@@ -88,12 +117,25 @@ class ValueListTVC: UITableViewController {
             var detail$ = " "
             
             if indexPath.section == 1 {
-                if values?[1][indexPath.row] ?? 0 > 0 {
-                    proportion = values![0][indexPath.row] / values![1][indexPath.row]
-                    detail$ = percentFormatter0Digits.string(from: proportion! as NSNumber) ?? " "
+                if values?.count ?? 0 == 2 {
+                    if values![1]![indexPath.row] > 0 {
+                        proportion = values![0]![indexPath.row] / values![1]![indexPath.row]
+                        if proportion != nil {
+                            detail$ = percentFormatter0Digits.string(from: proportion! as NSNumber) ?? " "
+                        }
+                    }
+                }
+                else if indexPath.row + 1 < values!.first!?.count ?? 0 {
+                    if values!.first!?.count ?? 0 > indexPath.row {
+                        proportion = (values!.first!![indexPath.row] - values!.first!![indexPath.row+1]) / abs(values!.first!![indexPath.row+1])
+                        if proportion != nil {
+                            detail$ = percentFormatter0Digits.string(from: proportion! as NSNumber) ?? " "
+                        }
+                    }
                 }
             }
-            cell.configure(title: "\(year)", value: values?[indexPath.section-1][indexPath.row], detail: detail$, detailColor: detailColor(value: proportion), formatter: formatter)
+            
+            cell.configure(title: "\(year)", value: values?[indexPath.section-1]?[indexPath.row], detail: detail$, detailColor: detailColor(value: proportion), formatter: formatter)
         }
 
         return cell
@@ -170,6 +212,13 @@ class ValueListTVC: UITableViewController {
         return true
     }
     */
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if let destination = segue.destination as? WBValuationTVC {
+            destination.chartDelegate.removeValueChart()
+        }
+    }
 
 
 }

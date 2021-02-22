@@ -178,6 +178,16 @@ let percentFormatter2DigitsPositive: NumberFormatter = {
     return formatter
 }()
 
+let percentFormatter0DigitsPositive: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .percent
+    formatter.positivePrefix = "+"
+//    formatter.positiveFormat =
+    formatter.maximumFractionDigits = 0
+    formatter.minimumIntegerDigits = 1
+    return formatter
+}()
+
 
 let numberFormatterWith1Digit: NumberFormatter = {
     let formatter = NumberFormatter()

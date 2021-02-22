@@ -8,12 +8,18 @@
 import UIKit
 import CoreData
 
+protocol StocksListDelegate: NSObject {
+    func showValueListChart(array: [Double]?)
+    func removeValueListChart()
+}
+
 class StocksListViewController: UITableViewController {
     
     @IBOutlet var addButton: UIBarButtonItem!
     @IBOutlet var downloadButton: UIBarButtonItem!
     
     var controller: StocksController?
+    weak var valueChartDelegate: StocksListDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +32,7 @@ class StocksListViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
-        
+                
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -159,11 +165,14 @@ class StocksListViewController: UITableViewController {
         guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
 
         wbValuationView.stock = stocks[indexPath.row]
+        wbValuationView.chartDelegate = self
+        wbValuationView.controller = WBValuationController(stock: stocks[indexPath.row], progressDelegate: wbValuationView)
         
         if stocks[indexPath.row].peRatio == nil {
             stocks[indexPath.row].downloadKeyRatios(delegate: wbValuationView)
         }
 
+//        wbValuationView.refreshList()
         performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         
         navigationController?.pushViewController(wbValuationView, animated: true)
@@ -175,6 +184,7 @@ class StocksListViewController: UITableViewController {
         performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
     }
     
+        
     @IBAction func downloadAction(_ sender: Any) {
         
         guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSearchTVC") as? StockSearchTVC else { return }
@@ -193,6 +203,8 @@ class StocksListViewController: UITableViewController {
                 
                 chartView.stockToShow = stocks[indexPath.row]
                 chartView.configure()
+                
+                self.valueChartDelegate = chartView
 
             }
         }
@@ -202,6 +214,8 @@ class StocksListViewController: UITableViewController {
                     
                     chartView.stockToShow = stocks[indexPath.row]
                     chartView.configure()
+                    
+                    self.valueChartDelegate = chartView
                 }
             }
         }
@@ -235,5 +249,20 @@ extension StocksListViewController: StockControllerDelegate {
             showWelcomeView()
         }
     }
+    
+}
+
+extension StocksListViewController: WBValuationListDelegate {
+    
+    func sendArrayForDisplay(array: [Double]?) {
+        
+        self.valueChartDelegate?.showValueListChart(array: array)
+    }
+    
+    func removeValueChart() {
+        
+        self.valueChartDelegate?.removeValueListChart()
+    }
+    
     
 }

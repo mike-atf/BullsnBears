@@ -11,8 +11,8 @@ import WebKit
 
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
-    var sectionTitles = ["Key ratios","Income statement"]
-    var sectionSubTitles = ["from Yahoo finance","from MacroTrends"]
+    var sectionTitles = ["Key ratios","Income statement", "Balance Sheet", "Cash flow"]
+    var sectionSubTitles = ["from Yahoo finance","from MacroTrends","from MacroTrends","from MacroTrends"]
     var rowTitles: [[String]]!
     var stock: Stock!
     var valuation: WBValuation?
@@ -95,16 +95,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             return ("--", nil, ["no valuation"])
         }
         
-        var value$: String?
         var errors: [String]?
         var color: UIColor?
         
         if path.section == 0 {
+            var value$: String?
+
             switch path.row {
             case 0:
                 if let valid = stock.peRatio {
                     value$ = numberFormatterDecimals.string(from: valid as NSNumber)
-                    color = valid > 40.0 ? UIColor(named: "Red") : UIColor(named: "Green")
+                    color = valid > 40.0 ? UIColor(named: "Red") : UIColor.label
                 }
             case 1:
                 if let valid = stock.eps {
@@ -125,51 +126,54 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             var value$ = "-"
             switch path.row {
             case 0:
+                var years = [Double]()
+                var count = 0.0
+                for _ in valuation?.eps ?? [] {
+                    years.append(count)
+                    count += 1.0
+                }
+     
+                if let trend = Calculator.correlation(xArray: years, yArray: valuation?.eps?.reversed()) {
+                    let endY =  trend.yIntercept + trend.incline * (count)
+                    let incline = (endY - trend.yIntercept) / abs(trend.yIntercept)
+                    value$ = percentFormatter0DigitsPositive.string(from: incline as NSNumber) ?? "-"
+                }
+                return (value$,color,errors)
+            case 1:
                 let (margins, es$) = valuation!.grossProfitMargins()
                 errors = es$
-                if let averageMargin = margins.mean() {
+                if let averageMargin = margins.first { // margins.mean() or weightedMean()
                     value$ = percentFormatter0Digits.string(from: averageMargin as NSNumber) ?? "-"
                     if averageMargin > 0.4 { color = UIColor(named: "Green") }
                     else if averageMargin > 0.2 { color = UIColor.systemYellow }
                     else { color = UIColor(named: "Red") }
                 }
                 return (value$,color,errors)
-            case 1:
+            case 2:
                 let (proportions, es$) = valuation!.sgaProportion()
                 errors = es$
-                if let average = proportions.mean() {
+                if let average = proportions.first { //proportions.mean()
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     if average <= 0.3 { color = UIColor(named: "Green") }
                     else if average < 100 { color = UIColor.systemYellow }
                     else { color = UIColor(named: "Red") }
                 }
                 return (value$, color, errors)
-            case 2:
+            case 3:
                 let (proportions, es$) = valuation!.rAndDProportion()
                 errors = es$
-                if let average = proportions.mean() {
+                if let average = proportions.first { // .mean()
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                 }
 
                 return (value$, nil, errors)
-            case 3:
+            case 4:
                 let (proportions, es$) = valuation!.netIncomeProportion()
                 errors = es$
-                if let average = proportions.mean() {
+                if let average = proportions.first { // .mean()
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     if average > 0.2 { color = UIColor(named: "Green") }
                     else if average > 0.1 { color = UIColor.systemYellow }
-                    else { color = UIColor(named: "Red") }
-                }
-
-                return (value$, color, errors)
-            case 4:
-                let (proportions, es$) = valuation!.longtermDebtProportion()
-                errors = es$
-                if let average = proportions.mean() {
-                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
-                    if average < 3.0 { color = UIColor(named: "Green") }
-                    else if average < 4.0 { color = UIColor.systemYellow }
                     else { color = UIColor(named: "Red") }
                 }
 
@@ -179,25 +183,63 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             }
             
         }
-        else  if path.section == 2 {
-            let (value, errors) = valuation!.ivalue()
-            if errors.count == 0 {
-                if let valid = value {
-                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", color, nil)
+        else if path.section == 2 {
+            
+            var value$ = "-"
+            switch path.row {
+            case 0:
+                let (proportions, es$) = valuation!.longtermDebtProportion()
+                errors = es$
+                if let average = proportions.first { // mean()
+                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+                    if average < 3.0 { color = UIColor(named: "Green") }
+                    else if average < 4.0 { color = UIColor.systemYellow }
+                    else { color = UIColor(named: "Red") }
                 }
-                else {
-                    return ("no value", color, nil)
+
+                return (value$, color, errors)
+                
+            case 1:
+
+                var years = [Double]()
+                var count = 0.0
+                for _ in valuation?.equityRepurchased ?? [] {
+                    years.append(count)
+                    count += 1.0
                 }
-            }
-            else { // errors
-                if let valid = value {
-                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", color, errors)
+     
+                if let trend = Calculator.correlation(xArray: years, yArray: valuation?.equityRepurchased?.reversed()) {
+                    let endY =  trend.yIntercept + trend.incline * (count)
+                    let incline = (endY - trend.yIntercept) / abs(trend.yIntercept)
+                    value$ = percentFormatter0DigitsPositive.string(from: incline as NSNumber) ?? "-"
                 }
-                else {
-                    return ("no value", color, errors)
-                }
+
+                return (value$, color, errors)
+
+            default:
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
+
             }
         }
+//        else if path.section == 2 {
+//            let (value, errors) = valuation!.ivalue()
+//            if errors.count == 0 {
+//                if let valid = value {
+//                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", color, nil)
+//                }
+//                else {
+//                    return ("no value", color, nil)
+//                }
+//            }
+//            else { // errors
+//                if let valid = value {
+//                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", color, errors)
+//                }
+//                else {
+//                    return ("no value", color, errors)
+//                }
+//            }
+//        }
         
         return ("no value", color, nil)
         
@@ -207,7 +249,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     private func buildRowTitles() -> [[String]] {
         
-        return [["P/E ratio", "EPS", "beta"], ["profit margin","SGA / Rev.", "R&D / profit", "Net inc./ Rev.", "LT Debt / net inc"]]
+        return [["P/E ratio", "EPS", "beta"], ["EPS trend","profit margin","SGA / Rev.", "R&D / profit", "Net inc./ Rev."],["LT Debt / net inc","Ret earnings trend"],[]]
     }
         
     // MARK: - Data download functions

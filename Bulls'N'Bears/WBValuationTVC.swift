@@ -7,12 +7,18 @@
 
 import UIKit
 
+protocol WBValuationListDelegate: NSObject {
+    func sendArrayForDisplay(array: [Double]?)
+    func removeValueChart()
+}
+
 class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     var downloadButton: UIBarButtonItem!
     var controller: WBValuationController!
     var stock: Stock!
     var progressView: DownloadProgressView?
+    weak var chartDelegate: WBValuationListDelegate!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,10 +29,8 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         self.navigationController?.title = stock.name_short
         tableView.register(UINib(nibName: "WBValuationCell", bundle: nil), forCellReuseIdentifier: "wbValuationCell")
         
-        controller = WBValuationController(stock: stock, progressDelegate: self)
-
     }
-
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -216,62 +220,82 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             return
         }
         
+        
         if let destination = segue.destination as? ValueListTVC {
             
             destination.loadViewIfNeeded()
             destination.valuation = controller.valuation
-            var arrays: [[Double]]?
+            var arrays: [[Double]?]?
             
             if selectedPath.section == 1 {
                 if selectedPath.row == 0 {
+                    arrays = [controller.valuation?.eps ?? []]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["EPS"])
+                    destination.formatter = currencyFormatterGapWithPence
+//                    let (margins, errors) = controller.valuation!.longtermDebtProportion()
+//                    destination.proportions = margins
+                }
+
+                if selectedPath.row == 1 {
                     arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["Gross profit, % of revenue", "Revenue"])
+                    destination.sectionTitles.append(contentsOf: ["Gross profit (% of revenue)", "Revenue"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.grossProfitMargins()
                     destination.proportions = margins
                     destination.gradingLimits = [0.4,0.2]
                 }
-                else if selectedPath.row == 1 {
+                else if selectedPath.row == 2 {
                     arrays = [controller.valuation?.sgaExpense ?? [], controller.valuation?.grossProfit ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["SGA, % of profit", "Profit"])
+                    destination.sectionTitles.append(contentsOf: ["SGA (% of profit)", "Profit"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.sgaProportion()
                     destination.proportions = margins
                     destination.gradingLimits = [0.3,0.9]
                 }
-                else if selectedPath.row == 2 {
+                else if selectedPath.row == 3 {
                     arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["R&D, % of profit", "Profit"])
+                    destination.sectionTitles.append(contentsOf: ["R&D (% of profit)", "Profit"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.rAndDProportion()
                     destination.proportions = margins
                     destination.gradingLimits = nil
                 }
-                else if selectedPath.row == 3 {
+                else if selectedPath.row == 4 {
                     arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.revenue ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["net income, % of revenue", "Revenue"])
+                    destination.sectionTitles.append(contentsOf: ["net income (% of revenue)", "Revenue"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.netIncomeProportion()
                     destination.proportions = margins
                     destination.gradingLimits = [0.2,0.1]
                 }
-                else if selectedPath.row == 4 {
+                
+            }
+            else if selectedPath.section == 2 {
+                if selectedPath.row == 0 {
                     arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["LT debt, % of net income", "Net income"])
+                    destination.sectionTitles.append(contentsOf: ["LT debt (% of net income)", "Net income"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.longtermDebtProportion()
                     destination.proportions = margins
                     destination.gradingLimits = [3.0,4.0]
                 }
-
+                if selectedPath.row == 1 {
+                    arrays = [controller.valuation?.equityRepurchased ?? []]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["Retained earnings"])
+                    destination.formatter = currencyFormatterGapNoPence
+                }
             }
             
+//            destination.refreshTableView()
         }
+        
     }
 
     
@@ -298,7 +322,7 @@ extension WBValuationTVC: StockKeyratioDownloadDelegate, WBValuationCellDelegate
     
     func keyratioDownloadComplete(errors: [String]) {
         DispatchQueue.main.async {
-            self.tableView.reloadSections([0], with: .automatic)
+            self.tableView.reloadSections([0,1,2], with: .automatic)
 
         }
     }

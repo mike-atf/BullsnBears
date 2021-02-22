@@ -98,6 +98,35 @@ public class WBValuation: NSManagedObject {
 
     }
     
+    /// returns porportions of array 2 / array 1 elements
+    public func proportions(array1: [Double]?, array2: [Double]?) -> ([Double], [String]?) {
+        
+        guard array1 != nil && array2 != nil else {
+            return ([Double()], ["missing data"])
+        }
+        
+        let rawData = [array1!, array2!]
+        
+        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+        
+        guard cleanedData[0].count == cleanedData[1].count else {
+            return ([Double()], ["insufficient data"])
+        }
+        
+        var proportions = [Double]()
+        var errorList: [String]?
+        for i in 0..<cleanedData[0].count {
+            proportions.append(cleanedData[1][i] / cleanedData[0][i])
+        }
+        
+        if let validError = error {
+            errorList = [validError]
+        }
+        return (proportions, errorList)
+
+    }
+
+    
     public func rAndDProportion() -> ([Double], [String]?) {
         
         guard grossProfit != nil && rAndDexpense != nil else {
