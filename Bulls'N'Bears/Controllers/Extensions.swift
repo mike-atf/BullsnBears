@@ -81,6 +81,7 @@ extension Array where Element == Double {
             return nil
         }
         
+        
         var sum = 0.0
         let n = self.count + 1
         var i = self.count

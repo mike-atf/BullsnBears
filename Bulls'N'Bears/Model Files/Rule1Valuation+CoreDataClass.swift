@@ -224,6 +224,12 @@ public class Rule1Valuation: NSManagedObject {
     
     func stickerPrice() -> (Double?, [String]?) {
         
+        
+        guard bvps != nil && eps != nil else {
+            
+            return (nil, ["missing book value per share or EPS."])
+        }
+        
         var errors:[String]?
         
         let dataArrays = [bvps!, eps!]
