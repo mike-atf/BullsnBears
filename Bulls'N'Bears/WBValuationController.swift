@@ -132,17 +132,26 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     years.append(count)
                     count += 1.0
                 }
-     
-                if let trend = Calculator.correlation(xArray: years, yArray: valuation?.eps?.reversed()) {
-                    let endY =  trend.yIntercept + trend.incline * (count)
-                    let incline = (endY - trend.yIntercept) / abs(trend.yIntercept)
-                    value$ = percentFormatter0DigitsPositive.string(from: incline as NSNumber) ?? "-"
+                
+                if let growthRatesMean = valuation?.eps?.filter({ (element) -> Bool in
+                    if element != 0.0 { return true }
+                    else { return false }
+                }).growthRates()?.weightedMean() {
+                    value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
                 }
+//                if let trend = Calculator.correlation(xArray: years, yArray: valuation?.eps?.reversed()) {
+//                    let endY =  trend.yIntercept + trend.incline * (count)
+//                    let incline = (endY - trend.yIntercept) / abs(trend.yIntercept)
+//                    value$ = percentFormatter0DigitsPositive.string(from: incline as NSNumber) ?? "-"
+//                }
                 return (value$,color,errors)
             case 1:
                 let (margins, es$) = valuation!.grossProfitMargins()
                 errors = es$
-                if let averageMargin = margins.first { // margins.mean() or weightedMean()
+                if let averageMargin = margins.filter({ (element) -> Bool in
+                    if element != 0.0 { return true }
+                    else { return false }
+                }).weightedMean() {
                     value$ = percentFormatter0Digits.string(from: averageMargin as NSNumber) ?? "-"
                     if averageMargin > 0.4 { color = UIColor(named: "Green") }
                     else if averageMargin > 0.2 { color = UIColor.systemYellow }
@@ -152,7 +161,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 2:
                 let (proportions, es$) = valuation!.sgaProportion()
                 errors = es$
-                if let average = proportions.first { //proportions.mean()
+                if let average = proportions.filter({ (element) -> Bool in
+                    if element != 0.0 { return true }
+                    else { return false }
+                }).weightedMean() { //proportions.mean()
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     if average <= 0.3 { color = UIColor(named: "Green") }
                     else if average < 100 { color = UIColor.systemYellow }
@@ -162,7 +174,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 3:
                 let (proportions, es$) = valuation!.rAndDProportion()
                 errors = es$
-                if let average = proportions.first { // .mean()
+                if let average = proportions.filter({ (element) -> Bool in
+                    if element != 0.0 { return true }
+                    else { return false }
+                }).weightedMean() {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                 }
 
@@ -170,7 +185,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 4:
                 let (proportions, es$) = valuation!.netIncomeProportion()
                 errors = es$
-                if let average = proportions.first { // .mean()
+                if let average = proportions.filter({ (element) -> Bool in
+                    if element != 0.0 { return true }
+                    else { return false }
+                }).weightedMean() {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     if average > 0.2 { color = UIColor(named: "Green") }
                     else if average > 0.1 { color = UIColor.systemYellow }
@@ -190,7 +208,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 0:
                 let (proportions, es$) = valuation!.longtermDebtProportion()
                 errors = es$
-                if let average = proportions.first { // mean()
+                if let average = proportions.weightedMean() {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     if average < 3.0 { color = UIColor(named: "Green") }
                     else if average < 4.0 { color = UIColor.systemYellow }
@@ -201,18 +219,29 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 
             case 1:
 
-                var years = [Double]()
-                var count = 0.0
-                for _ in valuation?.equityRepurchased ?? [] {
-                    years.append(count)
-                    count += 1.0
+//                var years = [Double]()
+//                var count = 0.0
+//                for _ in valuation?.equityRepurchased ?? [] {
+//                    years.append(count)
+//                    count += 1.0
+//                }
+//
+//                if let trend = Calculator.correlation(xArray: years, yArray: valuation?.equityRepurchased?.reversed()) {
+//                    let endY =  trend.yIntercept + trend.incline * (count)
+//                    let incline = (endY - trend.yIntercept) / abs(trend.yIntercept)
+//                    value$ = percentFormatter0DigitsPositive.string(from: incline as NSNumber) ?? "-"
+//                }
+// NEW 2
+                let retEarningsGrowths = valuation?.equityRepurchased?.filter({ (element) -> Bool in
+                    if element != 0.0 { return true }
+                    else { return false }
+                }).growthRates()
+                
+                if let meanGrowth = retEarningsGrowths?.weightedMean() {
+                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
+                    color = meanGrowth > 0 ? UIColor(named: "Green") : UIColor(named: "Red")
                 }
-     
-                if let trend = Calculator.correlation(xArray: years, yArray: valuation?.equityRepurchased?.reversed()) {
-                    let endY =  trend.yIntercept + trend.incline * (count)
-                    let incline = (endY - trend.yIntercept) / abs(trend.yIntercept)
-                    value$ = percentFormatter0DigitsPositive.string(from: incline as NSNumber) ?? "-"
-                }
+                
 
                 return (value$, color, errors)
 
@@ -249,7 +278,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     private func buildRowTitles() -> [[String]] {
         
-        return [["P/E ratio", "EPS", "beta"], ["EPS trend","profit margin","SGA / Rev.", "R&D / profit", "Net inc./ Rev."],["LT Debt / net inc","Ret earnings trend"],[]]
+        return [["P/E ratio", "EPS", "beta"], ["EPS trend","profit margin","SGA / Revenue", "R&D / profit", "Net inc./ Revenue"],["LT Debt / net income","Retd. earnings growth trend"],[]]
     }
         
     // MARK: - Data download functions

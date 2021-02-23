@@ -83,24 +83,22 @@ extension Array where Element == Double {
         
         
         var sum = 0.0
-        let n = self.count + 1
-        var i = self.count
-        var weight = 1.0
-        
-        for element in self {
-            weight = Double((i / n))
-            sum += element * weight
-            i -= 1
+        var weightSum = 0.0
+
+        for i in 0..<self.count {
+            let weight = (1/Double(i+1))
+            sum += weight * self[i]
+            weightSum += weight
         }
         
         if count > 0 {
-            return sum / Double(self.count)
+            return sum / weightSum
         }
         else { return nil }
     }
     
     /// calculates growth rates from current to preceding element
-    /// should have elemetns in time-ascending order!
+    /// should have elemetns in time-descending order!
     /// return n-1 elements
     func growthRates() -> [Double]? {
         
@@ -115,6 +113,110 @@ extension Array where Element == Double {
         }
         
         return rates
+    }
+
+}
+
+extension Array where Element == Double? {
+    
+    /// calculates growth rates from current to preceding element
+    /// should have elemetns in descending order!
+    /// i.e. the following element is younger/ usually smaller
+    /// return n-1 elements
+    func growthRates() -> [Double?]? {
+        
+        guard self.count > 1 else {
+            return nil
+        }
+        
+        var rates = [Double?]()
+        
+        var hold: Double?
+        var steps = 1
+        for i in 0..<self.count - 1 {
+            if let valid = hold ?? self[i] {
+                if let validNext = self[i+1] {
+                    for _ in 0..<steps {
+                        rates.append((valid - validNext) / (validNext * Double(steps)))
+                    }
+                    hold = nil
+                    steps = 1
+                }
+                else {
+                    // validNext empty
+                    hold = valid
+                    steps += 1
+                }
+            }
+            else {
+                // valid empty
+                rates.append(nil)
+            }
+        }
+
+        return rates
+    }
+    
+    /// calculates the absolute growth = difference element to previous element
+    /// array should be sorted in DESCENDING order
+    /// returns n-1 elements
+    func growth() -> [Double?]? {
+        
+        guard self.count > 1 else {
+            return nil
+        }
+
+        var difference = [Double?]()
+        var hold: Double?
+        var steps = 1
+        for i in 0..<self.count - 1 {
+            if let valid = hold ?? self[i] {
+                if let validNext = self[i+1] {
+                    for _ in 0..<steps {
+                        difference.append((valid - validNext) / Double(steps))
+                    }
+                    hold = nil
+                    steps = 1
+                }
+                else {
+                    // validNext empty
+                    hold = valid
+                    steps += 1
+                }
+            }
+            else {
+                // valid empty
+                difference.append(nil)
+            }
+        }
+
+        return difference
+    }
+    
+    /// assumes (time) ordered array
+    /// with element given the largest weights first and the smallest last
+    /// (time) distance between array elements are assumed to be equal (e.g. one year)
+    func weightedMean() -> Double? {
+        
+        guard self.count > 0 else {
+            return nil
+        }
+        
+        var sum = 0.0
+        var weightSum = 0.0
+
+        for i in 0..<self.count {
+            if let valid = self[i] {
+                let weight = (1/Double(i+1))
+                sum += weight * valid
+                weightSum += weight
+            }
+        }
+        
+        if count > 0 {
+            return sum / weightSum
+        }
+        else { return nil }
     }
 
 }

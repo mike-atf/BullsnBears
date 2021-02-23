@@ -180,7 +180,7 @@ public class WBValuation: NSManagedObject {
         return (proportions, errorList)
     }
     
-    public func longtermDebtProportion() -> ([Double], [String]?) {
+    public func longtermDebtProportion() -> ([Double?], [String]?) {
         
         guard debtLT != nil && netEarnings != nil else {
             return ([Double()], ["there are no net income and/or long-term debt data"])
@@ -194,14 +194,25 @@ public class WBValuation: NSManagedObject {
             return ([Double()], ["insufficient net income and long-term debt data"])
         }
         
-        var proportions = [Double]()
+        var proportions = [Double?]()
         var errorList: [String]?
         for i in 0..<cleanedData[0].count {
-            proportions.append(cleanedData[1][i] / cleanedData[0][i])
+            if cleanedData[0][i] > 0 {
+                proportions.append(cleanedData[1][i] / cleanedData[0][i])
+            }
+            else {
+                proportions.append(nil)
+                if cleanedData[1][i] > 0 {
+                    errorList = ["company made losses and had long term debt!"]
+                }
+            }
         }
         
         if let validError = error {
-            errorList = [validError]
+            if errorList == nil {
+                errorList = [String]()
+            }
+            errorList!.append(validError)
         }
         return (proportions, errorList)
 

@@ -332,7 +332,7 @@ extension WBValuationTVC: StockKeyratioDownloadDelegate, WBValuationCellDelegate
         if let errorsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {
             
             errorsView.modalPresentationStyle = .popover
-            errorsView.preferredContentSize = CGSize(width: self.view.frame.width * 0.9, height: self.view.frame.height * 0.5)
+            errorsView.preferredContentSize = CGSize(width: self.view.frame.width * 0.75, height: self.view.frame.height * 0.25)
 
             let popUpController = errorsView.popoverPresentationController
             popUpController!.permittedArrowDirections = .any

@@ -268,6 +268,13 @@ struct Correlation {
         
         return change
     }
+    
+    public func r2() -> Double? {
+        if coEfficient != Double() {
+            return (coEfficient * coEfficient) // should be '*100' but use precentFormatter to display as %
+        }
+        else { return nil }
+    }
 }
 
 struct TrendProperties {

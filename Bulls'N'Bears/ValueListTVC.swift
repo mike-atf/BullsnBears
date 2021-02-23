@@ -18,8 +18,9 @@ class ValueListTVC: UITableViewController {
     var correlationToDisplay: Double?
     var trendToDisplay: Double?
     var mostRecentYear: Int!
-    var proportions: [Double]?
+    var proportions: [Double?]?
     var gradingLimits: [Double]? // first = good, // second = moderate // third = bad
+    var gapErrors: [String]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,39 +35,61 @@ class ValueListTVC: UITableViewController {
     override func viewDidAppear(_ animated: Bool) {
         
         if values?.count ?? 0  == 2 {
-            meanToDisplay = proportions?.mean()
+
             proportions = Calculator.proportions(array1: values?.first!, array0: values?.last!)
-            let proportionsNoGaps = proportions?.filter({ (element) -> Bool in
+
+            let proportionsNoGaps = proportions?.compactMap{$0}.filter({ (element) -> Bool in
                 if element != 0.0 { return true }
                 else { return false }
             })
-            
+
+            if proportions?.count ?? 0 != proportionsNoGaps?.count ?? 0 {
+                gapErrors = ["missing data were omitted. Use result with caution"]
+            }
+            else {
+                gapErrors = nil
+            }
+            meanToDisplay = proportionsNoGaps?.weightedMean()
+            trendToDisplay = proportions?.growthRates()?.weightedMean()
             var years = [Double]()
             var count = 0.0
             for _ in proportionsNoGaps ?? [] {
                 years.append(count)
                 count += 1.0
             }
-            
+
             if let trend = Calculator.correlation(xArray: years, yArray: proportionsNoGaps?.reversed()) {
-                let endY =  trend.yIntercept + trend.incline * (count)
-                trendToDisplay = (endY - trend.yIntercept) / abs(trend.yIntercept)
-                correlationToDisplay = trend.coEfficient
+                correlationToDisplay = trend.r2()
             }
         }
         else if values?.count ?? 0 == 1 {
-            meanToDisplay = values!.first!?.mean()
+            
+            let valuesWOMissing = values?.first!?.filter({ (element) -> Bool in
+                if element != 0.0 { return true }
+                else { return false }
+            })
+            
+            if values?.first!?.count ?? 0 != valuesWOMissing?.count ?? 0 {
+                gapErrors = ["missing data were omitted. Use result with caution"]
+            }
+            else {
+                gapErrors = nil
+            }
+
+            meanToDisplay = valuesWOMissing?.weightedMean()
+            let growthRates = valuesWOMissing?.growthRates()
+            trendToDisplay = growthRates?.weightedMean()
             var years = [Double]()
             var count = 0.0
-            for _ in values?.first! ?? [] {
-                years.append(count)
+            for _ in growthRates ?? [] {
+                years.append(Double(mostRecentYear) - count)
                 count += 1.0
             }
  
-            if let trend = Calculator.correlation(xArray: years, yArray: values!.first!?.reversed()) {
-                let endY =  trend.yIntercept + trend.incline * (count)
-                trendToDisplay = (endY - trend.yIntercept) / abs(trend.yIntercept)
-                correlationToDisplay = trend.coEfficient
+            if let trend = Calculator.correlation(xArray: years.reversed(), yArray: growthRates?.reversed()) {
+//                let endY =  trend.yIntercept + trend.incline * (count)
+//                trendToDisplay =  (endY - trend.yIntercept) / abs(trend.yIntercept)
+                correlationToDisplay = trend.r2() // formula for 'variance explained' =R2
             }
         }
         
@@ -86,7 +109,7 @@ class ValueListTVC: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if section == 0 {
-            return 3
+            return 2
         } else {
             return values?[section-1]?.count ?? 0
         }
@@ -97,18 +120,19 @@ class ValueListTVC: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell", for: indexPath) as! ValueListCell
 
         if indexPath.section == 0 {
-            if indexPath.row == 0 {
-                if values?.count ?? 0 == 2 {
-                    cell.configure(title: "Avg growth", value: meanToDisplay, detail: "", formatter: percentFormatter0Digits)
-                }
-                else if values?.count ?? 0 == 1 {
-                    cell.configure(title: "Avg growth", value: meanToDisplay, detail: "", formatter: numberFormatterNoFraction)
-                }
-            }
-            else if indexPath.row == 2 {
-                cell.configure(title: "R2", attributedTitle: "R2", superscriptLetterIndex: 1 ,value: correlationToDisplay, detail: "", formatter: numberFormatterDecimals)
+//            if indexPath.row == 0 {
+//                if values?.count ?? 0 == 2 {
+//                    cell.configure(title: "Weighted growth", value: meanToDisplay, detail: "", formatter: percentFormatter0Digits)
+//                }
+//                else if values?.count ?? 0 == 1 {
+//                    cell.configure(title: "Weighted average", value: meanToDisplay, detail: "", formatter: numberFormatterNoFraction)
+//                }
+//            }
+//            else
+            if indexPath.row == 1 {
+                cell.configure(title: "R2", attributedTitle: "R2", superscriptLetterIndex: 1 ,value: correlationToDisplay, detail: "", formatter: percentFormatter0Digits)
             } else {
-                cell.configure(title: "Trend", value: trendToDisplay, detail: "", formatter: percentFormatter2DigitsPositive)
+                cell.configure(title: "Growth trend", value: trendToDisplay, detail: "", formatter: percentFormatter2DigitsPositive)
             }
         }
         else {

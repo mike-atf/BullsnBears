@@ -377,11 +377,14 @@ class ChartView: UIView {
         let labelMidY = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - price) / (maxPrice - minPrice))
         
         var text = " \(endPrice$) = \(increase1$) \n From latest: \(increase2$) "
+        var superscriptIndex = Int()
         if let r = correlation {
-            text = text + "\n r=" + numberFormatterWith1Digit.string(from: NSNumber(value: r))! + " "
+            superscriptIndex = text.count + 3
+            text = text + "\n R2=" + percentFormatter0Digits.string(from: NSNumber(value: r))! + " "
         }
         if let r = reliability {
-            text = text + "\n R=" + percentFormatter0Digits.string(from: NSNumber(value: r))! + " "
+            superscriptIndex = text.count + 1
+            text = text + "\n success=" + percentFormatter0Digits.string(from: NSNumber(value: r))! + " "
         }
         
         let newTrendLabel: UILabel = {
@@ -390,7 +393,7 @@ class ChartView: UIView {
             label.font = UIFont.preferredFont(forTextStyle: .callout)
             label.textColor = UIColor.white
             label.backgroundColor = color
-            label.text = text
+            label.setAttributedTextWithSuperscripts(text: text, indicesOfSuperscripts: [superscriptIndex])
             label.sizeToFit()
             
             let labelTop = labelMidY - label.frame.height / 2
