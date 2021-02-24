@@ -172,10 +172,10 @@ class StocksListViewController: UITableViewController {
             stocks[indexPath.row].downloadKeyRatios(delegate: wbValuationView)
         }
 
-//        wbValuationView.refreshList()
         performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         
         navigationController?.pushViewController(wbValuationView, animated: true)
+//        wbValuationView.tableView.reloadData()
     }
     
     func valuationCompleted(indexPath: IndexPath) {

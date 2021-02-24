@@ -233,8 +233,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.values = arrays
                     destination.sectionTitles.append(contentsOf: ["EPS"])
                     destination.formatter = currencyFormatterGapWithPence
-//                    let (margins, errors) = controller.valuation!.longtermDebtProportion()
-//                    destination.proportions = margins
+                    destination.gradingLimits = [10.0, 40.0]
                 }
 
                 if selectedPath.row == 1 {
@@ -285,11 +284,31 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.proportions = margins
                     destination.gradingLimits = [3.0,4.0]
                 }
-                if selectedPath.row == 1 {
+                else if selectedPath.row == 1 {
+                    let (shEquityWithRetEarnings, _) = controller.valuation!.addElements(array1: controller.valuation?.shareholdersEquity ?? [], array2: controller.valuation!.equityRepurchased ?? [])
+                    arrays = [controller.valuation?.debtLT ?? [], shEquityWithRetEarnings]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["LT debt (% of sh. equity + rt. earnings)", "Sh. equity + rt. earnings"])
+                    destination.formatter = currencyFormatterGapNoPence
+
+                }
+                else if selectedPath.row == 2 {
                     arrays = [controller.valuation?.equityRepurchased ?? []]
                     destination.values = arrays
                     destination.sectionTitles.append(contentsOf: ["Retained earnings"])
                     destination.formatter = currencyFormatterGapNoPence
+                }
+                else if selectedPath.row == 3 {
+                    arrays = [controller.valuation?.roe ?? []]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["Return on equity"])
+                    destination.formatter = percentFormatter0Digits
+                }
+                else if selectedPath.row == 4 {
+                    arrays = [controller.valuation?.roa ?? []]
+                    destination.values = arrays
+                    destination.sectionTitles.append(contentsOf: ["Return on assets"])
+                    destination.formatter = percentFormatter0Digits
                 }
             }
             
@@ -312,7 +331,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         progressView?.removeFromSuperview()
         progressView = nil
         controller.valuation?.save()
-        tableView.reloadSections([1], with: .automatic)
+        tableView.reloadSections([1,2], with: .automatic)
     }
 
 
@@ -322,7 +341,7 @@ extension WBValuationTVC: StockKeyratioDownloadDelegate, WBValuationCellDelegate
     
     func keyratioDownloadComplete(errors: [String]) {
         DispatchQueue.main.async {
-            self.tableView.reloadSections([0,1,2], with: .automatic)
+            self.tableView.reloadSections([0], with: .automatic)
 
         }
     }

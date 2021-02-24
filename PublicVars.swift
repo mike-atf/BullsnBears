@@ -11,6 +11,8 @@ var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
 var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 var errorLog: [ErrorLog]?
+let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
+let gradientBar = UIImage(named: "GradientBar")
 
 var stockTickerDictionary: [String:String]? = {
         

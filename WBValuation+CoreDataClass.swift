@@ -218,7 +218,32 @@ public class WBValuation: NSManagedObject {
 
     }
 
-
+    /// if at any index i one or both arrays have a nil element then an empty 'Double()' will be inserted as spaceholder at that index
+    /// this enables ongoing correlation with other ordered arrays e.g. 'years'
+    public func addElements(array1: [Double?], array2: [Double?]) -> ([Double]?, String?) {
+        
+        var sumArray = [Double]()
+        
+        guard array1.count == array2.count else {
+            return (nil, "two arrays to be added together have differing number of elements")
+        }
+        
+        for i in 0..<array1.count {
+            if let valid1 = array1[i] {
+                if let valid2 = array2[i] {
+                    sumArray.append(valid1 + valid2)
+                }
+                else {
+                    sumArray.append(Double())
+                }
+            }
+            else {
+                sumArray.append(Double())
+            }
+        }
+        
+        return (sumArray,nil)
+    }
 
     
     public func ivalue() -> (Double?, [String] ){
@@ -232,6 +257,10 @@ public class WBValuation: NSManagedObject {
         guard let price = stock.dailyPrices.last?.close else {
             return (nil, ["no current price available for \(company)"])
         }
+        
+        guard price > 0 else {
+            return (nil, ["current price for \(company) = 0"])
+        }
               
         
         guard peRatio > 0 else {
@@ -239,12 +268,12 @@ public class WBValuation: NSManagedObject {
         }
         
         var errors = [String]()
-        var epsGrowthRates = eps?.growthRates()
+        var epsGrowthRates = netEarnings?.growthRates()?.excludeQuartiles()
         if epsGrowthRates == nil {
-            errors.append("can't calculate EPS growth rates; trying revenue growth rates instead")
-            epsGrowthRates = revenue?.growthRates()
+            errors.append("can't calculate earnigs growth rates; trying EPS growth rates instead")
+            epsGrowthRates = eps?.growthRates()
             if epsGrowthRates == nil {
-                errors.append("can't calculate revenue growth rates either")
+                errors.append("can't calculate EPS growth rates either")
                 return (nil, errors)
             }
         }
@@ -254,12 +283,20 @@ public class WBValuation: NSManagedObject {
             return (nil, errors)
         }
         
+        if let stdVariation = epsGrowthRates?.stdVariation() {
+            if (stdVariation / meanEPSGrowth) > 1.0 {
+                errors.append("highly variable past earnings growth rates. Resulting intrinsic value is unreliable")
+            }
+        }
+        
+// Method 1
         let futureEPS = Calculator.futureValue(present: eps!.first!, growth: meanEPSGrowth, years: 10.0)
         
         let discountRate = UserDefaults.standard.value(forKey: UserDefaultTerms().longTermCoporateInterestRate) as? Double ?? 0.021
         let discountedCurrentEPS = Calculator.presentValue(growth: discountRate, years: 10.0, endValue: futureEPS)
         let dcCurrentEPSReturn = discountedCurrentEPS / price
         let ivalue = dcCurrentEPSReturn * peRatio
+        
         
         return (ivalue, errors)
         

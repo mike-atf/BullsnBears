@@ -49,8 +49,18 @@ class ValueListTVC: UITableViewController {
             else {
                 gapErrors = nil
             }
-            meanToDisplay = proportionsNoGaps?.weightedMean()
-            trendToDisplay = proportions?.growthRates()?.weightedMean()
+            if let weightedMean = proportionsNoGaps?.weightedMean() {
+                if !weightedMean.isNaN {
+                    meanToDisplay = weightedMean
+                }
+            }
+            
+            if let trend = proportions?.growthRates()?.weightedMean() {
+                if !trend.isNaN {
+                    trendToDisplay = trend
+                }
+            }
+
             var years = [Double]()
             var count = 0.0
             for _ in proportionsNoGaps ?? [] {
@@ -76,9 +86,19 @@ class ValueListTVC: UITableViewController {
                 gapErrors = nil
             }
 
-            meanToDisplay = valuesWOMissing?.weightedMean()
+            if let weightedMean = valuesWOMissing?.weightedMean() {
+                if !weightedMean.isNaN {
+                    meanToDisplay = weightedMean
+                }
+            }
+
             let growthRates = valuesWOMissing?.growthRates()
-            trendToDisplay = growthRates?.weightedMean()
+            if let trend = growthRates?.weightedMean() {
+                if !trend.isNaN {
+                    trendToDisplay = trend
+                }
+            }
+
             var years = [Double]()
             var count = 0.0
             for _ in growthRates ?? [] {
@@ -87,8 +107,6 @@ class ValueListTVC: UITableViewController {
             }
  
             if let trend = Calculator.correlation(xArray: years.reversed(), yArray: growthRates?.reversed()) {
-//                let endY =  trend.yIntercept + trend.incline * (count)
-//                trendToDisplay =  (endY - trend.yIntercept) / abs(trend.yIntercept)
                 correlationToDisplay = trend.r2() // formula for 'variance explained' =R2
             }
         }

@@ -27,6 +27,7 @@
 		EA5FDBE325B1EE34008918C8 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5FDBE225B1EE34008918C8 /* AlertController.swift */; };
 		EA736CCD25D7C8FF007FC981 /* ValuationDataCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */; };
 		EA736CDE25D7E72C007FC981 /* ValuationErrorsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */; };
+		EA79790225E6F24200663644 /* GradientColorFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA79790125E6F24200663644 /* GradientColorFinder.swift */; };
 		EA7B613925C412860018BA02 /* StockTickerDictionary.csv in Resources */ = {isa = PBXBuildFile; fileRef = EA7B613825C412860018BA02 /* StockTickerDictionary.csv */; };
 		EA7B613A25C412860018BA02 /* StockTickerDictionary.csv in Resources */ = {isa = PBXBuildFile; fileRef = EA7B613825C412860018BA02 /* StockTickerDictionary.csv */; };
 		EA7B613B25C412860018BA02 /* StockTickerDictionary.csv in Resources */ = {isa = PBXBuildFile; fileRef = EA7B613825C412860018BA02 /* StockTickerDictionary.csv */; };
@@ -184,6 +185,7 @@
 		EA5FDBE225B1EE34008918C8 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AlertController.swift; path = "Bulls'N'Bears/DCFValuation FIles/AlertController.swift"; sourceTree = SOURCE_ROOT; };
 		EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationDataCleaner.swift; sourceTree = "<group>"; };
 		EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationErrorsTVC.swift; sourceTree = SOURCE_ROOT; };
+		EA79790125E6F24200663644 /* GradientColorFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientColorFinder.swift; sourceTree = "<group>"; };
 		EA7B613825C412860018BA02 /* StockTickerDictionary.csv */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = StockTickerDictionary.csv; sourceTree = "<group>"; };
 		EA805DC425D54D4E00720E68 /* StockSearchTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockSearchTVC.swift; sourceTree = "<group>"; };
 		EAA099C32588020B00DBB93C /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
@@ -332,6 +334,7 @@
 			children = (
 				EAD835BB25DA9BA40015C93A /* WBValuationTVC.swift */,
 				EA1F86D625DC247C006791BD /* WBValuationController.swift */,
+				EA79790125E6F24200663644 /* GradientColorFinder.swift */,
 				EAD835F925DC16470015C93A /* WBValuationCell.swift */,
 				EAD835FA25DC16470015C93A /* WBValuationCell.xib */,
 				EAD835E625DC10700015C93A /* ValueListTVC.swift */,
@@ -611,6 +614,7 @@
 				EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
 				EA163F77258BA85E000974AB /* StockTrend.swift in Sources */,
+				EA79790225E6F24200663644 /* GradientColorFinder.swift in Sources */,
 				EA4B5F2825E2E9800070CC70 /* ValueChartVC.swift in Sources */,
 				EAC2FC4525A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
 				EAD835D625DC015E0015C93A /* WBValuation+CoreDataClass.swift in Sources */,

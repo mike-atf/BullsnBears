@@ -47,6 +47,10 @@ class ValueListCell: UITableViewCell, UITextFieldDelegate {
             self.textField.placeholder = formatter.string(from: number as NSNumber)
             self.textField.text = formatter.string(from: number as NSNumber)
         }
+        else {
+            self.textField.placeholder = "-"
+            self.textField.text = "-"
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

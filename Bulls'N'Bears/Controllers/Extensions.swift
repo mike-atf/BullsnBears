@@ -91,11 +91,33 @@ extension Array where Element == Double {
             weightSum += weight
         }
         
-        if count > 0 {
+        if weightSum > 0 {
             return sum / weightSum
         }
         else { return nil }
     }
+    
+    func stdVariation() -> Double? {
+        
+        guard self.count > 1 else {
+            return nil
+        }
+        
+        guard let mean = self.mean() else {
+            return nil
+        }
+        
+        var differenceSquares = [Double]()
+        
+        for element in self {
+            differenceSquares.append((element - mean) * (element - mean))
+        }
+        
+        let variance = differenceSquares.reduce(0, +)
+        
+        return sqrt(variance)
+    }
+
     
     /// calculates growth rates from current to preceding element
     /// should have elemetns in time-descending order!
@@ -213,12 +235,82 @@ extension Array where Element == Double? {
             }
         }
         
-        if count > 0 {
+        if weightSum > 0 {
             return sum / weightSum
         }
         else { return nil }
     }
+    
+    func mean() -> Double? {
+        
+        guard self.count > 0 else {
+            return nil
+        }
+        
+        let sum = self.compactMap{$0}.reduce(0, +)
+        
+        var validsCount = 0.0
+        
+        for element in self {
+            if element != nil {
+                validsCount += 1.0
+            }
+        }
+        
+        if validsCount > 0 {
+            return sum / validsCount
+        }
+        else { return nil }
+    }
 
+    
+    func stdVariation() -> Double? {
+        
+        guard self.count > 1 else {
+            return nil
+        }
+        
+        guard let mean = self.mean() else {
+            return nil
+        }
+        
+        var differenceSquares = [Double]()
+        var validsCount = 0.0
+        
+        for element in self {
+            if element != nil {
+                validsCount += 1.0
+                differenceSquares.append((element! - mean) * (element! - mean))
+            }
+        }
+        
+        let variance = differenceSquares.reduce(0, +)
+        
+        return sqrt(variance)
+    }
+    
+    func excludeQuartiles() -> [Double] {
+                
+        let cleaned = self.compactMap{$0}
+        
+        guard cleaned.count > 3 else {
+            return cleaned
+        }
+        
+        let sorted = cleaned.sorted()
+        
+        let lower_quintile = Int(sorted.count/4)
+        let upper_quintile = Int(sorted.count * 3/4)
+        
+        var array = [Double]()
+        for i in lower_quintile...upper_quintile {
+            array.append(sorted[i])
+        }
+        
+        return array
+    }
+
+    
 }
 
 extension UILabel {
@@ -285,3 +377,42 @@ extension HTTPCookie {
     }
 
 }
+
+extension UIImage {
+    
+    func getPixelColor(pos: CGPoint) -> UIColor {
+        
+        let pixelData = self.cgImage!.dataProvider!.data
+        let data: UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
+        
+        let pixelInfo: Int = ((Int(self.size.width) * Int(pos.y)) + Int(pos.x)) * 4
+        
+        let r = CGFloat(data[pixelInfo]) / CGFloat(255.0)
+        let g = CGFloat(data[pixelInfo+1]) / CGFloat(255.0)
+        let b = CGFloat(data[pixelInfo+2]) / CGFloat(255.0)
+        let a = CGFloat(data[pixelInfo+3]) / CGFloat(255.0)
+        
+        return UIColor(red: r, green: g, blue: b, alpha: a)
+    }
+}
+
+extension UIView {
+    func getPixelColor(fromPoint: CGPoint) -> UIColor {
+        
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitMapInfo =  CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+        var pixel: [CUnsignedChar] = [0,0,0,0]
+        
+        let context = CGContext(data: &pixel,width: 1,height: 1,bitsPerComponent: 8,bytesPerRow: 4, space: colorSpace, bitmapInfo: bitMapInfo.rawValue)
+        context?.translateBy(x: -fromPoint.x, y: -fromPoint.y)
+        self.layer.render(in: context!)
+        
+        let r = CGFloat(pixel[0]) / CGFloat(255.0)
+        let g = CGFloat(pixel[1]) / CGFloat(255.0)
+        let b = CGFloat(pixel[2]) / CGFloat(255.0)
+        let a = CGFloat(pixel[3]) / CGFloat(255.0)
+        
+        return UIColor(red: r, green: g, blue: b, alpha: a)
+    }
+}
+

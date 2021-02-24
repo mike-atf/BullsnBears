@@ -47,7 +47,11 @@ class WBValuationCell: UITableViewCell {
         self.errors = errors
         
         if errors != nil {
-            infoButton.isHidden = false
+            if errors?.count ?? 0 > 0 {
+                infoButton.isHidden = false
+            } else {
+                infoButton.isHidden = true
+            }
         }
         else {
             infoButton.isHidden = true
