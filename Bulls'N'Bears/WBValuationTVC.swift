@@ -224,14 +224,15 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         if let destination = segue.destination as? ValueListTVC {
             
             destination.loadViewIfNeeded()
-            destination.valuation = controller.valuation
+            destination.controller = controller
+            destination.sectionTitles.append(contentsOf: controller.valueListTVCSectionTitles[selectedPath.section-1][selectedPath.row])
             var arrays: [[Double]?]?
             
             if selectedPath.section == 1 {
                 if selectedPath.row == 0 {
                     arrays = [controller.valuation?.eps ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["EPS"])
+//                    destination.sectionTitles.append(contentsOf: ["EPS"])
                     destination.formatter = currencyFormatterGapWithPence
                     destination.gradingLimits = [10.0, 40.0]
                 }
@@ -239,7 +240,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 if selectedPath.row == 1 {
                     arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["Gross profit (% of revenue)", "Revenue"])
+//                    destination.sectionTitles.append(contentsOf: ["Gross profit (% of revenue)", "Revenue"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.grossProfitMargins()
                     destination.proportions = margins
@@ -248,7 +249,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 2 {
                     arrays = [controller.valuation?.sgaExpense ?? [], controller.valuation?.grossProfit ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["SGA (% of profit)", "Profit"])
+//                    destination.sectionTitles.append(contentsOf: ["SGA (% of profit)", "Profit"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.sgaProportion()
                     destination.proportions = margins
@@ -257,7 +258,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 3 {
                     arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["R&D (% of profit)", "Profit"])
+//                    destination.sectionTitles.append(contentsOf: ["R&D (% of profit)", "Profit"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.rAndDProportion()
                     destination.proportions = margins
@@ -266,7 +267,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 4 {
                     arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.revenue ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["net income (% of revenue)", "Revenue"])
+//                    destination.sectionTitles.append(contentsOf: ["net income (% of revenue)", "Revenue"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.netIncomeProportion()
                     destination.proportions = margins
@@ -278,7 +279,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 if selectedPath.row == 0 {
                     arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["LT debt (% of net income)", "Net income"])
+//                    destination.sectionTitles.append(contentsOf: ["LT debt (% of net income)", "Net income"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.longtermDebtProportion()
                     destination.proportions = margins
@@ -288,26 +289,26 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     let (shEquityWithRetEarnings, _) = controller.valuation!.addElements(array1: controller.valuation?.shareholdersEquity ?? [], array2: controller.valuation!.equityRepurchased ?? [])
                     arrays = [controller.valuation?.debtLT ?? [], shEquityWithRetEarnings]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["LT debt (% of sh. equity + rt. earnings)", "Sh. equity + rt. earnings"])
+//                    destination.sectionTitles.append(contentsOf: ["LT debt (% of sh. equity + rt. earnings)", "Sh. equity + rt. earnings"])
                     destination.formatter = currencyFormatterGapNoPence
 
                 }
                 else if selectedPath.row == 2 {
                     arrays = [controller.valuation?.equityRepurchased ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["Retained earnings"])
+//                    destination.sectionTitles.append(contentsOf: ["Retained earnings"])
                     destination.formatter = currencyFormatterGapNoPence
                 }
                 else if selectedPath.row == 3 {
                     arrays = [controller.valuation?.roe ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["Return on equity"])
+//                    destination.sectionTitles.append(contentsOf: ["Return on equity"])
                     destination.formatter = percentFormatter0Digits
                 }
                 else if selectedPath.row == 4 {
                     arrays = [controller.valuation?.roa ?? []]
                     destination.values = arrays
-                    destination.sectionTitles.append(contentsOf: ["Return on assets"])
+//                    destination.sectionTitles.append(contentsOf: ["Return on assets"])
                     destination.formatter = percentFormatter0Digits
                 }
             }
@@ -330,7 +331,14 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         self.progressView?.delegate = nil
         progressView?.removeFromSuperview()
         progressView = nil
+        
         controller.valuation?.save()
+        
+        print()
+        print("valuation saved 3x")
+        print(controller.valuation)
+        print()
+        
         tableView.reloadSections([1,2], with: .automatic)
     }
 

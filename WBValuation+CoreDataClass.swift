@@ -6,7 +6,7 @@
 //
 //
 
-import Foundation
+import UIKit
 import CoreData
 
 @objc(WBValuation)
@@ -34,12 +34,8 @@ public class WBValuation: NSManagedObject {
     
     func save() {
         
-        guard let context = managedObjectContext else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "no moc available - can't save valuation")
-            return
-        }
-        do {
-            try  context.save()
+       do {
+            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error in WBValuation.save function \(nserror), \(nserror.userInfo)")
@@ -180,7 +176,7 @@ public class WBValuation: NSManagedObject {
         return (proportions, errorList)
     }
     
-    public func longtermDebtProportion() -> ([Double?], [String]?) {
+    public func longtermDebtProportion() -> ([Double], [String]?) {
         
         guard debtLT != nil && netEarnings != nil else {
             return ([Double()], ["there are no net income and/or long-term debt data"])
@@ -194,14 +190,14 @@ public class WBValuation: NSManagedObject {
             return ([Double()], ["insufficient net income and long-term debt data"])
         }
         
-        var proportions = [Double?]()
+        var proportions = [Double]()
         var errorList: [String]?
         for i in 0..<cleanedData[0].count {
             if cleanedData[0][i] > 0 {
                 proportions.append(cleanedData[1][i] / cleanedData[0][i])
             }
             else {
-                proportions.append(nil)
+                proportions.append(Double())
                 if cleanedData[1][i] > 0 {
                     errorList = ["company made losses and had long term debt!"]
                 }

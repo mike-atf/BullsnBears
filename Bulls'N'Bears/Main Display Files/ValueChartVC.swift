@@ -26,7 +26,7 @@ class ValueChartVC: UIViewController {
         chart?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
         chart?.heightAnchor.constraint(equalTo: margins.heightAnchor , multiplier: 0.9).isActive = true
         
-        chart.configure(array: values)
+        chart.configure(array1: values, array2: nil)
         chart.setNeedsDisplay()
     }
     

@@ -21,7 +21,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var downloadTasksCompleted = 0
     var downloadErrors = [String]()
     var downloader: WebDataDownloader?
-
+    var valueListTVCSectionTitles = [[["EPS"],
+                                     ["Gross profit (% of revenue)", "Revenue"],
+                                     ["SGA (% of profit)", "Profit"],
+                                     ["R&D (% of profit)", "Profit"],
+                                     ["net income (% of revenue)", "Revenue"]],
+                                     [["LT debt (% of net income)", "Net income"],
+                                     ["LT debt (% of sh. equity + rt. earnings)", "Sh. equity + rt. earnings"],
+                                     ["Retained earnings"],
+                                     ["Return on equity"],
+                                     ["Return on assets"]]
+    ]
     
     //MARK: - init
 
@@ -39,6 +49,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             self.valuation = WBValuationController.createWBValuation(company: stock.symbol)
         }
         
+        print()
+        print("controller created for \(stock.name_short)")
+        print("valuation: \(valuation)")
+        
         rowTitles = buildRowTitles()
     }
     
@@ -55,11 +69,12 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         do {
-            valuations = try managedObjectContext.fetch(fetchRequest)
+            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
         }
 
+        print("fetched valuation: \(valuations?.first!)")
         return valuations
     }
 
@@ -70,7 +85,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }()
         newValuation?.company = company
         do {
-            try  managedObjectContext.save()
+            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let error = error
             ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
@@ -470,6 +485,4 @@ extension WBValuationController: DataDownloaderDelegate {
             }
         }
     }
-    
-    
 }

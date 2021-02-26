@@ -338,6 +338,7 @@
 				EAD835F925DC16470015C93A /* WBValuationCell.swift */,
 				EAD835FA25DC16470015C93A /* WBValuationCell.xib */,
 				EAD835E625DC10700015C93A /* ValueListTVC.swift */,
+				EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */,
 				EAD835ED25DC12000015C93A /* ValueListCell.swift */,
 				EAD835EE25DC12000015C93A /* ValueListCell.xib */,
 			);
@@ -414,7 +415,6 @@
 				EAA099C32588020B00DBB93C /* CheckButton.swift */,
 				EAC190F32577E3B60030B331 /* ChartView.swift */,
 				EA4B5F2725E2E9800070CC70 /* ValueChartVC.swift */,
-				EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */,
 			);
 			path = "Main Display Files";
 			sourceTree = "<group>";

@@ -10,13 +10,12 @@ import UIKit
 class ValueListCell: UITableViewCell, UITextFieldDelegate {
 
     @IBOutlet var title: UILabel!
-    @IBOutlet var textField: UITextField!
-    @IBOutlet var detail: UILabel!
+    @IBOutlet var chartView: ValueChart!
     
     override func awakeFromNib() {
         super.awakeFromNib()
        
-        textField.delegate = self
+//        textField.delegate = self
     }
     
 
@@ -28,38 +27,20 @@ class ValueListCell: UITableViewCell, UITextFieldDelegate {
     
     override func prepareForReuse() {
         self.title.text = ""
-        self.detail.text = ""
-        self.textField.text = ""
-        self.textField.placeholder = ""
+        self.chartView.configure(array1: nil, array2: nil)
     }
     
-    public func configure(title: String, attributedTitle: String?=nil, superscriptLetterIndex: Int?=nil,value: Any?, detail: String, detailColor: UIColor?=nil, formatter: NumberFormatter) {
+    public func configure(title: String, values1: [Double]?, values2: [Double]?) {
         
-        if let attTitle = attributedTitle {
-            self.title.setAttributedTextWithSuperscripts(text: attTitle, indicesOfSuperscripts: [superscriptLetterIndex!])
-        }
-        else {
-            self.title.text = title
-        }
-        self.detail.text = detail
-        self.detail.textColor = detailColor ?? UIColor.label
-        if let number = value as? Double {
-            self.textField.placeholder = formatter.string(from: number as NSNumber)
-            self.textField.text = formatter.string(from: number as NSNumber)
-        }
-        else {
-            self.textField.placeholder = "-"
-            self.textField.text = "-"
-        }
+        self.title.text = title
+        
+        chartView.configure(array1: values1, array2: values2)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
-        return false
-        
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
+        textField.resignFirstResponder()
+        return true
         
     }
         

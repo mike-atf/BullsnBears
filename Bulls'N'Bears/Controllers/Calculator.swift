@@ -139,6 +139,9 @@ class Calculator {
             if values0[i] != 0 {
                 proportions.append(values1[i] / values0[i])
             }
+            else {
+                proportions.append(Double())
+            }
         }
         
         return proportions
