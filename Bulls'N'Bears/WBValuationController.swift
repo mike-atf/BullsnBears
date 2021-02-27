@@ -27,7 +27,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                                      ["R&D (% of profit)", "Profit"],
                                      ["net income (% of revenue)", "Revenue"]],
                                      [["LT debt (% of net income)", "Net income"],
-                                     ["LT debt (% of sh. equity + rt. earnings)", "Sh. equity + rt. earnings"],
+                                     ["LT debt (% of equity + ret. earnings)", "equity + ret. earnings"],
                                      ["Retained earnings"],
                                      ["Return on equity"],
                                      ["Return on assets"]]

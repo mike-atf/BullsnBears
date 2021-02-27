@@ -43,6 +43,10 @@ class ValueChart: UIView {
     /// both should have some number of elements, otherwise, the second array will be brought to same size
     func configure(array1: [Double]?, array2: [Double]?) {
         
+        guard array1?.count ?? 0 > 0 || array2?.count ?? 0 > 0 else {
+            return
+        }
+
         self.valueArray1 = array1?.reversed()
         self.valueArray2 = array2?.reversed()
         
@@ -62,6 +66,16 @@ class ValueChart: UIView {
 
         minValue2 = CGFloat(valueArray2?.min() ?? Double())
         maxValue2 = CGFloat(valueArray2?.max() ?? Double())
+        
+        if maxValue1 > 0 && minValue1 < 0 {
+            // null axis != xAxis
+            let proportion = minValue1 / maxValue1
+            minValue2 = maxValue2 * proportion
+        } else if maxValue2 > 0 && minValue2 < 0 {
+            // null axis != xAxis
+            let proportion = minValue2 / maxValue2
+            minValue1 = maxValue1 * proportion
+        }
 
         let components: Set<Calendar.Component> = [.year]
         let dateComponents = Calendar.current.dateComponents(components, from: Date())
@@ -80,9 +94,12 @@ class ValueChart: UIView {
                 xAxisLabels.append(aLabel)
             count -= 1
         }
-        
-        findYAxisValuesRight(min: minValue1, max: maxValue1)
-        findYAxisValuesLeft(min: minValue2, max: maxValue2)
+        if array1?.count ?? 0 > 0 {
+            findYAxisValuesRight(min: minValue1, max: maxValue1)
+        }
+        if array2?.count ?? 0 > 0 {
+            findYAxisValuesLeft(min: minValue2, max: maxValue2)
+        }
     }
     
     override func draw(_ rect: CGRect) {
@@ -110,17 +127,41 @@ class ValueChart: UIView {
         xAxis.stroke()
 
         guard let validValues = valueArray1 else { return }
+        
         guard validValues.count > 0 else {
             return
         }
         
-        guard maxValue1 > minValue1 else {
-            return
+//        guard maxValue1 > minValue1 else {
+//            return
+//        }
+        
+        var value1Range = maxValue1 - minValue1
+        if value1Range == 0 {
+            value1Range = 1
+            maxValue1 = 1
+        }
+        
+        var value2Range = maxValue2 - minValue2
+        if value2Range == 0 {
+            value2Range = 1
+            maxValue2 = 1
+        }
+
+        
+        var nullAxisY = chartOrigin.y
+        var horizontalNullLine: UIBezierPath?
+        if maxValue1 > 0 && minValue1 < 0 {
+            nullAxisY = chartEnd.y + chartAreaSize.height * maxValue1 / value1Range
+            horizontalNullLine = UIBezierPath()
+            horizontalNullLine?.move(to: CGPoint(x: chartOrigin.x, y: nullAxisY))
+            horizontalNullLine?.addLine(to: CGPoint(x: chartEnd.x, y: nullAxisY))
+            horizontalNullLine?.lineWidth = 1.2
         }
 
         var index = 0
         yAxisLabelsRight.forEach { (label) in
-            let labelY: CGFloat = chartEnd.y + chartAreaSize.height * (maxValue1 - CGFloat(yAxisNumbersRight[index])) / (maxValue1 - minValue1)
+            let labelY: CGFloat = chartEnd.y + chartAreaSize.height * (maxValue1 - CGFloat(yAxisNumbersRight[index])) / value1Range
             label.frame.origin = CGPoint(x: rect.maxX - 5 - label.frame.width, y: labelY - label.frame.height / 2)
             index += 1
         }
@@ -138,18 +179,18 @@ class ValueChart: UIView {
         
         let boxWidth = chartAreaSize.width / CGFloat(validValues.count + 1)
         
-        var valueRange = CGFloat(maxValue1 - minValue1)
+//        var valueRange = CGFloat(value1Range)
         
         var valueCount: CGFloat = 0
-        let fillColor = UIColor.systemOrange
+        let fillColor = UIColor.darkGray
                 
         fillColor.setFill()
         fillColor.setStroke()
 
         validValues.forEach({ (value) in
             let boxLeft = chartOrigin.x + (boxWidth * 0.8 / 2) + (valueCount / CGFloat(validValues.count)) * chartAreaSize.width
-            let boxTop = chartEnd.y + chartAreaSize.height * (maxValue1 - CGFloat(value)) / valueRange
-            let boxBottom = chartEnd.y + chartAreaSize.height //* ((maxValue - CGFloat(value)) / (valueRange))
+            let boxTop = chartEnd.y + chartAreaSize.height * (maxValue1 - CGFloat(value)) / value1Range
+            let boxBottom = nullAxisY
             let boxHeight = boxBottom - boxTop
 
             let boxRect = CGRect(x: boxLeft, y: boxTop, width: boxWidth * 0.8, height: boxHeight)
@@ -159,43 +200,55 @@ class ValueChart: UIView {
             valueCount += 1
         })
         
-        guard let secondValues = valueArray2 else { return }
-        guard minValue2 < maxValue2 else {
+        guard let secondValues = valueArray2 else {
+            UIColor.lightGray.setStroke()
+            horizontalNullLine?.stroke()
             return
         }
+//        guard minValue2 < maxValue2 else {
+//            UIColor.lightGray.setStroke()
+//            horizontalNullLine?.stroke()
+//            return
+//        }
         
         index = 0
         yAxisLabelsLeft.forEach { (label) in
-            let labelY: CGFloat = chartEnd.y + chartAreaSize.height * (maxValue2 - CGFloat(yAxisNumbersLeft[index])) / (maxValue2 - minValue2)
+            let labelY: CGFloat = chartEnd.y + chartAreaSize.height * (maxValue2 - CGFloat(yAxisNumbersLeft[index])) / value2Range
             label.frame.origin = CGPoint(x: rect.minX + 5 , y: labelY - label.frame.height / 2)
             index += 1
         }
 
-        valueRange = CGFloat(maxValue2 - minValue2)
+//        valueRange = CGFloat(value2Range)
         
         let linePath = UIBezierPath()
         let lineStartX = chartOrigin.x + labelSlotWidth / 2
-        let lineStartY = chartEnd.y + chartAreaSize.height * (maxValue2 - CGFloat(secondValues.first!)) / valueRange
+        let lineStartY = chartEnd.y + chartAreaSize.height * (maxValue2 - CGFloat(secondValues.first!)) / value2Range
         linePath.move(to: CGPoint(x: lineStartX, y: lineStartY))
 
         valueCount = 1
         secondValues.forEach({ (value) in
 
             let lineX = chartOrigin.x + labelSlotWidth * valueCount - labelSlotWidth / 2
-            let lineY = chartEnd.y + chartAreaSize.height * (maxValue2 - CGFloat(value)) / valueRange
+            let lineY = chartEnd.y + chartAreaSize.height * (maxValue2 - CGFloat(value)) / value2Range
             linePath.addLine(to: CGPoint(x: lineX, y: lineY))
 
             valueCount += 1
         })
 
         UIColor.label.setStroke()
-        linePath.lineWidth = 3.0
+        UIColor.systemOrange.setStroke()
+        linePath.lineWidth = 2.5
         linePath.stroke()
-
+        
+        UIColor.lightGray.setStroke()
+        horizontalNullLine?.stroke()
     }
     
     private func findYAxisValuesRight(min: CGFloat, max: CGFloat) {
         
+        guard valueArray1?.count ?? 0 > 0 else {
+            return
+        }
                 
         let options:[CGFloat] = [2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0,1000.0, 5000.0,10000.0, 50000.0,100000.0]
         let range = max - min
@@ -205,7 +258,7 @@ class ValueChart: UIView {
         repeat {
             index += 1
             count = range / options[index]
-        } while count > 11.0
+        } while count > 6
         
         let step = options[index]
         
@@ -245,9 +298,10 @@ class ValueChart: UIView {
     
     private func findYAxisValuesLeft(min: CGFloat, max: CGFloat) {
         
-        guard valueArray2 != nil else {
+        guard valueArray2?.count ?? 0 > 0 else {
             return
         }
+
         
         let options:[CGFloat] = [0.01, 0.05, 0.1, 0.25, 0.5, 1.0,2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0,1000.0, 5000.0,10000.0, 50000.0,100000.0]
         let range = max - min
