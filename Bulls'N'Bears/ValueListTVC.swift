@@ -10,7 +10,7 @@ import UIKit
 class ValueListTVC: UITableViewController {
 
     var values: [[Double]?]?
-    var sectionTitles = ["Summary"]
+    var sectionTitles = [String]()
     var rowTitles = [String]()
     var formatter: NumberFormatter!
     weak var controller: WBValuationController!
@@ -37,75 +37,75 @@ class ValueListTVC: UITableViewController {
         proportions = Calculator.proportions(array1: values?.first!, array0: values?.last!)
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        
-        if values?.count ?? 0  == 2 {
-
-
-            let proportionsNoGaps = proportions?.compactMap{$0}.filter({ (element) -> Bool in
-                if element != 0.0 { return true }
-                else { return false }
-            })
-
-            if proportions?.count ?? 0 != proportionsNoGaps?.count ?? 0 {
-                gapErrors = ["missing data were omitted. Use result with caution"]
-            }
-            else {
-                gapErrors = nil
-            }
-            
-            if let trend = proportions?.growthRates()?.weightedMean() {
-                if !trend.isNaN {
-                    trendToDisplay = trend
-                }
-            }
-
-            var years = [Double]()
-            var count = 0.0
-            for _ in proportionsNoGaps ?? [] {
-                years.append(count)
-                count += 1.0
-            }
-
-            if let trend = Calculator.correlation(xArray: years, yArray: proportionsNoGaps?.reversed()) {
-                correlationToDisplay = trend.r2()
-            }
-        }
-        else if values?.count ?? 0 == 1 {
-            
-            let valuesWOMissing = values?.first!?.filter({ (element) -> Bool in
-                if element != 0.0 { return true }
-                else { return false }
-            })
-            
-            if values?.first!?.count ?? 0 != valuesWOMissing?.count ?? 0 {
-                gapErrors = ["missing data were omitted. Use result with caution"]
-            }
-            else {
-                gapErrors = nil
-            }
-
-            let growthRates = valuesWOMissing?.growthRates()
-            if let trend = growthRates?.weightedMean() {
-                if !trend.isNaN {
-                    trendToDisplay = trend
-                }
-            }
-
-            var years = [Double]()
-            var count = 0.0
-            for _ in growthRates ?? [] {
-                years.append(Double(mostRecentYear) - count)
-                count += 1.0
-            }
- 
-            if let trend = Calculator.correlation(xArray: years.reversed(), yArray: growthRates?.reversed()) {
-                correlationToDisplay = trend.r2() // formula for 'variance explained' =R2
-            }
-        }
-        
-        tableView.reloadSections([0], with: .automatic)
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//
+//        if values?.count ?? 0  == 2 {
+//
+//
+//            let proportionsNoGaps = proportions?.compactMap{$0}.filter({ (element) -> Bool in
+//                if element != 0.0 { return true }
+//                else { return false }
+//            })
+//
+//            if proportions?.count ?? 0 != proportionsNoGaps?.count ?? 0 {
+//                gapErrors = ["missing data were omitted. Use result with caution"]
+//            }
+//            else {
+//                gapErrors = nil
+//            }
+//
+//            if let trend = proportions?.growthRates()?.weightedMean() {
+//                if !trend.isNaN {
+//                    trendToDisplay = trend
+//                }
+//            }
+//
+//            var years = [Double]()
+//            var count = 0.0
+//            for _ in proportionsNoGaps ?? [] {
+//                years.append(count)
+//                count += 1.0
+//            }
+//
+//            if let trend = Calculator.correlation(xArray: years, yArray: proportionsNoGaps?.reversed()) {
+//                correlationToDisplay = trend.r2()
+//            }
+//        }
+//        else if values?.count ?? 0 == 1 {
+//
+//            let valuesWOMissing = values?.first!?.filter({ (element) -> Bool in
+//                if element != 0.0 { return true }
+//                else { return false }
+//            })
+//
+//            if values?.first!?.count ?? 0 != valuesWOMissing?.count ?? 0 {
+//                gapErrors = ["missing data were omitted. Use result with caution"]
+//            }
+//            else {
+//                gapErrors = nil
+//            }
+//
+//            let growthRates = valuesWOMissing?.growthRates()
+//            if let trend = growthRates?.weightedMean() {
+//                if !trend.isNaN {
+//                    trendToDisplay = trend
+//                }
+//            }
+//
+//            var years = [Double]()
+//            var count = 0.0
+//            for _ in growthRates ?? [] {
+//                years.append(Double(mostRecentYear) - count)
+//                count += 1.0
+//            }
+//
+//            if let trend = Calculator.correlation(xArray: years.reversed(), yArray: growthRates?.reversed()) {
+//                correlationToDisplay = trend.r2() // formula for 'variance explained' =R2
+//            }
+//        }
+//
+//        tableView.reloadSections([0], with: .automatic)
+//    }
 //    func refreshTableView() {
 //        self.tableView.reloadSections([1,2], with: .automatic)
 //    }
@@ -113,72 +113,71 @@ class ValueListTVC: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return (values?.count ?? 0) + 1
+        return (values?.count ?? 0)
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        if section == 0 {
-            return 2
-        } else {
+//        if section == 0 {
+//            return 2
+//        } else {
             return 1 // values?[section-1]?.count ?? 0
-        }
+//        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        if indexPath.section == 0 {
-            
-            let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell1", for: indexPath)
-
-            if indexPath.row == 1 {
-                
-                if let titleLabel = cell.viewWithTag(10) as? UILabel {
-                    titleLabel.setAttributedTextWithSuperscripts(text: "R2", indicesOfSuperscripts: [1])
-                }
-                if let detailLabel = cell.viewWithTag(20) as? UILabel {
-                    if let valid = correlationToDisplay {
-                        detailLabel.text = percentFormatter0Digits.string(from: valid as NSNumber)
-                    }
-                    else {
-                        detailLabel.text = "-"
-                    }
-                }
-            } else {
-                
-                if let titleLabel = cell.viewWithTag(10) as? UILabel {
-                    titleLabel.text = "Growth trend"
-                }
-                if let detailLabel = cell.viewWithTag(20) as? UILabel {
-                    if let valid = trendToDisplay {
-                        detailLabel.text = percentFormatter0Digits.string(from: valid as NSNumber)
-                    }
-                    else {
-                        detailLabel.text = "-"
-                    }
-                }
-            }
-            
-            return cell
-        }
-        else {
+//        if indexPath.section == 0 {
+//
+//            let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell1", for: indexPath)
+//
+//            if indexPath.row == 1 {
+//
+//                if let titleLabel = cell.viewWithTag(10) as? UILabel {
+//                    titleLabel.setAttributedTextWithSuperscripts(text: "R2", indicesOfSuperscripts: [1])
+//                }
+//                if let detailLabel = cell.viewWithTag(20) as? UILabel {
+//                    if let valid = correlationToDisplay {
+//                        detailLabel.text = percentFormatter0Digits.string(from: valid as NSNumber)
+//                    }
+//                    else {
+//                        detailLabel.text = "-"
+//                    }
+//                }
+//            } else {
+//
+//                if let titleLabel = cell.viewWithTag(10) as? UILabel {
+//                    titleLabel.text = "Growth trend"
+//                }
+//                if let detailLabel = cell.viewWithTag(20) as? UILabel {
+//                    if let valid = trendToDisplay {
+//                        detailLabel.text = percentFormatter0Digits.string(from: valid as NSNumber)
+//                    }
+//                    else {
+//                        detailLabel.text = "-"
+//                    }
+//                }
+//            }
+//
+//            return cell
+//        }
+//        else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
             
-            let year = mostRecentYear - indexPath.row
-            if indexPath.section == 1 {
+            if indexPath.section == 0 {
                 if values?.count ?? 0 > 1 {
-                    cell.configure(title: "\(year)", values1: values?[indexPath.section-1], values2: proportions)
+                    cell.configure(values1: values?[indexPath.section], values2: proportions)
                 }
                 else {
-                    cell.configure(title: "\(year)", values1: values?[indexPath.section-1], values2: nil)
+                    cell.configure(values1: values?[indexPath.section], values2: nil)
                 }
             }
             else {
-                cell.configure(title: "\(year)", values1: values?[indexPath.section-1], values2: nil)
+                cell.configure(values1: values?[indexPath.section], values2: nil)
             }
             
             return cell
-        }
+//        }
         
     }
     
@@ -187,8 +186,11 @@ class ValueListTVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 { return 50 }
-        else { return 275 }
+//        if indexPath.section == 0 { return 50 }
+//        else {
+            return 300
+            
+//        }
     }
 
     

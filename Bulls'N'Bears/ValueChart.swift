@@ -14,9 +14,11 @@ class ValueChart: UIView {
 
     var yAxisLabelsRight = [UILabel]()
     var yAxisNumbersRight = [CGFloat]()
-    
+//    var yAxisLabelsRightMaxWidth = CGFloat()
+
     var yAxisLabelsLeft = [UILabel]()
     var yAxisNumbersLeft = [CGFloat]()
+//    var yAxisLabelsLeftMaxWidth = CGFloat()
     
     var xAxisLabels = [UILabel]()
     var trendLabels = [UILabel]()
@@ -36,12 +38,15 @@ class ValueChart: UIView {
     var chartOrigin = CGPoint()
     var chartEnd = CGPoint()
     
-    var trendsToShow = [TrendProperties]()
+    var trend:Correlation!
+    var trendlabel: UILabel!
     
     /// 1st array will be bar chart
     /// 2nd array (optional) will line chart
     /// both should have some number of elements, otherwise, the second array will be brought to same size
-    func configure(array1: [Double]?, array2: [Double]?) {
+    func configure(array1: [Double]?, array2: [Double]?, trendLabel: UILabel) {
+        
+//        self.backgroundColor = UIColor.systemTeal
         
         guard array1?.count ?? 0 > 0 || array2?.count ?? 0 > 0 else {
             return
@@ -49,6 +54,7 @@ class ValueChart: UIView {
 
         self.valueArray1 = array1?.reversed()
         self.valueArray2 = array2?.reversed()
+        self.trendlabel = trendLabel
         
         if let secondArray = array2 {
             if secondArray.count > valueArray1?.count ?? 0 {
@@ -62,9 +68,11 @@ class ValueChart: UIView {
         }
 
         minValue1 = CGFloat(valueArray1?.min() ?? Double())
+        if minValue1 > 0 { minValue1 = 0 }
         maxValue1 = CGFloat(valueArray1?.max() ?? Double())
 
         minValue2 = CGFloat(valueArray2?.min() ?? Double())
+        if minValue2 > 0 { minValue2 = 0 }
         maxValue2 = CGFloat(valueArray2?.max() ?? Double())
         
         if maxValue1 > 0 && minValue1 < 0 {
@@ -94,35 +102,99 @@ class ValueChart: UIView {
                 xAxisLabels.append(aLabel)
             count -= 1
         }
+        
         if array1?.count ?? 0 > 0 {
             findYAxisValuesRight(min: minValue1, max: maxValue1)
         }
         if array2?.count ?? 0 > 0 {
             findYAxisValuesLeft(min: minValue2, max: maxValue2)
         }
+        
+        
+        if array2?.count ?? 0 > 1 {
+            // proportions - calculate trend of proportions
+            
+//            let array1NoEmpties = array2?.filter({ (element) -> Bool in
+//                if element == Double() { return false }
+//                else { return true }
+//            }) ?? []
+            var years = [Double]()
+            var count = 0.0
+            for _ in array2! {
+                years.append(count)
+                count += 1.0
+            }
+
+            trend = Calculator.correlation(xArray: years, yArray: array2?.reversed())
+        } else if array1?.count ?? 0 > 1 {
+            // values only, no proportions - calculate values trend
+            
+//            let array1NoEmpties = array1?.filter({ (element) -> Bool in
+//                if element == Double() { return false }
+//                else { return true }
+//            }) ?? []
+            var years = [Double]()
+            var count = 0.0
+            for _ in array1! {
+                years.append(count)
+                count += 1.0
+            }
+
+            trend = Calculator.correlation(xArray: years, yArray: array1?.reversed())
+        }
     }
     
     override func draw(_ rect: CGRect) {
-
-// Y axis
+        
+        
         chartOrigin.x = rect.width * 0.13
-        chartEnd.y = rect.height * 0.05
-        chartOrigin.y = rect.height * 0.95
+        chartOrigin.y = 10.0
         chartEnd.x = rect.width * 0.87
-        chartAreaSize.height = chartOrigin.y - chartEnd.y
         chartAreaSize.width = chartEnd.x - chartOrigin.x
+        
+        var value1Range = maxValue1 - minValue1
+        if value1Range == 0 {
+            value1Range = 1
+            maxValue1 = 1
+        }
+        
+        
+//xAxisLabels
+        let labelSlotWidth = chartAreaSize.width / CGFloat(xAxisLabels.count)
+        var step: CGFloat = 1
+        xAxisLabels.forEach { (label) in
+            let labelLeft = chartOrigin.x + labelSlotWidth * step - label.frame.width / 2 //+ (step / CGFloat(validValues.count)) * chartAreaSize.width
+            label.frame.origin = CGPoint(x: labelLeft - label.frame.width / 2, y: rect.maxY - label.frame.height)
+           step += 1
+        }
+        
+        chartEnd.y = xAxisLabels.first!.frame.minY - 5
+        chartAreaSize.height = chartEnd.y - chartOrigin.y
+        let pixPerValue1 = chartAreaSize.height / CGFloat(value1Range)
 
+        var nullAxisY = chartEnd.y
+        var horizontalNullLine: UIBezierPath?
+        if (maxValue1 > 0 && minValue1 < 0) {
+        // max1 and min1 have been adapted to reflect max2 and min2 in configure()
+            nullAxisY = chartOrigin.y + chartAreaSize.height * maxValue1 / value1Range
+            horizontalNullLine = UIBezierPath()
+            horizontalNullLine?.move(to: CGPoint(x: chartOrigin.x, y: nullAxisY))
+            horizontalNullLine?.addLine(to: CGPoint(x: chartEnd.x, y: nullAxisY))
+            horizontalNullLine?.lineWidth = 1.2
+        }
+        
+// Y axis
         let yAxis = UIBezierPath()
-        yAxis.move(to: CGPoint(x: chartOrigin.x, y:chartEnd.y))
-        yAxis.addLine(to: CGPoint(x: chartOrigin.x, y: chartOrigin.y))
+        yAxis.move(to: CGPoint(x: chartOrigin.x, y:chartOrigin.y))
+        yAxis.addLine(to: CGPoint(x: chartOrigin.x, y: chartEnd.y))
         yAxis.lineWidth = 2
         UIColor.systemGray.setStroke()
         yAxis.stroke()
 
 // x axis
         let xAxis = UIBezierPath()
-        xAxis.move(to: CGPoint(x: chartOrigin.x, y: chartOrigin.y))
-        xAxis.addLine(to: CGPoint(x: chartEnd.x, y: chartOrigin.y))
+        xAxis.move(to: CGPoint(x: chartOrigin.x, y: chartEnd.y))
+        xAxis.addLine(to: CGPoint(x: chartEnd.x, y: chartEnd.y))
         xAxis.lineWidth = 2
         xAxis.stroke()
 
@@ -131,55 +203,18 @@ class ValueChart: UIView {
         guard validValues.count > 0 else {
             return
         }
+                
         
-//        guard maxValue1 > minValue1 else {
-//            return
-//        }
-        
-        var value1Range = maxValue1 - minValue1
-        if value1Range == 0 {
-            value1Range = 1
-            maxValue1 = 1
-        }
-        
-        var value2Range = maxValue2 - minValue2
-        if value2Range == 0 {
-            value2Range = 1
-            maxValue2 = 1
-        }
-
-        
-        var nullAxisY = chartOrigin.y
-        var horizontalNullLine: UIBezierPath?
-        if maxValue1 > 0 && minValue1 < 0 {
-            nullAxisY = chartEnd.y + chartAreaSize.height * maxValue1 / value1Range
-            horizontalNullLine = UIBezierPath()
-            horizontalNullLine?.move(to: CGPoint(x: chartOrigin.x, y: nullAxisY))
-            horizontalNullLine?.addLine(to: CGPoint(x: chartEnd.x, y: nullAxisY))
-            horizontalNullLine?.lineWidth = 1.2
-        }
-
+// right yAxis labels
         var index = 0
         yAxisLabelsRight.forEach { (label) in
-            let labelY: CGFloat = chartEnd.y + chartAreaSize.height * (maxValue1 - CGFloat(yAxisNumbersRight[index])) / value1Range
-            label.frame.origin = CGPoint(x: rect.maxX - 5 - label.frame.width, y: labelY - label.frame.height / 2)
+            let labelY = nullAxisY - CGFloat(yAxisNumbersRight[index]) * pixPerValue1
+            label.frame.origin = CGPoint(x: rect.maxX - label.frame.width, y: labelY - label.frame.height / 2)
             index += 1
         }
-        
-
-        let labelSlotWidth = chartAreaSize.width / CGFloat(xAxisLabels.count)
-        var step: CGFloat = 1
-        xAxisLabels.forEach { (label) in
-            let labelLeft = chartOrigin.x + labelSlotWidth * step - label.frame.width / 2 //+ (step / CGFloat(validValues.count)) * chartAreaSize.width
-           label.frame.origin = CGPoint(x: labelLeft - label.frame.width / 2, y: chartOrigin.y + 5)
-           step += 1
-        }
-        
+                
 // colums
-        
         let boxWidth = chartAreaSize.width / CGFloat(validValues.count + 1)
-        
-//        var valueRange = CGFloat(value1Range)
         
         var valueCount: CGFloat = 0
         let fillColor = UIColor.darkGray
@@ -189,7 +224,7 @@ class ValueChart: UIView {
 
         validValues.forEach({ (value) in
             let boxLeft = chartOrigin.x + (boxWidth * 0.8 / 2) + (valueCount / CGFloat(validValues.count)) * chartAreaSize.width
-            let boxTop = chartEnd.y + chartAreaSize.height * (maxValue1 - CGFloat(value)) / value1Range
+            let boxTop = nullAxisY - CGFloat(value) * pixPerValue1 //chartEnd.y - chartAreaSize.height * CGFloat(value) / maxValue1
             let boxBottom = nullAxisY
             let boxHeight = boxBottom - boxTop
 
@@ -200,48 +235,89 @@ class ValueChart: UIView {
             valueCount += 1
         })
         
-        guard let secondValues = valueArray2 else {
+// growthline
+        
+        var value2Range = maxValue2 - minValue2
+        if value2Range == 0 {
+            value2Range = 1
+            maxValue2 = 1
+        }
+        let pixPerValue2 = chartAreaSize.height / CGFloat(value2Range)
+
+        
+        if let secondValues = valueArray2 {
+            index = 0
+
+// left yAxis labels
+            yAxisLabelsLeft.forEach { (label) in
+                let labelY = nullAxisY - CGFloat(yAxisNumbersLeft[index]) * pixPerValue2
+                label.frame.origin = CGPoint(x: rect.minX + 5 , y: labelY - label.frame.height / 2)
+                index += 1
+            }
+
+            let linePath = UIBezierPath()
+            let lineStartX = chartOrigin.x + labelSlotWidth / 2
+            let lineStartY = nullAxisY - CGFloat(secondValues.first!) * pixPerValue2
+            linePath.move(to: CGPoint(x: lineStartX, y: lineStartY))
+
+// growth line graph
+            valueCount = 1
+            secondValues.forEach({ (value) in
+                let lineX = chartOrigin.x + labelSlotWidth * valueCount - labelSlotWidth / 2
+                let lineY = nullAxisY - CGFloat(value) * pixPerValue2
+                linePath.addLine(to: CGPoint(x: lineX, y: lineY))
+
+                valueCount += 1
+            })
+
+            UIColor.label.setStroke()
+            UIColor.systemOrange.setStroke()
+            linePath.lineWidth = 2.5
+            linePath.stroke()
+        }
+        
+//Trend
+        if trend != nil {
+            let trendLine = UIBezierPath()
+            
+//            let maxValue = (valueArray2?.count ?? 0 > 0) ? maxValue2 : maxValue1
+            let pixPerValue = (valueArray2?.count ?? 0 > 0) ? pixPerValue2 : pixPerValue1
+
+            let trendLineStartY = nullAxisY - CGFloat(trend.yIntercept) * pixPerValue
+            let trendLineEndY = nullAxisY - CGFloat(trend.endValue(for: Double(xAxisLabels.count))) * pixPerValue
+            
+            trendLine.move(to: CGPoint(x: chartOrigin.x, y: trendLineStartY))
+            trendLine.addLine(to: CGPoint(x: chartEnd.x, y: trendLineEndY))
+            trendLine.lineWidth = 1.5
+            let dashPattern:[CGFloat] = [3,7]
+            trendLine.setLineDash(dashPattern, count: dashPattern.count, phase: 0)
+            UIColor.label.setStroke()
+            trendLine.stroke()
+            
             UIColor.lightGray.setStroke()
             horizontalNullLine?.stroke()
-            return
+            
+            var r2$ = String()
+            var growth$ = String()
+            let r2 = trend.r2()
+            let growth = trend.growth(for: Double(xAxisLabels.count)) / (Double(xAxisLabels.count))
+            if r2 != nil{
+                r2$ = percentFormatter0Digits.string(from: r2! as NSNumber) ?? ""
+                if r2! > 0.64 {
+                    growth$ = percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? ""
+                }
+                else {
+                    growth$ = "highly volatile (" + (percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? "") + ")"
+                }
+            }
+                        
+            trendlabel.font = UIFont.preferredFont(forTextStyle: .footnote)
+            trendlabel.numberOfLines = 0
+
+            trendlabel.setAttributedTextWithSuperscripts(text: "Correlation R2: \(r2$)  -  Growth: \(growth$) p.a.", indicesOfSuperscripts: [7])
+            trendlabel.sizeToFit()
+            
         }
-//        guard minValue2 < maxValue2 else {
-//            UIColor.lightGray.setStroke()
-//            horizontalNullLine?.stroke()
-//            return
-//        }
-        
-        index = 0
-        yAxisLabelsLeft.forEach { (label) in
-            let labelY: CGFloat = chartEnd.y + chartAreaSize.height * (maxValue2 - CGFloat(yAxisNumbersLeft[index])) / value2Range
-            label.frame.origin = CGPoint(x: rect.minX + 5 , y: labelY - label.frame.height / 2)
-            index += 1
-        }
-
-//        valueRange = CGFloat(value2Range)
-        
-        let linePath = UIBezierPath()
-        let lineStartX = chartOrigin.x + labelSlotWidth / 2
-        let lineStartY = chartEnd.y + chartAreaSize.height * (maxValue2 - CGFloat(secondValues.first!)) / value2Range
-        linePath.move(to: CGPoint(x: lineStartX, y: lineStartY))
-
-        valueCount = 1
-        secondValues.forEach({ (value) in
-
-            let lineX = chartOrigin.x + labelSlotWidth * valueCount - labelSlotWidth / 2
-            let lineY = chartEnd.y + chartAreaSize.height * (maxValue2 - CGFloat(value)) / value2Range
-            linePath.addLine(to: CGPoint(x: lineX, y: lineY))
-
-            valueCount += 1
-        })
-
-        UIColor.label.setStroke()
-        UIColor.systemOrange.setStroke()
-        linePath.lineWidth = 2.5
-        linePath.stroke()
-        
-        UIColor.lightGray.setStroke()
-        horizontalNullLine?.stroke()
     }
     
     private func findYAxisValuesRight(min: CGFloat, max: CGFloat) {
@@ -311,7 +387,7 @@ class ValueChart: UIView {
         repeat {
             index += 1
             count = range / options[index]
-        } while count > 11.0
+        } while count > 6
         
         let step = options[index]
         
@@ -337,6 +413,7 @@ class ValueChart: UIView {
             let newLabel: UILabel = {
                 let label = UILabel()
                 label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                label.textColor = UIColor.systemOrange
                 label.textAlignment = .right
                 label.text = (percentFormatter0Digits.string(from: (labelValue / factor) as NSNumber) ?? "") + (lastLetter ?? "")
                 label.sizeToFit()

@@ -26,15 +26,13 @@ class ValueListCell: UITableViewCell, UITextFieldDelegate {
     }
     
     override func prepareForReuse() {
-        self.title.text = ""
-        self.chartView.configure(array1: nil, array2: nil)
+        self.title.text = "T-G"
+        self.chartView.configure(array1: nil, array2: nil, trendLabel: title)
     }
     
-    public func configure(title: String, values1: [Double]?, values2: [Double]?) {
-        
-        self.title.text = title
-        
-        chartView.configure(array1: values1, array2: values2)
+    public func configure(values1: [Double]?, values2: [Double]?) {
+                
+        chartView.configure(array1: values1, array2: values2, trendLabel: title)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

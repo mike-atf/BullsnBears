@@ -264,11 +264,15 @@ struct Correlation {
     }
     
     /// increase/ decline in % from yIntercept to endpoint using timeInterval as x-axis
-    public func growth(timeInterval: TimeInterval) -> Double {
-        let endPoint = incline * timeInterval + yIntercept
-        let change = (endPoint - yIntercept) / yIntercept
+    public func growth(for xElements: Double) -> Double {
+        let endPoint = incline * xElements + yIntercept
+        let change = (endPoint - yIntercept) / abs(yIntercept)
         
         return change
+    }
+    
+    public func endValue(for xElements: Double) -> Double {
+        return yIntercept + xElements * incline
     }
     
     public func r2() -> Double? {

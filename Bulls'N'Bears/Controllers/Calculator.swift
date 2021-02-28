@@ -59,19 +59,31 @@ class Calculator {
             return nil
         }
         
-        let ySum = yArray!.reduce(0,+)
-        let xSum = xArray!.reduce(0,+)
+        // Removing any empty Double() elements
+        
+        var elementsToRemove = [Int]()
+        for i in 0..<xArray!.count {
+            if xArray![i] == Double() || yArray![i] == Double() {
+                elementsToRemove.append(i)
+            }
+        }
+        
+        let cleanedArrayX = xArray?.enumerated().filter { !elementsToRemove.contains($0.offset) }.map { $0.element} ?? []
+        let cleanedArrayY = yArray?.enumerated().filter { !elementsToRemove.contains($0.offset) }.map { $0.element} ?? []
+        
+        let ySum = cleanedArrayY.reduce(0,+)
+        let xSum = cleanedArrayX.reduce(0,+)
         var xyProductArray = [Double]()
         var x2Array = [Double]()
         var y2Array = [Double]()
         var xySumArray = [Double]()
-        let n: Double = Double(yArray!.count)
+        let n: Double = Double(cleanedArrayY.count)
 
         var count = 0
-        for y in yArray! {
-            xyProductArray.append(y * xArray![count])
-            x2Array.append(xArray![count] * xArray![count])
-            xySumArray.append(y + xArray![count])
+        for y in cleanedArrayY {
+            xyProductArray.append(y * cleanedArrayX[count])
+            x2Array.append(cleanedArrayX[count] * cleanedArrayX[count])
+            xySumArray.append(y + cleanedArrayX[count])
             y2Array.append(y * y)
             count += 1
         }
@@ -93,11 +105,11 @@ class Calculator {
         var ydiff2Sum = Double()
         
 //        count = 0
-        for y in yArray! {
+        for y in cleanedArrayY {
             let ydiff = y - yMean
             ydiff2Sum += (ydiff * ydiff)
         }
-        for x in xArray! {
+        for x in cleanedArrayX {
             let xdiff = x - xMean
             xdiff2Sum += (xdiff * xdiff)
         }
