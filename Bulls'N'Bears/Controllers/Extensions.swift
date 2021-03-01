@@ -99,6 +99,24 @@ extension Array where Element == Double {
         else { return nil }
     }
     
+    func average(of first: Int) -> Double? {
+    
+        guard first > 1 else {
+            return nil
+        }
+        
+        guard first < self.count else {
+            return nil
+        }
+        
+        var sum = 0.0
+        for i in 0..<first {
+            sum += self[i]
+        }
+        
+        return sum / (Double(first))
+    }
+    
     /// assumes array is in DESCENDING order
     /// periods is the number of elements to build a moving average for
     /// periods must be greater thn 2 and smaller than array.count-2

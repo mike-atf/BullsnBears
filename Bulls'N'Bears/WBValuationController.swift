@@ -11,8 +11,8 @@ import WebKit
 
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
-    var sectionTitles = ["Key ratios","Income statement", "Balance Sheet"]
-    var sectionSubTitles = ["from Yahoo finance","from MacroTrends","from MacroTrends"]
+    var sectionTitles = ["Key ratios","Primary values EMA", "Secondary values","Expenses EMA"]
+    var sectionSubTitles = ["from Yahoo finance","Growth EMA (from MacroTrends data)","Growth EMA (from MacroTrends data)","Growth EMA (from MacroTrends data)"]
     var rowTitles: [[String]]!
     var stock: Stock!
     var valuation: WBValuation?
@@ -21,7 +21,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var downloadTasksCompleted = 0
     var downloadErrors = [String]()
     var downloader: WebDataDownloader?
-    var valueListTVCSectionTitles = [[["EPS"],
+    var valueListTVCSectionTitlesOld = [[["EPS"],
                                      ["Growth of profit % of revenue", "Revenue"],
                                      ["Growth of SGA % of profit", "Profit"],
                                      ["Growth of R&D % of profit", "Profit"],
@@ -33,7 +33,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                                      ["Growth of return on assets"]]
     ]
     
-    var valueListTVCSectionTitles2 = [
+    var valueListTVCSectionTitles = [
                                     [
                                         ["Growth of retained earnings"],
                                         ["EPS"],
@@ -170,6 +170,18 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             var value$ = "-"
             switch path.row {
             case 0:
+                let retEarningsGrowths = valuation?.equityRepurchased?.filter({ (element) -> Bool in
+                    if element != 0.0 { return true }
+                    else { return false }
+                }).growthRates()
+                
+                if let meanGrowth = retEarningsGrowths?.ema(periods: emaPeriod) {
+                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.05, redCutOff: 0.05)
+                }
+
+                return (value$, color, errors)
+            case 1:
                 var years = [Double]()
                 var count = 0.0
                 for _ in valuation?.eps ?? [] {
@@ -183,36 +195,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
 
                 return (value$,color,errors)
-            case 1:
-                let (margins, es$) = valuation!.grossProfitMargins()
-                errors = es$
-                if let averageMargin = margins.ema(periods: emaPeriod) { //weightedMean()
-                    value$ = percentFormatter0Digits.string(from: averageMargin as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: averageMargin, greenCutoff: 0.4, redCutOff: 0.2)
-                }
-                return (value$,color,errors)
             case 2:
-                let (proportions, es$) = valuation!.sgaProportion()
-                errors = es$
-                if let average = proportions.ema(periods: emaPeriod) { //proportions.mean()
-                    //.filter({ (element) -> Bool in
-//                    if element != 0.0 { return true }
-//                    else { return false }
-//                })
-                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: average, greenCutoff: 0.3, redCutOff: 1.0)
-                }
-                return (value$, color, errors)
-            case 3:
-                let (proportions, es$) = valuation!.rAndDProportion()
-                errors = es$
-                if let average = proportions.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 0, redCutOff: 100)
-                }
-
-                return (value$, nil, errors)
-            case 4:
                 let (proportions, es$) = valuation!.netIncomeProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
@@ -221,16 +204,15 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
 
                 return (value$, color, errors)
-            default:
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
-            }
-            
-        }
-        else if path.section == 2 {
-            
-            var value$ = "-"
-            switch path.row {
-            case 0:
+            case 3:
+                let (margins, es$) = valuation!.grossProfitMargins()
+                errors = es$
+                if let averageMargin = margins.ema(periods: emaPeriod) { //weightedMean()
+                    value$ = percentFormatter0Digits.string(from: averageMargin as NSNumber) ?? "-"
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: averageMargin, greenCutoff: 0.4, redCutOff: 0.2)
+                }
+                return (value$,color,errors)
+            case 4:
                 let (proportions, es$) = valuation!.longtermDebtProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
@@ -239,42 +221,15 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
 
                 return (value$, color, errors)
-                
-            case 1:
-                
-                let (shEquityWithRetEarnings, error) = valuation!.addElements(array1: valuation!.shareholdersEquity ?? [], array2: valuation!.equityRepurchased ?? [])
-                if error != nil {
-                    errors = [error!]
-                }
-                
-                let (proportions, es$) = valuation!.proportions(array1: shEquityWithRetEarnings, array2: valuation?.debtLT)
-                if es$ != nil {
-                    if errors != nil { errors?.append(contentsOf: es$!) }
-                    else { errors = es$! }
-                }
-                if let average = proportions.ema(periods: emaPeriod) {
-                    if average > 0 { // avoid negative values
-                        value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 0.8, redCutOff: 0.8 )
-                    }
-                }
-
-                return (value$, color, errors)
-
-            case 2:
-                let retEarningsGrowths = valuation?.equityRepurchased?.filter({ (element) -> Bool in
-                    if element != 0.0 { return true }
-                    else { return false }
-                }).growthRates()
-                
-                if let meanGrowth = retEarningsGrowths?.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.05, redCutOff: 0.05)
-                }
-
-                return (value$, color, errors)
-                
-            case 3:
+            default:
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
+            }
+        }
+        else if path.section == 2 {
+            
+            var value$ = "-"
+            switch path.row {
+            case 0:
                 let roeGrowths = valuation?.roe?.filter({ (element) -> Bool in
                     if element != 0.0 { return true }
                     else { return false }
@@ -286,7 +241,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
                 return (value$, color, errors)
 
-            case 4:
+            case 1:
                 let roaGrowths = valuation?.roa?.filter({ (element) -> Bool in
                     if element != 0.0 { return true }
                     else { return false }
@@ -298,9 +253,64 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
                 return (value$, color, errors)
 
+            case 2:
+                
+                let (shEquityWithRetEarnings, error) = valuation!.addElements(array1: valuation!.shareholdersEquity ?? [], array2: valuation!.equityRepurchased ?? [])
+                if error != nil {
+                    errors = [error!]
+                }
+                let first3Average = shEquityWithRetEarnings?.average(of: 3)
+                let (proportions, es$) = valuation!.proportions(array1: shEquityWithRetEarnings, array2: valuation?.debtLT)
+                if es$ != nil {
+                    if errors != nil { errors?.append(contentsOf: es$!) }
+                    else { errors = es$! }
+                }
+                if let average = proportions.ema(periods: emaPeriod) {
+                    if first3Average ?? 0 < 0 && average < 0 {
+                        // recently negative equity resulting in wrongly negative LT debt
+                        value$ = "neg!"
+                        errors = ["recent LT debt and negative equity + ret. earnings "]
+                        color = GradientColorFinder.redGradientColor()
+                    }
+                    else {
+                        value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 0.8, redCutOff: 0.8 )
+                    }
+                }
+
+                return (value$, color, errors)
+
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
 
+            }
+        }
+        else if path.section == 3 {
+            
+            var value$ = "-"
+            switch path.row {
+            case 0:
+                let (proportions, es$) = valuation!.sgaProportion()
+                errors = es$
+                if let average = proportions.ema(periods: emaPeriod) { //proportions.mean()
+                    //.filter({ (element) -> Bool in
+//                    if element != 0.0 { return true }
+//                    else { return false }
+//                })
+                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: average, greenCutoff: 0.3, redCutOff: 1.0)
+                }
+                return (value$, color, errors)
+            case 1:
+                let (proportions, es$) = valuation!.rAndDProportion()
+                errors = es$
+                if let average = proportions.ema(periods: emaPeriod) {
+                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+//                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 0, redCutOff: 100)
+                }
+                return (value$, nil, errors)
+            default:
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
             }
         }
         
@@ -312,7 +322,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     private func buildRowTitles() -> [[String]] {
         
-        return [["P/E ratio", "EPS", "beta", "intr. value (10y)"], ["EPS growth","profit margin growth","SGA / Revenue growth", "R&D / profit growth", "Net inc./ Revenue growth"],["LT Debt / net income growth", "LT debt / adj.sh.equity" ,"Rt. earnings growth", "Return on equity growth", "Return on assets growth"],[]]
+        return [["P/E ratio", "EPS", "beta", "intr. value (10y)"], ["Ret. earnings growth", "EPS growth", "Net inc./ Revenue growth","profit margin growth","LT Debt / net income growth"],["Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
     }
         
     // MARK: - Data download functions

@@ -25,7 +25,7 @@ class StockChartVC: UIViewController {
     var r1Valuation: Rule1Valuation?
     var dcfErrors = [String]()
     var r1Errors: [String]?
-    var temporaryValueChartView: ValueChartVC?
+//    var temporaryValueChartView: ValueChartVC?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -311,27 +311,27 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
     
 }
 
-extension StockChartVC: StocksListDelegate {
-    
-    func showValueListChart(array: [Double]?) {
-        
-        return
-            
-        temporaryValueChartView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValueChartVC") as? ValueChartVC
-            
-        temporaryValueChartView?.values = array
-        
-        self.present(temporaryValueChartView!, animated: true, completion: nil)
-        
-    }
-    
-    func removeValueListChart() {
-        
-        temporaryValueChartView?.dismiss(animated: true, completion: {
-            self.temporaryValueChartView = nil
-        })
-        
-    }
-    
-    
-}
+//extension StockChartVC: StocksListDelegate {
+//    
+//    func showValueListChart(array: [Double]?) {
+//        
+//        return
+//            
+//        temporaryValueChartView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValueChartVC") as? ValueChartVC
+//            
+//        temporaryValueChartView?.values = array
+//        
+//        self.present(temporaryValueChartView!, animated: true, completion: nil)
+//        
+//    }
+//    
+//    func removeValueListChart() {
+//        
+//        temporaryValueChartView?.dismiss(animated: true, completion: {
+//            self.temporaryValueChartView = nil
+//        })
+//        
+//    }
+//    
+//    
+//}

@@ -7,10 +7,10 @@
 
 import UIKit
 
-protocol WBValuationListDelegate: NSObject {
-    func sendArrayForDisplay(array: [Double]?)
-    func removeValueChart()
-}
+//protocol WBValuationListDelegate: NSObject {
+//    func sendArrayForDisplay(array: [Double]?)
+//    func removeValueChart()
+//}
 
 class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
@@ -18,7 +18,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     var controller: WBValuationController!
     var stock: Stock!
     var progressView: DownloadProgressView?
-    weak var chartDelegate: WBValuationListDelegate!
+//    weak var chartDelegate: WBValuationListDelegate!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -230,41 +230,19 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             
             if selectedPath.section == 1 {
                 if selectedPath.row == 0 {
+                    arrays = [controller.valuation?.equityRepurchased ?? []]
+                    destination.values = arrays
+//                    destination.sectionTitles.append(contentsOf: ["Retained earnings"])
+                    destination.formatter = currencyFormatterGapNoPence
+                }
+                else if selectedPath.row == 1 {
                     arrays = [controller.valuation?.eps ?? []]
                     destination.values = arrays
 //                    destination.sectionTitles.append(contentsOf: ["EPS"])
                     destination.formatter = currencyFormatterGapWithPence
                     destination.gradingLimits = [10.0, 40.0]
                 }
-
-                if selectedPath.row == 1 {
-                    arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
-                    destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["Gross profit (% of revenue)", "Revenue"])
-                    destination.formatter = currencyFormatterGapNoPence
-                    let (margins, errors) = controller.valuation!.grossProfitMargins()
-                    destination.proportions = margins
-                    destination.gradingLimits = [0.4,0.2]
-                }
                 else if selectedPath.row == 2 {
-                    arrays = [controller.valuation?.sgaExpense ?? [], controller.valuation?.grossProfit ?? []]
-                    destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["SGA (% of profit)", "Profit"])
-                    destination.formatter = currencyFormatterGapNoPence
-                    let (margins, errors) = controller.valuation!.sgaProportion()
-                    destination.proportions = margins
-                    destination.gradingLimits = [0.3,0.9]
-                }
-                else if selectedPath.row == 3 {
-                    arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
-                    destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["R&D (% of profit)", "Profit"])
-                    destination.formatter = currencyFormatterGapNoPence
-                    let (margins, errors) = controller.valuation!.rAndDProportion()
-                    destination.proportions = margins
-                    destination.gradingLimits = nil
-                }
-                else if selectedPath.row == 4 {
                     arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.revenue ?? []]
                     destination.values = arrays
 //                    destination.sectionTitles.append(contentsOf: ["net income (% of revenue)", "Revenue"])
@@ -273,10 +251,16 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.proportions = margins
                     destination.gradingLimits = [0.2,0.1]
                 }
-                
-            }
-            else if selectedPath.section == 2 {
-                if selectedPath.row == 0 {
+                else if selectedPath.row == 3 {
+                    arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
+                    destination.values = arrays
+//                    destination.sectionTitles.append(contentsOf: ["Gross profit (% of revenue)", "Revenue"])
+                    destination.formatter = currencyFormatterGapNoPence
+                    let (margins, errors) = controller.valuation!.grossProfitMargins()
+                    destination.proportions = margins
+                    destination.gradingLimits = [0.4,0.2]
+                }
+                else if selectedPath.row == 4 {
                     arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
                     destination.values = arrays
 //                    destination.sectionTitles.append(contentsOf: ["LT debt (% of net income)", "Net income"])
@@ -285,32 +269,48 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.proportions = margins
                     destination.gradingLimits = [3.0,4.0]
                 }
-                else if selectedPath.row == 1 {
-                    let (shEquityWithRetEarnings, _) = controller.valuation!.addElements(array1: controller.valuation?.shareholdersEquity ?? [], array2: controller.valuation!.equityRepurchased ?? [])
-                    arrays = [controller.valuation?.debtLT ?? [], shEquityWithRetEarnings]
-                    destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["LT debt (% of sh. equity + rt. earnings)", "Sh. equity + rt. earnings"])
-                    destination.formatter = currencyFormatterGapNoPence
-
-                }
-                else if selectedPath.row == 2 {
-                    arrays = [controller.valuation?.equityRepurchased ?? []]
-                    destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["Retained earnings"])
-                    destination.formatter = currencyFormatterGapNoPence
-                }
-                else if selectedPath.row == 3 {
+                
+            }
+            else if selectedPath.section == 2 {
+                if selectedPath.row == 0 {
                     arrays = [controller.valuation?.roe ?? []]
                     destination.values = arrays
 //                    destination.sectionTitles.append(contentsOf: ["Return on equity"])
                     destination.formatter = percentFormatter0Digits
                 }
-                else if selectedPath.row == 4 {
+                else if selectedPath.row == 1 {
                     arrays = [controller.valuation?.roa ?? []]
                     destination.values = arrays
 //                    destination.sectionTitles.append(contentsOf: ["Return on assets"])
                     destination.formatter = percentFormatter0Digits
                 }
+                else if selectedPath.row == 2 {
+                    let (shEquityWithRetEarnings, _) = controller.valuation!.addElements(array1: controller.valuation?.shareholdersEquity ?? [], array2: controller.valuation!.equityRepurchased ?? [])
+                    arrays = [controller.valuation?.debtLT ?? [], shEquityWithRetEarnings]
+                    destination.values = arrays
+                    destination.formatter = currencyFormatterGapNoPence
+                }
+            }
+            else if selectedPath.section == 3 {
+                if selectedPath.row == 0 {
+                    arrays = [controller.valuation?.sgaExpense ?? [], controller.valuation?.grossProfit ?? []]
+                    destination.values = arrays
+//                    destination.sectionTitles.append(contentsOf: ["SGA (% of profit)", "Profit"])
+                    destination.formatter = currencyFormatterGapNoPence
+                    let (margins, errors) = controller.valuation!.sgaProportion()
+                    destination.proportions = margins
+                    destination.gradingLimits = [0.3,0.9]
+                }
+                else if selectedPath.row == 1 {
+                    arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
+                    destination.values = arrays
+//                    destination.sectionTitles.append(contentsOf: ["R&D (% of profit)", "Profit"])
+                    destination.formatter = currencyFormatterGapNoPence
+                    let (margins, errors) = controller.valuation!.rAndDProportion()
+                    destination.proportions = margins
+                    destination.gradingLimits = nil
+                }
+
             }
             
 //            destination.refreshTableView()

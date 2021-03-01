@@ -88,11 +88,15 @@ class ValueChart: UIView {
         }
         
         if proportion2 != nil  && proportion1 != nil {
-            minValue1 = maxValue1 * min(proportion1!, proportion2!)
-            minValue2 = maxValue2 * min(proportion1!, proportion2!)
+            minValue1 = maxValue1 * min(abs(proportion1!), abs(proportion2!))
+            minValue2 = maxValue2 * min(abs(proportion1!), abs(proportion2!))
         }
         else if proportion2 != nil {
-            minValue1 = maxValue1 * proportion2!
+            if minValue1 >= 0 && maxValue1 > 0 {
+                minValue1 = maxValue1 * proportion2!
+            } else {
+                maxValue1 = minValue1 / proportion2!
+            }
         }
         else if proportion1 != nil {
             minValue2 = maxValue2 * proportion1!
@@ -159,6 +163,9 @@ class ValueChart: UIView {
     
     override func draw(_ rect: CGRect) {
         
+        guard valueArray1?.count ?? 0 > 0 || valueArray2?.count ?? 0 > 0 else {
+            return
+        }
         
         chartOrigin.x = rect.width * 0.15
         chartOrigin.y = 10.0
@@ -195,6 +202,14 @@ class ValueChart: UIView {
             horizontalNullLine?.addLine(to: CGPoint(x: chartEnd.x, y: nullAxisY))
             horizontalNullLine?.lineWidth = 1.2
         }
+        else if (maxValue2 > 0 && minValue2 < 0) {
+            nullAxisY = chartOrigin.y + chartAreaSize.height * maxValue2 / (maxValue2 - minValue2)
+            horizontalNullLine = UIBezierPath()
+            horizontalNullLine?.move(to: CGPoint(x: chartOrigin.x, y: nullAxisY))
+            horizontalNullLine?.addLine(to: CGPoint(x: chartEnd.x, y: nullAxisY))
+            horizontalNullLine?.lineWidth = 1.2
+
+        }
         
 // Y axis
         let yAxis = UIBezierPath()
@@ -230,7 +245,7 @@ class ValueChart: UIView {
 //        let boxWidth = chartAreaSize.width / CGFloat(validValues.count + 1)
         
         var valueCount: CGFloat = 0
-        let fillColor = UIColor.systemGray3
+        let fillColor = UIColor.systemGray4
                 
         fillColor.setFill()
         fillColor.setStroke()

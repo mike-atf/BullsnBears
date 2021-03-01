@@ -8,10 +8,10 @@
 import UIKit
 import CoreData
 
-protocol StocksListDelegate: NSObject {
-    func showValueListChart(array: [Double]?)
-    func removeValueListChart()
-}
+//protocol StocksListDelegate: NSObject {
+//    func showValueListChart(array: [Double]?)
+//    func removeValueListChart()
+//}
 
 class StocksListViewController: UITableViewController {
     
@@ -19,7 +19,7 @@ class StocksListViewController: UITableViewController {
     @IBOutlet var downloadButton: UIBarButtonItem!
     
     var controller: StocksController?
-    weak var valueChartDelegate: StocksListDelegate?
+//    weak var valueChartDelegate: StocksListDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -165,7 +165,7 @@ class StocksListViewController: UITableViewController {
         guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
 
         wbValuationView.stock = stocks[indexPath.row]
-        wbValuationView.chartDelegate = self
+//        wbValuationView.chartDelegate = self
         wbValuationView.controller = WBValuationController(stock: stocks[indexPath.row], progressDelegate: wbValuationView)
         
         if stocks[indexPath.row].peRatio == nil {
@@ -204,7 +204,7 @@ class StocksListViewController: UITableViewController {
                 chartView.stockToShow = stocks[indexPath.row]
                 chartView.configure()
                 
-                self.valueChartDelegate = chartView
+//                self.valueChartDelegate = chartView
 
             }
         }
@@ -215,7 +215,7 @@ class StocksListViewController: UITableViewController {
                     chartView.stockToShow = stocks[indexPath.row]
                     chartView.configure()
                     
-                    self.valueChartDelegate = chartView
+//                    self.valueChartDelegate = chartView
                 }
             }
         }
@@ -252,17 +252,17 @@ extension StocksListViewController: StockControllerDelegate {
     
 }
 
-extension StocksListViewController: WBValuationListDelegate {
-    
-    func sendArrayForDisplay(array: [Double]?) {
-        
-        self.valueChartDelegate?.showValueListChart(array: array)
-    }
-    
-    func removeValueChart() {
-        
-        self.valueChartDelegate?.removeValueListChart()
-    }
-    
-    
-}
+//extension StocksListViewController: WBValuationListDelegate {
+//
+//    func sendArrayForDisplay(array: [Double]?) {
+//
+//        self.valueChartDelegate?.showValueListChart(array: array)
+//    }
+//
+//    func removeValueChart() {
+//
+//        self.valueChartDelegate?.removeValueListChart()
+//    }
+//
+//
+//}

@@ -60,12 +60,7 @@ class ValueListTVC: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
 
             if indexPath.section == 0 {
-//                if values?.count ?? 0 > 1 {
                     cell.configure(values1: values?[indexPath.section], values2: proportions)
-//                }
-//                else {
-//                    cell.configure(values1: values?[indexPath.section], values2: nil)
-//                }
             }
             else {
                 cell.configure(values1: values?[indexPath.section], values2: nil)
@@ -151,11 +146,11 @@ class ValueListTVC: UITableViewController {
     }
     */
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        if let destination = segue.destination as? WBValuationTVC {
-            destination.chartDelegate.removeValueChart()
-        }
-    }
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        
+//        if let destination = segue.destination as? WBValuationTVC {
+//            destination.chartDelegate.removeValueChart()
+//        }
+//    }
 }
 
