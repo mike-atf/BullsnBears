@@ -22,15 +22,15 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var downloadErrors = [String]()
     var downloader: WebDataDownloader?
     var valueListTVCSectionTitles = [[["EPS"],
-                                     ["Gross profit (% of revenue)", "Revenue"],
-                                     ["SGA (% of profit)", "Profit"],
-                                     ["R&D (% of profit)", "Profit"],
-                                     ["net income (% of revenue)", "Revenue"]],
-                                     [["LT debt (% of net income)", "Net income"],
-                                     ["LT debt (% of equity + ret. earnings)", "equity + ret. earnings"],
-                                     ["Retained earnings"],
-                                     ["Return on equity"],
-                                     ["Return on assets"]]
+                                     ["Growth of profit % of revenue", "Revenue"],
+                                     ["Growth of SGA % of profit", "Profit"],
+                                     ["Growth of R&D % of profit", "Profit"],
+                                     ["Growth of net income % of revenue", "Revenue"]],
+                                     [["Growth of LT debt % of net income", "Net income"],
+                                     ["Growth of LT debt % of equity + ret. earnings", "equity + ret. earnings"],
+                                     ["Growth of retained earnings"],
+                                     ["Growth of return on equity"],
+                                     ["Growth of return on assets"]]
     ]
     
     //MARK: - init
@@ -48,10 +48,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         else {
             self.valuation = WBValuationController.createWBValuation(company: stock.symbol)
         }
-        
-        print()
-        print("controller created for \(stock.name_short)")
-        print("valuation: \(valuation)")
         
         rowTitles = buildRowTitles()
     }
@@ -74,7 +70,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
         }
 
-        print("fetched valuation: \(valuations?.first!)")
         return valuations
     }
 

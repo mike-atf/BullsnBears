@@ -334,11 +334,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         controller.valuation?.save()
         
-        print()
-        print("valuation saved 3x")
-        print(controller.valuation)
-        print()
-        
         tableView.reloadSections([1,2], with: .automatic)
     }
 

@@ -264,11 +264,17 @@ struct Correlation {
     }
     
     /// increase/ decline in % from yIntercept to endpoint using timeInterval as x-axis
-    public func growth(for xElements: Double) -> Double {
+    public func meanGrowth(for xElements: Double) -> Double {
         let endPoint = incline * xElements + yIntercept
         let change = (endPoint - yIntercept) / abs(yIntercept)
         
-        return change
+        return change / xElements
+    }
+    
+    public func compoundGrowthRate(for xElements: Double) -> Double {
+        
+        let endPoint = incline * xElements + yIntercept
+        return (pow((endPoint/yIntercept), (1/(xElements-1)))-1)
     }
     
     public func endValue(for xElements: Double) -> Double {

@@ -12,7 +12,7 @@ class Calculator {
     
     class func compoundGrowthRate(endValue: Double, startValue: Double, years: Double) -> Double {
         
-        return (pow((endValue / startValue) , (1/years)) - 1)
+        return (pow((endValue / startValue) , (1/(years-1))) - 1)
     }
 
     class func futureValue(present: Double, growth: Double, years: Double) -> Double {
@@ -104,7 +104,6 @@ class Calculator {
         var xdiff2Sum = Double()
         var ydiff2Sum = Double()
         
-//        count = 0
         for y in cleanedArrayY {
             let ydiff = y - yMean
             ydiff2Sum += (ydiff * ydiff)
@@ -158,6 +157,4 @@ class Calculator {
         
         return proportions
     }
-
-
 }

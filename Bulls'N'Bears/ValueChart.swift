@@ -62,7 +62,8 @@ class ValueChart: UIView {
             }
             else if secondArray.count < valueArray1?.count ?? 0 {
                 for _ in secondArray.count..<(valueArray1?.count ?? 0) {
-                    valueArray2?.append(Double())
+//                    valueArray2?.append(Double())
+                    valueArray2?.insert(Double(), at: 0)
                 }
             }
         }
@@ -75,14 +76,26 @@ class ValueChart: UIView {
         if minValue2 > 0 { minValue2 = 0 }
         maxValue2 = CGFloat(valueArray2?.max() ?? Double())
         
+        var proportion1: CGFloat?
+        var proportion2: CGFloat?
         if maxValue1 > 0 && minValue1 < 0 {
             // null axis != xAxis
-            let proportion = minValue1 / maxValue1
-            minValue2 = maxValue2 * proportion
-        } else if maxValue2 > 0 && minValue2 < 0 {
+            proportion1 = minValue1 / maxValue1
+        }
+        if maxValue2 > 0 && minValue2 < 0 {
             // null axis != xAxis
-            let proportion = minValue2 / maxValue2
-            minValue1 = maxValue1 * proportion
+            proportion2 = minValue2 / maxValue2
+        }
+        
+        if proportion2 != nil  && proportion1 != nil {
+            minValue1 = maxValue1 * min(proportion1!, proportion2!)
+            minValue2 = maxValue2 * min(proportion1!, proportion2!)
+        }
+        else if proportion2 != nil {
+            minValue1 = maxValue1 * proportion2!
+        }
+        else if proportion1 != nil {
+            minValue2 = maxValue2 * proportion1!
         }
 
         let components: Set<Calendar.Component> = [.year]
@@ -119,7 +132,7 @@ class ValueChart: UIView {
 //                else { return true }
 //            }) ?? []
             var years = [Double]()
-            var count = 0.0
+            var count = 1.0 // important to avoid dropping 0 element in correlation
             for _ in array2! {
                 years.append(count)
                 count += 1.0
@@ -134,7 +147,7 @@ class ValueChart: UIView {
 //                else { return true }
 //            }) ?? []
             var years = [Double]()
-            var count = 0.0
+            var count = 1.0 // important to avoid dropping 0 element in correlation
             for _ in array1! {
                 years.append(count)
                 count += 1.0
@@ -214,21 +227,22 @@ class ValueChart: UIView {
         }
                 
 // colums
-        let boxWidth = chartAreaSize.width / CGFloat(validValues.count + 1)
+//        let boxWidth = chartAreaSize.width / CGFloat(validValues.count + 1)
         
         var valueCount: CGFloat = 0
-        let fillColor = UIColor.darkGray
+        let fillColor = UIColor.systemGray3
                 
         fillColor.setFill()
         fillColor.setStroke()
 
         validValues.forEach({ (value) in
-            let boxLeft = chartOrigin.x + (boxWidth * 0.8 / 2) + (valueCount / CGFloat(validValues.count)) * chartAreaSize.width
+//            let boxLeft = chartOrigin.x + (boxWidth * 0.8 / 2) + (valueCount / CGFloat(validValues.count)) * chartAreaSize.width
+            let boxLeft = chartOrigin.x + (labelSlotWidth / 2) + labelSlotWidth * valueCount - (labelSlotWidth * 0.8 / 2)
             let boxTop = nullAxisY - CGFloat(value) * pixPerValue1 //chartEnd.y - chartAreaSize.height * CGFloat(value) / maxValue1
             let boxBottom = nullAxisY
             let boxHeight = boxBottom - boxTop
 
-            let boxRect = CGRect(x: boxLeft, y: boxTop, width: boxWidth * 0.8, height: boxHeight)
+            let boxRect = CGRect(x: boxLeft, y: boxTop, width: labelSlotWidth * 0.8, height: boxHeight)
             let newBox = UIBezierPath(rect: boxRect)
             newBox.fill()
 
@@ -261,12 +275,13 @@ class ValueChart: UIView {
             linePath.move(to: CGPoint(x: lineStartX, y: lineStartY))
 
 // growth line graph
-            valueCount = 1
+            valueCount = 0
             secondValues.forEach({ (value) in
-                let lineX = chartOrigin.x + labelSlotWidth * valueCount - labelSlotWidth / 2
-                let lineY = nullAxisY - CGFloat(value) * pixPerValue2
-                linePath.addLine(to: CGPoint(x: lineX, y: lineY))
-
+                if value != Double() {
+                    let lineX = chartOrigin.x + labelSlotWidth / 2 + labelSlotWidth * valueCount
+                    let lineY = nullAxisY - CGFloat(value) * pixPerValue2
+                    linePath.addLine(to: CGPoint(x: lineX, y: lineY))
+                }
                 valueCount += 1
             })
 
@@ -300,21 +315,21 @@ class ValueChart: UIView {
             var r2$ = String()
             var growth$ = String()
             let r2 = trend.r2()
-            let growth = trend.growth(for: Double(xAxisLabels.count)) / (Double(xAxisLabels.count))
+            let growth = trend.meanGrowth(for: Double(xAxisLabels.count))
             if r2 != nil{
                 r2$ = percentFormatter0Digits.string(from: r2! as NSNumber) ?? ""
                 if r2! > 0.64 {
                     growth$ = percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? ""
                 }
                 else {
-                    growth$ = "highly volatile (" + (percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? "") + ")"
+                    growth$ = "high volatility (" + (percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? "") + ")"
                 }
             }
                         
             trendlabel.font = UIFont.preferredFont(forTextStyle: .footnote)
             trendlabel.numberOfLines = 0
 
-            trendlabel.setAttributedTextWithSuperscripts(text: "Correlation R2: \(r2$)  -  Growth: \(growth$) p.a.", indicesOfSuperscripts: [7])
+            trendlabel.setAttributedTextWithSuperscripts(text: "R2: \(r2$)  -  Avg. growth pa.: \(growth$)", indicesOfSuperscripts: [1])
             trendlabel.sizeToFit()
             
         }
@@ -360,6 +375,7 @@ class ValueChart: UIView {
             let newLabel: UILabel = {
                 let label = UILabel()
                 label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                label.textColor = UIColor.systemGray
                 label.textAlignment = .right
                 label.text = (numberFormatterDecimals.string(from: (labelValue / factor) as NSNumber) ?? "") + (lastLetter ?? "")
                 label.sizeToFit()
@@ -413,7 +429,7 @@ class ValueChart: UIView {
             let newLabel: UILabel = {
                 let label = UILabel()
                 label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                label.textColor = UIColor.systemOrange
+                label.textColor = UIColor.systemYellow
                 label.textAlignment = .right
                 label.text = (percentFormatter0Digits.string(from: (labelValue / factor) as NSNumber) ?? "") + (lastLetter ?? "")
                 label.sizeToFit()

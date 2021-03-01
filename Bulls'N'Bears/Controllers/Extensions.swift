@@ -122,6 +122,7 @@ extension Array where Element == Double {
     /// calculates growth rates from current to preceding element
     /// should have elemetns in time-descending order!
     /// return n-1 elements
+    /// can include empty placeholder Double() elements instead of nil
     func growthRates() -> [Double]? {
         
         guard self.count > 1 else {
@@ -131,9 +132,15 @@ extension Array where Element == Double {
         var rates = [Double]()
         
         for i in 0..<self.count - 1 {
-            rates.append((self[i] - self[i+1]) / abs(self[i+1]))
+            if self[i] == Double() {
+                rates.append(Double())
+            }
+            else if self[i+1] != 0 {
+                rates.append((self[i] - self[i+1]) / abs(self[i+1]))
+            }
+            else { rates.append(Double()) }
         }
-        
+
         return rates
     }
 
@@ -141,7 +148,7 @@ extension Array where Element == Double {
 
 extension Array where Element == Double? {
     
-    /// calculates growth rates from current to preceding element
+    /// calculates growth rates from current to next element
     /// should have elemetns in descending order!
     /// i.e. the following element is younger/ usually smaller
     /// return n-1 elements
