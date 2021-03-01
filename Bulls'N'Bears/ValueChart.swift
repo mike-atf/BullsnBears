@@ -106,7 +106,7 @@ class ValueChart: UIView {
         for _ in valueArray1 ?? [] {
                 let aLabel: UILabel = {
                     let label = UILabel()
-                    label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                    label.font = UIFont.systemFont(ofSize: 12)
                     label.text = "\(mostRecentYear-count)"
                     label.sizeToFit()
                     self.addSubview(label)
@@ -160,7 +160,7 @@ class ValueChart: UIView {
     override func draw(_ rect: CGRect) {
         
         
-        chartOrigin.x = rect.width * 0.13
+        chartOrigin.x = rect.width * 0.15
         chartOrigin.y = 10.0
         chartEnd.x = rect.width * 0.87
         chartAreaSize.width = chartEnd.x - chartOrigin.x
@@ -265,7 +265,7 @@ class ValueChart: UIView {
 // left yAxis labels
             yAxisLabelsLeft.forEach { (label) in
                 let labelY = nullAxisY - CGFloat(yAxisNumbersLeft[index]) * pixPerValue2
-                label.frame.origin = CGPoint(x: rect.minX + 5 , y: labelY - label.frame.height / 2)
+                label.frame.origin = CGPoint(x: rect.minX , y: labelY - label.frame.height / 2)
                 index += 1
             }
 
@@ -374,7 +374,7 @@ class ValueChart: UIView {
         while labelValue >= minValue1 {
             let newLabel: UILabel = {
                 let label = UILabel()
-                label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                label.font = UIFont.systemFont(ofSize: 12)
                 label.textColor = UIColor.systemGray
                 label.textAlignment = .right
                 label.text = (numberFormatterDecimals.string(from: (labelValue / factor) as NSNumber) ?? "") + (lastLetter ?? "")
@@ -428,7 +428,7 @@ class ValueChart: UIView {
         while labelValue >= minValue2 {
             let newLabel: UILabel = {
                 let label = UILabel()
-                label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                label.font = UIFont.systemFont(ofSize: 12)
                 label.textColor = UIColor.systemYellow
                 label.textAlignment = .right
                 label.text = (percentFormatter0Digits.string(from: (labelValue / factor) as NSNumber) ?? "") + (lastLetter ?? "")

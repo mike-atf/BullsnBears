@@ -33,6 +33,27 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                                      ["Growth of return on assets"]]
     ]
     
+    var valueListTVCSectionTitles2 = [
+                                    [
+                                        ["Growth of retained earnings"],
+                                        ["EPS"],
+                                        ["Growth of net income % of revenue", "Revenue"],
+                                        ["Growth of profit % of revenue", "Revenue"],
+                                        ["Growth of LT debt % of net income", "Net income"]
+                                    ],
+                                    [
+                                        ["Growth of return on equity"],
+                                        ["Growth of return on assets"],
+                                        ["Growth of LT debt % of equity + ret. earnings", "equity + ret. earnings"]
+                                         
+                                    ],
+                                    [
+                                        ["Growth of SGA % of profit", "Profit"],
+                                        ["Growth of R&D % of profit", "Profit"]
+                                    ]
+    ]
+ 
+    
     //MARK: - init
 
     init(stock: Stock, progressDelegate: ProgressViewDelegate) {
