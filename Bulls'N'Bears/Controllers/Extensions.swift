@@ -86,15 +86,48 @@ extension Array where Element == Double {
         var weightSum = 0.0
 
         for i in 0..<self.count {
-            let weight = (1/Double(i+1))
-            sum += weight * self[i]
-            weightSum += weight
+            if self[i] != Double() {
+                let weight = (1/Double(i+1))
+                sum += weight * self[i]
+                weightSum += weight
+            }
         }
         
         if weightSum > 0 {
             return sum / weightSum
         }
         else { return nil }
+    }
+    
+    /// assumes array is in DESCENDING order
+    /// periods is the number of elements to build a moving average for
+    /// periods must be greater thn 2 and smaller than array.count-2
+    /// use reverse() if it isn't
+    func ema(periods: Int) -> Double? {
+        
+        guard periods > 2 else { return nil }
+        
+        guard self.count > periods+2 else {
+            return nil
+        }
+        
+        let ascending = Array(self.reversed())
+        
+        var sum = Double()
+        for i in 0..<periods {
+            sum += ascending[i]
+        }
+        let sma = sum / Double(periods)
+        
+        var ema = sma
+        
+        for i in periods..<self.count {
+            if ascending[i] != Double() {
+                ema = ascending[i] * (2/(Double(periods+1))) + ema * (1 - 2/(Double(periods+1)))
+            }
+        }
+        
+        return ema
     }
     
     func stdVariation() -> Double? {
@@ -247,6 +280,30 @@ extension Array where Element == Double? {
         }
         else { return nil }
     }
+    
+    /// assumes array is in DESCENDING order
+    /// use reverse() if it isn't
+//    func ema(periods: Int) -> Double? {
+//
+//        guard self.count > periods*2 else {
+//            return nil
+//        }
+//
+//        let ascending = self.reversed()
+//
+//        var initialEMA = Double()
+//        for i in 0..<periods {
+//            initialEMA += ascending[i]
+//        }
+//        initialEMA = initialEMA / Double(periods)
+//
+//
+//        for i in 0..<self.count {
+//
+//            ema = self[i] * (2/(periods+1)) + ema * (1 - 2/(periods+1))
+//        }
+//
+//    }
     
     func mean() -> Double? {
         

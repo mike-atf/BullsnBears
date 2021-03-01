@@ -13,6 +13,7 @@ var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persi
 var errorLog: [ErrorLog]?
 let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
 let gradientBar = UIImage(named: "GradientBar")
+let userDefaultTerms = UserDefaultTerms()
 
 var stockTickerDictionary: [String:String]? = {
         
@@ -102,6 +103,7 @@ struct UserDefaultTerms {
     let treasuryBondRate = "10YUSTreasuryBondRate"
     let perpetualGrowthRate = "PerpetualGrowthRate"
     let longTermMarketReturn = "LongTermMarketReturn"
+    let emaPeriodAnnualData = "emaPeriodAnnualData"
 }
 
 let currencyFormatterGapNoPence: NumberFormatter = {

@@ -46,7 +46,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if UserDefaults.standard.value(forKey: "LongTermCoporateInterestRate") as? Double == nil {
             UserDefaults.standard.set(0.021, forKey: "LongTermCoporateInterestRate")
         }
-        
+        if UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int == nil {
+            UserDefaults.standard.set(7, forKey: userDefaultTerms.emaPeriodAnnualData)
+        }
     }
         
     // MARK: - Core Data stack

@@ -107,6 +107,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         
         var errors: [String]?
         var color: UIColor?
+        let emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
         
         if path.section == 0 {
             var value$: String?
@@ -155,10 +156,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     count += 1.0
                 }
                 
-                if let growthRatesMean = valuation?.eps?.filter({ (element) -> Bool in
-                    if element != 0.0 { return true }
-                    else { return false }
-                }).growthRates()?.weightedMean() {
+                if let growthRatesMean = valuation?.eps?.growthRates()?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
                     color = growthRatesMean > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
                 }
@@ -167,38 +165,27 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 1:
                 let (margins, es$) = valuation!.grossProfitMargins()
                 errors = es$
-                if let averageMargin = margins.filter({ (element) -> Bool in
-                    if element != 0.0 { return true }
-                    else { return false }
-                }).weightedMean() {
+                if let averageMargin = margins.ema(periods: emaPeriod) { //weightedMean()
                     value$ = percentFormatter0Digits.string(from: averageMargin as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: averageMargin, greenCutoff: 0.4, redCutOff: 0.2)
-//                    if averageMargin > 0.4 { color = UIColor(named: "Green") }
-//                    else if averageMargin > 0.2 { color = UIColor.systemYellow }
-//                    else { color = UIColor(named: "Red") }
                 }
                 return (value$,color,errors)
             case 2:
                 let (proportions, es$) = valuation!.sgaProportion()
                 errors = es$
-                if let average = proportions.filter({ (element) -> Bool in
-                    if element != 0.0 { return true }
-                    else { return false }
-                }).weightedMean() { //proportions.mean()
+                if let average = proportions.ema(periods: emaPeriod) { //proportions.mean()
+                    //.filter({ (element) -> Bool in
+//                    if element != 0.0 { return true }
+//                    else { return false }
+//                })
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: average, greenCutoff: 0.3, redCutOff: 1.0)
-//                    if average <= 0.3 { color = UIColor(named: "Green") }
-//                    else if average < 100 { color = UIColor.systemYellow }
-//                    else { color = UIColor(named: "Red") }
                 }
                 return (value$, color, errors)
             case 3:
                 let (proportions, es$) = valuation!.rAndDProportion()
                 errors = es$
-                if let average = proportions.filter({ (element) -> Bool in
-                    if element != 0.0 { return true }
-                    else { return false }
-                }).weightedMean() {
+                if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 0, redCutOff: 100)
                 }
@@ -207,15 +194,9 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 4:
                 let (proportions, es$) = valuation!.netIncomeProportion()
                 errors = es$
-                if let average = proportions.filter({ (element) -> Bool in
-                    if element != 0.0 { return true }
-                    else { return false }
-                }).weightedMean() {
+                if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: average, greenCutoff: 0.2, redCutOff: 0.1)
-//                     if average > 0.2 { color = UIColor(named: "Green") }
-//                    else if average > 0.1 { color = UIColor.systemYellow }
-//                    else { color = UIColor(named: "Red") }
                 }
 
                 return (value$, color, errors)
@@ -231,12 +212,9 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 0:
                 let (proportions, es$) = valuation!.longtermDebtProportion()
                 errors = es$
-                if let average = proportions.weightedMean() {
+                if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 3.0, redCutOff: 4.0)
-//                     if average < 3.0 { color = UIColor(named: "Green") }
-//                    else if average < 4.0 { color = UIColor.systemYellow }
-//                    else { color = UIColor(named: "Red") }
                 }
 
                 return (value$, color, errors)
@@ -253,12 +231,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     if errors != nil { errors?.append(contentsOf: es$!) }
                     else { errors = es$! }
                 }
-                if let average = proportions.weightedMean() {
+                if let average = proportions.ema(periods: emaPeriod) {
                     if average > 0 { // avoid negative values
                         value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                         color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 0.8, redCutOff: 0.8 )
-//                             if average < 0.8 { color = UIColor(named: "Green") }
-//                        else { color = UIColor(named: "Red") }
                     }
                 }
 
@@ -270,10 +246,9 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     else { return false }
                 }).growthRates()
                 
-                if let meanGrowth = retEarningsGrowths?.weightedMean() {
+                if let meanGrowth = retEarningsGrowths?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.05, redCutOff: 0.05)
-//                     color = meanGrowth > 0.05 ? UIColor(named: "Green") : UIColor(named: "Red")
                 }
 
                 return (value$, color, errors)
@@ -284,12 +259,8 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     else { return false }
                 }).growthRates()
                 
-                if let meanGrowth = roeGrowths?.weightedMean() {
+                if let meanGrowth = roeGrowths?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-//                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1000, value: meanGrowth)
-//                     if meanGrowth > 0.25 { color = UIColor(named: "Green") }
-//                    else if meanGrowth < 0.1 { color = UIColor(named: "Red") }
-//                    else { color = UIColor.systemYellow }
                 }
 
                 return (value$, color, errors)
@@ -300,12 +271,8 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     else { return false }
                 }).growthRates()
                 
-                if let meanGrowth = roaGrowths?.weightedMean() {
+                if let meanGrowth = roaGrowths?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-//                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1000, value: meanGrowth)
-//                    if meanGrowth > 0.25 { color = UIColor(named: "Green") }
-//                    else if meanGrowth < 0.1 { color = UIColor(named: "Red") }
-//                    else { color = UIColor.systemYellow }
                 }
 
                 return (value$, color, errors)
@@ -315,25 +282,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
             }
         }
-//        else if path.section == 2 {
-//            let (value, errors) = valuation!.ivalue()
-//            if errors.count == 0 {
-//                if let valid = value {
-//                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", color, nil)
-//                }
-//                else {
-//                    return ("no value", color, nil)
-//                }
-//            }
-//            else { // errors
-//                if let valid = value {
-//                    return (currencyFormatterGapNoPence.string(from: valid as NSNumber) ?? "no value", color, errors)
-//                }
-//                else {
-//                    return ("no value", color, errors)
-//                }
-//            }
-//        }
         
         return ("no value", color, nil)
         
@@ -343,7 +291,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     private func buildRowTitles() -> [[String]] {
         
-        return [["P/E ratio", "EPS", "beta", "intr. value (10y)"], ["EPS trend","profit margin","SGA / Revenue", "R&D / profit", "Net inc./ Revenue"],["LT Debt / net income", "LT debt / adj. sh.equity" ,"Rt. earnings growth trend", "Return on equity trend", "Return on assets trend"],[]]
+        return [["P/E ratio", "EPS", "beta", "intr. value (10y)"], ["EPS growth","profit margin growth","SGA / Revenue growth", "R&D / profit growth", "Net inc./ Revenue growth"],["LT Debt / net income growth", "LT debt / adj.sh.equity" ,"Rt. earnings growth", "Return on equity growth", "Return on assets growth"],[]]
     }
         
     // MARK: - Data download functions
