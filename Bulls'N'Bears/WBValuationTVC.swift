@@ -160,7 +160,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
 
         progressView?.delegate = self
-        progressView?.title.text = "Trying public data acquisition..."
+        progressView?.title.text = "Public data download..."
 
         controller.downloadWBValuationData()
     }
@@ -170,45 +170,9 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         performSegue(withIdentifier: "valueListSegue", sender: nil)
         tableView.deselectRow(at: indexPath, animated: true)
     }
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
 
     // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
            
         guard let selectedPath = self.tableView.indexPathForSelectedRow else {
@@ -226,26 +190,24 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             destination.loadViewIfNeeded()
             destination.controller = controller
             destination.sectionTitles.append(contentsOf: controller.valueListTVCSectionTitles[selectedPath.section-1][selectedPath.row])
+            destination.cellLegendTitles = controller.valueListChartLegendTitles[selectedPath.section-1][selectedPath.row]
             var arrays: [[Double]?]?
             
             if selectedPath.section == 1 {
                 if selectedPath.row == 0 {
                     arrays = [controller.valuation?.equityRepurchased ?? []]
                     destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["Retained earnings"])
                     destination.formatter = currencyFormatterGapNoPence
                 }
                 else if selectedPath.row == 1 {
                     arrays = [controller.valuation?.eps ?? []]
                     destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["EPS"])
                     destination.formatter = currencyFormatterGapWithPence
                     destination.gradingLimits = [10.0, 40.0]
                 }
                 else if selectedPath.row == 2 {
                     arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.revenue ?? []]
                     destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["net income (% of revenue)", "Revenue"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.netIncomeProportion()
                     destination.proportions = margins
@@ -254,7 +216,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 3 {
                     arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
                     destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["Gross profit (% of revenue)", "Revenue"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.grossProfitMargins()
                     destination.proportions = margins
@@ -263,7 +224,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 4 {
                     arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
                     destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["LT debt (% of net income)", "Net income"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.longtermDebtProportion()
                     destination.proportions = margins
@@ -275,13 +235,11 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 if selectedPath.row == 0 {
                     arrays = [controller.valuation?.roe ?? []]
                     destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["Return on equity"])
                     destination.formatter = percentFormatter0Digits
                 }
                 else if selectedPath.row == 1 {
                     arrays = [controller.valuation?.roa ?? []]
                     destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["Return on assets"])
                     destination.formatter = percentFormatter0Digits
                 }
                 else if selectedPath.row == 2 {
@@ -295,7 +253,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 if selectedPath.row == 0 {
                     arrays = [controller.valuation?.sgaExpense ?? [], controller.valuation?.grossProfit ?? []]
                     destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["SGA (% of profit)", "Profit"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.sgaProportion()
                     destination.proportions = margins
@@ -304,7 +261,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 1 {
                     arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
                     destination.values = arrays
-//                    destination.sectionTitles.append(contentsOf: ["R&D (% of profit)", "Profit"])
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.rAndDProportion()
                     destination.proportions = margins
@@ -313,7 +269,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
             }
             
-//            destination.refreshTableView()
         }
         
     }

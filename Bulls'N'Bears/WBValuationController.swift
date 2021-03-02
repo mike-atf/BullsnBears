@@ -11,7 +11,7 @@ import WebKit
 
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
-    var sectionTitles = ["Key ratios","Primary values EMA", "Secondary values","Expenses EMA"]
+    var sectionTitles = ["Key ratios","Main parameters", "Secondary parameters","Expenses"]
     var sectionSubTitles = ["from Yahoo finance","Growth EMA (from MacroTrends data)","Growth EMA (from MacroTrends data)","Growth EMA (from MacroTrends data)"]
     var rowTitles: [[String]]!
     var stock: Stock!
@@ -21,18 +21,20 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var downloadTasksCompleted = 0
     var downloadErrors = [String]()
     var downloader: WebDataDownloader?
-    var valueListTVCSectionTitlesOld = [[["EPS"],
-                                     ["Growth of profit % of revenue", "Revenue"],
-                                     ["Growth of SGA % of profit", "Profit"],
-                                     ["Growth of R&D % of profit", "Profit"],
-                                     ["Growth of net income % of revenue", "Revenue"]],
-                                     [["Growth of LT debt % of net income", "Net income"],
-                                     ["Growth of LT debt % of equity + ret. earnings", "equity + ret. earnings"],
-                                     ["Growth of retained earnings"],
-                                     ["Growth of return on equity"],
-                                     ["Growth of return on assets"]]
-    ]
-    
+    var valueListChartLegendTitles = [
+        [["YoY Growth","Retained earnings"],
+         ["YoY Growth","EPS"],
+         ["Growth net income % of revenue","net income","revenue"],
+         ["Growth profit % of revenue","profit","revenue"],
+         ["Growth LT debt % of net income","LT debt","revenue"]
+        ],
+        [["YoY Growth","Return of equity"],
+         ["YoY Growth","Return on assets"],
+         ["Growth lt debt % of (equity+ret. earnings))","lt debt","equity + ret. earnings"]
+        ],
+        [["Growth SGA % of profit)","SGA","profit"],
+         ["Growth R&D % of profit)","R&D","profit"]
+        ]]
     var valueListTVCSectionTitles = [
                                     [
                                         ["Growth of retained earnings"],
@@ -170,10 +172,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             var value$ = "-"
             switch path.row {
             case 0:
-                let retEarningsGrowths = valuation?.equityRepurchased?.filter({ (element) -> Bool in
-                    if element != 0.0 { return true }
-                    else { return false }
-                }).growthRates()
+                let retEarningsGrowths = valuation?.equityRepurchased?.growthRates()
                 
                 if let meanGrowth = retEarningsGrowths?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
@@ -306,7 +305,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
-//                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 0, redCutOff: 100)
                 }
                 return (value$, nil, errors)
             default:

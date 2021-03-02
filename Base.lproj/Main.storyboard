@@ -760,24 +760,6 @@
             </objects>
             <point key="canvasLocation" x="2122" y="492"/>
         </scene>
-        <!--Value ChartVC-->
-        <scene sceneID="XX0-4v-OTG">
-            <objects>
-                <viewController storyboardIdentifier="ValueChartVC" id="YfB-K4-4tm" customClass="ValueChartVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="0IZ-QW-rsT">
-                        <rect key="frame" x="0.0" y="0.0" width="500" height="400"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="OqG-1c-mgz"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <value key="contentSizeForViewInPopover" type="size" width="500" height="400"/>
-                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="500" height="400"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="zK9-IG-Mhx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2122" y="1237"/>
-        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="HCm-I9-2PD"/>

@@ -298,31 +298,7 @@ extension Array where Element == Double? {
         }
         else { return nil }
     }
-    
-    /// assumes array is in DESCENDING order
-    /// use reverse() if it isn't
-//    func ema(periods: Int) -> Double? {
-//
-//        guard self.count > periods*2 else {
-//            return nil
-//        }
-//
-//        let ascending = self.reversed()
-//
-//        var initialEMA = Double()
-//        for i in 0..<periods {
-//            initialEMA += ascending[i]
-//        }
-//        initialEMA = initialEMA / Double(periods)
-//
-//
-//        for i in 0..<self.count {
-//
-//            ema = self[i] * (2/(periods+1)) + ema * (1 - 2/(periods+1))
-//        }
-//
-//    }
-    
+        
     func mean() -> Double? {
         
         guard self.count > 0 else {
@@ -416,8 +392,6 @@ extension UILabel {
 
 //
 //  HTTPCookie+Arquiver.swift
-//
-//
 //  Created by Antoine Barrault on 17/01/2018.
 //
 

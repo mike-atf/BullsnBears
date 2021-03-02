@@ -14,15 +14,12 @@ class ValueChart: UIView {
 
     var yAxisLabelsRight = [UILabel]()
     var yAxisNumbersRight = [CGFloat]()
-//    var yAxisLabelsRightMaxWidth = CGFloat()
 
     var yAxisLabelsLeft = [UILabel]()
     var yAxisNumbersLeft = [CGFloat]()
-//    var yAxisLabelsLeftMaxWidth = CGFloat()
     
     var xAxisLabels = [UILabel]()
     var trendLabels = [UILabel]()
-//    var valuationLabels = [UILabel]()
     
     var boxes = UIBezierPath()
     
@@ -46,8 +43,6 @@ class ValueChart: UIView {
     /// both should have some number of elements, otherwise, the second array will be brought to same size
     func configure(array1: [Double]?, array2: [Double]?, trendLabel: UILabel) {
         
-//        self.backgroundColor = UIColor.systemTeal
-        
         guard array1?.count ?? 0 > 0 || array2?.count ?? 0 > 0 else {
             return
         }
@@ -62,7 +57,6 @@ class ValueChart: UIView {
             }
             else if secondArray.count < valueArray1?.count ?? 0 {
                 for _ in secondArray.count..<(valueArray1?.count ?? 0) {
-//                    valueArray2?.append(Double())
                     valueArray2?.insert(Double(), at: 0)
                 }
             }
@@ -88,8 +82,13 @@ class ValueChart: UIView {
         }
         
         if proportion2 != nil  && proportion1 != nil {
-            minValue1 = maxValue1 * min(abs(proportion1!), abs(proportion2!))
-            minValue2 = maxValue2 * min(abs(proportion1!), abs(proportion2!))
+            var proportion = max(abs(proportion1!), abs(proportion2!))
+            if proportion != proportion1 && proportion != proportion2 {
+                // negative
+                proportion *= -1
+            }
+            minValue1 = maxValue1 * proportion
+            minValue2 = maxValue2 * proportion
         }
         else if proportion2 != nil {
             if minValue1 >= 0 && maxValue1 > 0 {
@@ -131,12 +130,8 @@ class ValueChart: UIView {
         if array2?.count ?? 0 > 1 {
             // proportions - calculate trend of proportions
             
-//            let array1NoEmpties = array2?.filter({ (element) -> Bool in
-//                if element == Double() { return false }
-//                else { return true }
-//            }) ?? []
             var years = [Double]()
-            var count = 1.0 // important to avoid dropping 0 element in correlation
+            var count = 1.0 // important to start with 1.0 to avoid dropping 0 element in correlation
             for _ in array2! {
                 years.append(count)
                 count += 1.0
@@ -146,10 +141,6 @@ class ValueChart: UIView {
         } else if array1?.count ?? 0 > 1 {
             // values only, no proportions - calculate values trend
             
-//            let array1NoEmpties = array1?.filter({ (element) -> Bool in
-//                if element == Double() { return false }
-//                else { return true }
-//            }) ?? []
             var years = [Double]()
             var count = 1.0 // important to avoid dropping 0 element in correlation
             for _ in array1! {
@@ -242,8 +233,6 @@ class ValueChart: UIView {
         }
                 
 // colums
-//        let boxWidth = chartAreaSize.width / CGFloat(validValues.count + 1)
-        
         var valueCount: CGFloat = 0
         let fillColor = UIColor.systemGray4
                 
@@ -251,7 +240,6 @@ class ValueChart: UIView {
         fillColor.setStroke()
 
         validValues.forEach({ (value) in
-//            let boxLeft = chartOrigin.x + (boxWidth * 0.8 / 2) + (valueCount / CGFloat(validValues.count)) * chartAreaSize.width
             let boxLeft = chartOrigin.x + (labelSlotWidth / 2) + labelSlotWidth * valueCount - (labelSlotWidth * 0.8 / 2)
             let boxTop = nullAxisY - CGFloat(value) * pixPerValue1 //chartEnd.y - chartAreaSize.height * CGFloat(value) / maxValue1
             let boxBottom = nullAxisY
@@ -310,7 +298,6 @@ class ValueChart: UIView {
         if trend != nil {
             let trendLine = UIBezierPath()
             
-//            let maxValue = (valueArray2?.count ?? 0 > 0) ? maxValue2 : maxValue1
             let pixPerValue = (valueArray2?.count ?? 0 > 0) ? pixPerValue2 : pixPerValue1
 
             let trendLineStartY = nullAxisY - CGFloat(trend.yIntercept) * pixPerValue

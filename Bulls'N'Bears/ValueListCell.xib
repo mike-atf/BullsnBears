@@ -24,22 +24,41 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fLN-zd-gLR" customClass="ValueChart" customModule="Bulls_N_Bears" customModuleProvider="target">
-                        <rect key="frame" x="20" y="41" width="427" height="313"/>
+                        <rect key="frame" x="20" y="41" width="427" height="288"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mgT-Dc-3oJ">
+                        <rect key="frame" x="20" y="336" width="31" height="14.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lju-oW-UHW">
+                        <rect key="frame" x="416" y="336" width="31" height="14.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <constraints>
                     <constraint firstItem="fLN-zd-gLR" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" symbolic="YES" id="ACy-9q-E9C"/>
                     <constraint firstItem="Sbo-QJ-i2A" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="Kjq-Ir-2px"/>
+                    <constraint firstItem="Lju-oW-UHW" firstAttribute="trailing" secondItem="fLN-zd-gLR" secondAttribute="trailing" id="Uzs-RZ-hkF"/>
                     <constraint firstItem="Sbo-QJ-i2A" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" symbolic="YES" id="YgF-bn-JKl"/>
-                    <constraint firstAttribute="bottom" secondItem="fLN-zd-gLR" secondAttribute="bottom" constant="25" id="cfy-HE-yaW"/>
+                    <constraint firstAttribute="bottom" secondItem="fLN-zd-gLR" secondAttribute="bottom" constant="50" id="cfy-HE-yaW"/>
                     <constraint firstItem="fLN-zd-gLR" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="41" id="gBL-Ne-hq5"/>
+                    <constraint firstItem="Lju-oW-UHW" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="mgT-Dc-3oJ" secondAttribute="trailing" constant="5" id="guh-Vc-ure"/>
                     <constraint firstAttribute="trailing" secondItem="fLN-zd-gLR" secondAttribute="trailing" constant="20" symbolic="YES" id="klG-XS-6nk"/>
+                    <constraint firstItem="mgT-Dc-3oJ" firstAttribute="leading" secondItem="fLN-zd-gLR" secondAttribute="leading" id="meI-JX-opL"/>
+                    <constraint firstItem="mgT-Dc-3oJ" firstAttribute="firstBaseline" secondItem="fLN-zd-gLR" secondAttribute="baseline" constant="24.5" symbolType="layoutAnchor" id="peK-aI-SWg"/>
+                    <constraint firstItem="Lju-oW-UHW" firstAttribute="firstBaseline" secondItem="fLN-zd-gLR" secondAttribute="baseline" constant="24.5" symbolType="layoutAnchor" id="zd3-xC-PlU"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="chartView" destination="fLN-zd-gLR" id="MLD-x1-fZf"/>
+                <outlet property="leftLowerLabel" destination="mgT-Dc-3oJ" id="n1W-qc-3bJ"/>
+                <outlet property="rightLowerLabel" destination="Lju-oW-UHW" id="QWS-CW-9E5"/>
                 <outlet property="title" destination="Sbo-QJ-i2A" id="Syb-D3-kjS"/>
             </connections>
             <point key="canvasLocation" x="192.0289855072464" y="193.86160714285714"/>
