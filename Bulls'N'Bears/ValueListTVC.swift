@@ -10,7 +10,7 @@ import UIKit
 class ValueListTVC: UITableViewController {
 
     var values: [[Double]?]?
-    var sectionTitles = [String]()
+    var sectionTitles = ["Rating","Evaluation notes"]
     var rowTitles = [String]()
     var formatter: NumberFormatter!
     weak var controller: WBValuationController!
@@ -18,7 +18,7 @@ class ValueListTVC: UITableViewController {
     var trendToDisplay: Double?
     var mostRecentYear: Int!
     var proportions: [Double]?
-    var gradingLimits: [Double]? // first = good, // second = moderate // third = bad
+//    var gradingLimits: [Double]? // first = good, // second = moderate // third = bad
     var gapErrors: [String]?
     var cellLegendTitles = [String]()
     
@@ -26,7 +26,9 @@ class ValueListTVC: UITableViewController {
         super.viewDidLoad()
         
         tableView.register(UINib(nibName: "ValueListCell", bundle: nil), forCellReuseIdentifier: "valueListCell2")
-        
+        tableView.register(UINib(nibName: "ValueListRatingCell", bundle: nil), forCellReuseIdentifier: "valueListRatingCell")
+        tableView.register(UINib(nibName: "ValueListTextEntryCell", bundle: nil), forCellReuseIdentifier: "valueListTextEntryCell")
+
         let components: Set<Calendar.Component> = [.year]
         let dateComponents = Calendar.current.dateComponents(components, from: Date())
         mostRecentYear = dateComponents.year! - 1
@@ -48,7 +50,7 @@ class ValueListTVC: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return (values?.count ?? 0)
+        return (values?.count ?? 0) + 2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -58,9 +60,20 @@ class ValueListTVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-            let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
+        
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "valueListRatingCell", for: indexPath) as! ValueListRatingCell
 
-            if indexPath.section == 0 {
+            return cell
+        }
+        else if indexPath.section == 1 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "valueListTextEntryCell", for: indexPath) as! ValueListTextEntryCell
+
+            return cell
+        }
+        else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
+            if indexPath.section == 2 {
 
                 cell.configure(values1: values?[indexPath.section], values2: proportions, rightTitle: cellLegendTitles[1], leftTitle: cellLegendTitles.first)
             }
@@ -69,6 +82,7 @@ class ValueListTVC: UITableViewController {
             }
             
             return cell
+        }
         
     }
     
@@ -81,34 +95,34 @@ class ValueListTVC: UITableViewController {
     }
 
     
-    private func detailColor(value: Double?) -> UIColor? {
-        
-        guard let validvalue = value else {
-            return nil
-        }
-        
-        guard gradingLimits != nil else {
-            return nil
-        }
-        
-        guard gradingLimits!.count == 2 else {
-            return nil
-        }
-        
-        if gradingLimits!.first! < gradingLimits!.last! {
-            // smaller values are graded better
-            if validvalue < gradingLimits!.first! { return UIColor(named: "Green") }
-            else if validvalue > gradingLimits!.last! { return UIColor(named: "Red") }
-            else { return UIColor.systemYellow }
-        }
-        else {
-            // larger values are graded better
-            if validvalue > gradingLimits!.first! { return UIColor(named: "Green") }
-            else if validvalue < gradingLimits!.last! { return UIColor(named: "Red") }
-            else { return UIColor.systemYellow }
-        }
-        
-    }
+//    private func detailColor(value: Double?) -> UIColor? {
+//
+//        guard let validvalue = value else {
+//            return nil
+//        }
+//
+//        guard gradingLimits != nil else {
+//            return nil
+//        }
+//
+//        guard gradingLimits!.count == 2 else {
+//            return nil
+//        }
+//
+//        if gradingLimits!.first! < gradingLimits!.last! {
+//            // smaller values are graded better
+//            if validvalue < gradingLimits!.first! { return UIColor(named: "Green") }
+//            else if validvalue > gradingLimits!.last! { return UIColor(named: "Red") }
+//            else { return UIColor.systemYellow }
+//        }
+//        else {
+//            // larger values are graded better
+//            if validvalue > gradingLimits!.first! { return UIColor(named: "Green") }
+//            else if validvalue < gradingLimits!.last! { return UIColor(named: "Red") }
+//            else { return UIColor.systemYellow }
+//        }
+//
+//    }
 
 }
 
