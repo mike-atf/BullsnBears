@@ -35,25 +35,26 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         [["Growth SGA % of profit)","SGA","profit"],
          ["Growth R&D % of profit)","R&D","profit"]
         ]]
-    var valueListTVCSectionTitles = [
-                                    [
-                                        ["Growth of retained earnings"],
-                                        ["EPS"],
-                                        ["Growth of net income % of revenue", "Revenue"],
-                                        ["Growth of profit % of revenue", "Revenue"],
-                                        ["Growth of LT debt % of net income", "Net income"]
-                                    ],
-                                    [
-                                        ["Growth of return on equity"],
-                                        ["Growth of return on assets"],
-                                        ["Growth of LT debt % of equity + ret. earnings", "equity + ret. earnings"]
-                                         
-                                    ],
-                                    [
-                                        ["Growth of SGA % of profit", "Profit"],
-                                        ["Growth of R&D % of profit", "Profit"]
-                                    ]
-    ]
+    var wbvParameters = WBVParameters()
+//    var valueListTVCSectionTitles = [[[String]]]()// [
+//                                    [
+//                                        ["Growth of retained earnings"],
+//                                        ["EPS"],
+//                                        ["Growth of net income % of revenue", "Revenue"],
+//                                        ["Growth of profit % of revenue", "Revenue"],
+//                                        ["Growth of LT debt % of net income", "Net income"]
+//                                    ],
+//                                    [
+//                                        ["Growth of return on equity"],
+//                                        ["Growth of return on assets"],
+//                                        ["Growth of LT debt % of equity + ret. earnings", "equity + ret. earnings"]
+//
+//                                    ],
+//                                    [
+//                                        ["Growth of SGA % of profit", "Profit"],
+//                                        ["Growth of R&D % of profit", "Profit"]
+//                                    ]
+//    ]
  
     
     //MARK: - init
@@ -71,7 +72,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         else {
             self.valuation = WBValuationController.createWBValuation(company: stock.symbol)
         }
-        
+                
         rowTitles = buildRowTitles()
     }
     
@@ -337,7 +338,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         downloader = WebDataDownloader(stock: stock, delegate: self)
         downloader?.macroTrendsDownload(pageTitles: webPageNames)
         downloadTasks = webPageNames.count
-
     }
     
     public func stopDownload() {
@@ -351,9 +351,57 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         downloader?.webView = nil
         downloader = nil
     }
+    
+    func returnUserEvaluation(for parameter: String) -> UserEvaluation? {
+        
+        let storedEvaluations = valuation?.userEvaluations
+        if storedEvaluations?.count ?? 0 != 0 {
+            
+            for element in storedEvaluations! {
+                if let evaluation = element as? UserEvaluation {
+                    if evaluation.wbvParameter == parameter { return evaluation }
+                }
+            }
+        }
 
+        return addUserEvaluation(for: parameter)
+    }
+    
+    func addUserEvaluation(for parameter: String) -> UserEvaluation? {
+        
+        guard let newValuation = {
+            NSEntityDescription.insertNewObject(forEntityName: "UserEvaluation", into: managedObjectContext) as? UserEvaluation
+        }() else { return nil }
+         
+        newValuation.stock = stock.symbol
+        newValuation.wbvParameter = parameter
+        valuation?.addToUserEvaluations(newValuation)
+        
+        do {
+            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+        } catch {
+            let error = error
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
+        }
 
+        return newValuation
+
+    }
+    
 }
+
+extension WBValuationController: RatingButtonDelegate {
+    
+    func updateRating(rating: Int, parameter: String) {
+        
+        for element in valuation?.userEvaluations ?? [] {
+            if let evaluation = element as? UserEvaluation {
+                evaluation.rating = Int16(rating)
+            }
+        }
+    }
+    
+ }
 
 extension WBValuationController: DataDownloaderDelegate {
     

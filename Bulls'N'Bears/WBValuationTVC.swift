@@ -188,9 +188,14 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         if let destination = segue.destination as? ValueListTVC {
             
             destination.loadViewIfNeeded()
+            
             destination.controller = controller
-            destination.sectionTitles.append(contentsOf: controller.valueListTVCSectionTitles[selectedPath.section-1][selectedPath.row])
+            let titles = controller.wbvParameters.structuredTitlesParameters()[selectedPath.section-1][selectedPath.row]
+            destination.sectionTitles.append(contentsOf: titles)
             destination.cellLegendTitles = controller.valueListChartLegendTitles[selectedPath.section-1][selectedPath.row]
+            
+            destination.userEvaluation = controller.returnUserEvaluation(for: titles.first ?? "missing")
+            
             var arrays: [[Double]?]?
             
             if selectedPath.section == 1 {
@@ -203,7 +208,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     arrays = [controller.valuation?.eps ?? []]
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapWithPence
-                    destination.gradingLimits = [10.0, 40.0]
+//                    destination.gradingLimits = [10.0, 40.0]
                 }
                 else if selectedPath.row == 2 {
                     arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.revenue ?? []]
@@ -211,7 +216,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.netIncomeProportion()
                     destination.proportions = margins
-                    destination.gradingLimits = [0.2,0.1]
+//                    destination.gradingLimits = [0.2,0.1]
                 }
                 else if selectedPath.row == 3 {
                     arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
@@ -219,7 +224,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.grossProfitMargins()
                     destination.proportions = margins
-                    destination.gradingLimits = [0.4,0.2]
+//                    destination.gradingLimits = [0.4,0.2]
                 }
                 else if selectedPath.row == 4 {
                     arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
@@ -227,7 +232,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.longtermDebtProportion()
                     destination.proportions = margins
-                    destination.gradingLimits = [3.0,4.0]
+//                    destination.gradingLimits = [3.0,4.0]
                 }
                 
             }
@@ -256,7 +261,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.sgaProportion()
                     destination.proportions = margins
-                    destination.gradingLimits = [0.3,0.9]
+//                    destination.gradingLimits = [0.3,0.9]
                 }
                 else if selectedPath.row == 1 {
                     arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
@@ -264,7 +269,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.rAndDProportion()
                     destination.proportions = margins
-                    destination.gradingLimits = nil
+//                    destination.gradingLimits = nil
                 }
 
             }

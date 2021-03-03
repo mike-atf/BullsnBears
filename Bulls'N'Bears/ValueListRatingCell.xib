@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -15,9 +16,56 @@
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                 <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="t1e-YL-Fo3" customClass="WBVRatingButton" customModule="Bulls_N_Bears" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="22"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6az-g4-SAE">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="22"/>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="6az-g4-SAE" firstAttribute="leading" secondItem="t1e-YL-Fo3" secondAttribute="leading" id="6xz-1Z-v6C"/>
+                            <constraint firstItem="6az-g4-SAE" firstAttribute="top" secondItem="t1e-YL-Fo3" secondAttribute="top" id="Vha-qR-vTJ"/>
+                            <constraint firstAttribute="trailing" secondItem="6az-g4-SAE" secondAttribute="trailing" id="Xqn-9r-UIO"/>
+                            <constraint firstAttribute="bottom" secondItem="6az-g4-SAE" secondAttribute="bottom" id="wYf-A3-cBh"/>
+                        </constraints>
+                        <connections>
+                            <outlet property="stackView" destination="6az-g4-SAE" id="RHI-xa-aIT"/>
+                        </connections>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CQ5-K3-ekj">
+                        <rect key="frame" x="142.5" y="29.5" width="35.5" height="17"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="CQ5-K3-ekj" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="MA6-Jy-oNt"/>
+                    <constraint firstItem="CQ5-K3-ekj" firstAttribute="firstBaseline" secondItem="t1e-YL-Fo3" secondAttribute="baseline" constant="21" symbolType="layoutAnchor" id="X1X-IQ-G66"/>
+                </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <constraints>
+                <constraint firstItem="njF-e1-oar" firstAttribute="top" secondItem="t1e-YL-Fo3" secondAttribute="top" id="4e4-cl-hUJ"/>
+                <constraint firstItem="njF-e1-oar" firstAttribute="trailing" secondItem="t1e-YL-Fo3" secondAttribute="trailing" id="ls5-kP-G90"/>
+                <constraint firstItem="t1e-YL-Fo3" firstAttribute="leading" secondItem="njF-e1-oar" secondAttribute="leading" id="pow-hV-QhB"/>
+                <constraint firstItem="t1e-YL-Fo3" firstAttribute="height" secondItem="njF-e1-oar" secondAttribute="height" multiplier="0.5" id="wiT-gg-mgh"/>
+            </constraints>
+            <connections>
+                <outlet property="label" destination="CQ5-K3-ekj" id="CoP-3J-tuV"/>
+                <outlet property="ratingButton" destination="t1e-YL-Fo3" id="Ewd-32-QCl"/>
+                <outlet property="stackView" destination="6az-g4-SAE" id="aAz-vp-ge3"/>
+                <outlet property="textLabel" destination="CQ5-K3-ekj" id="z7q-vU-M5X"/>
+            </connections>
             <point key="canvasLocation" x="81" y="82"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

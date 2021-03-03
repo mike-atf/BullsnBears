@@ -247,20 +247,20 @@ public class WBValuation: NSManagedObject {
          guard let stock = stocks.filter({ (stock) -> Bool in
             stock.symbol == company
          }).first else {
-            return (nil, ["no stock data available for \(company)"])
+            return (nil, ["no stock data available for \(company!)"])
          }
         
         guard let price = stock.dailyPrices.last?.close else {
-            return (nil, ["no current price available for \(company)"])
+            return (nil, ["no current price available for \(company!)"])
         }
         
         guard price > 0 else {
-            return (nil, ["current price for \(company) = 0"])
+            return (nil, ["current price for \(company!) = 0"])
         }
               
         
         guard peRatio > 0 else {
-            return (nil, ["P/E ratio for \(company) is negative \(peRatio)"])
+            return (nil, ["P/E ratio for \(company!) is negative \(peRatio)"])
         }
         
         var errors = [String]()

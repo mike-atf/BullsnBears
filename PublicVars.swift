@@ -98,6 +98,48 @@ enum TrendTimeOption {
     case month
 }
 
+struct WBVParameters {
+    let retEarningsGrowth = "Growth of retained earnings"
+    let epsGrowth = "EPS"
+    let incomeOfRevenueGrowth = "Growth of net income % of revenue"
+    let profitOfRevenueGrowth = "Growth of profit % of revenue"
+    let debtOfIncomeGrowth = "Growth of LT debt % of net income"
+    let roeGrowth = "Growth of return on equity"
+    let roaGrowth = "Growth of return on assets"
+    let debtOfEqAndRtEarningsGrowth = "Growth of LT debt % of equity + ret. earnings"
+    let sgaOfProfitGrowth = "Growth of SGA % of profit"
+    let rAdOfProfitGrowth = "Growth of R&D % of profit"
+    
+    func allParameters() -> [String] {
+        return [retEarningsGrowth, epsGrowth, incomeOfRevenueGrowth, profitOfRevenueGrowth, debtOfIncomeGrowth, roeGrowth, roaGrowth ,debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth ,rAdOfProfitGrowth]
+    }
+    
+    func structuredTitlesParameters() -> [[[String]]] {
+        return [firstSection(), secondSection(), thirdSection()]
+    }
+    
+    func firstSection() -> [[String]] {
+        return [[retEarningsGrowth],
+                [epsGrowth],
+                [incomeOfRevenueGrowth, "Revenue"],
+                [profitOfRevenueGrowth, "Revenue"],
+                [debtOfIncomeGrowth, "Net income"]]
+    }
+    
+    func secondSection() -> [[String]] {
+        return [[roeGrowth],
+                [roaGrowth],
+                [debtOfEqAndRtEarningsGrowth, "equity + ret. earnings"]]
+    }
+    
+    func thirdSection() -> [[String]] {
+        return [[sgaOfProfitGrowth, "Profit"],
+                [rAdOfProfitGrowth, "Profit"]]
+    }
+
+
+}
+
 struct UserDefaultTerms {
     let longTermCoporateInterestRate = "LongTermCoporateInterestRate"
     let treasuryBondRate = "10YUSTreasuryBondRate"

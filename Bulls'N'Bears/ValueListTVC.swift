@@ -18,7 +18,7 @@ class ValueListTVC: UITableViewController {
     var trendToDisplay: Double?
     var mostRecentYear: Int!
     var proportions: [Double]?
-//    var gradingLimits: [Double]? // first = good, // second = moderate // third = bad
+    var userEvaluation: UserEvaluation?
     var gapErrors: [String]?
     var cellLegendTitles = [String]()
     
@@ -33,7 +33,6 @@ class ValueListTVC: UITableViewController {
         let dateComponents = Calendar.current.dateComponents(components, from: Date())
         mostRecentYear = dateComponents.year! - 1
         
-
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -63,7 +62,7 @@ class ValueListTVC: UITableViewController {
         
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListRatingCell", for: indexPath) as! ValueListRatingCell
-
+            cell.configure(rating: 0, ratingUpdateDelegate: controller, parameter: userEvaluation?.wbvParameter ?? "missing")
             return cell
         }
         else if indexPath.section == 1 {
@@ -75,10 +74,10 @@ class ValueListTVC: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
             if indexPath.section == 2 {
 
-                cell.configure(values1: values?[indexPath.section], values2: proportions, rightTitle: cellLegendTitles[1], leftTitle: cellLegendTitles.first)
+                cell.configure(values1: values?[indexPath.section-2], values2: proportions, rightTitle: cellLegendTitles[1], leftTitle: cellLegendTitles.first)
             }
             else {
-                cell.configure(values1: values?[indexPath.section], values2: nil, rightTitle: sectionTitles.last, leftTitle: nil)
+                cell.configure(values1: values?[indexPath.section-2], values2: nil, rightTitle: sectionTitles.last, leftTitle: nil)
             }
             
             return cell
@@ -91,38 +90,9 @@ class ValueListTVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-            return 300
+        if indexPath.section == 0 { return 70 }
+        else if indexPath.section == 1 { return 100 }
+        else { return 300 }
     }
 
-    
-//    private func detailColor(value: Double?) -> UIColor? {
-//
-//        guard let validvalue = value else {
-//            return nil
-//        }
-//
-//        guard gradingLimits != nil else {
-//            return nil
-//        }
-//
-//        guard gradingLimits!.count == 2 else {
-//            return nil
-//        }
-//
-//        if gradingLimits!.first! < gradingLimits!.last! {
-//            // smaller values are graded better
-//            if validvalue < gradingLimits!.first! { return UIColor(named: "Green") }
-//            else if validvalue > gradingLimits!.last! { return UIColor(named: "Red") }
-//            else { return UIColor.systemYellow }
-//        }
-//        else {
-//            // larger values are graded better
-//            if validvalue > gradingLimits!.first! { return UIColor(named: "Green") }
-//            else if validvalue < gradingLimits!.last! { return UIColor(named: "Red") }
-//            else { return UIColor.systemYellow }
-//        }
-//
-//    }
-
 }
-
