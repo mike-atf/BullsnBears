@@ -7,18 +7,12 @@
 
 import UIKit
 
-//protocol WBValuationListDelegate: NSObject {
-//    func sendArrayForDisplay(array: [Double]?)
-//    func removeValueChart()
-//}
-
 class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     var downloadButton: UIBarButtonItem!
     var controller: WBValuationController!
     var stock: Stock!
     var progressView: DownloadProgressView?
-//    weak var chartDelegate: WBValuationListDelegate!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +23,11 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         self.navigationController?.title = stock.name_short
         tableView.register(UINib(nibName: "WBValuationCell", bundle: nil), forCellReuseIdentifier: "wbValuationCell")
         
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshRow(notification:)), name: NSNotification.Name(rawValue: "refreshWBValuationTVCRow"), object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Table view data source
@@ -47,8 +46,14 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "wbValuationCell", for: indexPath) as! WBValuationCell
 
         let (value$, color, errors) = controller.value$(path: indexPath)
-        
-        cell.configure(title: controller.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self)
+        let evaluation = controller.userEvaluation(for: indexPath)
+        var correlation: Correlation?
+        if let arrays = arraysForValueListTVC(indexPath: indexPath) {
+            let proportions = controller.valueListTVCProportions(values: arrays)
+            let sendArrays = [arrays[0], proportions]
+            correlation = Calculator.valueChartCorrelation(arrays:sendArrays)
+        }
+        cell.configure(title: controller.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self, userEvaluation: evaluation, correlation: correlation)
         
         if indexPath.section == 0 {
             cell.accessoryType = .none
@@ -114,33 +119,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         subTitle.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
         subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
         
-//        if section == 0 {
-//            let donwloadButton = UIButton()
-//            donwloadButton.setBackgroundImage(UIImage(systemName: "icloud.and.arrow.down.fill"), for: .normal)
-//            donwloadButton.addTarget(self, action: #selector(downloadValuationData), for: .touchUpInside)
-//            donwloadButton.translatesAutoresizingMaskIntoConstraints = false
-//            header.addSubview(donwloadButton)
-//
-//            donwloadButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-//            donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-//            donwloadButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
-//            donwloadButton.widthAnchor.constraint(equalTo: donwloadButton.heightAnchor).isActive = true
-//
-//        }
-        
-//        if section == (sectionTitles?.count ?? 0) - 1 {
-//            let saveButton = UIButton()
-//            saveButton.setBackgroundImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
-//            saveButton.addTarget(self, action: #selector(saveValuation), for: .touchUpInside)
-//            saveButton.translatesAutoresizingMaskIntoConstraints = false
-//            header.addSubview(saveButton)
-//
-//            saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-//            saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-//            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
-//            saveButton.widthAnchor.constraint(equalTo: saveButton.heightAnchor).isActive = true
-//        }
-
         return header
         
     }
@@ -163,6 +141,13 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         progressView?.title.text = "Public data download..."
 
         controller.downloadWBValuationData()
+    }
+    
+    @objc
+    func refreshRow(notification: Notification) {
+        if let indexPath = notification.object as? IndexPath {
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -190,94 +175,123 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             destination.loadViewIfNeeded()
             
             destination.controller = controller
+            destination.indexPath = selectedPath
             let titles = controller.wbvParameters.structuredTitlesParameters()[selectedPath.section-1][selectedPath.row]
             destination.sectionTitles.append(contentsOf: titles)
             destination.cellLegendTitles = controller.valueListChartLegendTitles[selectedPath.section-1][selectedPath.row]
             
-            destination.userEvaluation = controller.returnUserEvaluation(for: titles.first ?? "missing")
-            
-            var arrays: [[Double]?]?
+            let arrays = arraysForValueListTVC(indexPath: selectedPath)
             
             if selectedPath.section == 1 {
                 if selectedPath.row == 0 {
-                    arrays = [controller.valuation?.equityRepurchased ?? []]
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                 }
                 else if selectedPath.row == 1 {
-                    arrays = [controller.valuation?.eps ?? []]
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapWithPence
-//                    destination.gradingLimits = [10.0, 40.0]
                 }
                 else if selectedPath.row == 2 {
-                    arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.revenue ?? []]
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.netIncomeProportion()
                     destination.proportions = margins
-//                    destination.gradingLimits = [0.2,0.1]
                 }
                 else if selectedPath.row == 3 {
-                    arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.grossProfitMargins()
                     destination.proportions = margins
-//                    destination.gradingLimits = [0.4,0.2]
                 }
                 else if selectedPath.row == 4 {
-                    arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.longtermDebtProportion()
                     destination.proportions = margins
-//                    destination.gradingLimits = [3.0,4.0]
+                    destination.higherGrowthIsBetter = false
                 }
-                
             }
             else if selectedPath.section == 2 {
                 if selectedPath.row == 0 {
-                    arrays = [controller.valuation?.roe ?? []]
                     destination.values = arrays
                     destination.formatter = percentFormatter0Digits
                 }
                 else if selectedPath.row == 1 {
-                    arrays = [controller.valuation?.roa ?? []]
                     destination.values = arrays
                     destination.formatter = percentFormatter0Digits
                 }
                 else if selectedPath.row == 2 {
-                    let (shEquityWithRetEarnings, _) = controller.valuation!.addElements(array1: controller.valuation?.shareholdersEquity ?? [], array2: controller.valuation!.equityRepurchased ?? [])
-                    arrays = [controller.valuation?.debtLT ?? [], shEquityWithRetEarnings]
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
+                    destination.higherGrowthIsBetter = false
                 }
             }
             else if selectedPath.section == 3 {
                 if selectedPath.row == 0 {
-                    arrays = [controller.valuation?.sgaExpense ?? [], controller.valuation?.grossProfit ?? []]
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.sgaProportion()
                     destination.proportions = margins
-//                    destination.gradingLimits = [0.3,0.9]
+                    destination.higherGrowthIsBetter = false
+                    
                 }
                 else if selectedPath.row == 1 {
-                    arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, errors) = controller.valuation!.rAndDProportion()
                     destination.proportions = margins
-//                    destination.gradingLimits = nil
+                    destination.higherGrowthIsBetter = false
                 }
-
             }
-            
         }
         
     }
 
+    func arraysForValueListTVC(indexPath: IndexPath) -> [[Double]?]? {
+        
+        var arrays:[[Double]?]?
+        
+        if indexPath.section == 1 {
+            if indexPath.row == 0 {
+                arrays = [controller.valuation?.equityRepurchased ?? []]
+            }
+            else if indexPath.row == 1 {
+                arrays = [controller.valuation?.eps ?? []]
+            }
+            else if indexPath.row == 2 {
+                arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.revenue ?? []]
+            }
+            else if indexPath.row == 3 {
+                arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
+            }
+            else if indexPath.row == 4 {
+                arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
+            }
+        }
+        else if indexPath.section == 2 {
+            if indexPath.row == 0 {
+                arrays = [controller.valuation?.roe ?? []]
+            }
+            else if indexPath.row == 1 {
+                arrays = [controller.valuation?.roa ?? []]
+            }
+            else if indexPath.row == 2 {
+                let (shEquityWithRetEarnings, _) = controller.valuation!.addElements(array1: controller.valuation?.shareholdersEquity ?? [], array2: controller.valuation!.equityRepurchased ?? [])
+                arrays = [controller.valuation?.debtLT ?? [], shEquityWithRetEarnings]
+            }
+        }
+        else if indexPath.section == 3 {
+            if indexPath.row == 0 {
+                arrays = [controller.valuation?.sgaExpense ?? [], controller.valuation?.grossProfit ?? []]
+            }
+            else if indexPath.row == 1 {
+                arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
+            }
+        }
+
+       return arrays
+
+    }
     
     func progressUpdate(allTasks: Int, completedTasks: Int) {
         self.progressView?.updateProgress(tasks: allTasks, completed: completedTasks)

@@ -127,6 +127,9 @@ class ValueChart: UIView {
         }
         
         
+        trend = Calculator.valueChartCorrelation(arrays: [array1 ?? [], array2 ?? []])
+        
+        /*
         if array2?.count ?? 0 > 1 {
             // proportions - calculate trend of proportions
             
@@ -138,7 +141,8 @@ class ValueChart: UIView {
             }
 
             trend = Calculator.correlation(xArray: years, yArray: array2?.reversed())
-        } else if array1?.count ?? 0 > 1 {
+        }
+        else if array1?.count ?? 0 > 1 {
             // values only, no proportions - calculate values trend
             
             var years = [Double]()
@@ -150,6 +154,7 @@ class ValueChart: UIView {
 
             trend = Calculator.correlation(xArray: years, yArray: array1?.reversed())
         }
+        */
     }
     
     override func draw(_ rect: CGRect) {
@@ -317,17 +322,17 @@ class ValueChart: UIView {
             var r2$ = String()
             var growth$ = String()
             let r2 = trend.r2()
-            let growth = trend.meanGrowth(for: Double(xAxisLabels.count))
-            if r2 != nil{
-                r2$ = percentFormatter0Digits.string(from: r2! as NSNumber) ?? ""
-                if r2! > 0.64 {
-                    growth$ = percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? ""
-                }
-                else {
-                    growth$ = "high volatility (" + (percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? "") + ")"
+            if let growth = trend.meanGrowth(for: Double(xAxisLabels.count)) {
+                if r2 != nil{
+                    r2$ = percentFormatter0Digits.string(from: r2! as NSNumber) ?? ""
+                    if r2! > 0.64 {
+                        growth$ = percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? ""
+                    }
+                    else {
+                        growth$ = "high volatility (" + (percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? "") + ")"
+                    }
                 }
             }
-                        
             trendlabel.font = UIFont.preferredFont(forTextStyle: .footnote)
             trendlabel.numberOfLines = 0
 

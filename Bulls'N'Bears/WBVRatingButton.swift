@@ -19,96 +19,99 @@ class WBVRatingButton: UIView {
     var wbvParameter: String!
     var delegate: RatingButtonDelegate!
     var oneTapRecognizer: UITapGestureRecognizer!
-    var doubleTapRecognizer: UITapGestureRecognizer!
-    var filledStars: [UIImage]!
-    var emptyStars: [UIImage]!
-    var emptyColor = UIColor.systemGray
-    var allStars: [UIImageView]!
+    var allStars:[UIImageView]!
     var starColor: UIColor!
+    var higherIsBetter: Bool!
+    weak var cell: ValueListRatingCell?
     
-    func configure(rating: Int, delegate: RatingButtonDelegate, parameter: String) {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        oneTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
+        addGestureRecognizer(oneTapRecognizer)
+        
+        rating = 0
+        
+        allStars = [UIImageView]()
+        
+        starColor = UIColor.systemGray
+        updateStackView()
+
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        oneTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
+        addGestureRecognizer(oneTapRecognizer)
+        
+        rating = 0
+        
+        allStars = [UIImageView]()
+        
+        starColor = UIColor.systemGray
+        higherIsBetter = true
+        updateStackView()
+
+    }
+
+    
+    func configure(rating: Int, delegate: RatingButtonDelegate, parameter: String, cell: ValueListRatingCell) {
         
         self.rating = rating
         self.delegate = delegate
         self.wbvParameter = parameter
+        self.cell = cell
         
-        oneTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
-        doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(doubleTap))
-        doubleTapRecognizer.numberOfTapsRequired = 2
-        addGestureRecognizer(oneTapRecognizer)
-        addGestureRecognizer(doubleTapRecognizer)
-        filledStars = [UIImage]()
-        emptyStars = [UIImage]()
-        
-        for _ in 0..<rating {
-            filledStars.append(UIImage.init(systemName: "star.fill")!)
-        }
-        for _ in rating...10 {
-            emptyStars.append(UIImage.init(systemName: "star")!)
-        }
-        
-        allStars = [UIImageView]()
-        stackView.distribution = .fillEqually
-        stackView.spacing = 0.2 * stackView.frame.width / CGFloat(allStars.count)
+        higherIsBetter = WBVParameters().isHigherBetter(for: parameter)
 
-        starColor = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: Double(rating))
+        starColor = GradientColorFinder.cleanRatingColor(for: rating, higherIsBetter: higherIsBetter)// GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: Double(rating))
+        setNeedsDisplay()
     }
+    
 
     override func draw(_ rect: CGRect) {
         
-//
-//        let starCount = CGFloat(emptyStars.count + filledStars.count)
-//        let margins = layoutMarginsGuide
-//        let gapWidth: CGFloat = 0.25 // of slotWidth
-//        let starSlotWidth = (rect.width / CGFloat(starCount + (starCount + 1) * gapWidth))
-//
-//
-            updateStackView()
+        updateStackView()
+    
+        for star in allStars {
+            stackView.addArrangedSubview(star)
+        }
     }
     
     @objc
     func singleTap() {
-        guard rating < 11 else { return }
         
         rating += 1
-        filledStars.append(UIImage.init(systemName: "star.fill")!)
-        emptyStars = emptyStars.dropLast(1)
-        starColor = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: Double(rating))
-        delegate.updateRating(rating: rating, parameter: wbvParameter)
-    }
-    
-    @objc
-    func doubleTap() {
-        guard rating > -1 else { return }
-        
-        rating -= 1
-        emptyStars.append(UIImage.init(systemName: "star")!)
-        filledStars = filledStars.dropLast(1)
-        starColor = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: Double(rating))
-        delegate.updateRating(rating: rating, parameter: wbvParameter)
+        if rating > 10 {
+            rating -= 11
+        }
 
+        starColor = GradientColorFinder.cleanRatingColor(for: rating, higherIsBetter: higherIsBetter) // GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: Double(rating), greenCutoff: 9, redCutOff: 1)
+        delegate.updateRating(rating: rating, parameter: wbvParameter)
+        self.setNeedsDisplay()
+        cell?.updateText(rating: rating)
     }
-    
+        
     private func updateStackView() {
+        
         for star in allStars {
             star.removeFromSuperview()
         }
         allStars.removeAll()
         
-        for empty in emptyStars {
-            let view = UIImageView(image: empty)
+        for _ in 0..<rating {
+            let view = UIImageView(image: UIImage.init(systemName: "star.fill")!)
+            view.tintColor = starColor
             allStars.append(view)
         }
         
-        for filled in filledStars {
-            let view = UIImageView(image: filled)
+        for _ in rating..<10 {
+            let view = UIImageView(image: UIImage.init(systemName: "star")!)
+            view.tintColor = UIColor.systemGray
             allStars.append(view)
         }
-//
-//        for star in allStars {
-//            stackView.addArrangedSubview(star)
-//            stackView.distribution = .fillEqually
-//        }
+        
     }
 
 

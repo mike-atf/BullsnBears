@@ -99,6 +99,8 @@ enum TrendTimeOption {
 }
 
 struct WBVParameters {
+    // when adding new parameter check impact in WBVValuationController and WBVValuationTVC and ValueListTVC
+    // also adapt 'higherIsBetter' parameter in UserEvaluation
     let retEarningsGrowth = "Growth of retained earnings"
     let epsGrowth = "EPS"
     let incomeOfRevenueGrowth = "Growth of net income % of revenue"
@@ -137,6 +139,21 @@ struct WBVParameters {
                 [rAdOfProfitGrowth, "Profit"]]
     }
 
+    /// all other WBVParameters have highIsBetter
+    func higherIsWorseParameters() -> [String] {
+        return [debtOfIncomeGrowth, debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth, rAdOfProfitGrowth]
+    }
+    
+    func isHigherBetter(for parameter: String) -> Bool {
+        
+        for term in higherIsWorseParameters() {
+            if parameter == term {
+                return false
+            }
+        }
+
+        return true
+    }
 
 }
 
@@ -300,29 +317,38 @@ struct Correlation {
     var incline = Double()
     var yIntercept = Double()
     var coEfficient = Double()
+    var xElements = Int()
     
-    init(m: Double, b: Double, r: Double) {
+    init(m: Double, b: Double, r: Double, xElements: Int) {
         self.incline = m
         self.yIntercept = b
         self.coEfficient = r
+        self.xElements = xElements
     }
     
     /// increase/ decline in % from yIntercept to endpoint using timeInterval as x-axis
-    public func meanGrowth(for xElements: Double) -> Double {
-        let endPoint = incline * xElements + yIntercept
-        let change = (endPoint - yIntercept) / abs(yIntercept)
+    public func meanGrowth(for xElements: Double?=nil) -> Double? {
         
-        return change / xElements
+        guard (xElements ?? Double(self.xElements)) > 0 else {
+            return nil
+        }
+        
+        let intercept = (yIntercept != 0) ? yIntercept : 1
+        
+        let endPoint = incline * (xElements ?? Double(self.xElements)) + yIntercept
+        let change = (endPoint - yIntercept) / abs(intercept)
+        
+        return change / (xElements ?? Double(self.xElements))
     }
     
-    public func compoundGrowthRate(for xElements: Double) -> Double {
+    public func compoundGrowthRate(for xElements: Double?=nil) -> Double {
         
-        let endPoint = incline * xElements + yIntercept
-        return (pow((endPoint/yIntercept), (1/(xElements-1)))-1)
+        let endPoint = incline * (xElements ?? Double(self.xElements)) + yIntercept
+        return (pow((endPoint/yIntercept), (1/((xElements ?? Double(self.xElements))-1)))-1)
     }
     
-    public func endValue(for xElements: Double) -> Double {
-        return yIntercept + xElements * incline
+    public func endValue(for xElements: Double?=nil) -> Double {
+        return yIntercept + (xElements ?? Double(self.xElements)) * incline
     }
     
     public func r2() -> Double? {

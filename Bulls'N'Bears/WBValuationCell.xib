@@ -11,10 +11,10 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="wbValuationCell" id="KGk-i7-Jjw" customClass="WBValuationCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <rect key="frame" x="0.0" y="0.0" width="514" height="44"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="293" height="44"/>
+                <rect key="frame" x="0.0" y="0.0" width="483" height="44"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KDU-EY-7DQ">
@@ -24,7 +24,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q5Z-L5-pk0">
-                        <rect key="frame" x="263" y="13" width="20" height="18"/>
+                        <rect key="frame" x="459.5" y="13" width="20.5" height="18"/>
                         <color key="tintColor" systemColor="systemYellowColor"/>
                         <state key="normal" backgroundImage="exclamationmark.triangle" catalog="system"/>
                         <connections>
@@ -32,8 +32,28 @@
                         </connections>
                     </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uoj-Dx-7bk">
-                        <rect key="frame" x="213" y="11.5" width="42" height="21"/>
+                        <rect key="frame" x="415.5" y="11.5" width="42" height="21"/>
                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" image="star.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="kKl-qt-iSX">
+                        <rect key="frame" x="284.5" y="6" width="35" height="31"/>
+                        <color key="tintColor" systemColor="systemGrayColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="kKl-qt-iSX" secondAttribute="height" multiplier="8:7" id="aaV-xi-lY1"/>
+                        </constraints>
+                    </imageView>
+                    <view contentMode="scaleToFill" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="KjS-uh-uUV" customClass="TrendIconView" customModule="Bulls_N_Bears" customModuleProvider="target">
+                        <rect key="frame" x="329.5" y="6.5" width="34.5" height="31"/>
+                        <color key="backgroundColor" systemColor="systemGrayColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="KjS-uh-uUV" secondAttribute="height" multiplier="29:26" id="i20-0I-csc"/>
+                        </constraints>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ytK-8O-sV5">
+                        <rect key="frame" x="295" y="16" width="13.5" height="14.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -41,25 +61,43 @@
                 <constraints>
                     <constraint firstItem="Q5Z-L5-pk0" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.454545" id="1lx-er-B0f"/>
                     <constraint firstItem="KDU-EY-7DQ" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="6yT-Ua-w3a"/>
-                    <constraint firstAttribute="trailing" secondItem="Q5Z-L5-pk0" secondAttribute="trailing" constant="10" id="A1M-YN-AXC"/>
+                    <constraint firstAttribute="trailing" secondItem="Q5Z-L5-pk0" secondAttribute="trailing" constant="3" id="A1M-YN-AXC"/>
                     <constraint firstItem="Q5Z-L5-pk0" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="JUs-AB-3sn"/>
+                    <constraint firstItem="ytK-8O-sV5" firstAttribute="centerX" secondItem="kKl-qt-iSX" secondAttribute="centerX" id="PjB-Wn-wbU"/>
                     <constraint firstItem="KDU-EY-7DQ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="RVY-Se-5L5"/>
-                    <constraint firstItem="uoj-Dx-7bk" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="KDU-EY-7DQ" secondAttribute="trailing" constant="10" id="TVA-oH-KYs"/>
-                    <constraint firstItem="Q5Z-L5-pk0" firstAttribute="leading" secondItem="uoj-Dx-7bk" secondAttribute="trailing" constant="8" symbolic="YES" id="lan-6p-fJZ"/>
+                    <constraint firstItem="kKl-qt-iSX" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="KDU-EY-7DQ" secondAttribute="trailing" constant="5" id="WZJ-ZY-y84"/>
+                    <constraint firstItem="KjS-uh-uUV" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.7" id="agE-tm-Mlp"/>
+                    <constraint firstItem="kKl-qt-iSX" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" multiplier="1.25" id="bUE-0L-i4r"/>
+                    <constraint firstItem="ytK-8O-sV5" firstAttribute="centerY" secondItem="kKl-qt-iSX" secondAttribute="centerY" multiplier="1.05" id="j3m-dK-Wvw"/>
+                    <constraint firstItem="Q5Z-L5-pk0" firstAttribute="leading" secondItem="uoj-Dx-7bk" secondAttribute="trailing" constant="2" id="lan-6p-fJZ"/>
+                    <constraint firstItem="KjS-uh-uUV" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="qkh-UO-quK"/>
                     <constraint firstItem="uoj-Dx-7bk" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="uPf-dP-orn"/>
+                    <constraint firstItem="KjS-uh-uUV" firstAttribute="leading" secondItem="kKl-qt-iSX" secondAttribute="trailing" constant="10" id="xrw-gC-JJg"/>
+                    <constraint firstItem="uoj-Dx-7bk" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="KjS-uh-uUV" secondAttribute="trailing" constant="5" id="yD3-Tw-7Ye"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <constraints>
+                <constraint firstItem="kKl-qt-iSX" firstAttribute="height" secondItem="njF-e1-oar" secondAttribute="height" multiplier="0.7" id="ou5-0F-39t"/>
+                <constraint firstItem="kKl-qt-iSX" firstAttribute="centerY" secondItem="njF-e1-oar" secondAttribute="centerY" id="tJa-ar-y5q"/>
+            </constraints>
             <connections>
                 <outlet property="detail" destination="uoj-Dx-7bk" id="SPy-r9-FMj"/>
                 <outlet property="infoButton" destination="Q5Z-L5-pk0" id="AmN-Qv-G7R"/>
+                <outlet property="ratingLabel" destination="ytK-8O-sV5" id="eCp-dB-Fjk"/>
+                <outlet property="starView" destination="kKl-qt-iSX" id="cki-YO-530"/>
                 <outlet property="title" destination="KDU-EY-7DQ" id="7lV-lS-40X"/>
+                <outlet property="trendIcon" destination="KjS-uh-uUV" id="U42-CJ-SZD"/>
             </connections>
-            <point key="canvasLocation" x="-486" y="-49"/>
+            <point key="canvasLocation" x="-346.37681159420293" y="-49.553571428571423"/>
         </tableViewCell>
     </objects>
     <resources>
         <image name="exclamationmark.triangle" catalog="system" width="128" height="112"/>
+        <image name="star.fill" catalog="system" width="128" height="116"/>
+        <systemColor name="systemGrayColor">
+            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

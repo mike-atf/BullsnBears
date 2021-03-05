@@ -10,7 +10,8 @@ import UIKit
 class ValueListTVC: UITableViewController {
 
     var values: [[Double]?]?
-    var sectionTitles = ["Rating","Evaluation notes"]
+    var higherGrowthIsBetter = true
+    var sectionTitles = ["Your Rating (keep tapping the stars)","Your evaluation notes"]
     var rowTitles = [String]()
     var formatter: NumberFormatter!
     weak var controller: WBValuationController!
@@ -18,9 +19,9 @@ class ValueListTVC: UITableViewController {
     var trendToDisplay: Double?
     var mostRecentYear: Int!
     var proportions: [Double]?
-    var userEvaluation: UserEvaluation?
     var gapErrors: [String]?
     var cellLegendTitles = [String]()
+    var indexPath: IndexPath!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,16 +37,14 @@ class ValueListTVC: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        if values?.count ?? 0 > 1 {
-            proportions = Calculator.proportions(array1: values?.first!, array0: values?.last!)
-        }
-        else {
-            if let array1 = values!.first {
-                proportions = array1?.growthRates()
-            }
-        }
-    }
         
+        proportions = controller.valueListTVCProportions(values: values)
+   }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "refreshWBValuationTVCRow"), object: indexPath, userInfo: nil)
+    }
+           
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -62,12 +61,17 @@ class ValueListTVC: UITableViewController {
         
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListRatingCell", for: indexPath) as! ValueListRatingCell
-            cell.configure(rating: 0, ratingUpdateDelegate: controller, parameter: userEvaluation?.wbvParameter ?? "missing")
+            let parameter = sectionTitles[2] // ! careful. This assumes the first two sectionsTitles are '["Your Rating (keep tapping the stars)","Your evaluation notes"]' to which the parameter and more are appended in WBValuationController prepareForSegue()
+            let userEvaluation = controller.returnUserEvaluation(for: parameter)
+            cell.configure(rating: Int(userEvaluation?.rating ?? 0), ratingUpdateDelegate: controller, parameter: userEvaluation?.wbvParameter ?? "missing", reverseRatingOrder: !higherGrowthIsBetter)
             return cell
         }
         else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListTextEntryCell", for: indexPath) as! ValueListTextEntryCell
-
+            let parameter = sectionTitles[2] // ! careful. This assumes the first two sectionsTitles are '["Your Rating (keep tapping the stars)","Your evaluation notes"]' to which the parameter and more are appended in WBValuationController prepareForSegue()
+            let userEvaluation = controller.returnUserEvaluation(for: parameter)
+            cell.configure(text: userEvaluation?.comment, delegate: controller, wbvParameter: userEvaluation?.wbvParameter ?? "missing")
+            
             return cell
         }
         else {
@@ -90,8 +94,8 @@ class ValueListTVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 { return 70 }
-        else if indexPath.section == 1 { return 100 }
+        if indexPath.section == 0 { return 100 }
+        else if indexPath.section == 1 { return 120 }
         else { return 300 }
     }
 

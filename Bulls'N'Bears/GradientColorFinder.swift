@@ -51,4 +51,22 @@ class GradientColorFinder: NSObject {
     class func greenGradientColor() -> UIColor {
         return gradientBar!.getPixelColor(pos: CGPoint(x: 2, y: 0.01 * gradientBarHeight))
     }
+    
+    class func cleanRatingColor(for rating: Int, higherIsBetter:Bool) -> UIColor {
+        
+//        let modRating = higherIsBetter ? rating : (10-rating)
+        switch rating {
+        case ...2:
+            return UIColor.systemRed
+        case 2...5:
+            return UIColor.systemOrange
+        case 5...7:
+            return UIColor.systemYellow
+        case 7...:
+            return UIColor.systemGreen
+        default:
+            return UIColor.systemGray
+        }
+
+    }
 }

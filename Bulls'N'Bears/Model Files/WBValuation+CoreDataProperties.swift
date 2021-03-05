@@ -2,7 +2,7 @@
 //  WBValuation+CoreDataProperties.swift
 //  Bulls'N'Bears
 //
-//  Created by aDav on 02/03/2021.
+//  Created by aDav on 03/03/2021.
 //
 //
 
@@ -38,19 +38,19 @@ extension WBValuation {
 
 }
 
-// MARK: Generated accessors for userEvaluation
+// MARK: Generated accessors for userEvaluations
 extension WBValuation {
 
-    @objc(addUserEvaluationObject:)
+    @objc(addUserEvaluationsObject:)
     @NSManaged public func addToUserEvaluations(_ value: UserEvaluation)
 
-    @objc(removeUserEvaluationObject:)
+    @objc(removeUserEvaluationsObject:)
     @NSManaged public func removeFromUserEvaluations(_ value: UserEvaluation)
 
-    @objc(addUserEvaluation:)
+    @objc(addUserEvaluations:)
     @NSManaged public func addToUserEvaluations(_ values: NSSet)
 
-    @objc(removeUserEvaluation:)
+    @objc(removeUserEvaluations:)
     @NSManaged public func removeFromUserEvaluations(_ values: NSSet)
 
 }

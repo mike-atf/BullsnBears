@@ -269,7 +269,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     if first3Average ?? 0 < 0 && average < 0 {
                         // recently negative equity resulting in wrongly negative LT debt
                         value$ = "neg!"
-                        errors = ["recent LT debt and negative equity + ret. earnings "]
+                        errors = ["Long-term debt set against recently negative equity with retained earnings"]
                         color = GradientColorFinder.redGradientColor()
                     }
                     else {
@@ -317,10 +317,26 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         
     }
     
+    public func valueListTVCProportions(values: [[Double]?]?) -> [Double]? {
+        
+        var proportions: [Double]?
+        
+        if values?.count ?? 0 > 1 {
+            proportions = Calculator.proportions(array1: values?.first!, array0: values?.last!)
+        }
+        else {
+            if let array1 = values!.first {
+                proportions = array1?.growthRates()
+            }
+        }
+        return proportions
+    }
+    
     // MARK: - internal functions
     
     private func buildRowTitles() -> [[String]] {
-        
+        // careful when changing these - terms and order are linked to WBVParameters() in public vars
+        // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
         return [["P/E ratio", "EPS", "beta", "intr. value (10y)"], ["Ret. earnings growth", "EPS growth", "Net inc./ Revenue growth","profit margin growth","LT Debt / net income growth"],["Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
     }
         
@@ -352,6 +368,8 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         downloader = nil
     }
     
+    /// searches for stored evaluation related to controller.wbvValuation with specified wbvParameter
+    /// if none is found it returns a new UserEvaluation object linked to the controller.wbvValuation with specified wbvParameter
     func returnUserEvaluation(for parameter: String) -> UserEvaluation? {
         
         let storedEvaluations = valuation?.userEvaluations
@@ -365,6 +383,36 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
 
         return addUserEvaluation(for: parameter)
+    }
+    
+    /// for use in WBValuationTVC.cellForRow function
+    func userEvaluation(for indexPath: IndexPath) -> UserEvaluation? {
+        
+        guard indexPath.section > 0 else {
+            return nil
+        }
+        
+        let parameters = WBVParameters().structuredTitlesParameters()
+        
+        guard indexPath.section <= parameters.count  else {
+            return nil
+        }
+        
+        let parameter = parameters[indexPath.section-1][indexPath.row].first!
+
+        // [["P/E ratio", "EPS", "beta", "intr. value (10y)"], ["Ret. earnings growth", "EPS growth", "Net inc./ Revenue growth","profit margin growth","LT Debt / net income growth"],["Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
+        
+        let storedEvaluations = valuation?.userEvaluations
+        if storedEvaluations?.count ?? 0 != 0 {
+            
+            for element in storedEvaluations! {
+                if let evaluation = element as? UserEvaluation {
+                    if evaluation.wbvParameter == parameter { return evaluation }
+                }
+            }
+        }
+        
+        return nil
     }
     
     func addUserEvaluation(for parameter: String) -> UserEvaluation? {
@@ -390,13 +438,29 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
 }
 
-extension WBValuationController: RatingButtonDelegate {
+extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
     
+    func userEnteredNotes(notes: String?, parameter: String) {
+        if let valid = notes {
+            for element in valuation?.userEvaluations ?? [] {
+                if let evaluation = element as? UserEvaluation {
+                    if evaluation.wbvParameter == parameter {
+                        evaluation.comment = valid
+                        evaluation.save()
+                    }
+                }
+            }
+        }
+    }
+        
     func updateRating(rating: Int, parameter: String) {
         
         for element in valuation?.userEvaluations ?? [] {
             if let evaluation = element as? UserEvaluation {
-                evaluation.rating = Int16(rating)
+                if evaluation.wbvParameter == parameter {
+                    evaluation.rating = Int16(rating)
+                    evaluation.save()
+                }
             }
         }
     }

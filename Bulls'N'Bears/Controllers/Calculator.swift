@@ -122,7 +122,7 @@ class Calculator {
 // b = y axis intercept of regression line
         let b = yMean - m * xMean
 
-        return Correlation(m: m, b: b, r: r)
+        return Correlation(m: m, b: b, r: r, xElements: cleanedArrayX.count)
     }
     
     /// returns the proportions of array1 / array0
@@ -156,5 +156,46 @@ class Calculator {
         }
         
         return proportions
+    }
+    
+    class func valueChartCorrelation(arrays: [[Double]?]?) -> Correlation? {
+        
+        guard let array1 = arrays?.first else {
+            return nil
+        }
+        
+        var array2: [Double]?
+        if arrays?.count ?? 0 > 0 {
+            array2 = arrays![1]
+        }
+        
+        var trend: Correlation?
+        
+        if array2?.count ?? 0 > 1 {
+            // proportions - calculate trend of proportions
+            
+            var years = [Double]()
+            var count = 1.0 // important to start with 1.0 to avoid dropping 0 element in correlation
+            for _ in array2! {
+                years.append(count)
+                count += 1.0
+            }
+
+            trend = Calculator.correlation(xArray: years, yArray: array2?.reversed())
+        } else if (array1 ?? [])?.count ?? 0 > 1 {
+            // values only, no proportions - calculate values trend
+            
+            var years = [Double]()
+            var count = 1.0 // important to avoid dropping 0 element in correlation
+            for _ in (array1 ?? []) {
+                years.append(count)
+                count += 1.0
+            }
+
+            trend = Calculator.correlation(xArray: years, yArray: array1?.reversed())
+        }
+        
+        return trend
+
     }
 }

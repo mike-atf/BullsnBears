@@ -41,6 +41,7 @@
     </entity>
     <entity name="UserEvaluation" representedClassName="UserEvaluation" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String"/>
+        <attribute name="higherIsBetter" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="rating" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="stock" optional="YES" attributeType="String"/>
         <attribute name="wbvParameter" optional="YES" attributeType="String"/>
@@ -70,7 +71,7 @@
     <elements>
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="284"/>
         <element name="Rule1Valuation" positionX="-261.819091796875" positionY="-29.61836242675781" width="128" height="299"/>
+        <element name="UserEvaluation" positionX="-81.646728515625" positionY="-18.5029296875" width="128" height="133"/>
         <element name="WBValuation" positionX="174.9136962890625" positionY="-16.72808837890625" width="128" height="328"/>
-        <element name="UserEvaluation" positionX="-81.646728515625" positionY="-18.5029296875" width="128" height="118"/>
     </elements>
 </model>
