@@ -19,7 +19,7 @@
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KDU-EY-7DQ">
                         <rect key="frame" x="10" y="13" width="37.5" height="18"/>
-                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -32,8 +32,8 @@
                         </connections>
                     </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uoj-Dx-7bk">
-                        <rect key="frame" x="415.5" y="11.5" width="42" height="21"/>
-                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                        <rect key="frame" x="414" y="13" width="37.5" height="18"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -69,7 +69,7 @@
                     <constraint firstItem="KjS-uh-uUV" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.7" id="agE-tm-Mlp"/>
                     <constraint firstItem="kKl-qt-iSX" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" multiplier="1.25" id="bUE-0L-i4r"/>
                     <constraint firstItem="ytK-8O-sV5" firstAttribute="centerY" secondItem="kKl-qt-iSX" secondAttribute="centerY" multiplier="1.05" id="j3m-dK-Wvw"/>
-                    <constraint firstItem="Q5Z-L5-pk0" firstAttribute="leading" secondItem="uoj-Dx-7bk" secondAttribute="trailing" constant="2" id="lan-6p-fJZ"/>
+                    <constraint firstItem="Q5Z-L5-pk0" firstAttribute="leading" secondItem="uoj-Dx-7bk" secondAttribute="trailing" constant="8" symbolic="YES" id="lan-6p-fJZ"/>
                     <constraint firstItem="KjS-uh-uUV" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="qkh-UO-quK"/>
                     <constraint firstItem="uoj-Dx-7bk" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="uPf-dP-orn"/>
                     <constraint firstItem="KjS-uh-uUV" firstAttribute="leading" secondItem="kKl-qt-iSX" secondAttribute="trailing" constant="10" id="xrw-gC-JJg"/>
