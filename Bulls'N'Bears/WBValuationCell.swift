@@ -55,15 +55,21 @@ class WBValuationCell: UITableViewCell {
         }
         
         if let valid = userEvaluation {
-            
-            if valid.rating > 3 {
-                self.ratingLabel.textColor = UIColor.black
+
+            if let validRating = valid.userRating() {
+                if validRating > 3 {
+                    self.ratingLabel.textColor = UIColor.black
+                }
+                
+                starView.isHidden = false
+                starView.tintColor = valid.ratingColor()
+                ratingLabel.isHidden = false
+                ratingLabel.text = numberFormatterNoFraction.string(from: (valid.userRating() ?? 0) as NSNumber)
             }
-            
-            starView.isHidden = false
-            starView.tintColor = valid.ratingColor()
-            ratingLabel.isHidden = false
-            ratingLabel.text = numberFormatterNoFraction.string(from: valid.rating as NSNumber)
+            else {
+                starView.isHidden = true
+                self.ratingLabel.isHidden = true
+            }
         } else {
             starView.isHidden = true
             self.ratingLabel.isHidden = true

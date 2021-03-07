@@ -96,11 +96,64 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
         return valuations
     }
+    
+    static func summaryRating(symbol: String, type: RatingCircleSymbols) -> RatingCircleData {
+        
+        var data = RatingCircleData(rating: nil, maximum: nil, symbol: nil)
+        
+        var stock = stocks.filter { (s) -> Bool in
+            if s.symbol == symbol { return true }
+            else { return false }
+        }.first
+        
+        guard let wbv = returnWBValuations(company: symbol)?.first else {
+            return data
+        }
+        
+        if type == .star {
+            var userSummaryScore: Double = 0
+            var maximumScoreSum: Double = 0
+            
+            for element in wbv.userEvaluations ?? [] {
+                if let evaluation = element as? UserEvaluation {
+                    if let valid = evaluation.userRating() { // -1 is model default, treat a nil
+                        userSummaryScore += Double(valid)
+                        maximumScoreSum += 10.0
+                    }
+                }
+            }
+        
+            data.max = maximumScoreSum
+            data.rating = userSummaryScore
+            data.symbol = .star
+
+            stock?.userRatingScore = data
+        }
+        else {
+            
+            if let values = valueSummaryScore(valuation: wbv) {
+                data.rating = values[1]
+                data.max = values[2]
+                data.min = values[0]
+                data.symbol = .dollar
+            }
+            stock?.fundamentalsScore = data
+        }
+        
+        return data
+
+    }
+    
+    
+    static func valueSummaryScore(valuation: WBValuation) -> [Double]? {
+        
+        return valuation.valuesSummaryScores()
+    }
 
     static func createWBValuation(company: String) -> WBValuation? {
         
         let newValuation:WBValuation? = {
-            NSEntityDescription.insertNewObject(forEntityName: "WBValuation", into: managedObjectContext) as? WBValuation
+            NSEntityDescription.insertNewObject(forEntityName: "WBValuation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? WBValuation
         }()
         newValuation?.company = company
         do {
@@ -197,12 +250,15 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 return (value$,color,errors)
             case 2:
                 let (proportions, es$) = valuation!.netIncomeProportion()
+//                print()
+//                print("\(stock.symbol) net income props \(proportions)")
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: average, greenCutoff: 0.2, redCutOff: 0.1)
                 }
-
+//                print("\(stock.symbol) net income ema \(value$)")
+//                print()
                 return (value$, color, errors)
             case 3:
                 let (margins, es$) = valuation!.grossProfitMargins()
@@ -418,7 +474,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     func addUserEvaluation(for parameter: String) -> UserEvaluation? {
         
         guard let newValuation = {
-            NSEntityDescription.insertNewObject(forEntityName: "UserEvaluation", into: managedObjectContext) as? UserEvaluation
+            NSEntityDescription.insertNewObject(forEntityName: "UserEvaluation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? UserEvaluation
         }() else { return nil }
          
         newValuation.stock = stock.symbol

@@ -9,7 +9,7 @@ import UIKit
 
 var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
-var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 var errorLog: [ErrorLog]?
 let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
 let gradientBar = UIImage(named: "GradientBar")
@@ -154,7 +154,35 @@ struct WBVParameters {
 
         return true
     }
+}
 
+struct RatingCircleData {
+    var rating: Double?
+    var max: Double?
+    var min: Double = 0.0
+    var symbol: RatingCircleSymbols?
+    
+    init(rating: Double?, maximum: Double?, minimum: Double?=0.0, symbol: RatingCircleSymbols?) {
+        self.rating = rating
+        self.max = maximum
+        self.min = minimum ?? 0.0
+        self.symbol = symbol
+    }
+    
+    func ratingScore() -> Double? {
+        
+        guard let validMax = max else { return nil }
+        
+        guard let validRating = rating else { return nil }
+        
+        let range = validMax - min
+        return validRating / range
+    }
+}
+
+enum RatingCircleSymbols {
+    case star
+    case dollar
 }
 
 struct UserDefaultTerms {

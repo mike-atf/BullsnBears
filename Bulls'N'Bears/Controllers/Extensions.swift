@@ -125,23 +125,28 @@ extension Array where Element == Double {
         
         guard periods > 2 else { return nil }
         
-        guard self.count > periods+2 else {
+        var appliedPeriods = periods
+        if self.count < periods+2 {
+            appliedPeriods = Int(Double(self.count * 7/12))
+            
+        }
+        guard appliedPeriods > 2 else {
             return nil
         }
         
         let ascending = Array(self.reversed())
         
         var sum = Double()
-        for i in 0..<periods {
+        for i in 0..<appliedPeriods {
             sum += ascending[i]
         }
-        let sma = sum / Double(periods)
+        let sma = sum / Double(appliedPeriods)
         
         var ema = sma
         
-        for i in periods..<self.count {
+        for i in appliedPeriods..<self.count {
             if ascending[i] != Double() {
-                ema = ascending[i] * (2/(Double(periods+1))) + ema * (1 - 2/(Double(periods+1)))
+                ema = ascending[i] * (2/(Double(appliedPeriods+1))) + ema * (1 - 2/(Double(appliedPeriods+1)))
             }
         }
         

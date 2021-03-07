@@ -15,7 +15,7 @@ class WBVRatingButton: UIView {
     
     @IBOutlet var stackView: UIStackView!
     
-    var rating: Int!
+    var rating: Int?
     var wbvParameter: String!
     var delegate: RatingButtonDelegate!
     var oneTapRecognizer: UITapGestureRecognizer!
@@ -23,6 +23,7 @@ class WBVRatingButton: UIView {
     var starColor: UIColor!
     var higherIsBetter: Bool!
     weak var cell: ValueListRatingCell?
+    var userInteracted = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -56,7 +57,7 @@ class WBVRatingButton: UIView {
     }
 
     
-    func configure(rating: Int, delegate: RatingButtonDelegate, parameter: String, cell: ValueListRatingCell) {
+    func configure(rating: Int?, delegate: RatingButtonDelegate, parameter: String, cell: ValueListRatingCell) {
         
         self.rating = rating
         self.delegate = delegate
@@ -65,7 +66,7 @@ class WBVRatingButton: UIView {
         
         higherIsBetter = WBVParameters().isHigherBetter(for: parameter)
 
-        starColor = GradientColorFinder.cleanRatingColor(for: rating, higherIsBetter: higherIsBetter)// GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: Double(rating))
+        starColor = GradientColorFinder.cleanRatingColor(for: rating ?? 0, higherIsBetter: higherIsBetter)// GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: Double(rating))
         setNeedsDisplay()
     }
     
@@ -82,15 +83,21 @@ class WBVRatingButton: UIView {
     @objc
     func singleTap() {
         
-        rating += 1
-        if rating > 10 {
-            rating -= 11
+        userInteracted = true
+        
+        var validRating = self.rating ?? 0
+        
+        validRating += 1
+        if validRating > 10 {
+            validRating -= 11
         }
 
-        starColor = GradientColorFinder.cleanRatingColor(for: rating, higherIsBetter: higherIsBetter) // GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: Double(rating), greenCutoff: 9, redCutOff: 1)
-        delegate.updateRating(rating: rating, parameter: wbvParameter)
+        starColor = GradientColorFinder.cleanRatingColor(for: validRating, higherIsBetter: higherIsBetter) // GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: Double(rating), greenCutoff: 9, redCutOff: 1)
+        delegate.updateRating(rating: validRating, parameter: wbvParameter)
         self.setNeedsDisplay()
-        cell?.updateText(rating: rating)
+        cell?.updateText(rating: validRating)
+        
+        self.rating = validRating
     }
         
     private func updateStackView() {
@@ -99,14 +106,14 @@ class WBVRatingButton: UIView {
             star.removeFromSuperview()
         }
         allStars.removeAll()
-        
-        for _ in 0..<rating {
+
+        for _ in 0..<(self.rating ?? 0) {
             let view = UIImageView(image: UIImage.init(systemName: "star.fill")!)
             view.tintColor = starColor
             allStars.append(view)
         }
         
-        for _ in rating..<10 {
+        for _ in (self.rating ?? 0)..<10 {
             let view = UIImageView(image: UIImage.init(systemName: "star")!)
             view.tintColor = UIColor.systemGray
             allStars.append(view)

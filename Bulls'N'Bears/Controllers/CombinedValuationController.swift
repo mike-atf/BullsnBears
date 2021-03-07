@@ -77,11 +77,11 @@ class CombinedValuationController: ValuationHelper {
     
     static func createR1Valuation(company: String) -> Rule1Valuation? {
         let newValuation:Rule1Valuation? = {
-            NSEntityDescription.insertNewObject(forEntityName: "Rule1Valuation", into: managedObjectContext) as? Rule1Valuation
+            NSEntityDescription.insertNewObject(forEntityName: "Rule1Valuation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? Rule1Valuation
         }()
         newValuation?.company = company
         do {
-            try  managedObjectContext.save()
+            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let error = error
             ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
@@ -101,7 +101,7 @@ class CombinedValuationController: ValuationHelper {
         }
         
         do {
-            valuations = try managedObjectContext.fetch(fetchRequest)
+            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
         }
@@ -120,7 +120,7 @@ class CombinedValuationController: ValuationHelper {
         }
         
         do {
-            valuations = try managedObjectContext.fetch(fetchRequest)
+            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching dcfValuations")
         }
@@ -130,11 +130,11 @@ class CombinedValuationController: ValuationHelper {
     
     static func createDCFValuation(company: String) -> DCFValuation? {
         let newValuation:DCFValuation? = {
-            NSEntityDescription.insertNewObject(forEntityName: "DCFValuation", into: managedObjectContext) as? DCFValuation
+            NSEntityDescription.insertNewObject(forEntityName: "DCFValuation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? DCFValuation
         }()
         newValuation?.company = company
         do {
-            try  managedObjectContext.save()
+            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let error = error
             ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving dcfValuations")

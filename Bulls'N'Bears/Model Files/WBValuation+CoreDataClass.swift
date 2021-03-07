@@ -94,6 +94,29 @@ public class WBValuation: NSManagedObject {
 
     }
     
+    /// returns arary of sums of sahreholdersEquity + equityRepurchased
+    public func adjustedEquity() -> [Double] {
+        
+        var sums = [Double]()
+        var count = 0
+
+        if shareholdersEquity?.count ?? 0 > 0 {
+        
+            for element in shareholdersEquity ?? [] {
+                if (equityRepurchased?.count ?? 0) >= count {
+                    sums.append(element + equityRepurchased![count])
+                }
+                
+                count += 1
+            }
+        }
+        else {
+            sums = equityRepurchased ?? [Double]()
+        }
+        
+        return sums
+    }
+    
     /// returns porportions of array 2 / array 1 elements
     public func proportions(array1: [Double]?, array2: [Double]?) -> ([Double], [String]?) {
         
@@ -121,7 +144,6 @@ public class WBValuation: NSManagedObject {
         return (proportions, errorList)
 
     }
-
     
     public func rAndDProportion() -> ([Double], [String]?) {
         
@@ -213,6 +235,129 @@ public class WBValuation: NSManagedObject {
         return (proportions, errorList)
 
     }
+    
+    public func valuesSummaryScores() -> [Double]? { // [min,score,max]
+        
+        let peRatioWeight = 1.5
+        let retEarningsGrowthWeight = 1.3
+        let epsGrowthWeight = 1.0
+        let netIncomeDivProfitWeight = 1.0
+        let profitMarginWeight = 1.0
+        let ltDebtDivIncomeWeight = 1.0
+        let ltDebtDivadjEq = 0.75
+        let sgaDivRevenue = 0.75
+        let radDivRevenue = 0.75
+        
+        var allFactors = [Double]()
+        var allWeights = [Double]()
+        let emaPeriods = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
+        
+        allFactors.append(perValueFactor() * peRatioWeight)
+        allWeights.append(peRatioWeight)
+        
+        if let valid = valueFactor(values1: equityRepurchased, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * retEarningsGrowthWeight)
+            allWeights.append(retEarningsGrowthWeight)
+        }
+        if let valid = valueFactor(values1: eps, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * epsGrowthWeight)
+            allWeights.append(epsGrowthWeight)
+        }
+        if let valid = valueFactor(values1: revenue, values2: netEarnings, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * netIncomeDivProfitWeight)
+            allWeights.append(netIncomeDivProfitWeight)
+        }
+        if let valid = valueFactor(values1: revenue, values2: grossProfit, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * profitMarginWeight)
+            allWeights.append(profitMarginWeight)
+        }
+        if let valid = inverseValueFactor(values1: netEarnings, values2: debtLT, maxCutOff: 3, emaPeriod: emaPeriods) {
+            allFactors.append(valid * ltDebtDivIncomeWeight)
+            allWeights.append(ltDebtDivIncomeWeight)
+        }
+        if let valid = inverseValueFactor(values1: adjustedEquity(), values2: debtLT, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * ltDebtDivadjEq)
+            allWeights.append(ltDebtDivadjEq)
+        }
+        if let valid = valueFactor(values1: revenue, values2: sgaExpense, maxCutOff: 0.4, emaPeriod: emaPeriods) {
+            allFactors.append(valid * sgaDivRevenue)
+            allWeights.append(sgaDivRevenue)
+        }
+        if let valid = valueFactor(values1: revenue, values2: rAndDexpense, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * radDivRevenue)
+            allWeights.append(radDivRevenue)
+        }
+        
+        let scoreSum = allFactors.reduce(0, +)
+        let maximum = allWeights.reduce(0, +)
+        
+        return [0, scoreSum , maximum]
+    }
+    
+    func perValueFactor() -> Double {
+        
+        guard !(peRatio < 0) else {
+            return 0
+        }
+        
+        return ((40 - (abs(peRatio) > 40 ? 40.0 : peRatio)) / 40)
+    }
+    
+    /// for 'higherIsBetter' values; for 'higherIsWorse' use inverseValueFactor()
+    /// for 1 value array: returns nil or ema of values based factor between 0-1 for ema 0-maxCutoff
+    /// for 2 arrays returns growth-ema of porportions values2 / values1
+    /// values above cutOff are returned as 1.0
+    /// ema < 0 is returned as 0
+    func valueFactor(values1: [Double]?, values2: [Double]?, maxCutOff: Double,emaPeriod: Int) -> Double? {
+        
+        guard values1 != nil else {
+            return nil
+        }
+        
+        var array = values1!
+        
+        if values2 != nil {
+            (array,_) = proportions(array1: values1, array2: values2)
+        }
+        
+//        guard let growthArray = array.growthRates() else {
+//            return nil
+//        }
+        
+        guard let ema = array.ema(periods: emaPeriod) else { return nil }
+        
+        if ema < 0 { return 0 }
+        
+        return (ema > maxCutOff ? maxCutOff : ema) / maxCutOff
+    }
+    
+    
+    /// same as velueFactor but for 'higherIsWorse' rather than 'higherIsBetter' values
+    /// negative ema is good
+    /// use postiive value for maxCutOff!
+    func inverseValueFactor(values1: [Double]?, values2: [Double]?, maxCutOff: Double, emaPeriod: Int) -> Double? {
+        
+        guard values1 != nil else {
+            return nil
+        }
+        
+        var array = values1!
+        
+        if values2 != nil {
+            (array,_) = proportions(array1: values1, array2: values2)
+        }
+        
+//        guard let growthArray = array.growthRates() else {
+//            return nil
+//        }
+//
+        guard let ema = array.ema(periods: emaPeriod) else { return nil }
+        
+        if ema > 0 { return 0 }
+        
+        return 1 - (((ema * -1) > maxCutOff ? maxCutOff : (ema * -1)) / maxCutOff)
+    }
+    
 
     /// if at any index i one or both arrays have a nil element then an empty 'Double()' will be inserted as spaceholder at that index
     /// this enables ongoing correlation with other ordered arrays e.g. 'years'
@@ -240,7 +385,6 @@ public class WBValuation: NSManagedObject {
         
         return (sumArray,nil)
     }
-
     
     public func ivalue() -> (Double?, [String] ){
         

@@ -33,10 +33,13 @@ class StocksListViewController: UITableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
                 
+        NotificationCenter.default.addObserver(self, selector: #selector(updateOrderReturningFromWBValuationTVC(notification:)), name: NSNotification.Name(rawValue: "refreshStockListTVCRow"), object: nil)
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
         controller?.updateStockFiles()
+        tableView.reloadData()
     }
 
     deinit {
@@ -110,6 +113,14 @@ class StocksListViewController: UITableViewController {
         }
 
     }
+    
+    @objc
+    func updateOrderReturningFromWBValuationTVC(notification: Notification) {
+        
+//        stocks = (controller!.sortStocksByRatings(stocks: stocks))
+//        tableView.reloadData()
+    }
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -123,9 +134,13 @@ class StocksListViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
-        cell.configureCell(indexPath: indexPath, stock: stocks[indexPath.row])
+        let userRatingData = stocks[indexPath.row].userRatingScore // WBValuationController.summaryRating(symbol: stocks[indexPath.row].symbol, type: .star)
+        let valueRatingData = stocks[indexPath.row].fundamentalsScore // WBValuationController.summaryRating(symbol: stocks[indexPath.row].symbol, type: .dollar)
+        cell.configureCell(indexPath: indexPath, stock: stocks[indexPath.row], userRatingData: userRatingData, valueRatingData: valueRatingData)
+        
         return cell
     }
 
@@ -165,7 +180,7 @@ class StocksListViewController: UITableViewController {
         guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
 
         wbValuationView.stock = stocks[indexPath.row]
-//        wbValuationView.chartDelegate = self
+        wbValuationView.fromIndexPath = indexPath
         wbValuationView.controller = WBValuationController(stock: stocks[indexPath.row], progressDelegate: wbValuationView)
         
         if stocks[indexPath.row].peRatio == nil {
@@ -175,7 +190,6 @@ class StocksListViewController: UITableViewController {
         performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         
         navigationController?.pushViewController(wbValuationView, animated: true)
-//        wbValuationView.tableView.reloadData()
     }
     
     func valuationCompleted(indexPath: IndexPath) {

@@ -12,19 +12,11 @@ class StockListCellTableViewCell: UITableViewCell {
 
     @IBOutlet var title: UILabel!
     @IBOutlet var detail: UILabel!
+    @IBOutlet var ratingCircle: ScoreCircle!
+    @IBOutlet var valueCircle: ScoreCircle!
     
     var indexPath: IndexPath!
     var stock: Stock!
-    
-//    let timeFormatter: DateComponentsFormatter = {
-//        let formatter = DateComponentsFormatter()
-//        formatter.allowedUnits = [.day]
-//        formatter.unitsStyle = .full
-//        formatter.zeroFormattingBehavior = .pad
-//        formatter.maximumUnitCount = 3
-//        formatter.includesApproximationPhrase = false
-//        return formatter
-//    }()
     
     let timeFormatter: RelativeDateTimeFormatter = {
         let formatter = RelativeDateTimeFormatter()
@@ -37,12 +29,15 @@ class StockListCellTableViewCell: UITableViewCell {
         super.awakeFromNib()
     }
     
-    public func configureCell(indexPath: IndexPath, stock: Stock) {
+    public func configureCell(indexPath: IndexPath, stock: Stock, userRatingData: RatingCircleData?, valueRatingData: RatingCircleData?) {
         self.indexPath = indexPath
         self.stock = stock
         
         title.text = stock.symbol
         detail.text = timeFormatter.localizedString(for: stock.dailyPrices.last!.tradingDate, relativeTo: Date())
+        
+        ratingCircle.configure(ratingStruct: userRatingData)
+        valueCircle.configure(ratingStruct: valueRatingData)
         
     }
 }

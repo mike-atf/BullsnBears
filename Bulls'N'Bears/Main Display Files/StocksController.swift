@@ -56,7 +56,6 @@ class StocksController: StockDelegate {
                    }
                 }
                 } catch let error {
-                   print(error)
                     ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't access contens of directory \(documentFolder)")
                 }
                 self.delegate?.openStocksComplete()
@@ -66,6 +65,8 @@ class StocksController: StockDelegate {
     
     func updateStockFiles() {
         
+        stocks = sortStocksByRatings(stocks: stocks)
+        
         guard (Calendar.current.component(.weekday, from: Date()) > 2) else {
             return
         }
@@ -73,9 +74,24 @@ class StocksController: StockDelegate {
         for stock in stocks {
             if stock.needsUpdate {
                 stock.startPriceUpdate(yahooRefDate: yahooRefDate)
-//                stock.downloadKeyRatios()
             }
         }
+        
+    }
+    
+    public func sortStocksByRatings(stocks: [Stock]) -> [Stock] {
+        
+        let sortedStocks = stocks.sorted(by: { (e0, e1) -> Bool in
+            if (e0.userRatingScore?.ratingScore() ?? 0) > (e1.userRatingScore?.ratingScore() ?? 0) { return true }
+            else if (e0.userRatingScore?.ratingScore() ?? 0) < (e1.userRatingScore?.ratingScore() ?? 0) { return false }
+            else {
+                if (e0.fundamentalsScore?.ratingScore() ?? 0) > (e1.fundamentalsScore?.ratingScore() ?? 0)  { return true }
+                else if (e0.fundamentalsScore?.ratingScore() ?? 0) < (e1.fundamentalsScore?.ratingScore() ?? 0)  { return false }
+                else { return false }
+            }
+        })
+        
+        return sortedStocks
     }
     
     private func getYahooRefDate() -> Date {
@@ -91,5 +107,4 @@ class StocksController: StockDelegate {
         return calendar.date(from: dateComponents) ?? Date()
 
     }
-
 }

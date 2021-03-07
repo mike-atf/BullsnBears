@@ -14,7 +14,7 @@ class ValueListTVC: UITableViewController {
     var sectionTitles = ["Your Rating (keep tapping the stars)","Your evaluation notes"]
     var rowTitles = [String]()
     var formatter: NumberFormatter!
-    weak var controller: WBValuationController!
+    var controller: WBValuationController!
     var correlationToDisplay: Double?
     var trendToDisplay: Double?
     var mostRecentYear: Int!
@@ -38,6 +38,10 @@ class ValueListTVC: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         
+        if let textcell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) as? ValueListTextEntryCell {
+            let parameter = textcell.wbvParameter ?? ""
+            controller.userEnteredNotes(notes: textcell.textView.text, parameter: parameter)
+        }
         proportions = controller.valueListTVCProportions(values: values)
    }
     
@@ -63,7 +67,7 @@ class ValueListTVC: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListRatingCell", for: indexPath) as! ValueListRatingCell
             let parameter = sectionTitles[2] // ! careful. This assumes the first two sectionsTitles are '["Your Rating (keep tapping the stars)","Your evaluation notes"]' to which the parameter and more are appended in WBValuationController prepareForSegue()
             let userEvaluation = controller.returnUserEvaluation(for: parameter)
-            cell.configure(rating: Int(userEvaluation?.rating ?? 0), ratingUpdateDelegate: controller, parameter: userEvaluation?.wbvParameter ?? "missing", reverseRatingOrder: !higherGrowthIsBetter)
+            cell.configure(rating: userEvaluation?.userRating(), ratingUpdateDelegate: controller, parameter: userEvaluation?.wbvParameter ?? "missing", reverseRatingOrder: !higherGrowthIsBetter)
             return cell
         }
         else if indexPath.section == 1 {

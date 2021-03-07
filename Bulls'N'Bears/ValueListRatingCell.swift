@@ -15,15 +15,15 @@ class ValueListRatingCell: UITableViewCell {
     var wbvParameter: String!
     
     let ratingDescriptions = ["Consistent zero or negative growth",
-                              "Inconsistent growth <= 0%, or \nConsistent growth <= 0%, recent trend up,",
-                              "Inconsistent growth <= 0%, recent trend up",
-                              "Inconsistent growth 0-10%\nrecent trend down",
-                              "Inconsistent growth 0-10%\nrecent trend stable or up",
-                              "Consistent growth 0-10% or \nInconsistent growth 10-15% recently down",
-                              "Consistent growth 0-10% or\nInconsistent growth 10-15% recently up",
-                              "Consistent growth 10-15% or\nInconsistent growth >15% recently down",
-                              "Consistent growth 10-15% or \nInconsistent growth >15% recently up",
-                              "Consistent growth >15%\nrecently down",
+                              "IConsistent zero or negative growth, or \nInconsistent zero or negative growth, recently worse",
+                              "Inconsistent zero or negative growth, recently better",
+                              "IInconsistent growth 0-10%, recently worse",
+                              "Inconsistent growth 0-10%, recently better",
+                              "Inconsistent growth 10-15% recently worse",
+                              "Consistent growth 0-10%, or\n Inconsistent growth 10-15% recently better",
+                              "Inconsistent growth >15% recently worse",
+                              "Consistent growth 10-15% , or \nInconsistent growth >15%, recently better",
+                              "Consistent growth >15%,  recently worse",
                               "Consistent growth >15%"
                       ]
     
@@ -42,9 +42,9 @@ class ValueListRatingCell: UITableViewCell {
 
     var ratingsDescriptionsUsed = [String]()
         
-    func configure(rating: Int, ratingUpdateDelegate: RatingButtonDelegate, parameter: String, reverseRatingOrder: Bool?=false) {
+    func configure(rating: Int?, ratingUpdateDelegate: RatingButtonDelegate, parameter: String, reverseRatingOrder: Bool?=false) {
         
-        self.rating = rating
+        self.rating = rating ?? 0
         self.wbvParameter = parameter
                 
         if self.rating < 0 { self.rating = 0 }
@@ -52,13 +52,13 @@ class ValueListRatingCell: UITableViewCell {
         ratingButton.configure(rating: self.rating, delegate: ratingUpdateDelegate, parameter: parameter, cell: self)
         
         self.ratingsDescriptionsUsed = (reverseRatingOrder ?? false) ? reverseRatingDescriptions.reversed() : ratingDescriptions
-        label.text = "\(rating)/10 - " + ratingsDescriptionsUsed[self.rating]
+        label.text = "\(self.rating!)/10 - " + ratingsDescriptionsUsed[self.rating]
 
     }
     
     func updateText(rating: Int) {
         self.rating = rating
-        label.text = "\(rating)/10 - " + ratingsDescriptionsUsed[self.rating]
+        label.text = "\(self.rating!)/10 - " + ratingsDescriptionsUsed[self.rating]
     }
     
 }

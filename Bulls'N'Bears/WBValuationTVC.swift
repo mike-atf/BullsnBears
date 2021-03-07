@@ -13,6 +13,8 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     var controller: WBValuationController!
     var stock: Stock!
     var progressView: DownloadProgressView?
+    var fromIndexPath: IndexPath!
+    var movingToValueListTVC = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +31,16 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        
+        guard !movingToValueListTVC else {
+            return
+        }
+
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "refreshStockListTVCRow"), object: fromIndexPath, userInfo: nil)
+    }
+
     
     // MARK: - Table view data source
 
@@ -145,6 +157,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     
     @objc
     func refreshRow(notification: Notification) {
+        movingToValueListTVC = false
         if let indexPath = notification.object as? IndexPath {
             tableView.reloadRows(at: [indexPath], with: .automatic)
         }
@@ -160,6 +173,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
            
+        
         guard let selectedPath = self.tableView.indexPathForSelectedRow else {
             return
         }
@@ -171,6 +185,8 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         
         if let destination = segue.destination as? ValueListTVC {
+            
+            movingToValueListTVC = true
             
             destination.loadViewIfNeeded()
             
@@ -308,7 +324,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         controller.valuation?.save()
         
-        tableView.reloadSections([1,2], with: .automatic)
+        tableView.reloadSections([1,2,3], with: .automatic)
     }
 
 

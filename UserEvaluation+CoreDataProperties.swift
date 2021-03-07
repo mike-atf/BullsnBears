@@ -17,7 +17,7 @@ extension UserEvaluation {
     }
 
     @NSManaged public var comment: String?
-    @NSManaged public var rating: Int16
+    @NSManaged public var rating: Int16 // 0-10, default is '-1' rather than nil
     @NSManaged public var wbvParameter: String?
     @NSManaged public var stock: String?
     @NSManaged public var userEvaluation: WBValuation?

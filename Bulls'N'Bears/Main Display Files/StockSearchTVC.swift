@@ -24,7 +24,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         searchController?.searchBar.delegate = self
         navigationItem.searchController = searchController
         definesPresentationContext = true
-        
+                
     }
 
     override func viewDidAppear(_ animated: Bool) {

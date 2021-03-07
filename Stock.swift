@@ -33,6 +33,8 @@ class Stock {
     var peRatio: Double?
     var eps: Double?
     var beta: Double?
+    var userRatingScore: RatingCircleData?
+    var fundamentalsScore: RatingCircleData?
 
     init(name: String, dailyPrices:[PricePoint], fileURL: URL?, delegate: StockDelegate?) {
         self.symbol = name
@@ -55,13 +57,16 @@ class Stock {
                 name_short = String(cleanedName.dropLast())
             }
         }
-        
 
         self.dailyPrices = dailyPrices
         self.fileURL = fileURL
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyratioDownloadComplete(notification:)), name: Notification.Name(rawValue: "KeyRatioDownloadComplete"), object: nil)
-
+        
+//        DispatchQueue.main.async {
+            self.userRatingScore = WBValuationController.summaryRating(symbol: self.symbol, type: .star)
+            self.fundamentalsScore = WBValuationController.summaryRating(symbol: self.symbol, type: .dollar)
+//        }
     }
     
     //MARK: - File update download function
