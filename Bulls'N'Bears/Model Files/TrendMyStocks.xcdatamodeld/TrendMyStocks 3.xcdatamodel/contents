@@ -48,6 +48,8 @@
         <relationship name="wbValuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WBValuation" inverseName="userEvaluations" inverseEntity="WBValuation"/>
     </entity>
     <entity name="WBValuation" representedClassName="WBValuation" syncable="YES">
+        <attribute name="avAnStockPrice" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="bvps" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="capExpend" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="company" optional="YES" attributeType="String"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -72,6 +74,6 @@
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="284"/>
         <element name="Rule1Valuation" positionX="-261.819091796875" positionY="-29.61836242675781" width="128" height="299"/>
         <element name="UserEvaluation" positionX="-81.646728515625" positionY="-18.5029296875" width="128" height="119"/>
-        <element name="WBValuation" positionX="174.9136962890625" positionY="-16.72808837890625" width="128" height="328"/>
+        <element name="WBValuation" positionX="174.9136962890625" positionY="-16.72808837890625" width="128" height="344"/>
     </elements>
 </model>

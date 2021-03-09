@@ -38,14 +38,19 @@ class ValueListTVC: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         
+       proportions = controller.valueListTVCProportions(values: values)
+   }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        
         if let textcell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) as? ValueListTextEntryCell {
             let parameter = textcell.wbvParameter ?? ""
             controller.userEnteredNotes(notes: textcell.textView.text, parameter: parameter)
         }
-        proportions = controller.valueListTVCProportions(values: values)
-   }
+    }
     
     override func viewDidDisappear(_ animated: Bool) {
+                 
         NotificationCenter.default.post(name: Notification.Name(rawValue: "refreshWBValuationTVCRow"), object: indexPath, userInfo: nil)
     }
            

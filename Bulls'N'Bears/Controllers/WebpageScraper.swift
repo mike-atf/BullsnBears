@@ -196,7 +196,7 @@ class WebpageScraper {
         return value
     }
     
-    class func scrapeColumn(html$: String?, tableHeader: String, tableTerminal: String? = nil, columnTerminal: String? = nil) -> ([Double]?, [String]) {
+    class func scrapeColumn(html$: String?, tableHeader: String, tableTerminal: String? = nil, columnTerminal: String? = nil, noOfColumns:Int?=4, targetColumnFromRight: Int?=0) -> ([Double]?, [String]) {
         
         let tableHeader = tableHeader
         let tableTerminal =  tableTerminal ?? "</td>\n\t\t\t\t </tr></tbody>"
@@ -223,11 +223,12 @@ class WebpageScraper {
         var rowEndIndex = pageText.range(of: columnTerminal, options: .backwards, range: nil, locale: nil)
         var valueArray = [Double]()
         var count = 0 // row has four values, we only want the last of those four
+        
         repeat {
             let labelStartIndex = pageText.range(of: labelStart, options: .backwards, range: nil, locale: nil)
             let value$ = pageText[labelStartIndex!.upperBound...]
             
-            if count%4 == 0 {
+            if count%(noOfColumns ?? 4) == (targetColumnFromRight ?? 0) {
                 valueArray.append(Double(value$.filter("-0123456789.".contains)) ?? Double())
             }
 

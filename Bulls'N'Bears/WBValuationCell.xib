@@ -83,6 +83,7 @@
             </constraints>
             <connections>
                 <outlet property="detail" destination="uoj-Dx-7bk" id="SPy-r9-FMj"/>
+                <outlet property="detailLEadingConstraint" destination="yD3-Tw-7Ye" id="EC7-eu-RDl"/>
                 <outlet property="infoButton" destination="Q5Z-L5-pk0" id="AmN-Qv-G7R"/>
                 <outlet property="ratingLabel" destination="ytK-8O-sV5" id="eCp-dB-Fjk"/>
                 <outlet property="starView" destination="kKl-qt-iSX" id="cki-YO-530"/>

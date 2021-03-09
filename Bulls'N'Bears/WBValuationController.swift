@@ -30,10 +30,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         ],
         [["YoY Growth","Return of equity"],
          ["YoY Growth","Return on assets"],
-         ["Growth lt debt % of (equity+ret. earnings))","lt debt","equity + ret. earnings"]
+         ["Growth lt debt % of [equity+ret. earnings]","lt debt","equity + ret. earnings"]
         ],
-        [["Growth SGA % of profit)","SGA","profit"],
-         ["Growth R&D % of profit)","R&D","profit"]
+        [["Growth SGA % of profit","SGA","profit"],
+         ["Growth R&D % of profit","R&D","profit"]
         ]]
     var wbvParameters = WBVParameters()
 //    var valueListTVCSectionTitles = [[[String]]]()// [
@@ -101,7 +101,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         
         var data = RatingCircleData(rating: nil, maximum: nil, symbol: nil)
         
-        var stock = stocks.filter { (s) -> Bool in
+        let stock = stocks.filter { (s) -> Bool in
             if s.symbol == symbol { return true }
             else { return false }
         }.first
@@ -116,7 +116,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             
             for element in wbv.userEvaluations ?? [] {
                 if let evaluation = element as? UserEvaluation {
-                    if let valid = evaluation.userRating() { // -1 is model default, treat a nil
+                    if let valid = evaluation.userRating() {
                         userSummaryScore += Double(valid)
                         maximumScoreSum += 10.0
                     }
@@ -204,10 +204,31 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     color = valid > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
                 }
             case 2:
+                let lastStockPrice = stock.dailyPrices.last?.close
+                if let valid = valuation?.bvps?.first {
+                    if lastStockPrice != nil {
+                        if let t$ = percentFormatter0Digits.string(from: (valid / lastStockPrice!) as NSNumber) {
+                            if let t2$ = currencyFormatterGapWithPence.string(from: valid as NSNumber) {
+                                value$ = t$ + " (" + t2$ + ")"
+                            }
+                            else {
+                                value$ = currencyFormatterGapWithPence.string(from: valid as NSNumber)
+                            }
+                        }
+                    }
+//                    color = valid > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
+                }
+//                else if let r1v = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
+//                    if let valid = r1v.bvps?.first {
+//                        value$ = currencyFormatterGapWithPence.string(from: valid as NSNumber)
+////                        color = valid > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
+//                    }
+//                }
+            case 3:
                 if let valid = stock.beta {
                     value$ = numberFormatterDecimals.string(from: valid as NSNumber)
                 }
-            case 3:
+            case 4:
                 valuation?.peRatio = stock.peRatio ?? Double()
 
                 let (valid, es$) = valuation!.ivalue()
@@ -393,14 +414,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     private func buildRowTitles() -> [[String]] {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
-        return [["P/E ratio", "EPS", "beta", "intr. value (10y)"], ["Ret. earnings growth", "EPS growth", "Net inc./ Revenue growth","profit margin growth","LT Debt / net income growth"],["Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
+        return [["P/E ratio", "EPS", "Book value /share price","beta", "intr. value (10y)"], ["Ret. earnings growth", "EPS growth", "Net inc./ Revenue growth","profit margin growth","LT Debt / net income growth"],["Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
     }
         
     // MARK: - Data download functions
     
     func downloadWBValuationData() {
         
-        let webPageNames = ["financial-statements", "balance-sheet", "financial-ratios","pe-ratio"]
+        let webPageNames = ["financial-statements", "balance-sheet", "financial-ratios","pe-ratio", "stock-price-history"]
         
         guard stock.name_short != nil else {
             alertController.showDialog(title: "Unable to load WB valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
@@ -503,6 +524,7 @@ extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
                     if evaluation.wbvParameter == parameter {
                         evaluation.comment = valid
                         evaluation.save()
+//                        print("user notes saved: \(evaluation.comment)")
                     }
                 }
             }
@@ -604,6 +626,10 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.roa = result.array
             
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Book Value Per Share")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.bvps = result.array
+            
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
             }
@@ -611,6 +637,16 @@ extension WBValuationController: DataDownloaderDelegate {
         else if section == "pe-ratio" {
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
             valuation?.peRatio = result.array?.last ?? Double()
+            downloadErrors.append(contentsOf: result.errors)
+
+            DispatchQueue.main.async {
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
+            }
+
+        }
+        else if section == "stock-price-history" {
+            result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "Historical Annual Stock Price Data</th>", tableTerminal: "</td>\n\t\t\t\t </tr>\n\n\t\t\t\t\t\t\n\t\t\t\t</tbody>\n\t\t\t",noOfColumns: 7, targetColumnFromRight: 5) //    </table>\t\t\t\n\t\t\t\n\t\t\t</div>
+            valuation?.avAnStockPrice = result.array?.reversed()
             downloadErrors.append(contentsOf: result.errors)
 
             DispatchQueue.main.async {

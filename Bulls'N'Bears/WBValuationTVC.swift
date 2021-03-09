@@ -32,6 +32,16 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         NotificationCenter.default.removeObserver(self)
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        guard !movingToValueListTVC else {
+            return
+        }
+        
+        // this updates the stock user- and fundamentals parametr when returning to StocksListVC for updating ScoreCircle view
+        let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .star)
+        let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .dollar)
+    }
+    
     override func viewDidDisappear(_ animated: Bool) {
         
         guard !movingToValueListTVC else {
@@ -80,6 +90,11 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 60
     }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 50
+    }
+
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
@@ -210,19 +225,19 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 2 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, errors) = controller.valuation!.netIncomeProportion()
+                    let (margins, _) = controller.valuation!.netIncomeProportion()
                     destination.proportions = margins
                 }
                 else if selectedPath.row == 3 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, errors) = controller.valuation!.grossProfitMargins()
+                    let (margins, _) = controller.valuation!.grossProfitMargins()
                     destination.proportions = margins
                 }
                 else if selectedPath.row == 4 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, errors) = controller.valuation!.longtermDebtProportion()
+                    let (margins, _) = controller.valuation!.longtermDebtProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                 }
@@ -246,7 +261,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 if selectedPath.row == 0 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, errors) = controller.valuation!.sgaProportion()
+                    let (margins, _) = controller.valuation!.sgaProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                     
@@ -324,7 +339,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         controller.valuation?.save()
         
-        tableView.reloadSections([1,2,3], with: .automatic)
+        tableView.reloadData()
     }
 
 

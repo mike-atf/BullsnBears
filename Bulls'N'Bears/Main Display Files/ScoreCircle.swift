@@ -22,10 +22,13 @@ class ScoreCircle: UIView {
     func configure(ratingStruct: RatingCircleData?) {
                
         guard let validData = ratingStruct else {
+            self.isHidden = true
             return
         }
         
         guard let validRatio = validData.ratingScore() else { return }
+        
+        self.isHidden = false
         
         self.scoreRatio = CGFloat(validRatio)
         self.symbol = validData.symbol

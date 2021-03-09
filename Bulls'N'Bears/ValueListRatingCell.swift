@@ -15,15 +15,15 @@ class ValueListRatingCell: UITableViewCell {
     var wbvParameter: String!
     
     let ratingDescriptions = ["Consistent zero or negative growth",
-                              "IConsistent zero or negative growth, or \nInconsistent zero or negative growth, recently worse",
+                              "Consistent zero or negative growth, or \nInconsistent zero or negative growth, recently worse",
                               "Inconsistent zero or negative growth, recently better",
                               "IInconsistent growth 0-10%, recently worse",
                               "Inconsistent growth 0-10%, recently better",
                               "Inconsistent growth 10-15% recently worse",
-                              "Consistent growth 0-10%, or\n Inconsistent growth 10-15% recently better",
+                              "Consistent growth 0-10%, or\nInconsistent growth 10-15% recently better",
                               "Inconsistent growth >15% recently worse",
-                              "Consistent growth 10-15% , or \nInconsistent growth >15%, recently better",
-                              "Consistent growth >15%,  recently worse",
+                              "Consistent growth 10-15% , or\nInconsistent growth >15%, recently better",
+                              "Consistent growth >15%, recently worse",
                               "Consistent growth >15%"
                       ]
     

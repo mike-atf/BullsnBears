@@ -29,6 +29,12 @@ class StockListCellTableViewCell: UITableViewCell {
         super.awakeFromNib()
     }
     
+    override func prepareForReuse() {
+        self.title.text = " "
+        self.detail.text = " "
+        self.ratingCircle.isHidden = true
+    }
+    
     public func configureCell(indexPath: IndexPath, stock: Stock, userRatingData: RatingCircleData?, valueRatingData: RatingCircleData?) {
         self.indexPath = indexPath
         self.stock = stock

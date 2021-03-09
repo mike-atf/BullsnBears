@@ -13,6 +13,9 @@ import CoreData
 public class WBValuation: NSManagedObject {
     
     override public func awakeFromInsert() {
+        
+        bvps = [Double]()
+        avAnStockPrice = [Double]()
         eps = [Double]()
         revenue = [Double]()
         grossProfit = [Double]()

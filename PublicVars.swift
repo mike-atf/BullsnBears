@@ -101,6 +101,7 @@ enum TrendTimeOption {
 struct WBVParameters {
     // when adding new parameter check impact in WBVValuationController and WBVValuationTVC and ValueListTVC
     // also adapt 'higherIsBetter' parameter in UserEvaluation
+    let earnigsGrowth = "Growth of earnings"
     let retEarningsGrowth = "Growth of retained earnings"
     let epsGrowth = "EPS"
     let incomeOfRevenueGrowth = "Growth of net income % of revenue"
@@ -113,13 +114,13 @@ struct WBVParameters {
     let rAdOfProfitGrowth = "Growth of R&D % of profit"
     
     func allParameters() -> [String] {
-        return [retEarningsGrowth, epsGrowth, incomeOfRevenueGrowth, profitOfRevenueGrowth, debtOfIncomeGrowth, roeGrowth, roaGrowth ,debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth ,rAdOfProfitGrowth]
+        return [earnigsGrowth,retEarningsGrowth, epsGrowth, incomeOfRevenueGrowth, profitOfRevenueGrowth, debtOfIncomeGrowth, roeGrowth, roaGrowth ,debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth ,rAdOfProfitGrowth]
     }
     
     func structuredTitlesParameters() -> [[[String]]] {
         return [firstSection(), secondSection(), thirdSection()]
     }
-    
+        
     func firstSection() -> [[String]] {
         return [[retEarningsGrowth],
                 [epsGrowth],

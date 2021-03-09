@@ -35,6 +35,8 @@ extension WBValuation {
     @NSManaged public var sgaExpense: [Double]?
     @NSManaged public var shareholdersEquity: [Double]?
     @NSManaged public var userEvaluations: NSSet?
+    @NSManaged public var avAnStockPrice: [Double]?
+    @NSManaged public var bvps: [Double]?
 
 }
 

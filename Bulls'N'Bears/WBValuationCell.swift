@@ -20,6 +20,7 @@ class WBValuationCell: UITableViewCell {
     @IBOutlet var starView: UIImageView!
     @IBOutlet var trendIcon: TrendIconView!
     @IBOutlet var ratingLabel: UILabel!
+    @IBOutlet var detailLEadingConstraint: NSLayoutConstraint!
     
     var errors: [String]?
     weak var delegate: WBValuationCellDelegate?
@@ -34,11 +35,13 @@ class WBValuationCell: UITableViewCell {
         self.ratingLabel.isHidden = true
         self.trendIcon.isHidden = true
         self.ratingLabel.textColor = UIColor.label
+        self.detailLEadingConstraint.isActive = true
     }
     
     public func configure(title: String, detail: String, detailColor: UIColor?=nil, errors: [String]?, delegate: WBValuationCellDelegate, userEvaluation: UserEvaluation?, correlation: Correlation?) {
         self.title.text = title
         self.detail.text = detail
+        self.detail.sizeToFit()
         self.detail.textColor = detailColor ?? UIColor.label
         self.delegate = delegate
         self.errors = errors
@@ -76,11 +79,13 @@ class WBValuationCell: UITableViewCell {
         }
         
         if let valid = correlation {
+            detailLEadingConstraint.isActive = true
             trendIcon.isHidden = false
             trendIcon.configure(correlation: valid)
         }
         else {
             trendIcon.isHidden = true
+            detailLEadingConstraint.isActive = false
         }
     }
     
