@@ -96,7 +96,7 @@ class CombinedValuationController: ValuationHelper {
         
         let fetchRequest = NSFetchRequest<Rule1Valuation>(entityName: "Rule1Valuation")
         if let validName = company {
-            let predicate = NSPredicate(format: "company BEGINSWITH %@", argumentArray: [validName])
+            let predicate = NSPredicate(format: "company == %@", argumentArray: [validName])
             fetchRequest.predicate = predicate
         }
         
@@ -114,8 +114,9 @@ class CombinedValuationController: ValuationHelper {
         var valuations: [DCFValuation]?
         
         let fetchRequest = NSFetchRequest<DCFValuation>(entityName: "DCFValuation")
+        fetchRequest.returnsObjectsAsFaults = false
         if let validName = company {
-            let predicate = NSPredicate(format: "company BEGINSWITH %@", argumentArray: [validName])
+            let predicate = NSPredicate(format: "company == %@", argumentArray: [validName])
             fetchRequest.predicate = predicate
         }
         

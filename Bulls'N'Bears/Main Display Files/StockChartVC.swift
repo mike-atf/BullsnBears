@@ -32,7 +32,7 @@ class StockChartVC: UIViewController {
 
         if stockToShow == nil {
             stockToShow = stocks.first
-            configure()
+            configure(dcfVal: dcfValuation, r1Val: r1Valuation)
         }
         
         buildLabel = UIBarButtonItem(title: "Build: " + appBuild, style: .plain, target: nil, action: nil)
@@ -58,13 +58,16 @@ class StockChartVC: UIViewController {
         chart.contentView.setNeedsDisplay()
     }
     
-    func configure() {
+    func configure(dcfVal: DCFValuation?, r1Val: Rule1Valuation?) {
         loadViewIfNeeded() // leave! essential
         if let validChart = chart {
             if let stock = stockToShow {
                 validChart.configure(with: stock)
-                dcfValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first
-                r1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first
+//                dcfValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first
+//                r1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first
+                dcfValuation = dcfVal
+                r1Valuation = r1Val
+
             }
         }
         
@@ -75,29 +78,6 @@ class StockChartVC: UIViewController {
         refreshDCFLabel()
         refreshR1Label()
     }
-    
-//    func addValueChartView(array: [Double]?) {
-//
-//        temporaryValueChartView = ValueChart()
-//        chart.translatesAutoresizingMaskIntoConstraints = false
-//
-//        self.view.addSubview(temporaryValueChartView!)
-//        let margins = self.view.layoutMarginsGuide
-//
-//        temporaryValueChartView?.leadingAnchor.constraint(equalTo: margins.leadingAnchor).isActive = true
-//        temporaryValueChartView?.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
-//        temporaryValueChartView?.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-//        temporaryValueChartView?.bottomAnchor.constraint(equalTo: margins.bottomAnchor).isActive = true
-//
-//        temporaryValueChartView?.configure(array: array)
-//
-//    }
-    
-//    func removeValueChartView() {
-//
-//        self.temporaryValueChartView?.removeFromSuperview()
-//        temporaryValueChartView = nil
-//    }
     
     func refreshDCFLabel() {
         if let validValuation = dcfValuation {

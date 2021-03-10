@@ -212,25 +212,21 @@ class StocksListViewController: UITableViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
+        guard let indexPath = tableView.indexPathForSelectedRow else { return }
+        
+        let dcfValuation = CombinedValuationController.returnDCFValuations(company: stocks[indexPath.row].symbol)?.first
+        let r1Valuation = CombinedValuationController.returnR1Valuations(company: stocks[indexPath.row].symbol)?.first
+        
         if let chartView = segue.destination as? StockChartVC {
-            if let indexPath = tableView.indexPathForSelectedRow {
                 
-                chartView.stockToShow = stocks[indexPath.row]
-                chartView.configure()
-                
-//                self.valueChartDelegate = chartView
-
-            }
+            chartView.stockToShow = stocks[indexPath.row]
+            chartView.configure(dcfVal: dcfValuation, r1Val: r1Valuation)
         }
         else if let navView = segue.destination as? UINavigationController {
             if let chartView = navView.topViewController as? StockChartVC {
-                if let indexPath = tableView.indexPathForSelectedRow {
                     
-                    chartView.stockToShow = stocks[indexPath.row]
-                    chartView.configure()
-                    
-//                    self.valueChartDelegate = chartView
-                }
+            chartView.stockToShow = stocks[indexPath.row]
+            chartView.configure(dcfVal: dcfValuation, r1Val: r1Valuation)
             }
         }
     }

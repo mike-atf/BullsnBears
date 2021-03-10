@@ -37,9 +37,11 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             return
         }
         
-        // this updates the stock user- and fundamentals parametr when returning to StocksListVC for updating ScoreCircle view
+        // this updates the stock user- and fundamentals parameter when returning to StocksListVC for updating ScoreCircle view
         let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .star)
         let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .dollar)
+        controller.deallocate()
+        controller = nil
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -196,7 +198,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         switch indexPath.row {
         case 0:
-            infoText = "Current P/E ratio, and P/E (mininum - maximum) during the period 6-24 months ago.\nThis allows comparison of current P/E to the recent past in order to help judge whether a stock price is above or below recent levels. Helpful to spot over- or under-pricing"
+            infoText = "Current P/E ratio, and P/E (minimum - maximum) during the period 6-24 months ago.\nThis allows comparison of current P/E to the recent past in order to help judge whether a stock price is above or below recent levels. Helpful to spot over- or under-pricing"
         case 1:
             infoText = "Not implemented"
         case 2:

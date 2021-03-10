@@ -36,26 +36,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
          ["Growth R&D % of profit","R&D","profit"]
         ]]
     var wbvParameters = WBVParameters()
-//    var valueListTVCSectionTitles = [[[String]]]()// [
-//                                    [
-//                                        ["Growth of retained earnings"],
-//                                        ["EPS"],
-//                                        ["Growth of net income % of revenue", "Revenue"],
-//                                        ["Growth of profit % of revenue", "Revenue"],
-//                                        ["Growth of LT debt % of net income", "Net income"]
-//                                    ],
-//                                    [
-//                                        ["Growth of return on equity"],
-//                                        ["Growth of return on assets"],
-//                                        ["Growth of LT debt % of equity + ret. earnings", "equity + ret. earnings"]
-//
-//                                    ],
-//                                    [
-//                                        ["Growth of SGA % of profit", "Profit"],
-//                                        ["Growth of R&D % of profit", "Profit"]
-//                                    ]
-//    ]
- 
     
     //MARK: - init
 
@@ -76,6 +56,13 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         rowTitles = buildRowTitles()
     }
     
+    func deallocate() {
+        self.downloader?.webView = nil
+        self.downloader = nil
+        self.progressDelegate = nil
+        self.valuation = nil
+        
+    }
     //MARK: - class functions
     
     static func returnWBValuations(company: String? = nil) -> [WBValuation]? {
@@ -83,6 +70,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         var valuations: [WBValuation]?
         
         let fetchRequest = NSFetchRequest<WBValuation>(entityName: "WBValuation")
+        fetchRequest.returnsObjectsAsFaults = false
         if let validName = company {
             let predicate = NSPredicate(format: "company BEGINSWITH %@", argumentArray: [validName])
             fetchRequest.predicate = predicate

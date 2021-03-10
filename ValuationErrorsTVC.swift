@@ -37,9 +37,9 @@ class ValuationErrorsTVC: UITableViewController {
         return cell
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "There were problems with the calculation"
-    }
+//    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+//        return "There were problems with the calculation"
+//    }
 
     /*
     // Override to support conditional editing of the table view.
