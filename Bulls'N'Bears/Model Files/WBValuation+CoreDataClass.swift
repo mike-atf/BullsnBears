@@ -35,6 +35,72 @@ public class WBValuation: NSManagedObject {
 
     }
     
+    func peRatiosWithDates() -> [DatedValue]? {
+        
+        if let valid = perDates {
+            do {
+                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
+                    var datedValues = [DatedValue]()
+                    for element in dictionary {
+                        datedValues.append(DatedValue(date: element.key, value: element.value))
+                    }
+                    return datedValues
+                }
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+            }
+        }
+        
+        return nil
+    }
+    
+    func savePERWithDateArray(datesValuesArray: [DatedValue]?) {
+        
+        guard let datedValues = datesValuesArray else { return }
+        
+        var array = [Date: Double]()
+
+        for element in datedValues {
+            array[element.date] = element.value
+        }
+
+        do {
+            let data = try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
+            perDates = data
+            save()
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
+        }
+        
+    }
+    
+    func minMeanMaxPER(from:Date, to: Date?=nil) -> (Double, Double, Double)? {
+        
+        guard let datedValues = peRatiosWithDates() else {
+            return nil
+        }
+        
+        let end = to ?? Date()
+        
+        let inDateRange = datedValues.filter { (element) -> Bool in
+            if element.date < from { return false }
+            else if element.date > end { return false }
+            return true
+        }
+        
+        let valuesInDateRange = inDateRange.compactMap { $0.value }
+        if let mean = valuesInDateRange.mean() {
+            if let min = valuesInDateRange.min() {
+                if let max = valuesInDateRange.max() {
+                    return (min, mean, max)
+                }
+            }
+        }
+        
+        return nil
+        
+    }
+    
     func save() {
         
        do {

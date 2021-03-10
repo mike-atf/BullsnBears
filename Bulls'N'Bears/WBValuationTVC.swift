@@ -78,7 +78,13 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         cell.configure(title: controller.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self, userEvaluation: evaluation, correlation: correlation)
         
         if indexPath.section == 0 {
-            cell.accessoryType = .none
+            cell.accessoryType = .detailButton
+            if [1,3,4].contains(indexPath.row) {
+                cell.accessoryView?.isHidden = true
+            }
+            else {
+                cell.accessoryView?.isHidden = false
+            }
         }
         else {
             cell.accessoryType = .disclosureIndicator
@@ -182,6 +188,30 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         performSegue(withIdentifier: "valueListSegue", sender: nil)
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        
+        var infoText = String()
+        
+        switch indexPath.row {
+        case 0:
+            infoText = "Current P/E ratio, and P/E (mininum - maximum) during the period 6-24 months ago.\nThis allows comparison of current P/E to the recent past in order to help judge whether a stock price is above or below recent levels. Helpful to spot over- or under-pricing"
+        case 1:
+            infoText = "Not implemented"
+        case 2:
+            infoText = "Proportion of book value to current share price in %, as well (book value per share).\nHelps to judge the stock price in relation to company assets."
+        case 3:
+            infoText = "Proportion of book value/ share to current share price in %, as well (book value per share).\nHelps to judge the stock price in relation to company assets."
+        case 4:
+            infoText = "Intrinsic value based on 10y prediction.\nTaking into account past earnings growth, pre-tax EPS and a long-term discount rate of 2.1%.\nAs calculated in 'Warren Buffet and the Interpretation of Financial Statements' (Simon & Schuster, 2008)"
+        default:
+            print("Error - default")
+        }
+        
+        let view = tableView.cellForRow(at: indexPath)?.contentView
+        
+        infoButtonAction(errors: [infoText], sender: view!)
     }
 
     // MARK: - Navigation
@@ -354,7 +384,7 @@ extension WBValuationTVC: StockKeyratioDownloadDelegate, WBValuationCellDelegate
         }
     }
     
-    func infoButtonAction(errors: [String]?, sender: UIButton) {
+    func infoButtonAction(errors: [String]?, sender: UIView) {
         
         if let errorsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {
             

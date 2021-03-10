@@ -197,6 +197,12 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     valuation?.peRatio = valid
                     valuation?.save()
                 }
+                let sixMonthsAgo = Date().addingTimeInterval(-183*24*3600)
+                let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-2*365*24*3600)
+                if let (min, _, max) = valuation?.minMeanMaxPER(from: twoYearsAgo, to: sixMonthsAgo) {
+                    let minMAxValue$ = " (" + numberFormatterNoFraction.string(from: min as NSNumber)! + " - " + numberFormatterNoFraction.string(from: max as NSNumber)! + ")"
+                    value$?.append(minMAxValue$)
+                }
                 
             case 1:
                 if let valid = stock.eps {
@@ -638,6 +644,10 @@ extension WBValuationController: DataDownloaderDelegate {
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
             valuation?.peRatio = result.array?.last ?? Double()
             downloadErrors.append(contentsOf: result.errors)
+            
+            let (results,errors) = WebpageScraper.scrapePERDatesTable(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
+            downloadErrors.append(contentsOf: errors)
+            valuation?.savePERWithDateArray(datesValuesArray: results)
 
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)

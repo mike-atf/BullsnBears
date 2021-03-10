@@ -241,5 +241,71 @@ class WebpageScraper {
         
         return (valueArray, errors)
 
-    }    
+    }
+    
+    class func scrapePERDatesTable(html$: String?, tableHeader: String, tableTerminal: String? = nil, columnTerminal: String? = nil) -> ([DatedValue]?, [String]) {
+        
+        let tableHeader = tableHeader
+        let tableTerminal =  tableTerminal ?? "</td>\n\t\t\t\t </tr></tbody>"
+        let columnTerminal = columnTerminal ?? "</td>"
+        let labelStart = ">"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "y-M-d"
+        
+        var errors = [String]()
+
+        var pageText = String(html$ ?? "")
+        
+        guard let titleIndex = pageText.range(of: tableHeader) else {
+            errors.append("Did not find section \(tableHeader) on MT website")
+            return (nil, errors)
+        }
+
+        let tableEndIndex = pageText.range(of: tableTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<pageText.endIndex, locale: nil)
+        
+        guard tableEndIndex != nil else {
+            errors.append("Did not find table end in section \(tableHeader) on MT website")
+            return (nil, errors)
+        }
+        pageText = String(pageText[titleIndex.upperBound..<tableEndIndex!.lowerBound])
+        
+        var rowEndIndex = pageText.range(of: columnTerminal, options: .backwards, range: nil, locale: nil)
+        var valueArray = [DatedValue]()
+        var count = 0 // row has four values, we only want the last of those four
+        var dateElements = [Date?]()
+        var perElements = [Double]()
+        
+        repeat {
+            let labelStartIndex = pageText.range(of: labelStart, options: .backwards, range: nil, locale: nil)
+            let value$ = pageText[labelStartIndex!.upperBound...]
+            
+            if count%4 == 0 { // PER value
+                perElements.append(Double(value$.filter("-0123456789.".contains)) ?? Double())
+            }
+            else if count%3 == 0 { // date
+                dateElements.append(dateFormatter.date(from: String(value$)))
+            }
+
+            rowEndIndex = pageText.range(of: columnTerminal, options: .backwards, range: nil, locale: nil)
+            if rowEndIndex != nil {
+                pageText.removeSubrange(rowEndIndex!.lowerBound...)
+                count += 1
+            }
+            
+        }  while rowEndIndex != nil
+        
+        count = 0
+        for per in perElements {
+            if dateElements.count > count {
+                if let date = dateElements[count] {
+                    valueArray.append(DatedValue(date: date, value: per))
+                }
+            }
+            count += 1
+        }
+        
+        return (valueArray.reversed(), errors)
+
+    }
+
 }

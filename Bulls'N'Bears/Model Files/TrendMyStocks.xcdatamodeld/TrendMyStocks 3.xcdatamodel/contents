@@ -61,6 +61,7 @@
         <attribute name="netEarnings" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="operatingIncome" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="peRatio" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="perDates" optional="YES" attributeType="Binary" customClassName="[(Date, Double)]"/>
         <attribute name="ppe" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="rAndDexpense" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="revenue" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
@@ -74,6 +75,6 @@
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="284"/>
         <element name="Rule1Valuation" positionX="-261.819091796875" positionY="-29.61836242675781" width="128" height="299"/>
         <element name="UserEvaluation" positionX="-81.646728515625" positionY="-18.5029296875" width="128" height="119"/>
-        <element name="WBValuation" positionX="174.9136962890625" positionY="-16.72808837890625" width="128" height="344"/>
+        <element name="WBValuation" positionX="174.9136962890625" positionY="-16.72808837890625" width="128" height="359"/>
     </elements>
 </model>

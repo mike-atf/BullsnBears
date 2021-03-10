@@ -37,6 +37,7 @@ extension WBValuation {
     @NSManaged public var userEvaluations: NSSet?
     @NSManaged public var avAnStockPrice: [Double]?
     @NSManaged public var bvps: [Double]?
+    @NSManaged public var perDates: Data?
 
 }
 

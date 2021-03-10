@@ -32,6 +32,20 @@ var stockTickerDictionary: [String:String]? = {
     return nil
 }()
 
+struct DatedValue {
+    var date: Date
+    var value: Double
+    
+    init(date: Date, value: Double) {
+        self.date = date
+        self.value = value
+    }
+    
+    func returnTuple() -> (Date, Double) {
+        return (date, value)
+    }
+}
+
 var appVersion:String = {
     if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
         return version

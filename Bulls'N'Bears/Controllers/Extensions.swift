@@ -7,6 +7,13 @@
 
 import UIKit
 
+//extension Array where Element == DatedValue {
+//    
+//    func encode() -> Data? {
+//        
+//    }
+//}
+
 extension Array where Element == Double {
     
     mutating func add(value: Double, index: Int) {
