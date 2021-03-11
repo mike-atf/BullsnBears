@@ -14,6 +14,7 @@ public class WBValuation: NSManagedObject {
     
     override public func awakeFromInsert() {
         
+        opCashFlow = [Double]()
         bvps = [Double]()
         avAnStockPrice = [Double]()
         eps = [Double]()
@@ -311,8 +312,10 @@ public class WBValuation: NSManagedObject {
         let retEarningsGrowthWeight = 1.3
         let epsGrowthWeight = 1.0
         let netIncomeDivProfitWeight = 1.0
+        let capExpendDivEarningsWeight = 1.1
         let profitMarginWeight = 1.0
         let ltDebtDivIncomeWeight = 1.0
+        let opCashFlowGrowthWeight = 1.1
         let ltDebtDivadjEq = 0.75
         let sgaDivRevenue = 0.75
         let radDivRevenue = 0.75
@@ -339,6 +342,20 @@ public class WBValuation: NSManagedObject {
         if let valid = valueFactor(values1: revenue, values2: grossProfit, maxCutOff: 1, emaPeriod: emaPeriods) {
             allFactors.append(valid * profitMarginWeight)
             allWeights.append(profitMarginWeight)
+        }
+        if let sumDiv = netEarnings?.reduce(0, +) {
+            // use 10 y sums / averages, not ema according to Book Ch 51
+            if let sumDenom = capExpend?.reduce(0, +) {
+                let tenYAverages = abs(sumDenom / sumDiv)
+                let maxCutOff = 0.5
+                let factor = (tenYAverages < maxCutOff) ? ((maxCutOff - tenYAverages) / maxCutOff) : 0
+                allFactors.append(factor * capExpendDivEarningsWeight)
+                allWeights.append(capExpendDivEarningsWeight)
+            }
+        }
+        if let valid = valueFactor(values1: opCashFlow, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * opCashFlowGrowthWeight)
+            allWeights.append(opCashFlowGrowthWeight)
         }
         if let valid = inverseValueFactor(values1: netEarnings, values2: debtLT, maxCutOff: 3, emaPeriod: emaPeriods) {
             allFactors.append(valid * ltDebtDivIncomeWeight)
@@ -389,10 +406,6 @@ public class WBValuation: NSManagedObject {
             (array,_) = proportions(array1: values1, array2: values2)
         }
         
-//        guard let growthArray = array.growthRates() else {
-//            return nil
-//        }
-        
         guard let ema = array.ema(periods: emaPeriod) else { return nil }
         
         if ema < 0 { return 0 }
@@ -416,10 +429,6 @@ public class WBValuation: NSManagedObject {
             (array,_) = proportions(array1: values1, array2: values2)
         }
         
-//        guard let growthArray = array.growthRates() else {
-//            return nil
-//        }
-//
         guard let ema = array.ema(periods: emaPeriod) else { return nil }
         
         if ema > 0 { return 0 }

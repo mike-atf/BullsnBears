@@ -12,7 +12,7 @@ import WebKit
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     var sectionTitles = ["Key ratios","Main parameters", "Secondary parameters","Expenses"]
-    var sectionSubTitles = ["from Yahoo finance","Growth EMA (from MacroTrends data)","Growth EMA (from MacroTrends data)","Growth EMA (from MacroTrends data)"]
+    var sectionSubTitles = ["from Yahoo finance","EMA of growth rates of...","EMA of growth rates of...","EMA of growth rates of..."]
     var rowTitles: [[String]]!
     var stock: Stock!
     var valuation: WBValuation?
@@ -26,9 +26,11 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
          ["YoY Growth","EPS"],
          ["Growth net income % of revenue","net income","revenue"],
          ["Growth profit % of revenue","profit","revenue"],
+         ["Growth cap.expend % of earnings","cap. expend","earnings"],
          ["Growth LT debt % of net income","LT debt","revenue"]
         ],
-        [["YoY Growth","Return of equity"],
+        [["YoY Growth","Op. cash flow"],
+         ["YoY Growth","Return of equity"],
          ["YoY Growth","Return on assets"],
          ["Growth lt debt % of [equity+ret. earnings]","lt debt","equity + ret. earnings"]
         ],
@@ -210,14 +212,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                             }
                         }
                     }
-//                    color = valid > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
                 }
-//                else if let r1v = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
-//                    if let valid = r1v.bvps?.first {
-//                        value$ = currencyFormatterGapWithPence.string(from: valid as NSNumber)
-////                        color = valid > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
-//                    }
-//                }
             case 3:
                 if let valid = stock.beta {
                     value$ = numberFormatterDecimals.string(from: valid as NSNumber)
@@ -284,6 +279,25 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
                 return (value$,color,errors)
             case 4:
+                if let sumDiv = valuation!.netEarnings?.reduce(0, +) {
+                    // use 10 y sums / averages, not ema according to Book Ch 51
+                    if let sumDenom = valuation!.capExpend?.reduce(0, +) {
+                        let tenYAverages = abs(sumDenom / sumDiv)
+                        value$ = percentFormatter0Digits.string(from: tenYAverages as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 1, value: tenYAverages, greenCutoff: 0.25, redCutOff: 0.5)
+                    }
+                }
+                
+                // OLD EMA
+//                let (prop, es$) = valuation!.proportions(array1: valuation?.netEarnings, array2: valuation?.capExpend?.positives()) // cap expend is negative
+//                errors = es$
+//                if let propEMA = prop.ema(periods: emaPeriod) { //weightedMean()
+//                    value$ = percentFormatter0Digits.string(from: propEMA as NSNumber) ?? "-"
+//                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: propEMA, greenCutoff: 0.25, redCutOff: 0.55)
+//                }
+                //
+                return (value$,color,errors)
+           case 5:
                 let (proportions, es$) = valuation!.longtermDebtProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
@@ -301,6 +315,18 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             var value$ = "-"
             switch path.row {
             case 0:
+                let fcfGrowth = valuation?.opCashFlow?.filter({ (element) -> Bool in
+                    if element != 0.0 { return true }
+                    else { return false }
+                }).growthRates()
+                
+                if let meanGrowth = fcfGrowth?.ema(periods: emaPeriod) {
+                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: meanGrowth, greenCutoff: 0.15, redCutOff: 0.0)
+                }
+
+                return (value$, color, errors)
+            case 1:
                 let roeGrowths = valuation?.roe?.filter({ (element) -> Bool in
                     if element != 0.0 { return true }
                     else { return false }
@@ -312,7 +338,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
                 return (value$, color, errors)
 
-            case 1:
+            case 2:
                 let roaGrowths = valuation?.roa?.filter({ (element) -> Bool in
                     if element != 0.0 { return true }
                     else { return false }
@@ -324,7 +350,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
                 return (value$, color, errors)
 
-            case 2:
+            case 3:
                 
                 let (shEquityWithRetEarnings, error) = valuation!.addElements(array1: valuation!.shareholdersEquity ?? [], array2: valuation!.equityRepurchased ?? [])
                 if error != nil {
@@ -408,14 +434,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     private func buildRowTitles() -> [[String]] {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
-        return [["P/E ratio", "EPS", "Book value /share price","beta", "intr. value (10y)"], ["Ret. earnings growth", "EPS growth", "Net inc./ Revenue growth","profit margin growth","LT Debt / net income growth"],["Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
+        return [["P/E ratio", "EPS", "Book value /share price","beta", "intr. value (10y)"], ["Ret. earnings", "EPS", "Net inc./ Revenue","profit margin", "Cap. expend. / earnings (av.)","LT Debt / net income"],["Op. cash flow","Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
     }
         
     // MARK: - Data download functions
     
     func downloadWBValuationData() {
         
-        let webPageNames = ["financial-statements", "balance-sheet", "financial-ratios","pe-ratio", "stock-price-history"]
+        let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios","pe-ratio", "stock-price-history"]
         
         guard stock.name_short != nil else {
             alertController.showDialog(title: "Unable to load WB valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
@@ -607,6 +633,19 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.shareholdersEquity = result.array
             
+            DispatchQueue.main.async {
+                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
+            }
+        }
+        else if section == "cash-flow-statement" {
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Investing Activities")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.capExpend = result.array?.positives() // converted from negative for more intuitive correlation display in ValueLIstTVC and WBValuationTVC
+            
+            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Operating Activities")
+            downloadErrors.append(contentsOf: result.errors)
+            valuation?.opCashFlow = result.array
+
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
             }

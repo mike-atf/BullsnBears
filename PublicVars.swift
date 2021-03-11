@@ -120,7 +120,9 @@ struct WBVParameters {
     let epsGrowth = "EPS"
     let incomeOfRevenueGrowth = "Growth of net income % of revenue"
     let profitOfRevenueGrowth = "Growth of profit % of revenue"
+    let capExpendOfEarningsGrowth = "Growth of cap. expend % of net income"
     let debtOfIncomeGrowth = "Growth of LT debt % of net income"
+    let opCashFlowGrowth = "Growth of op. cash flow"
     let roeGrowth = "Growth of return on equity"
     let roaGrowth = "Growth of return on assets"
     let debtOfEqAndRtEarningsGrowth = "Growth of LT debt % of equity + ret. earnings"
@@ -128,7 +130,7 @@ struct WBVParameters {
     let rAdOfProfitGrowth = "Growth of R&D % of profit"
     
     func allParameters() -> [String] {
-        return [earnigsGrowth,retEarningsGrowth, epsGrowth, incomeOfRevenueGrowth, profitOfRevenueGrowth, debtOfIncomeGrowth, roeGrowth, roaGrowth ,debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth ,rAdOfProfitGrowth]
+        return [earnigsGrowth,retEarningsGrowth, epsGrowth, incomeOfRevenueGrowth, profitOfRevenueGrowth, capExpendOfEarningsGrowth, debtOfIncomeGrowth, roeGrowth, roaGrowth ,debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth ,rAdOfProfitGrowth]
     }
     
     func structuredTitlesParameters() -> [[[String]]] {
@@ -140,11 +142,13 @@ struct WBVParameters {
                 [epsGrowth],
                 [incomeOfRevenueGrowth, "Revenue"],
                 [profitOfRevenueGrowth, "Revenue"],
+                [capExpendOfEarningsGrowth, "Net income"],
                 [debtOfIncomeGrowth, "Net income"]]
     }
     
     func secondSection() -> [[String]] {
-        return [[roeGrowth],
+        return [[opCashFlowGrowth],
+                [roeGrowth],
                 [roaGrowth],
                 [debtOfEqAndRtEarningsGrowth, "equity + ret. earnings"]]
     }

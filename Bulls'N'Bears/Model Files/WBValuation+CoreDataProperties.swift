@@ -16,7 +16,8 @@ extension WBValuation {
         return NSFetchRequest<WBValuation>(entityName: "WBValuation")
     }
 
-    @NSManaged public var capExpend: [Double]?
+    @NSManaged public var capExpend: [Double]? // converted from NEGATIVE in MacroTrends to positive!
+    @NSManaged public var opCashFlow: [Double]?
     @NSManaged public var company: String?
     @NSManaged public var date: Date?
     @NSManaged public var debtLT: [Double]?

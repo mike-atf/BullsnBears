@@ -206,6 +206,28 @@ extension Array where Element == Double {
 
         return rates
     }
+    
+    /// can include empty placeholder Double() elements instead of nil
+    func positives() -> [Double]? {
+        
+        guard self.count > 1 else {
+            return nil
+        }
+
+        let max = self.max()!
+        let min = self.min()!
+        
+        if max * min > 0 {
+            // either all values positive or all  negative
+            
+            return self.compactMap{ abs($0) }
+        }
+        else {
+            // either 0 (shouldn't) or some postive and some negative values
+            return self.compactMap{ $0 * -1 }
+        }
+    }
+
 
 }
 

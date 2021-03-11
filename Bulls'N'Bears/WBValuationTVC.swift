@@ -230,6 +230,10 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             return
         }
         
+        guard let wbVal = controller.valuation else {
+            return
+        }
+        
         
         if let destination = segue.destination as? ValueListTVC {
             
@@ -268,6 +272,13 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 }
                 else if selectedPath.row == 4 {
                     destination.values = arrays
+                    destination.formatter = percentFormatter0Digits
+                    let (prop, _) = controller.valuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
+                    destination.proportions = prop
+                    destination.higherGrowthIsBetter = false
+                }
+               else if selectedPath.row == 5 {
+                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, _) = controller.valuation!.longtermDebtProportion()
                     destination.proportions = margins
@@ -275,11 +286,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 }
             }
             else if selectedPath.section == 2 {
-                if selectedPath.row == 0 {
-                    destination.values = arrays
-                    destination.formatter = percentFormatter0Digits
-                }
-                else if selectedPath.row == 1 {
+                if selectedPath.row < 2 {
                     destination.values = arrays
                     destination.formatter = percentFormatter0Digits
                 }
@@ -328,11 +335,17 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
             }
             else if indexPath.row == 4 {
+                arrays = [controller.valuation?.capExpend ?? [], controller.valuation?.netEarnings ?? []]
+            }
+            else if indexPath.row == 5 {
                 arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
             }
         }
         else if indexPath.section == 2 {
             if indexPath.row == 0 {
+                arrays = [controller.valuation?.opCashFlow ?? []]
+            }
+            else if indexPath.row == 1 {
                 arrays = [controller.valuation?.roe ?? []]
             }
             else if indexPath.row == 1 {
