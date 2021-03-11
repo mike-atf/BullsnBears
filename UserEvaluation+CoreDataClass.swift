@@ -27,6 +27,7 @@ public class UserEvaluation: NSManagedObject {
     static func create(valuation: WBValuation, in managedObjectContext: NSManagedObjectContext) {
         let newEvaluation = self.init(context: managedObjectContext)
         newEvaluation.userEvaluation = valuation
+        newEvaluation.date = Date()
 
         do {
             try  managedObjectContext.save()
@@ -64,5 +65,5 @@ public class UserEvaluation: NSManagedObject {
         return GradientColorFinder.cleanRatingColor(for: userRating() ?? 0, higherIsBetter: higherIsBetter)
         
     }
-
+    
 }

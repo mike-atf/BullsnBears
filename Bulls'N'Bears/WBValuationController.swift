@@ -156,6 +156,27 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         return newValuation
     }
     
+    static func allUserRatings(for symbol: String?) -> [UserEvaluation]? {
+        
+        var ratings: [UserEvaluation]?
+        
+        let fetchRequest = NSFetchRequest<UserEvaluation>(entityName: "UserEvaluation")
+        fetchRequest.returnsObjectsAsFaults = false
+        if let validName = symbol {
+            let predicate = NSPredicate(format: "company == %@", argumentArray: [validName])
+            fetchRequest.predicate = predicate
+        }
+        
+        do {
+            ratings = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching UserEvaluations")
+        }
+
+        return ratings
+    }
+
+    
     //MARK: - TVC controller functions
     
     public func rowTitle(path: IndexPath) -> String {
@@ -543,8 +564,8 @@ extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
                 if let evaluation = element as? UserEvaluation {
                     if evaluation.wbvParameter == parameter {
                         evaluation.comment = valid
+                        evaluation.date = Date()
                         evaluation.save()
-//                        print("user notes saved: \(evaluation.comment)")
                     }
                 }
             }
@@ -557,6 +578,7 @@ extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
             if let evaluation = element as? UserEvaluation {
                 if evaluation.wbvParameter == parameter {
                     evaluation.rating = Int16(rating)
+                    evaluation.date = Date()
                     evaluation.save()
                 }
             }

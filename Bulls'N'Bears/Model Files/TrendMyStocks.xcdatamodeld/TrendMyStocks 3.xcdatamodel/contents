@@ -41,6 +41,7 @@
     </entity>
     <entity name="UserEvaluation" representedClassName="UserEvaluation" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="higherIsBetter" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="rating" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES"/>
         <attribute name="stock" optional="YES" attributeType="String"/>
@@ -70,12 +71,12 @@
         <attribute name="roe" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="sgaExpense" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="shareholdersEquity" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
-        <relationship name="userEvaluations" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserEvaluation" inverseName="wbValuation" inverseEntity="UserEvaluation"/>
+        <relationship name="userEvaluations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserEvaluation" inverseName="wbValuation" inverseEntity="UserEvaluation"/>
     </entity>
     <elements>
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="284"/>
         <element name="Rule1Valuation" positionX="-261.819091796875" positionY="-29.61836242675781" width="128" height="299"/>
-        <element name="UserEvaluation" positionX="-81.646728515625" positionY="-18.5029296875" width="128" height="119"/>
-        <element name="WBValuation" positionX="174.9136962890625" positionY="-16.72808837890625" width="128" height="374"/>
+        <element name="UserEvaluation" positionX="-81.646728515625" positionY="-18.5029296875" width="128" height="148"/>
+        <element name="WBValuation" positionX="174.9136962890625" positionY="-16.72808837890625" width="128" height="388"/>
     </elements>
 </model>

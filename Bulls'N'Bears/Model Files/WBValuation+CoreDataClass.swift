@@ -33,6 +33,14 @@ public class WBValuation: NSManagedObject {
         operatingIncome = [Double]()
         equityRepurchased = [Double]()
         date = Date()
+        
+        // when deleting a WBValuation this doe NOT delete related UserEvaluations
+        // these are linked to a company (symbol) as well as wbValuation parameters
+        // when (re-)creating a WBValuation check whether there are any old userEvaluations
+        // and if so re-add the relationships to this WBValuation via parameters
+        if let ratings = WBValuationController.allUserRatings(for: company) {
+            addToUserEvaluations(NSSet(object: ratings))
+        }
 
     }
     

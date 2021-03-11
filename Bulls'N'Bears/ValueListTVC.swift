@@ -79,7 +79,12 @@ class ValueListTVC: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListTextEntryCell", for: indexPath) as! ValueListTextEntryCell
             let parameter = sectionTitles[2] // ! careful. This assumes the first two sectionsTitles are '["Your Rating (keep tapping the stars)","Your evaluation notes"]' to which the parameter and more are appended in WBValuationController prepareForSegue()
             let userEvaluation = controller.returnUserEvaluation(for: parameter)
-            cell.configure(text: userEvaluation?.comment, delegate: controller, wbvParameter: userEvaluation?.wbvParameter ?? "missing")
+            var text: String?
+            if let comment = userEvaluation?.comment {
+                text = comment + " (" + dateFormatter.string(from: userEvaluation?.date ?? Date()) + ")"
+            }
+            
+            cell.configure(text: text, delegate: controller, wbvParameter: userEvaluation?.wbvParameter ?? "missing")
             
             return cell
         }

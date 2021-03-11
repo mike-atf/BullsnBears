@@ -22,6 +22,7 @@ extension UserEvaluation {
     @NSManaged public var stock: String?
     @NSManaged public var userEvaluation: WBValuation?
     @NSManaged public var higherIsBetter: Bool
+    @NSManaged public var date: Date?
 
 }
 
