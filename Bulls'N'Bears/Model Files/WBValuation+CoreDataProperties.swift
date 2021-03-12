@@ -27,7 +27,6 @@ extension WBValuation {
     @NSManaged public var interestExpense: [Double]?
     @NSManaged public var netEarnings: [Double]?
     @NSManaged public var operatingIncome: [Double]?
-    @NSManaged public var peRatio: Double
     @NSManaged public var ppe: [Double]?
     @NSManaged public var rAndDexpense: [Double]?
     @NSManaged public var revenue: [Double]?
@@ -39,6 +38,7 @@ extension WBValuation {
     @NSManaged public var avAnStockPrice: [Double]?
     @NSManaged public var bvps: [Double]?
     @NSManaged public var perDates: Data?
+    @NSManaged public var share: Share?
 
 }
 

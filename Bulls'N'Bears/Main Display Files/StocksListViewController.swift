@@ -20,9 +20,9 @@ class StocksListViewController: UITableViewController {
     
     var controller: StocksController = {
         let request = NSFetchRequest<Share>(entityName: "Share")
-        request.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+        request.sortDescriptors = [NSSortDescriptor(key: "userEvaluationScore", ascending: false), NSSortDescriptor(key: "valueScore", ascending: false),NSSortDescriptor(key: "symbol", ascending: true)]
         
-        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "creationDate", cacheName: nil)
+        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         
         do {
             try sL.performFetch()
@@ -41,20 +41,34 @@ class StocksListViewController: UITableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
                 
-        NotificationCenter.default.addObserver(self, selector: #selector(updateOrderReturningFromWBValuationTVC(notification:)), name: NSNotification.Name(rawValue: "refreshStockListTVCRow"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCellReturningFromWBValuationTVC(notification:)), name: NSNotification.Name(rawValue: "refreshStockListTVCRow"), object: nil)
         
         controller.delegate = self
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
         updateShares()
         if controller.fetchedObjects?.count ?? 0 > 0 {
             tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
             performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         }
-//        tableView.reloadData()
-    }
 
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        
+        controller.delegate = nil
+        for share in controller.fetchedObjects ?? [] {
+        
+            let valueRatingData = share.wbValuation?.valuesSummaryScores()
+            let userRatingData = share.wbValuation?.userEvaluationScore()
+            
+            if let score = valueRatingData?.ratingScore() {
+                share.valueScore = score
+            }
+            if let score = userRatingData?.ratingScore() {
+                share.userEvaluationScore = score
+            }
+        }
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -146,23 +160,28 @@ class StocksListViewController: UITableViewController {
     }
     
     @objc
-    func updateOrderReturningFromWBValuationTVC(notification: Notification) {
+    func updateCellReturningFromWBValuationTVC(notification: Notification) {
         
-//        stocks = (controller!.sortStocksByRatings(stocks: stocks))
-//        tableView.reloadData()
+        if let path = notification.object as? IndexPath {
+            tableView.reloadRows(at: [path], with: .automatic)
+        }
     }
     
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         
-        return (controller.fetchedObjects?.count ?? 0) < 1 ? 0 : 1
-//        return stocks.count < 1 ? 0 : 1
+        return controller.sections?.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return controller.fetchedObjects?.count ?? 0
+        if let sectionInfo = controller.sections?[section] {
+            return sectionInfo.numberOfObjects
+        }
+        else {
+            return 0
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -170,8 +189,16 @@ class StocksListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
         let share = controller.object(at: indexPath)
-        let userRatingData = share.wbValuation?.valuesSummaryScores() //stocks[indexPath.row].  // WBValuationController.summaryRating(symbol: stocks[indexPath.row].symbol, type: .star)
-        let valueRatingData = share.wbValuation?.userEvaluationScore() //stocks[indexPath.row].fundamentalsScore // WBValuationController.summaryRating(symbol: stocks[indexPath.row].symbol, type: .dollar)
+        let valueRatingData = share.wbValuation?.valuesSummaryScores()
+        let userRatingData = share.wbValuation?.userEvaluationScore()
+        
+//        if let score = valueRatingData?.ratingScore() {
+//            share.valueScore = score
+//        }
+//        if let score = userRatingData?.ratingScore() {
+//            share.userEvaluationScore = score
+//        }
+        
         cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData)
         
         return cell
@@ -186,9 +213,6 @@ class StocksListViewController: UITableViewController {
             let objectToDelete = self.controller.object(at: indexPath) //stocks[indexPath.row]
             
             ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext).delete(objectToDelete)
-//
-//            stocks.remove(at: indexPath.row)
-//            tableView.deleteRows(at: [indexPath], with: .automatic)
         }
             
             let swipeActions = UISwipeActionsConfiguration(actions: [deleteAction])
@@ -205,19 +229,13 @@ class StocksListViewController: UITableViewController {
         
         guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
 
-//        wbValuationView.stock = stocks[indexPath.row]
         wbValuationView.share = controller.object(at: indexPath)
         wbValuationView.fromIndexPath = indexPath
-//        wbValuationView.controller = WBValuationController(stock: stocks[indexPath.row], progressDelegate: wbValuationView)
-        
-        
-//        if stocks[indexPath.row].peRatio == nil {
-//            stocks[indexPath.row].downloadKeyRatios(delegate: wbValuationView)
-//        }
 
         performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         
         navigationController?.pushViewController(wbValuationView, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     func valuationCompleted(indexPath: IndexPath) {
@@ -243,19 +261,19 @@ class StocksListViewController: UITableViewController {
         guard let indexPath = tableView.indexPathForSelectedRow else { return }
         
         let share = controller.object(at: indexPath)
-        let dcfValuation = CombinedValuationController.returnDCFValuations(company: share.symbol)?.first
-        let r1Valuation = CombinedValuationController.returnR1Valuations(company: share.symbol)?.first
+//        let dcfValuation = share.dcfValuation
+//        let r1Valuation = share.rule1Valuation
         
         if let chartView = segue.destination as? StockChartVC {
                 
             chartView.share = controller.object(at: indexPath)
-            chartView.configure(dcfVal: dcfValuation, r1Val: r1Valuation)
+            chartView.configure(share: share)
         }
         else if let navView = segue.destination as? UINavigationController {
             if let chartView = navView.topViewController as? StockChartVC {
                     
             chartView.share = controller.object(at: indexPath)
-            chartView.configure(dcfVal: dcfValuation, r1Val: r1Valuation)
+            chartView.configure(share: share)
             }
         }
     }
@@ -292,8 +310,31 @@ extension StocksListViewController: SharesUpdaterDelegate {
 
 extension StocksListViewController: NSFetchedResultsControllerDelegate {
 
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.tableView.reloadData()
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        tableView.beginUpdates()
     }
-
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        
+        tableView.endUpdates()
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        switch type {
+        case .update:
+            tableView.reloadRows(at: [indexPath!], with: .none)
+        case .insert:
+            tableView.insertRows(at: [newIndexPath!], with: .automatic)
+        case .delete:
+            tableView.deleteRows(at: [indexPath!], with: .automatic)
+        case .move:
+            tableView.deleteRows(at: [indexPath!], with: .automatic)
+            tableView.insertRows(at: [newIndexPath!], with: .automatic)
+        @unknown default:
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined change to shares list controller")
+        }
+    }
+    
 }

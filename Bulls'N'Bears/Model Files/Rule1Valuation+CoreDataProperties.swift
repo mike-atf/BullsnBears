@@ -34,6 +34,8 @@ extension Rule1Valuation {
     @NSManaged public var creationDate: Date?
     @NSManaged public var insiderStocks: Double
     @NSManaged public var ceoRating: Double
+    @NSManaged public var share: Share?
+
 }
 
 extension Rule1Valuation : Identifiable {

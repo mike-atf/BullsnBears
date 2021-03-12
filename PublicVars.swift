@@ -7,7 +7,7 @@
 
 import UIKit
 
-var stocks = [Stock]()
+//var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
 //var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 var errorLog: [ErrorLog]?

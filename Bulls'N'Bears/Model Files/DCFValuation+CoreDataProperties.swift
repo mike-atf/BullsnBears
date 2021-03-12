@@ -33,6 +33,7 @@ extension DCFValuation {
     @NSManaged public var sharesOutstanding: Double
     @NSManaged public var company: String?
     @NSManaged public var creationDate: Date?
+    @NSManaged public var share: Share?
 
 }
 

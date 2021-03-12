@@ -24,38 +24,50 @@ class CombinedValuationController: ValuationHelper {
     weak var valuationListViewController: ValuationListViewController!
     var valuation: Any?
     var webAnalyser: Any?
-    var stock: Share!
+    var share: Share!
     var method: ValuationMethods!
     var rowtitles: [[String]]!
 
-    init(stock: Share, valuationMethod: ValuationMethods, listView: ValuationListViewController) {
+    init(share: Share, valuationMethod: ValuationMethods, listView: ValuationListViewController) {
         
         self.valuationListViewController = listView
         self.method = valuationMethod
-        self.stock = stock
+        self.share = share
         
         if valuationMethod == .rule1 {
-            if let valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol!)?.first {
+            
+            if let valuation = share.rule1Valuation {
+                self.valuation = valuation
+            }
+            else if let valuation = CombinedValuationController.returnR1Valuations(company: share.symbol!)?.first {
+                // any orphan valuation belonging to this compnay  left after deleting share
+                share.rule1Valuation = valuation
                 self.valuation = valuation
             }
             else {
-                self.valuation = CombinedValuationController.createR1Valuation(company: stock.symbol!)
-                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
+                self.valuation = CombinedValuationController.createR1Valuation(company: share.symbol!)
+                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: share.symbol)?.first {
                     (valuation as? Rule1Valuation)?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
                 }
+                share.rule1Valuation = self.valuation as? Rule1Valuation
             }
         }
         else if valuationMethod == .dcf {
             
-            
-            if let valuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
+            if let valuation = share.dcfValuation {
                 self.valuation = valuation
             }
+            else if let valuation = CombinedValuationController.returnDCFValuations(company: share.symbol!)?.first {
+                // any orphan valuation belonging to this compnay left after deleting share
+                self.valuation = valuation
+                share.dcfValuation = valuation
+            }
             else {
-                self.valuation = CombinedValuationController.createDCFValuation(company: stock.symbol!)
-                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
+                self.valuation = CombinedValuationController.createDCFValuation(company: share.symbol!)
+                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: share.symbol)?.first {
                     (valuation as? DCFValuation)?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
                 }
+                share.dcfValuation = self.valuation as? DCFValuation
             }
         }
     }
@@ -150,10 +162,10 @@ class CombinedValuationController: ValuationHelper {
         var titles = [String]()
         
         if method == .dcf {
-            titles = ["DCF Valuation - \(stock.symbol!)","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
+            titles = ["DCF Valuation - \(share.symbol!)","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
         } else
         if method == .rule1 {
-            titles = ["Rule 1 Valuation - \(stock.symbol!)",
+            titles = ["Rule 1 Valuation - \(share.symbol!)",
             "Moat parameters: Values 5-10 years back",
             "", "", "", "",
             "PE Ratios", "Growth predictions",
@@ -301,11 +313,11 @@ class CombinedValuationController: ValuationHelper {
     public func startDataDownload() {
         
         if method == .rule1 {
-            webAnalyser = R1WebDataAnalyser(stock: self.stock, valuation: self.valuation as! Rule1Valuation, controller: self, progressDelegate: self.valuationListViewController)
+            webAnalyser = R1WebDataAnalyser(stock: self.share, valuation: self.valuation as! Rule1Valuation, controller: self, progressDelegate: self.valuationListViewController)
 
         }
         else {
-            webAnalyser = DCFWebDataAnalyser(stock: stock, valuation: valuation as! DCFValuation, controller: self, pDelegate: self.valuationListViewController)
+            webAnalyser = DCFWebDataAnalyser(stock: share, valuation: valuation as! DCFValuation, controller: self, pDelegate: self.valuationListViewController)
         }
         
     }

@@ -35,13 +35,11 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        
         guard !movingToValueListTVC else {
             return
         }
         
-        // this updates the stock user- and fundamentals parameter when returning to StocksListVC for updating ScoreCircle view
-//        let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .star)
-//        let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .dollar)
         controller.deallocate()
         controller = nil
     }

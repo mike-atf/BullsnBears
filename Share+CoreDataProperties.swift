@@ -16,6 +16,8 @@ extension Share {
         return NSFetchRequest<Share>(entityName: "Share")
     }
 
+    @NSManaged public var valueScore: Double
+    @NSManaged public var userEvaluationScore: Double
     @NSManaged public var beta: Double
     @NSManaged public var peRatio: Double
     @NSManaged public var eps: Double

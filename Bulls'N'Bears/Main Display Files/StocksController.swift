@@ -24,37 +24,7 @@ class StocksController: NSFetchedResultsController<Share>, StockDelegate {
     var controllerDelegate: SharesUpdaterDelegate?
     var stocksDelegate: StockDelegate?
     lazy var yahooRefDate: Date = getYahooRefDate()
-        
-    
-//    func loadStockFiles() {
-//
-//        let appDocumentPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-//        if let documentFolder = appDocumentPaths.first {
-//
-//        DispatchQueue.main.async {
-//
-//            do {
-//                let fileURLs = try FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: documentFolder), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-//
-//                for url in fileURLs {
-//                    if url.lastPathComponent.contains(".csv") {
-//                        // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
-//                        StocksController.createShare(from: url, deleteFile: true)
-////                        if let stock = CSVImporter.csvExtractor(url: url) {
-////                            stock.delegate = self
-////                            stocks.append(stock)
-////                        }
-//                   }
-//                }
-//                } catch let error {
-//                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't access contens of directory \(documentFolder)")
-//                }
-//                self.delegate?.openStocksComplete()
-//            }
-//        }
-//    }
-    
-    
+            
     //Mark:- shares price update functions
     
     func updateStockFiles() {
@@ -101,23 +71,7 @@ class StocksController: NSFetchedResultsController<Share>, StockDelegate {
             }
         }
     }
-        
-    
-    public func sortStocksByRatings(stocks: [Stock]) -> [Stock] {
-        
-        let sortedStocks = stocks.sorted(by: { (e0, e1) -> Bool in
-            if (e0.userRatingScore?.ratingScore() ?? 0) > (e1.userRatingScore?.ratingScore() ?? 0) { return true }
-            else if (e0.userRatingScore?.ratingScore() ?? 0) < (e1.userRatingScore?.ratingScore() ?? 0) { return false }
-            else {
-                if (e0.fundamentalsScore?.ratingScore() ?? 0) > (e1.fundamentalsScore?.ratingScore() ?? 0)  { return true }
-                else if (e0.fundamentalsScore?.ratingScore() ?? 0) < (e1.fundamentalsScore?.ratingScore() ?? 0)  { return false }
-                else { return false }
-            }
-        })
-        
-        return sortedStocks
-    }
-    
+            
     private func getYahooRefDate() -> Date {
         let calendar = Calendar.current
         let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]

@@ -14,7 +14,7 @@ protocol StockDelegate {
     func priceUpdateComplete(symbol: String)
 }
 
-class Stock {
+class Stock2 {
     
     var symbol: String
     var name_short: String?

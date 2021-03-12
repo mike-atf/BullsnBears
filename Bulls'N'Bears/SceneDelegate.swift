@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 import UserNotifications
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -179,11 +180,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
+        
+//        let request = NSFetchRequest<Share>(entityName: "Share")
+//        request.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+//                
+//        do {
+//            let shares = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(request)
+//        } catch let error as NSError {
+//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch shares")
+//        }
+//
+//        for share
+//        if let wbv = wbValuation {
+//            if let score  = wbv.valuesSummaryScores()?.ratingScore() {
+//                self.valueScore = score
+//            }
+//            if let score  = wbv.userEvaluationScore()?.ratingScore() {
+//                self.valueScore = score
+//            }
+//       }
 
-        // Save changes in the application's managed object context when the application transitions to the background.
         (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
     }
 

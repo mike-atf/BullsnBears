@@ -23,8 +23,8 @@ class StockChartVC: UIViewController {
     @IBOutlet var r1ErrorsButton: UIButton!
     
     var buildLabel: UIBarButtonItem!
-    var dcfValuation: DCFValuation?
-    var r1Valuation: Rule1Valuation?
+//    var dcfValuation: DCFValuation?
+//    var r1Valuation: Rule1Valuation?
     var dcfErrors = [String]()
     var r1Errors: [String]?
 //    var temporaryValueChartView: ValueChartVC?
@@ -33,7 +33,7 @@ class StockChartVC: UIViewController {
         super.viewDidLoad()
 
         if share != nil {
-            configure(dcfVal: dcfValuation, r1Val: r1Valuation)
+            configure(share: share)
         }
         
         buildLabel = UIBarButtonItem(title: "Build: " + appBuild, style: .plain, target: nil, action: nil)
@@ -59,14 +59,11 @@ class StockChartVC: UIViewController {
         chart.contentView.setNeedsDisplay()
     }
     
-    func configure(dcfVal: DCFValuation?, r1Val: Rule1Valuation?) {
+    func configure(share: Share?) {
         loadViewIfNeeded() // leave! essential
         if let validChart = chart {
             if let validShare = share {
                 validChart.configure(with: validShare)
-                dcfValuation = dcfVal
-                r1Valuation = r1Val
-
             }
         }
         
@@ -79,7 +76,7 @@ class StockChartVC: UIViewController {
     }
     
     func refreshDCFLabel() {
-        if let validValuation = dcfValuation {
+        if let validValuation = share?.dcfValuation {
             let (value, errors) = validValuation.returnIValue()
             dcfErrorsButton.isHidden = (errors.count == 0)
             dcfErrors = errors
@@ -102,7 +99,7 @@ class StockChartVC: UIViewController {
     
     func refreshR1Label() {
         
-        if let validValuation = r1Valuation {
+        if let validValuation = share?.rule1Valuation {
             
             var r1Title = "R#1 value: "
             let (value, errors) = validValuation.stickerPrice()
@@ -262,45 +259,31 @@ class StockChartVC: UIViewController {
 
 extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
     
-    func valuationComplete(toDismiss: ValuationSummaryTVC?) {
-        
+    func valuationSummaryComplete(toDismiss: ValuationSummaryTVC?) {
+
         if toDismiss != nil {
 
             toDismiss?.dismiss(animated: true, completion: nil)
-            guard let symbol = self.share?.symbol else {
-                return
-            }
-            r1Valuation = CombinedValuationController.returnR1Valuations(company: symbol)?.first
             refreshR1Label()
         }
         else {
-            guard let symbol = self.share?.symbol else {
-                return
-            }
-            dcfValuation = CombinedValuationController.returnDCFValuations(company: symbol)?.first
             refreshDCFLabel()
         }
     }
     
     func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?) {
-        
+
         listView.dismiss(animated: true, completion: {
-            
 
-            if let valuation = r1Valuation {
-
+            if let _ = r1Valuation {
                 if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationSummaryTVC") as? ValuationSummaryTVC {
                     tvc.loadViewIfNeeded()
                     tvc.delegate = self
-                    tvc.r1Valuation = valuation
+                    tvc.share = self.share
                     self.present(tvc, animated: true, completion: nil)
                 }
             }
             else {
-                guard let symbol = self.share?.symbol else {
-                    return
-                }
-                self.dcfValuation = CombinedValuationController.returnDCFValuations(company: symbol)?.first
                 self.refreshDCFLabel()
             }
         })

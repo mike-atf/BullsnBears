@@ -6,7 +6,7 @@
 //
 //
 
-import Foundation
+import UIKit
 import CoreData
 
 @objc(Rule1Valuation)
@@ -65,10 +65,10 @@ public class Rule1Valuation: NSManagedObject {
 
     func delete() {
        
-        managedObjectContext?.delete(self)
+        (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.delete(self)
  
         do {
-            try managedObjectContext?.save()
+            try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")

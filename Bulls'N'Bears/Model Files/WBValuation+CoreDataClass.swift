@@ -442,12 +442,15 @@ public class WBValuation: NSManagedObject {
     }
     
     func perValueFactor() -> Double {
-        
-        guard !(peRatio < 0) else {
+        guard let validShare = share else {
             return 0
         }
         
-        return ((40 - (abs(peRatio) > 40 ? 40.0 : peRatio)) / 40)
+        guard !(validShare.peRatio < 0) else {
+            return 0
+        }
+        
+        return ((40 - (abs(validShare.peRatio) > 40 ? 40.0 : validShare.peRatio)) / 40)
     }
     
     /// for 'higherIsBetter' values; for 'higherIsWorse' use inverseValueFactor()
@@ -527,13 +530,13 @@ public class WBValuation: NSManagedObject {
     
     public func ivalue() -> (Double?, [String] ){
         
-         guard let stock = stocks.filter({ (stock) -> Bool in
-            stock.symbol == company
-         }).first else {
-            return (nil, ["no stock data available for \(company!)"])
-         }
+//         guard let stock = stocks.filter({ (stock) -> Bool in
+//            stock.symbol == company
+//         }).first else {
+//            return (nil, ["no stock data available for \(company!)"])
+//         }
         
-        guard let price = stock.dailyPrices.last?.close else {
+        guard let price = share?.getDailyPrices()?.last?.close else {
             return (nil, ["no current price available for \(company!)"])
         }
         
@@ -542,8 +545,8 @@ public class WBValuation: NSManagedObject {
         }
               
         
-        guard peRatio > 0 else {
-            return (nil, ["P/E ratio for \(company!) is negative \(peRatio)"])
+        guard (share?.peRatio ?? 0) > 0 else {
+            return (nil, ["P/E ratio for \(company!) is negative \(share!.peRatio)"])
         }
         
         var errors = [String]()
@@ -568,17 +571,15 @@ public class WBValuation: NSManagedObject {
             }
         }
         
-// Method 1
         let futureEPS = Calculator.futureValue(present: eps!.first!, growth: meanEPSGrowth, years: 10.0)
         
         let discountRate = UserDefaults.standard.value(forKey: UserDefaultTerms().longTermCoporateInterestRate) as? Double ?? 0.021
         let discountedCurrentEPS = Calculator.presentValue(growth: discountRate, years: 10.0, endValue: futureEPS)
         let dcCurrentEPSReturn = discountedCurrentEPS / price
-        let ivalue = dcCurrentEPSReturn * peRatio
+        let ivalue = dcCurrentEPSReturn * share!.peRatio
         
         
         return (ivalue, errors)
-        
     }
 
 }

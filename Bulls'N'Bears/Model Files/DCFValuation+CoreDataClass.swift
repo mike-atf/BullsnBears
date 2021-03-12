@@ -6,7 +6,7 @@
 //
 //
 
-import Foundation
+import UIKit
 import CoreData
 
 @objc(DCFValuation)
@@ -67,26 +67,22 @@ public class DCFValuation: NSManagedObject {
         creationDate = Date()
     }
     
-    static func create(company: String, in managedObjectContext: NSManagedObjectContext) {
-        let newValuation = self.init(context: managedObjectContext)
-        newValuation.company = company
-
-        do {
-            try  managedObjectContext.save()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-    }
-        
+//    static func create(company: String, in managedObjectContext: NSManagedObjectContext) {
+//        let newValuation = self.init(context: managedObjectContext)
+//        newValuation.company = company
+//
+//        do {
+//            try  managedObjectContext.save()
+//        } catch {
+//            let nserror = error as NSError
+//            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+//        }
+//    }
+//        
     func save() {
         
-        guard let context = managedObjectContext else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "no moc available - can't save valuation")
-            return
-        }
         do {
-            try  context.save()
+            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error in DCFValuation.save function \(nserror), \(nserror.userInfo)")
@@ -95,7 +91,7 @@ public class DCFValuation: NSManagedObject {
     
     func delete() {
        
-        managedObjectContext?.delete(self)
+        (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.delete(self)
  
         do {
             try managedObjectContext?.save()

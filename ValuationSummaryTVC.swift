@@ -8,7 +8,7 @@
 import UIKit
 
 protocol ValuationSummaryDelegate: AnyObject {
-    func valuationComplete(toDismiss: ValuationSummaryTVC?)
+    func valuationSummaryComplete(toDismiss: ValuationSummaryTVC?)
 }
 
 class ValuationSummaryTVC: UITableViewController {
@@ -16,8 +16,7 @@ class ValuationSummaryTVC: UITableViewController {
     var sectionHeaderTitles = ["Valuation Summary", "Resulting Sticker price"]
     var sectionHeaderSubTitles = ["Adjust numbers if necessary", "(non-editable)"]
     var sectionsRowTitles = [["Future growth", "Future PE ratio"],["Sticker price"]]
-    var r1Valuation: Rule1Valuation!
-//    var indexPath: IndexPath!
+    var share: Share!
     weak var delegate: ValuationSummaryDelegate?
     
     override func viewDidLoad() {
@@ -49,20 +48,20 @@ class ValuationSummaryTVC: UITableViewController {
         
         if indexPath.section == 0 {
             if indexPath.row == 0 {
-                value = r1Valuation.adjGrowthEstimates?.mean() ?? r1Valuation.growthEstimates?.mean()
+                value = share.rule1Valuation?.adjGrowthEstimates?.mean() ?? share.rule1Valuation?.growthEstimates?.mean()
                 format = .percent
             }
             else if indexPath.row == 1 {
-                let dataArrays = [r1Valuation.bvps!, r1Valuation.eps!]
+                let dataArrays = [share.rule1Valuation?.bvps! ?? [], share.rule1Valuation?.eps! ?? []]
                 let (cleanedArrays, _) = ValuationDataCleaner.cleanValuationData(dataArrays: dataArrays, method: .rule1)
                 
-                if let futureGrowth = r1Valuation.futureGrowthEstimate(cleanedBVPS: cleanedArrays[0]) {
-                    value = r1Valuation.futurePER(futureGrowth: futureGrowth)
+                if let futureGrowth = share.rule1Valuation?.futureGrowthEstimate(cleanedBVPS: cleanedArrays[0]) {
+                    value = share.rule1Valuation?.futurePER(futureGrowth: futureGrowth)
                     format = .numberWithDecimals
                 }
             }
-        } else {
-            (value,_) = r1Valuation.stickerPrice()
+        } else if let r1v = share.rule1Valuation {
+            (value,_) = r1v.stickerPrice()
             format = .currency
         }
         
@@ -147,9 +146,10 @@ class ValuationSummaryTVC: UITableViewController {
     
     @objc
     func saveValuation() {
-//        self.dismiss(animated: true) { [self] in
-            self.r1Valuation.save()
-            // NEW
+
+        self.share.rule1Valuation?.save()
+
+        // NEW
             for row in 0..<self.sectionsRowTitles.count {
                 if let cell = self.tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? ValuationSummaryCell {
                     cell.cellDelegate = nil
@@ -159,9 +159,8 @@ class ValuationSummaryTVC: UITableViewController {
                 cell.cellDelegate = nil
             }
 
-            delegate?.valuationComplete(toDismiss: self)
-        }
-//    }
+            delegate?.valuationSummaryComplete(toDismiss: self)
+    }
 
 }
 
@@ -174,10 +173,10 @@ extension ValuationSummaryTVC: ValSummaryCellDelegate {
         }
         
         if let valid = futurePER {
-            r1Valuation.adjFuturePE = valid
+            share.rule1Valuation?.adjFuturePE = valid
         }
         else if let valid = futureGrowth {
-            r1Valuation.adjGrowthEstimates = [valid,valid]
+            share.rule1Valuation?.adjGrowthEstimates = [valid,valid]
         }
         
         self.tableView.reloadSections([1], with: .none)

@@ -33,7 +33,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
         tableView.register(UINib(nibName: "ValuationTableViewCell", bundle: nil), forCellReuseIdentifier: "valuationTableViewCell")
 
-        valuationController = CombinedValuationController(stock: share, valuationMethod: valuationMethod, listView: self)
+        valuationController = CombinedValuationController(share: share, valuationMethod: valuationMethod, listView: self)
         self.helper = valuationController
         
         sectionTitles = helper.sectionTitles()
@@ -201,11 +201,15 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
                 NotificationCenter.default.removeObserver(analyser)
                 NotificationCenter.default.removeObserver(self)
             }
-//            let r1Valuation = self.valuationController.valuation as? Rule1Valuation // for transfer to ValuationSummaryVC
+
             self.valuationController.removeObjectsFromMemory()
-            //
             
-            delegate?.valuationComplete(listView: self, r1Valuation: (valuationController.valuation as? Rule1Valuation))
+            if valuationMethod == .rule1 {
+                delegate?.valuationComplete(listView: self, r1Valuation: share.rule1Valuation)
+            }
+            else {
+                delegate?.valuationComplete(listView: self, r1Valuation: nil)
+            }
         }
     }
     

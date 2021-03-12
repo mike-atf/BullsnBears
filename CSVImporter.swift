@@ -41,6 +41,7 @@ class CSVImporter: NSObject {
         return nil
     }
 
+    /*
     class func csvExtractor(url: URL? = nil) -> Stock? {
         
         guard let validURL = url else {
@@ -116,6 +117,7 @@ class CSVImporter: NSObject {
 
         return Stock(name: stockName, dailyPrices: stockPrices, fileURL: validURL, delegate: nil)
     }
+    */
     
     class func extractPricePointsFromFile(url: URL? = nil, symbol: String) -> [PricePoint]? {
         

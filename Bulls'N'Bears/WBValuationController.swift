@@ -50,15 +50,18 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         self.share = share
         self.progressDelegate = progressDelegate
         
-        if let valuation = WBValuationController.returnWBValuations(company: share.symbol!)?.first {
+        if let valuation = share.wbValuation {
+            self.valuation = valuation
+        }
+        else if let valuation = WBValuationController.returnWBValuations(share: share)?.first {
+            // find old disconnected valutions persisted after share was deleted
             self.valuation = valuation
         }
         else {
-            self.valuation = WBValuationController.createWBValuation(company: share.symbol!)
+            self.valuation = WBValuationController.createWBValuation(share: share)
         }
                 
         rowTitles = buildRowTitles()
-        
     }
     
     func deallocate() {
@@ -70,14 +73,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     }
     //MARK: - class functions
     
-    static func returnWBValuations(company: String? = nil) -> [WBValuation]? {
+    static func returnWBValuations(share: Share) -> [WBValuation]? {
         
         var valuations: [WBValuation]?
         
         let fetchRequest = NSFetchRequest<WBValuation>(entityName: "WBValuation")
         fetchRequest.returnsObjectsAsFaults = false
-        if let validName = company {
-            let predicate = NSPredicate(format: "company BEGINSWITH %@", argumentArray: [validName])
+        if let validName = share.symbol {
+            let predicate = NSPredicate(format: "company == %@", argumentArray: [validName])
             fetchRequest.predicate = predicate
         }
         
@@ -143,12 +146,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 //        return valuation.valuesSummaryScores()
 //    }
 
-    static func createWBValuation(company: String) -> WBValuation? {
+    static func createWBValuation(share: Share) -> WBValuation? {
         
         let newValuation:WBValuation? = {
             NSEntityDescription.insertNewObject(forEntityName: "WBValuation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? WBValuation
         }()
-        newValuation?.company = company
+        newValuation?.company = share.symbol!
+        share.wbValuation = newValuation
+        
         do {
             try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
@@ -241,7 +246,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
             case 4:
                 if share.peRatio != Double() {
-                    valuation?.peRatio = share.peRatio
 
                     let (valid, es$) = valuation!.ivalue()
                     errors = es$
@@ -694,7 +698,7 @@ extension WBValuationController: DataDownloaderDelegate {
         }
         else if section == "pe-ratio" {
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
-            valuation?.peRatio = result.array?.last ?? Double()
+            share?.peRatio = result.array?.last ?? Double()
             downloadErrors.append(contentsOf: result.errors)
             
             let (results,errors) = WebpageScraper.scrapePERDatesTable(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
@@ -704,7 +708,6 @@ extension WBValuationController: DataDownloaderDelegate {
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
             }
-
         }
         else if section == "stock-price-history" {
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "Historical Annual Stock Price Data</th>", tableTerminal: "</td>\n\t\t\t\t </tr>\n\n\t\t\t\t\t\t\n\t\t\t\t</tbody>\n\t\t\t",noOfColumns: 7, targetColumnFromRight: 5) //    </table>\t\t\t\n\t\t\t\n\t\t\t</div>
@@ -714,7 +717,6 @@ extension WBValuationController: DataDownloaderDelegate {
             DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
             }
-
         }
         
         if downloadTasksCompleted == downloadTasks {
