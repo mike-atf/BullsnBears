@@ -39,7 +39,10 @@ public class WBValuation: NSManagedObject {
         // when (re-)creating a WBValuation check whether there are any old userEvaluations
         // and if so re-add the relationships to this WBValuation via parameters
         if let ratings = WBValuationController.allUserRatings(for: company) {
-            addToUserEvaluations(NSSet(object: ratings))
+            if ratings.count > 0 {
+                let set = NSSet(array: ratings)
+                addToUserEvaluations(set)
+            }
         }
 
     }
@@ -54,6 +57,29 @@ public class WBValuation: NSManagedObject {
                         datedValues.append(DatedValue(date: element.key, value: element.value))
                     }
                     return datedValues
+                }
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+            }
+        }
+        
+        return nil
+    }
+    
+    func peRatios() -> [Double]? {
+       
+        if let valid = perDates {
+            do {
+                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
+                    var datedValues = [DatedValue]()
+                    for element in dictionary {
+                        datedValues.append(DatedValue(date: element.key, value: element.value))
+                    }
+                    let sorted = datedValues.sorted { (e0, e1) -> Bool in
+                        if e0.date > e1.date { return true }
+                        else { return false }
+                    }
+                    return sorted.compactMap{ $0.value }
                 }
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
@@ -314,7 +340,7 @@ public class WBValuation: NSManagedObject {
 
     }
     
-    public func valuesSummaryScores() -> [Double]? { // [min,score,max]
+    func valuesSummaryScores() -> RatingCircleData? { // [min,score,max]
         
         let peRatioWeight = 1.5
         let retEarningsGrowthWeight = 1.3
@@ -385,7 +411,34 @@ public class WBValuation: NSManagedObject {
         let scoreSum = allFactors.reduce(0, +)
         let maximum = allWeights.reduce(0, +)
         
-        return [0, scoreSum , maximum]
+        return RatingCircleData(rating: scoreSum, maximum: maximum, minimum: 0, symbol: .dollar)
+//        return [0, scoreSum , maximum]
+    }
+    
+    func userEvaluationScore() -> RatingCircleData? {
+        
+        guard userEvaluations?.count ?? 0 > 0 else {
+            return nil
+        }
+        
+        var userSummaryScore: Double = 0
+        var maximumScoreSum: Double = 0
+        
+        for element in userEvaluations ?? [] {
+            if let evaluation = element as? UserEvaluation {
+                if let valid = evaluation.userRating() {
+                    userSummaryScore += Double(valid)
+                    maximumScoreSum += 10.0
+                }
+            }
+        }
+
+        return RatingCircleData(rating: userSummaryScore, maximum: maximumScoreSum, minimum: 0, symbol: .star)
+//        data.max = maximumScoreSum
+//        data.rating = userSummaryScore
+//        data.symbol = .star
+//
+//        stock?.userRatingScore = data
     }
     
     func perValueFactor() -> Double {

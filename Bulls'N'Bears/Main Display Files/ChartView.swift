@@ -20,7 +20,7 @@ class ChartView: UIView {
     var candleBoxes = UIBezierPath()
     var candleSticks = UIBezierPath()
     
-    var stockToShow: Stock?
+    var share: Share?
     
     var lowestPriceInRange: Double?
     var highestPriceInRange: Double?
@@ -59,11 +59,11 @@ class ChartView: UIView {
         
     }
     
-    public func configure(stock: Stock) {
+    public func configure(stock: Share) {
         
-        stockToShow = stock
+        share = stock
 
-        guard let validStock = stockToShow else { return }
+        guard let validStock = share else { return }
 
         lowestPriceInRange = validStock.lowestPrice()
         highestPriceInRange = validStock.highestPrice()
@@ -133,7 +133,7 @@ class ChartView: UIView {
        xAxis.lineWidth = 2
        xAxis.stroke()
        
-       guard let validStock = stockToShow else { return }
+       guard let validStock = share else { return }
        
        
         var index = 0
@@ -154,7 +154,7 @@ class ChartView: UIView {
 // candles
         chartTimeSpan = dateRange!.last!.timeIntervalSince(dateRange!.first!)
         let boxWidth = chartAreaSize.width / CGFloat(dateRange!.last!.timeIntervalSince(dateRange!.first!) / (24*3600))
-        stockToShow?.dailyPrices.forEach({ (pricePoint) in
+        share?.getDailyPrices()?.forEach({ (pricePoint) in
             let boxLeft = chartOrigin.x - (boxWidth * 0.8 / 2) + CGFloat(pricePoint.tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width
             let boxTop = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - Swift.max(pricePoint.close, pricePoint.open)) / (maxPrice - minPrice)))
             let boxBottom = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - Swift.min(pricePoint.close, pricePoint.open)) / (maxPrice - minPrice)))
@@ -177,70 +177,45 @@ class ChartView: UIView {
         })
         
 // current price line
-        if let currentPrice = stockToShow?.dailyPrices.last?.close {
-            let currentPriceLine = UIBezierPath()
-            let pp1 = PriceDate(stockToShow!.dailyPrices.first!.tradingDate, currentPrice)
-            let pp2 = PriceDate(stockToShow!.dailyPrices.last!.tradingDate, currentPrice)
-            
-            let startPoint = plotPricePoint(pricePoint: pp1)
-            var endPoint = plotPricePoint(pricePoint: pp2)
-            endPoint.x = yAxisLabels.first!.frame.maxX + 5
-            currentPriceLine.move(to: startPoint)
-            currentPriceLine.addLine(to: endPoint)
-            
-            UIColor.label.setStroke()
-            currentPriceLine.stroke()
-  
-// DCF Label
-            
-            for label in valuationLabels {
-                label.removeFromSuperview()
-            }
-            valuationLabels.removeAll()
-
-            if let existingValuation = CombinedValuationController.returnDCFValuations(company: stockToShow!.symbol)?.first {
-                let (fairValue, errors) = existingValuation.returnIValue()
-                if (fairValue ?? 0.0) > 0 {
-                    let ratio = currentPrice / fairValue!
-                    let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
-
-                    let newLabel: UILabel = {
-                        let label = UILabel()
-                        label.numberOfLines = 1
-                        label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                        label.textColor = UIColor(named: "antiLabel")
-                        label.backgroundColor = (errors.count == 0) ? UIColor.label : UIColor.systemYellow
-                        label.text = ratio$
-                        label.sizeToFit()
-                        
-                        let labelTop = endPoint.y - label.frame.height - 2
-                        
-                        label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
-                        return label
-                    }()
-                    valuationLabels.append(newLabel)
-                    addSubview(newLabel)
+        
+        if let dailyPrices = share?.getDailyPrices(){
+            if let currentPrice = dailyPrices.last?.close {
+                let currentPriceLine = UIBezierPath()
+                let pp1 = PriceDate(dailyPrices.first!.tradingDate, currentPrice)
+                let pp2 = PriceDate(dailyPrices.last!.tradingDate, currentPrice)
+                
+                let startPoint = plotPricePoint(pricePoint: pp1)
+                var endPoint = plotPricePoint(pricePoint: pp2)
+                endPoint.x = yAxisLabels.first!.frame.maxX + 5
+                currentPriceLine.move(to: startPoint)
+                currentPriceLine.addLine(to: endPoint)
+                
+                UIColor.label.setStroke()
+                currentPriceLine.stroke()
+      
+    // DCF Label
+                
+                for label in valuationLabels {
+                    label.removeFromSuperview()
                 }
-            }
-            
-// R1 Label
-            // R1 Label
-            if let existingValuation = CombinedValuationController.returnR1Valuations(company: stockToShow!.symbol)?.first {
-                let (fairValue,errors) = existingValuation.stickerPrice()
-                    if (fairValue ?? 0) > 0 {
+                valuationLabels.removeAll()
+
+                if let existingValuation = CombinedValuationController.returnDCFValuations(company: share!.symbol)?.first {
+                    let (fairValue, errors) = existingValuation.returnIValue()
+                    if (fairValue ?? 0.0) > 0 {
                         let ratio = currentPrice / fairValue!
-                        let ratio$ = " R1 " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
+                        let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
 
                         let newLabel: UILabel = {
                             let label = UILabel()
                             label.numberOfLines = 1
                             label.font = UIFont.preferredFont(forTextStyle: .footnote)
                             label.textColor = UIColor(named: "antiLabel")
-                            label.backgroundColor = (errors == nil) ? UIColor.label : UIColor.systemYellow
+                            label.backgroundColor = (errors.count == 0) ? UIColor.label : UIColor.systemYellow
                             label.text = ratio$
                             label.sizeToFit()
                             
-                            let labelTop = endPoint.y + 2
+                            let labelTop = endPoint.y - label.frame.height - 2
                             
                             label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
                             return label
@@ -248,10 +223,37 @@ class ChartView: UIView {
                         valuationLabels.append(newLabel)
                         addSubview(newLabel)
                     }
+                }
+                
+    // R1 Label
+                // R1 Label
+                if let existingValuation = CombinedValuationController.returnR1Valuations(company: share!.symbol)?.first {
+                    let (fairValue,errors) = existingValuation.stickerPrice()
+                        if (fairValue ?? 0) > 0 {
+                            let ratio = currentPrice / fairValue!
+                            let ratio$ = " R1 " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
+
+                            let newLabel: UILabel = {
+                                let label = UILabel()
+                                label.numberOfLines = 1
+                                label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                                label.textColor = UIColor(named: "antiLabel")
+                                label.backgroundColor = (errors == nil) ? UIColor.label : UIColor.systemYellow
+                                label.text = ratio$
+                                label.sizeToFit()
+                                
+                                let labelTop = endPoint.y + 2
+                                
+                                label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
+                                return label
+                            }()
+                            valuationLabels.append(newLabel)
+                            addSubview(newLabel)
+                        }
 
             }
         }
-        
+        }
         trendLabels.forEach { (label) in
             label.removeFromSuperview()
         }
@@ -265,7 +267,7 @@ class ChartView: UIView {
 
     }
     
-    private func drawTrend(stock: Stock, trendProperties: TrendProperties) {
+    private func drawTrend(stock: Share, trendProperties: TrendProperties) {
         
         var trendDuration = dateRange!.last!.timeIntervalSince(dateRange!.first!)
         
@@ -293,7 +295,7 @@ class ChartView: UIView {
         
         if trendProperties.type == TrendType.regression {
             // draw regression trends
-            if let correlation = stock.correlationTrend2(properties: trendProperties) {
+            if let correlation = stock.correlationTrend(properties: trendProperties) {
                 let a = PriceDate(date:trendStart, price: correlation.yIntercept)
                 let b = PriceDate(date:trendEnd, price: correlation.yIntercept + correlation.incline * trendEnd.timeIntervalSince(trendStart))
                 
@@ -353,9 +355,10 @@ class ChartView: UIView {
         }
         
         let increase = (projectedPrice - startPrice) / startPrice
-        let increaseFromLatest = (projectedPrice - stock.dailyPrices.last!.close) / stock.dailyPrices.last!.close
-        addTrendLabel(price: projectedPrice, increase1: increase, increase2: increaseFromLatest, correlation: coCoEff , reliability: reliability,color: trendProperties.color)
-
+        if let latestPrice = stock.getDailyPrices()?.last {
+            let increaseFromLatest = (projectedPrice - latestPrice.close) / latestPrice.close
+            addTrendLabel(price: projectedPrice, increase1: increase, increase2: increaseFromLatest, correlation: coCoEff , reliability: reliability,color: trendProperties.color)
+        }
     }
     
     private func plotPricePoint(pricePoint: PriceDate) -> CGPoint {

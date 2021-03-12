@@ -91,8 +91,8 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
         
+        tableView.deselectRow(at: indexPath, animated: false)
         yahooStockDownload(stocksDictionary[indexPath.row].key)
         
     }
@@ -187,12 +187,8 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                 
                 DispatchQueue.main.async  {
                     
-                    NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: targetURL, userInfo: nil)
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: targetURL, userInfo: nil) // send to StocksListVC
                     self.navigationController?.popToRootViewController(animated: true)
-                    
-//                    self.dismiss(animated: true, completion: {
-//                        NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: targetURL, userInfo: nil)
-//                    })
                 }
 
             } catch {

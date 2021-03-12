@@ -11,7 +11,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     var downloadButton: UIBarButtonItem!
     var controller: WBValuationController!
-    var stock: Stock!
+    var share: Share!
     var progressView: DownloadProgressView?
     var fromIndexPath: IndexPath!
     var movingToValueListTVC = false
@@ -22,10 +22,12 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         downloadButton = UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down.fill"), style: .plain, target: self, action: #selector(startDownload))
          self.navigationItem.rightBarButtonItem = downloadButton
         
-        self.navigationController?.title = stock.name_short
+        self.navigationController?.title = share.name_short
         tableView.register(UINib(nibName: "WBValuationCell", bundle: nil), forCellReuseIdentifier: "wbValuationCell")
         
         NotificationCenter.default.addObserver(self, selector: #selector(refreshRow(notification:)), name: NSNotification.Name(rawValue: "refreshWBValuationTVCRow"), object: nil)
+        
+        controller = WBValuationController(share: share, progressDelegate: self)
     }
     
     deinit {
@@ -38,8 +40,8 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         }
         
         // this updates the stock user- and fundamentals parameter when returning to StocksListVC for updating ScoreCircle view
-        let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .star)
-        let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .dollar)
+//        let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .star)
+//        let _ = WBValuationController.summaryRating(symbol: stock.symbol, type: .dollar)
         controller.deallocate()
         controller = nil
     }

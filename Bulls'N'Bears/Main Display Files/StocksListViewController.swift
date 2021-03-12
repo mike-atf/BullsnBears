@@ -18,28 +18,41 @@ class StocksListViewController: UITableViewController {
     @IBOutlet var addButton: UIBarButtonItem!
     @IBOutlet var downloadButton: UIBarButtonItem!
     
-    var controller: StocksController?
-//    weak var valueChartDelegate: StocksListDelegate?
+    var controller: StocksController = {
+        let request = NSFetchRequest<Share>(entityName: "Share")
+        request.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+        
+        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "creationDate", cacheName: nil)
+        
+        do {
+            try sL.performFetch()
+        } catch let error as NSError {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
+        }
+        return sL
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.register(UINib(nibName: "StockListCellTableViewCell", bundle: nil), forCellReuseIdentifier: "stockListCell")
         
-        controller = StocksController(delegate: self)
-        controller?.loadStockFiles()
-        
         NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
                 
         NotificationCenter.default.addObserver(self, selector: #selector(updateOrderReturningFromWBValuationTVC(notification:)), name: NSNotification.Name(rawValue: "refreshStockListTVCRow"), object: nil)
-
+        
+        controller.delegate = self
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        controller?.updateStockFiles()
-        tableView.reloadData()
+        updateShares()
+        if controller.fetchedObjects?.count ?? 0 > 0 {
+            tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
+            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+        }
+//        tableView.reloadData()
     }
 
     deinit {
@@ -87,7 +100,7 @@ class StocksListViewController: UITableViewController {
         
         if let paths = notification.object as? [String] {
             for path in paths {
-                addStock(fileURL: URL(fileURLWithPath: path))
+                addShare(fileURL: URL(fileURLWithPath: path))
             }
         }
     }
@@ -96,21 +109,39 @@ class StocksListViewController: UITableViewController {
     func fileDownloaded(_ notification: Notification) {
 
         if let url = notification.object as? URL {
-            addStock(fileURL: url)
+            if let share = StocksController.createShare(from: url, deleteFile: true){
+                let indexPath = controller.indexPath(forObject: share)
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+                performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+            }
+            else {
+                ErrorController.addErrorLog(errorLocation: "StocksListVC." + #function, systemError: nil, errorInfo: "File download notification did not contain a url to creat new share from")
+            }
         }
     }
     
-    public func addStock(fileURL: URL) {
-        
-        if let stock = CSVImporter.csvExtractor(url: fileURL) {
-            stocks.append(stock)
-            
-            tableView.reloadData()
-            // causing crash on Hanski's iPad - why???
-            tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .bottom)
-            tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(item: stocks.count-1, section: 0))
-            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+    public func addShare(fileURL: URL) {
+
+        if let share = StocksController.createShare(from: fileURL, deleteFile: true) {
+            if let path = controller.indexPath(forObject: share) {
+                tableView.selectRow(at: path, animated: true, scrollPosition: .bottom)
+                tableView.delegate?.tableView?(self.tableView, didSelectRowAt: path)
+                performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+            }
         }
+        else {
+            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from file \(fileURL)")
+       }
+        
+//        if let stock = CSVImporter.csvExtractor(url: fileURL) {
+//            stocks.append(stock)
+//
+//            tableView.reloadData()
+//            // causing crash on Hanski's iPad - why???
+//            tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .bottom)
+//            tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(item: stocks.count-1, section: 0))
+//            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+//        }
 
     }
     
@@ -125,21 +156,23 @@ class StocksListViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         
-        return stocks.count < 1 ? 0 : 1
+        return (controller.fetchedObjects?.count ?? 0) < 1 ? 0 : 1
+//        return stocks.count < 1 ? 0 : 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return stocks.count
+        return controller.fetchedObjects?.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
-        let userRatingData = stocks[indexPath.row].userRatingScore // WBValuationController.summaryRating(symbol: stocks[indexPath.row].symbol, type: .star)
-        let valueRatingData = stocks[indexPath.row].fundamentalsScore // WBValuationController.summaryRating(symbol: stocks[indexPath.row].symbol, type: .dollar)
-        cell.configureCell(indexPath: indexPath, stock: stocks[indexPath.row], userRatingData: userRatingData, valueRatingData: valueRatingData)
+        let share = controller.object(at: indexPath)
+        let userRatingData = share.wbValuation?.valuesSummaryScores() //stocks[indexPath.row].  // WBValuationController.summaryRating(symbol: stocks[indexPath.row].symbol, type: .star)
+        let valueRatingData = share.wbValuation?.userEvaluationScore() //stocks[indexPath.row].fundamentalsScore // WBValuationController.summaryRating(symbol: stocks[indexPath.row].symbol, type: .dollar)
+        cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData)
         
         return cell
     }
@@ -150,19 +183,12 @@ class StocksListViewController: UITableViewController {
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete")
         { (action, view, bool) in
             
-            let objectToDelete = stocks[indexPath.row]
-
-            if let validURL = objectToDelete.fileURL {
-                do {
-                    try FileManager.default.removeItem(at: validURL)
-                }
-                catch let error {
-                    ErrorController.addErrorLog(errorLocation: "ValuationController." + #function, systemError: error, errorInfo: "couldn't remove stock file ")
-                }
-            }
+            let objectToDelete = self.controller.object(at: indexPath) //stocks[indexPath.row]
             
-            stocks.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
+            ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext).delete(objectToDelete)
+//
+//            stocks.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .automatic)
         }
             
             let swipeActions = UISwipeActionsConfiguration(actions: [deleteAction])
@@ -179,13 +205,15 @@ class StocksListViewController: UITableViewController {
         
         guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
 
-        wbValuationView.stock = stocks[indexPath.row]
+//        wbValuationView.stock = stocks[indexPath.row]
+        wbValuationView.share = controller.object(at: indexPath)
         wbValuationView.fromIndexPath = indexPath
-        wbValuationView.controller = WBValuationController(stock: stocks[indexPath.row], progressDelegate: wbValuationView)
+//        wbValuationView.controller = WBValuationController(stock: stocks[indexPath.row], progressDelegate: wbValuationView)
         
-        if stocks[indexPath.row].peRatio == nil {
-            stocks[indexPath.row].downloadKeyRatios(delegate: wbValuationView)
-        }
+        
+//        if stocks[indexPath.row].peRatio == nil {
+//            stocks[indexPath.row].downloadKeyRatios(delegate: wbValuationView)
+//        }
 
         performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         
@@ -214,18 +242,19 @@ class StocksListViewController: UITableViewController {
         
         guard let indexPath = tableView.indexPathForSelectedRow else { return }
         
-        let dcfValuation = CombinedValuationController.returnDCFValuations(company: stocks[indexPath.row].symbol)?.first
-        let r1Valuation = CombinedValuationController.returnR1Valuations(company: stocks[indexPath.row].symbol)?.first
+        let share = controller.object(at: indexPath)
+        let dcfValuation = CombinedValuationController.returnDCFValuations(company: share.symbol)?.first
+        let r1Valuation = CombinedValuationController.returnR1Valuations(company: share.symbol)?.first
         
         if let chartView = segue.destination as? StockChartVC {
                 
-            chartView.stockToShow = stocks[indexPath.row]
+            chartView.share = controller.object(at: indexPath)
             chartView.configure(dcfVal: dcfValuation, r1Val: r1Valuation)
         }
         else if let navView = segue.destination as? UINavigationController {
             if let chartView = navView.topViewController as? StockChartVC {
                     
-            chartView.stockToShow = stocks[indexPath.row]
+            chartView.share = controller.object(at: indexPath)
             chartView.configure(dcfVal: dcfValuation, r1Val: r1Valuation)
             }
         }
@@ -233,46 +262,38 @@ class StocksListViewController: UITableViewController {
 
 }
 
-extension StocksListViewController: StockControllerDelegate {
+extension StocksListViewController: SharesUpdaterDelegate {
     
     func updateStocksComplete() {
-        self.tableView.reloadData()
-        if stocks.count > 0 {
-            if tableView.indexPathForSelectedRow == nil {
-                tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .top)
-                tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: true)
-            }
+        
+//check if this is required of NSFRC updates list automatically
+//        self.tableView.reloadData()
+        
+        if (controller.fetchedObjects?.count ?? 0) > 0 {
+            
+            // renew chartContainerView with updated prices
+            let currentlySelectedPath = tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
+            tableView.selectRow(at: currentlySelectedPath, animated: true, scrollPosition: .top)
             performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         }
     }
     
-    func openStocksComplete() {
+    func updateShares() {
         
-        if stocks.count > 0 {
-            self.tableView.reloadData()
-            tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .top)
-            tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: true)
-            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
-            tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: true)
+        guard (Calendar.current.component(.weekday, from: Date()) > 2) else {
+            return
         }
-        else {
-            showWelcomeView()
-        }
+                
+        controller.updateStockFiles()
+        // returns to 'updateStocksComplete()' once complete
     }
     
 }
 
-//extension StocksListViewController: WBValuationListDelegate {
-//
-//    func sendArrayForDisplay(array: [Double]?) {
-//
-//        self.valueChartDelegate?.showValueListChart(array: array)
-//    }
-//
-//    func removeValueChart() {
-//
-//        self.valueChartDelegate?.removeValueListChart()
-//    }
-//
-//
-//}
+extension StocksListViewController: NSFetchedResultsControllerDelegate {
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        self.tableView.reloadData()
+    }
+
+}

@@ -427,7 +427,8 @@ struct TrendProperties {
     }
 }
 
-struct PricePoint {
+struct PricePoint: Codable {
+    
     var tradingDate: Date
     var open: Double
     var high: Double
@@ -435,13 +436,6 @@ struct PricePoint {
     var close: Double
     var volume: Double
     
-    let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = NSLocale.current
-        formatter.timeZone = NSTimeZone.local
-        formatter.dateStyle = .short
-        return formatter
-    }()
 
     
     init(open: Double, close: Double, low: Double, high: Double, volume: Double, date: Date) {
@@ -463,22 +457,41 @@ struct PricePoint {
         self.tradingDate = calendar.date(from: dateComponents) ?? date
     }
     
-    public func returnPrice(option: PricePointOptions) -> Double {
-        
-        switch option {
-        case .low:
-                return low
-            case .high:
-                return high
-            case .open:
-                return open
-            case .close:
-                return close
-            case .volume:
-                return volume
-        }
-        
+    func returnPrice(option: PricePointOptions) -> Double {
+    
+    switch option {
+    case .low:
+            return low
+        case .high:
+            return high
+        case .open:
+            return open
+        case .close:
+            return close
+        case .volume:
+            return volume
     }
+}
+    
+//    func encode(with coder: NSCoder) {
+//        coder.encode(open, forKey: "open")
+//        coder.encode(close, forKey: "close")
+//        coder.encode(high, forKey: "high")
+//        coder.encode(low, forKey: "low")
+//        coder.encode(tradingDate, forKey: "tradingDate")
+//        coder.encode(volume, forKey: "volume")
+//    }
+//
+//    required convenience init?(coder: NSCoder) {
+//        self.close = coder.decodeDouble(forKey: "close")
+//        self.open = coder.decodeDouble(forKey: "open")
+//        self.low = coder.decodeDouble(forKey: "low")
+//        self.high = coder.decodeDouble(forKey: "high")
+//        self.tradingDate = coder.decodeObject(forKey: "tradingDate") as? Date ?? Date()
+//        self.volume = coder.decodeDouble(forKey: "volume")
+//
+//
+//    }
     
     /// expected that self.tradsingDate is LATER than pricepoint.tradingDate
     /// otherwise a negative incline would be returned instead of a positive and vice versa

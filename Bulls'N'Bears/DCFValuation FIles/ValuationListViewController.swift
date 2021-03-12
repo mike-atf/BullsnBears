@@ -15,8 +15,8 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     
     var delegate: ValuationListDelegate?
     var sourceIndexPath: IndexPath!
-    var stock: Stock!
-    
+//    var stock: Stock!
+    var share: Share!
     var valuationMethod: ValuationMethods!
     var sectionSubtitles: [String]?
     var sectionTitles: [String]?
@@ -33,7 +33,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
         tableView.register(UINib(nibName: "ValuationTableViewCell", bundle: nil), forCellReuseIdentifier: "valuationTableViewCell")
 
-        valuationController = CombinedValuationController(stock: stock, valuationMethod: valuationMethod, listView: self)
+        valuationController = CombinedValuationController(stock: share, valuationMethod: valuationMethod, listView: self)
         self.helper = valuationController
         
         sectionTitles = helper.sectionTitles()

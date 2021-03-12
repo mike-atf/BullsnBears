@@ -16,7 +16,7 @@ class StockListCellTableViewCell: UITableViewCell {
     @IBOutlet var valueCircle: ScoreCircle!
     
     var indexPath: IndexPath!
-    var stock: Stock!
+    var stock: Share!
     
     let timeFormatter: RelativeDateTimeFormatter = {
         let formatter = RelativeDateTimeFormatter()
@@ -35,12 +35,14 @@ class StockListCellTableViewCell: UITableViewCell {
         self.ratingCircle.isHidden = true
     }
     
-    public func configureCell(indexPath: IndexPath, stock: Stock, userRatingData: RatingCircleData?, valueRatingData: RatingCircleData?) {
+    public func configureCell(indexPath: IndexPath, stock: Share, userRatingData: RatingCircleData?, valueRatingData: RatingCircleData?) {
         self.indexPath = indexPath
         self.stock = stock
         
         title.text = stock.symbol
-        detail.text = timeFormatter.localizedString(for: stock.dailyPrices.last!.tradingDate, relativeTo: Date())
+        if let lastPrice = stock.getDailyPrices()?.last {
+            detail.text = timeFormatter.localizedString(for: lastPrice.tradingDate, relativeTo: Date())
+        }
         
         ratingCircle.configure(ratingStruct: userRatingData)
         valueCircle.configure(ratingStruct: valueRatingData)

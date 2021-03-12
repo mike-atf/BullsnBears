@@ -9,13 +9,13 @@ import UIKit
 
 class ScoreCircle: UIView {
 
-    var scoreRatio: CGFloat!
+    var scoreRatio:CGFloat = 0
     var symbol: RatingCircleSymbols!
     let π: CGFloat = CGFloat(Double.pi)
     let margin: CGFloat = 5.0
     let circleSegment: CGFloat = 2 * CGFloat(Double.pi) / 4
     let circleColors = [UIColor.systemRed, UIColor.systemOrange, UIColor.systemYellow, UIColor.systemGreen]
-    var fillColor: UIColor!
+    var fillColor = UIColor.systemBackground
     var centerImageView: UIImageView!
 
 

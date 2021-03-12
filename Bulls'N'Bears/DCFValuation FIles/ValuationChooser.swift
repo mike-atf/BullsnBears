@@ -13,7 +13,7 @@ class ValuationChooser: UIViewController {
     @IBOutlet weak var dcfButton: UIButton!
     @IBOutlet weak var rule1Button: UIButton!
 
-    var stock: Stock!
+    var stock: Share!
     weak var rootView: StocksListViewController?
     var sourceCellPath: IndexPath!
     
@@ -35,7 +35,7 @@ class ValuationChooser: UIViewController {
             dcfValuation = valuation
         }
         else {
-            dcfValuation = CombinedValuationController.createDCFValuation(company: stock.symbol)
+            dcfValuation = CombinedValuationController.createDCFValuation(company: stock.symbol!)
             if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
                 dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
             }
@@ -45,7 +45,7 @@ class ValuationChooser: UIViewController {
             tvc.valuationMethod = ValuationMethods.dcf
 //            tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
-            tvc.stock = stock
+            tvc.share = stock
             
             self.dismiss(animated: true) {
                 self.rootView?.navigationController?.present(tvc, animated: true, completion: nil)
@@ -62,7 +62,7 @@ class ValuationChooser: UIViewController {
             r1Valuation = valuation
         }
         else {
-            r1Valuation = CombinedValuationController.createR1Valuation(company: stock.symbol)
+            r1Valuation = CombinedValuationController.createR1Valuation(company: stock.symbol!)
             if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
                 r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
             }
@@ -72,7 +72,7 @@ class ValuationChooser: UIViewController {
             tvc.valuationMethod = ValuationMethods.rule1
 //            tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
-            tvc.stock = stock
+            tvc.share = stock
             
             
             self.dismiss(animated: true) {

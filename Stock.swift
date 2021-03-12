@@ -14,10 +14,6 @@ protocol StockDelegate {
     func priceUpdateComplete(symbol: String)
 }
 
-protocol StockKeyratioDownloadDelegate {
-    func keyratioDownloadComplete(errors: [String])
-}
-
 class Stock {
     
     var symbol: String
@@ -61,11 +57,11 @@ class Stock {
         self.dailyPrices = dailyPrices
         self.fileURL = fileURL
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyratioDownloadComplete(notification:)), name: Notification.Name(rawValue: "KeyRatioDownloadComplete"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(keyratioDownloadComplete(notification:)), name: Notification.Name(rawValue: "KeyRatioDownloadComplete"), object: nil)
         
 //        DispatchQueue.main.async {
-            self.userRatingScore = WBValuationController.summaryRating(symbol: self.symbol, type: .star)
-            self.fundamentalsScore = WBValuationController.summaryRating(symbol: self.symbol, type: .dollar)
+//            self.userRatingScore = WBValuationController.summaryRating(symbol: self.symbol, type: .star)
+//            self.fundamentalsScore = WBValuationController.summaryRating(symbol: self.symbol, type: .dollar)
 //        }
     }
     
@@ -173,6 +169,7 @@ class Stock {
         }
     }
     
+    /*
     func downloadKeyRatios(delegate: StockKeyratioDownloadDelegate) {
         
         var components: URLComponents?
@@ -257,7 +254,7 @@ class Stock {
         html$ = nil
         
     }
-    
+    */
     //MARK: - internal functions
     
     func findDailyPricesIndexFromDate(_ date: Date) -> Int? {

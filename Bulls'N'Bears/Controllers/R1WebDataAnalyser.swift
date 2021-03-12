@@ -10,7 +10,7 @@ import WebKit
 
 class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         
-    var stock: Stock!
+    var stock: Share!
     var valuation: Rule1Valuation!
     var controller: CombinedValuationController!
     var webpages = ["financial-statements", "financial-ratios", "balance-sheet", "pe-ratio","analysis", "cash-flow","insider-transactions"]
@@ -21,12 +21,12 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
     
     var downloader: WebDataDownloader!
     
-    init(stock: Stock, valuation: Rule1Valuation, controller: CombinedValuationController, progressDelegate: ProgressViewDelegate) {
+    init(stock: Share, valuation: Rule1Valuation, controller: CombinedValuationController, progressDelegate: ProgressViewDelegate) {
         
         super.init()
             
         guard stock.name_short != nil else {
-            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
+            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol!)", alertMessage: "can't find a stock short name in dictionary.")
             return
         }
         

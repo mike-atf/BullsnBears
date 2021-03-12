@@ -15,8 +15,7 @@ protocol ChartButtonDelegate {
 
 class ChartContainerView: UIView {
 
-    var stockToShow: Stock?
-    
+    var shareToShow: Share?
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var scrollView: UIScrollView!
     @IBOutlet var contentView: ChartView!
@@ -49,7 +48,7 @@ class ChartContainerView: UIView {
                 
     }
     
-    public func configure(with: Stock) {
+    public func configure(with: Share) {
         
         button1.configureTrendType(title: "", color: UIColor(named: "Red")!, type: .bottom)
         button2.configureTrendType(title: "", color: UIColor.systemBlue, type: .regression)
@@ -64,9 +63,9 @@ class ChartContainerView: UIView {
         button6.active = true
         button6.setNeedsDisplay()
 //
-        stockToShow = with
+        shareToShow = with
         if let validLabel = titleLabel {
-            validLabel.text = stockToShow?.name_long
+            validLabel.text = shareToShow?.name_long
         }
         if let view = contentView {
             view.configure(stock: with)

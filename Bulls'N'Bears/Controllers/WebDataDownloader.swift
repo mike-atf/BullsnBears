@@ -23,11 +23,11 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
     var mt_html$: String?
     var yahoo_html$: String?
     var webView: HiddenWebView?
-    var stock: Stock!
+    var stock: Share!
     var hyphenatedShortName: String?
     var errors = [String]()
     
-    init(stock: Stock, delegate: DataDownloaderDelegate) {
+    init(stock: Share, delegate: DataDownloaderDelegate) {
         super.init()
         
         self.stock = stock
@@ -44,7 +44,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         yahooDownloadTasks = pageTitles
-        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(pageTitles.first!)")
+        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol!)/\(pageTitles.first!)")
         components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
         
         NotificationCenter.default.addObserver(self, selector: #selector(yahooDownloadCompleted(notification:)), name: Notification.Name(rawValue: "YahooDataDownloadComplete"), object: nil)
@@ -61,14 +61,14 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         guard let shortName = stock.name_short else {
-            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
+            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol!)", alertMessage: "can't find a stock short name in dictionary.")
             return
         }
                      
         let shortNameComponents = shortName.split(separator: " ")
         hyphenatedShortName = String(shortNameComponents.first ?? "")
         guard hyphenatedShortName != nil && hyphenatedShortName != "" else {
-            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't construct a stock term for the macrotrends website.")
+            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol!)", alertMessage: "can't construct a stock term for the macrotrends website.")
             return
         }
         
@@ -113,7 +113,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
 
         NotificationCenter.default.addObserver(self, selector: #selector(mtDownloadCompleted(_:)), name: Notification.Name(rawValue: "MTDataDownloadComplete"), object: nil)
 
-        loadWebView(url: nil, stockSymbol: stock.symbol, stockShortname: hyphenatedShortName!.lowercased(), section: mtDownloadTasks.first! )
+        loadWebView(url: nil, stockSymbol: stock.symbol!, stockShortname: hyphenatedShortName!.lowercased(), section: mtDownloadTasks.first! )
     }
     
     // MARK: - WebView functions
@@ -241,8 +241,8 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     func yahooDownloadPage(url: URL?, for section: String) {
         
-        var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(section)")
-        components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
+        var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol!)/\(section)")
+        components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol!)]
 
         
         guard let validURL = components?.url else {
@@ -296,7 +296,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         delegate?.downloadComplete(html$: mt_html$, pageTitle: section)
         
         if let nextTask = mtDownloadTasks.first {
-            loadWebView(stockSymbol: stock.symbol, stockShortname: hyphenatedShortName!.lowercased(), section: nextTask)
+            loadWebView(stockSymbol: stock.symbol!, stockShortname: hyphenatedShortName!.lowercased(), section: nextTask)
         }
 
     }

@@ -9,12 +9,14 @@ import Foundation
 import CoreData
 import WebKit
 
+
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     var sectionTitles = ["Key ratios","Main parameters", "Secondary parameters","Expenses"]
     var sectionSubTitles = ["from Yahoo finance","EMA of growth rates of...","EMA of growth rates of...","EMA of growth rates of..."]
     var rowTitles: [[String]]!
-    var stock: Stock!
+//    var stock: Stock!
+    var share: Share!
     var valuation: WBValuation?
     weak var progressDelegate: ProgressViewDelegate?
     var downloadTasks = 0
@@ -41,21 +43,22 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     //MARK: - init
 
-    init(stock: Stock, progressDelegate: ProgressViewDelegate) {
+    init(share: Share, progressDelegate: ProgressViewDelegate) {
         
         super.init()
         
-        self.stock = stock
+        self.share = share
         self.progressDelegate = progressDelegate
         
-        if let valuation = WBValuationController.returnWBValuations(company: stock.symbol)?.first {
+        if let valuation = WBValuationController.returnWBValuations(company: share.symbol!)?.first {
             self.valuation = valuation
         }
         else {
-            self.valuation = WBValuationController.createWBValuation(company: stock.symbol)
+            self.valuation = WBValuationController.createWBValuation(company: share.symbol!)
         }
                 
         rowTitles = buildRowTitles()
+        
     }
     
     func deallocate() {
@@ -87,58 +90,58 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         return valuations
     }
     
-    static func summaryRating(symbol: String, type: RatingCircleSymbols) -> RatingCircleData {
-        
-        var data = RatingCircleData(rating: nil, maximum: nil, symbol: nil)
-        
-        let stock = stocks.filter { (s) -> Bool in
-            if s.symbol == symbol { return true }
-            else { return false }
-        }.first
-        
-        guard let wbv = returnWBValuations(company: symbol)?.first else {
-            return data
-        }
-        
-        if type == .star {
-            var userSummaryScore: Double = 0
-            var maximumScoreSum: Double = 0
-            
-            for element in wbv.userEvaluations ?? [] {
-                if let evaluation = element as? UserEvaluation {
-                    if let valid = evaluation.userRating() {
-                        userSummaryScore += Double(valid)
-                        maximumScoreSum += 10.0
-                    }
-                }
-            }
-        
-            data.max = maximumScoreSum
-            data.rating = userSummaryScore
-            data.symbol = .star
-
-            stock?.userRatingScore = data
-        }
-        else {
-            
-            if let values = valueSummaryScore(valuation: wbv) {
-                data.rating = values[1]
-                data.max = values[2]
-                data.min = values[0]
-                data.symbol = .dollar
-            }
-            stock?.fundamentalsScore = data
-        }
-        
-        return data
-
-    }
+//    static func summaryRating(symbol: String, type: RatingCircleSymbols) -> RatingCircleData {
+//        
+//        var data = RatingCircleData(rating: nil, maximum: nil, symbol: nil)
+//        
+//        let stock = stocks.filter { (s) -> Bool in
+//            if s.symbol == symbol { return true }
+//            else { return false }
+//        }.first
+//        
+//        guard let wbv = returnWBValuations(company: symbol)?.first else {
+//            return data
+//        }
+//        
+//        if type == .star {
+//            var userSummaryScore: Double = 0
+//            var maximumScoreSum: Double = 0
+//            
+//            for element in wbv.userEvaluations ?? [] {
+//                if let evaluation = element as? UserEvaluation {
+//                    if let valid = evaluation.userRating() {
+//                        userSummaryScore += Double(valid)
+//                        maximumScoreSum += 10.0
+//                    }
+//                }
+//            }
+//        
+//            data.max = maximumScoreSum
+//            data.rating = userSummaryScore
+//            data.symbol = .star
+//
+//            stock?.userRatingScore = data
+//        }
+//        else {
+//            
+//            if let values = valueSummaryScore(valuation: wbv) {
+//                data.rating = values[1]
+//                data.max = values[2]
+//                data.min = values[0]
+//                data.symbol = .dollar
+//            }
+//            stock?.fundamentalsScore = data
+//        }
+//        
+//        return data
+//
+//    }
     
     
-    static func valueSummaryScore(valuation: WBValuation) -> [Double]? {
-        
-        return valuation.valuesSummaryScores()
-    }
+//    static func valueSummaryScore(valuation: WBValuation) -> [Double]? {
+//
+//        return valuation.valuesSummaryScores()
+//    }
 
     static func createWBValuation(company: String) -> WBValuation? {
         
@@ -202,11 +205,9 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
             switch path.row {
             case 0:
-                if let valid = stock.peRatio {
-                    value$ = numberFormatterDecimals.string(from: valid as NSNumber)
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: valid, greenCutoff: 10.0, redCutOff: 40.0)
-                    valuation?.peRatio = valid
-                    valuation?.save()
+                if share.peRatio != Double() {
+                    value$ = numberFormatterDecimals.string(from: share.peRatio as NSNumber)
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: share.peRatio, greenCutoff: 10.0, redCutOff: 40.0)
                 }
                 let sixMonthsAgo = Date().addingTimeInterval(-183*24*3600)
                 let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-2*365*24*3600)
@@ -216,12 +217,12 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
                 
             case 1:
-                if let valid = stock.eps {
-                    value$ = currencyFormatterGapWithPence.string(from: valid as NSNumber)
-                    color = valid > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
+                if share.eps != Double() {
+                    value$ = currencyFormatterGapWithPence.string(from: share.eps as NSNumber)
+                    color = share.eps > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
                 }
             case 2:
-                let lastStockPrice = stock.dailyPrices.last?.close
+                let lastStockPrice =  share.getDailyPrices()?.last?.close //stock.dailyPrices.last?.close
                 if let valid = valuation?.bvps?.first {
                     if lastStockPrice != nil {
                         if let t$ = percentFormatter0Digits.string(from: (valid / lastStockPrice!) as NSNumber) {
@@ -235,16 +236,18 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     }
                 }
             case 3:
-                if let valid = stock.beta {
-                    value$ = numberFormatterDecimals.string(from: valid as NSNumber)
+                if share.beta != Double() {
+                    value$ = numberFormatterDecimals.string(from: share.beta as NSNumber)
                 }
             case 4:
-                valuation?.peRatio = stock.peRatio ?? Double()
+                if share.peRatio != Double() {
+                    valuation?.peRatio = share.peRatio
 
-                let (valid, es$) = valuation!.ivalue()
-                errors = es$
-                if valid != nil {
-                    value$ = currencyFormatterGapWithPence.string(from: valid! as NSNumber)
+                    let (valid, es$) = valuation!.ivalue()
+                    errors = es$
+                    if valid != nil {
+                        value$ = currencyFormatterGapWithPence.string(from: valid! as NSNumber)
+                    }
                 }
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
@@ -459,17 +462,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     }
         
     // MARK: - Data download functions
-    
+        
     func downloadWBValuationData() {
         
         let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios","pe-ratio", "stock-price-history"]
         
-        guard stock.name_short != nil else {
-            alertController.showDialog(title: "Unable to load WB valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
+        guard share.name_short != nil else {
+            alertController.showDialog(title: "Unable to load WB valuation data for \(share.symbol ?? "missing")", alertMessage: "can't find a stock short name in dictionary.")
             return
         }
                 
-        downloader = WebDataDownloader(stock: stock, delegate: self)
+        downloader = WebDataDownloader(stock: share, delegate: self)
         downloader?.macroTrendsDownload(pageTitles: webPageNames)
         downloadTasks = webPageNames.count
     }
@@ -539,7 +542,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             NSEntityDescription.insertNewObject(forEntityName: "UserEvaluation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? UserEvaluation
         }() else { return nil }
          
-        newValuation.stock = stock.symbol
+        newValuation.stock = share.symbol
         newValuation.wbvParameter = parameter
         valuation?.addToUserEvaluations(newValuation)
         
@@ -721,3 +724,6 @@ extension WBValuationController: DataDownloaderDelegate {
         }
     }
 }
+
+
+

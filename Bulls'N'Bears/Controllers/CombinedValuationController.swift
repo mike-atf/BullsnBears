@@ -24,22 +24,22 @@ class CombinedValuationController: ValuationHelper {
     weak var valuationListViewController: ValuationListViewController!
     var valuation: Any?
     var webAnalyser: Any?
-    var stock: Stock!
+    var stock: Share!
     var method: ValuationMethods!
     var rowtitles: [[String]]!
 
-    init(stock: Stock, valuationMethod: ValuationMethods, listView: ValuationListViewController) {
+    init(stock: Share, valuationMethod: ValuationMethods, listView: ValuationListViewController) {
         
         self.valuationListViewController = listView
         self.method = valuationMethod
         self.stock = stock
         
         if valuationMethod == .rule1 {
-            if let valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
+            if let valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol!)?.first {
                 self.valuation = valuation
             }
             else {
-                self.valuation = CombinedValuationController.createR1Valuation(company: stock.symbol)
+                self.valuation = CombinedValuationController.createR1Valuation(company: stock.symbol!)
                 if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
                     (valuation as? Rule1Valuation)?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
                 }
@@ -52,7 +52,7 @@ class CombinedValuationController: ValuationHelper {
                 self.valuation = valuation
             }
             else {
-                self.valuation = CombinedValuationController.createDCFValuation(company: stock.symbol)
+                self.valuation = CombinedValuationController.createDCFValuation(company: stock.symbol!)
                 if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
                     (valuation as? DCFValuation)?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
                 }
@@ -150,10 +150,10 @@ class CombinedValuationController: ValuationHelper {
         var titles = [String]()
         
         if method == .dcf {
-            titles = ["DCF Valuation - \(stock.symbol)","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
+            titles = ["DCF Valuation - \(stock.symbol!)","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
         } else
         if method == .rule1 {
-            titles = ["Rule 1 Valuation - \(stock.symbol)",
+            titles = ["Rule 1 Valuation - \(stock.symbol!)",
             "Moat parameters: Values 5-10 years back",
             "", "", "", "",
             "PE Ratios", "Growth predictions",

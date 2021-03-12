@@ -9,7 +9,9 @@ import UIKit
 
 class StockChartVC: UIViewController {
 
-    var stockToShow: Stock?
+//    var stockToShow: Stock?
+    var share: Share?
+    
     @IBOutlet var chart: ChartContainerView!
     @IBOutlet var errorButton: UIBarButtonItem!
     @IBOutlet var barTitleButton: UIBarButtonItem!
@@ -30,8 +32,7 @@ class StockChartVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if stockToShow == nil {
-            stockToShow = stocks.first
+        if share != nil {
             configure(dcfVal: dcfValuation, r1Val: r1Valuation)
         }
         
@@ -41,7 +42,7 @@ class StockChartVC: UIViewController {
         
         self.navigationItem.leftBarButtonItems = [barTitleButton]
         self.navigationItem.rightBarButtonItem = buildLabel
-        barTitleButton.title = stockToShow?.name_long
+        barTitleButton.title = share?.name_long
         
         NotificationCenter.default.addObserver(self, selector: #selector(activateErrorButton), name: Notification.Name(rawValue: "NewErrorLogged"), object: nil)
         
@@ -61,10 +62,8 @@ class StockChartVC: UIViewController {
     func configure(dcfVal: DCFValuation?, r1Val: Rule1Valuation?) {
         loadViewIfNeeded() // leave! essential
         if let validChart = chart {
-            if let stock = stockToShow {
-                validChart.configure(with: stock)
-//                dcfValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first
-//                r1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first
+            if let validShare = share {
+                validChart.configure(with: validShare)
                 dcfValuation = dcfVal
                 r1Valuation = r1Val
 
@@ -161,26 +160,29 @@ class StockChartVC: UIViewController {
 
     @IBAction func dcfButtonAction(_ sender: UIButton) {
         
-        guard let stock = stockToShow else {
+        guard let validShare = share else {
             return
         }
-
+        
+        guard let symbol = validShare.symbol else {
+            return
+        }
         
         var dcfValuation: DCFValuation!
         
-        if let valuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
+        if let valuation = CombinedValuationController.returnDCFValuations(company: symbol)?.first {
             dcfValuation = valuation
         }
         else {
-            dcfValuation = CombinedValuationController.createDCFValuation(company: stock.symbol)
-            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
+            dcfValuation = CombinedValuationController.createDCFValuation(company: symbol)
+            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: symbol)?.first {
                 dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
             }
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.dcf
-            tvc.stock = stock
+            tvc.share = validShare
             tvc.delegate = self
             
             self.present(tvc, animated: true, completion: nil)
@@ -190,18 +192,22 @@ class StockChartVC: UIViewController {
     
     @IBAction func r1ButtonAction(_ sender: UIButton) {
         
-        guard let validStock = stockToShow else {
+        guard let validShare = share else {
             return
         }
         
+        guard let symbol = validShare.symbol else {
+            return
+        }
+
         var r1Valuation: Rule1Valuation!
         
-        if let valuation = CombinedValuationController.returnR1Valuations(company: validStock.symbol)?.first {
+        if let valuation = CombinedValuationController.returnR1Valuations(company: symbol)?.first {
             r1Valuation = valuation
         }
         else {
-            r1Valuation = CombinedValuationController.createR1Valuation(company: validStock.symbol)
-            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: validStock.symbol)?.first {
+            r1Valuation = CombinedValuationController.createR1Valuation(company: symbol)
+            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: symbol)?.first {
                 r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
             }
         }
@@ -209,7 +215,7 @@ class StockChartVC: UIViewController {
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             
             tvc.valuationMethod = ValuationMethods.rule1
-            tvc.stock = validStock
+            tvc.share = validShare
             tvc.delegate = self
             
             self.present(tvc, animated: true, completion: nil)
@@ -259,12 +265,19 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
     func valuationComplete(toDismiss: ValuationSummaryTVC?) {
         
         if toDismiss != nil {
+
             toDismiss?.dismiss(animated: true, completion: nil)
-            r1Valuation = CombinedValuationController.returnR1Valuations(company: stockToShow!.symbol)?.first
+            guard let symbol = self.share?.symbol else {
+                return
+            }
+            r1Valuation = CombinedValuationController.returnR1Valuations(company: symbol)?.first
             refreshR1Label()
         }
         else {
-            dcfValuation = CombinedValuationController.returnDCFValuations(company: stockToShow!.symbol)?.first
+            guard let symbol = self.share?.symbol else {
+                return
+            }
+            dcfValuation = CombinedValuationController.returnDCFValuations(company: symbol)?.first
             refreshDCFLabel()
         }
     }
@@ -273,6 +286,7 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
         
         listView.dismiss(animated: true, completion: {
             
+
             if let valuation = r1Valuation {
 
                 if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationSummaryTVC") as? ValuationSummaryTVC {
@@ -283,35 +297,13 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
                 }
             }
             else {
-                self.dcfValuation = CombinedValuationController.returnDCFValuations(company: self.stockToShow!.symbol)?.first
+                guard let symbol = self.share?.symbol else {
+                    return
+                }
+                self.dcfValuation = CombinedValuationController.returnDCFValuations(company: symbol)?.first
                 self.refreshDCFLabel()
             }
         })
     }
     
 }
-
-//extension StockChartVC: StocksListDelegate {
-//    
-//    func showValueListChart(array: [Double]?) {
-//        
-//        return
-//            
-//        temporaryValueChartView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValueChartVC") as? ValueChartVC
-//            
-//        temporaryValueChartView?.values = array
-//        
-//        self.present(temporaryValueChartView!, animated: true, completion: nil)
-//        
-//    }
-//    
-//    func removeValueListChart() {
-//        
-//        temporaryValueChartView?.dismiss(animated: true, completion: {
-//            self.temporaryValueChartView = nil
-//        })
-//        
-//    }
-//    
-//    
-//}

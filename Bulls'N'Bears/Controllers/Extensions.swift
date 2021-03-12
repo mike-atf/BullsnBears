@@ -472,6 +472,10 @@ extension UIImage {
     
     func getPixelColor(pos: CGPoint) -> UIColor {
         
+        guard !pos.y.isNaN else {
+            return UIColor.systemBackground
+        }
+        
         let pixelData = self.cgImage!.dataProvider!.data
         let data: UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
         

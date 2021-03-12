@@ -48,7 +48,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
             
             if let validStockList = stockListVC {
                 if let validUrl = localURL {
-                    validStockList.addStock(fileURL: validUrl)
+                    validStockList.addShare(fileURL: validUrl)
                 }
                 self.dismiss(animated: true, completion: nil)
             }
@@ -85,7 +85,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didImportDocumentAt sourceURL: URL, toDestinationURL destinationURL: URL) {
         
         if let validStockList = stockListVC {
-            validStockList.addStock(fileURL: sourceURL)
+            validStockList.addShare(fileURL: sourceURL)
             self.dismiss(animated: true, completion: nil)
         }
 
@@ -117,7 +117,7 @@ extension DocumentBrowserViewController {
             } else if let url = url {
               
                 if let validStockList = self.stockListVC {
-                    validStockList.addStock(fileURL: url)
+                    validStockList.addShare(fileURL: url)
                     self.dismiss(animated: true, completion: nil)
                 }
             }

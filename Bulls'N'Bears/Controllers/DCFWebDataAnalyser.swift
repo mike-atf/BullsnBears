@@ -9,7 +9,7 @@ import UIKit
 
 class DCFWebDataAnalyser {
     
-    var stock: Stock
+    var stock: Share
     var valuation: DCFValuation!
     var yahooPages = ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"]
     var controller: CombinedValuationController!
@@ -20,7 +20,7 @@ class DCFWebDataAnalyser {
     var downloader: WebDataDownloader!
     var altDebtDownload = false
     
-    init(stock: Stock, valuation: DCFValuation, controller: CombinedValuationController, pDelegate: ProgressViewDelegate) {
+    init(stock: Share, valuation: DCFValuation, controller: CombinedValuationController, pDelegate: ProgressViewDelegate) {
         self.stock = stock
         self.valuation = valuation
         self.controller = controller
