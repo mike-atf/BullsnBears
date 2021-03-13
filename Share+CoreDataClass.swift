@@ -89,6 +89,28 @@ public class Share: NSManagedObject {
         return nil
     }
     
+    /// takes new prices and adds any newer ones than already saved to the exsitng list (rather than replce the existing list)
+    func updateDailyPrices(newPrices: [PricePoint]?) {
+        
+        guard let validNewPoints = newPrices else { return }
+        
+        if let existingPricePoints = getDailyPrices() {
+            var newList = existingPricePoints
+            if let lastExistingDate = existingPricePoints.last?.tradingDate {
+                let pointsToAdd = validNewPoints.filter { (element) -> Bool in
+                    if element.tradingDate > lastExistingDate { return true }
+                    else { return false }
+                }
+                if pointsToAdd.count > 0 {
+                    for point in pointsToAdd {
+                        newList.append(point)
+                    }
+                    setDailyPrices(pricePoints: newList)
+                }
+            }
+        }
+    }
+    
     func getDailyPrices() -> [PricePoint]? {
 
         guard let valid = dailyPrices else { return nil }
@@ -637,7 +659,7 @@ public class Share: NSManagedObject {
                 
                 if let updatedPrices = CSVImporter.extractPriceData(url: targetURL, symbol: symbol!) {
                     priceUpdateComplete = true
-                    self.dailyPrices = convertDailyPricesToData(dailyPrices: updatedPrices)
+                    updateDailyPrices(newPrices: updatedPrices)
                     delegate.priceUpdateComplete(symbol: symbol!)
                     removeFile(targetURL)
                 }
