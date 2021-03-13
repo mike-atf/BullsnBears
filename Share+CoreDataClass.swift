@@ -18,6 +18,7 @@ public class Share: NSManagedObject {
         eps = Double()
         peRatio = Double()
         beta = Double()
+        watchStatus = 0 // 0 watchList, 1 owned, 2 archived
     }
     
     public override func awakeFromFetch() {

@@ -55,6 +55,7 @@
         <attribute name="symbol" optional="YES" attributeType="String"/>
         <attribute name="userEvaluationScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="valueScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="watchStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="dcfValuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DCFValuation" inverseName="share" inverseEntity="DCFValuation"/>
         <relationship name="rule1Valuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Rule1Valuation" inverseName="share" inverseEntity="Rule1Valuation"/>
         <relationship name="wbValuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WBValuation" inverseName="share" inverseEntity="WBValuation"/>
@@ -96,7 +97,7 @@
     <elements>
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="299"/>
         <element name="Rule1Valuation" positionX="-231.3936157226562" positionY="484.5766296386719" width="128" height="314"/>
-        <element name="Share" positionX="-236.3782958984375" positionY="80.7822265625" width="128" height="269"/>
+        <element name="Share" positionX="-236.3782958984375" positionY="80.7822265625" width="128" height="284"/>
         <element name="UserEvaluation" positionX="154.9986572265625" positionY="387.3724975585938" width="128" height="148"/>
         <element name="WBValuation" positionX="-37.604248046875" positionY="-7.48974609375" width="128" height="374"/>
     </elements>

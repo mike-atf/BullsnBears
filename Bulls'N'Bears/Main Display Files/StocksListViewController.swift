@@ -20,9 +20,9 @@ class StocksListViewController: UITableViewController {
     
     var controller: StocksController = {
         let request = NSFetchRequest<Share>(entityName: "Share")
-        request.sortDescriptors = [NSSortDescriptor(key: "userEvaluationScore", ascending: false), NSSortDescriptor(key: "valueScore", ascending: false),NSSortDescriptor(key: "symbol", ascending: true)]
+        request.sortDescriptors = [NSSortDescriptor(key: "watchStatus", ascending: true), NSSortDescriptor(key: "userEvaluationScore", ascending: false), NSSortDescriptor(key: "valueScore", ascending: false),NSSortDescriptor(key: "symbol", ascending: true)]
         
-        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "watchStatus", cacheName: nil)
         
         do {
             try sL.performFetch()
@@ -186,6 +186,10 @@ class StocksListViewController: UITableViewController {
             return 0
         }
     }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return ["Watch list", "Owned", "Archived"][section]
+    }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
@@ -194,13 +198,6 @@ class StocksListViewController: UITableViewController {
         let share = controller.object(at: indexPath)
         let valueRatingData = share.wbValuation?.valuesSummaryScores()
         let userRatingData = share.wbValuation?.userEvaluationScore()
-        
-//        if let score = valueRatingData?.ratingScore() {
-//            share.valueScore = score
-//        }
-//        if let score = userRatingData?.ratingScore() {
-//            share.userEvaluationScore = score
-//        }
         
         cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData)
         
@@ -222,6 +219,50 @@ class StocksListViewController: UITableViewController {
         
             return swipeActions
 
+    }
+    
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let objectOwned = self.controller.object(at: indexPath)
+
+        let ownAction = UIContextualAction(style: .normal, title: "Own")
+        { (action, view, bool) in
+            
+            objectOwned.watchStatus = 1
+            objectOwned.save()
+        }
+        ownAction.backgroundColor = UIColor.systemGreen
+        ownAction.image = UIImage(systemName: "bag.badge.plus")
+
+        let watchAction = UIContextualAction(style: .normal, title: "Watch")
+        { (action, view, bool) in
+            
+            objectOwned.watchStatus = 0
+            objectOwned.save()
+        }
+        watchAction.backgroundColor = UIColor.systemGray
+        watchAction.image = UIImage(systemName: "eyeglasses")
+        
+        let archiveAction = UIContextualAction(style: .normal, title: "Archive")
+        { (action, view, bool) in
+            
+            objectOwned.watchStatus = 2
+            objectOwned.save()
+        }
+        archiveAction.backgroundColor = UIColor.systemOrange
+        archiveAction.image = UIImage(systemName: "archivebox")
+        
+
+        
+        if objectOwned.watchStatus == 0 {
+            return UISwipeActionsConfiguration(actions: [ownAction, archiveAction])
+        }
+        else if objectOwned.watchStatus == 1 {
+            return UISwipeActionsConfiguration(actions: [watchAction, archiveAction])
+        }
+        else {
+            return UISwipeActionsConfiguration(actions: [watchAction, ownAction])
+        }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -338,6 +379,24 @@ extension StocksListViewController: NSFetchedResultsControllerDelegate {
         @unknown default:
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined change to shares list controller")
         }
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
+        
+        let indexSet = NSIndexSet(index: sectionIndex) as IndexSet
+        switch type {
+        case .insert:
+            tableView.insertSections(indexSet, with: .automatic)
+        case .delete:
+            tableView.deleteSections(indexSet, with: .automatic)
+        case .update:
+            tableView.reloadSections([sectionIndex], with: .automatic)
+        case .move:
+            tableView.reloadSections([sectionIndex], with: .automatic)
+        @unknown default:
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined change to shares list sections")
+        }
+
     }
     
 }
