@@ -18,7 +18,7 @@ public class Share: NSManagedObject {
         eps = Double()
         peRatio = Double()
         beta = Double()
-        watchStatus = 0 // 0 watchList, 1 owned, 2 archived
+//        watchStatus = 0 // 0 watchList, 1 owned, 2 archived
     }
     
     public override func awakeFromFetch() {
@@ -53,11 +53,13 @@ public class Share: NSManagedObject {
 
     func save() {
               
-       do {
-            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error in WBValuation.save function \(nserror), \(nserror.userInfo)")
+        DispatchQueue.main.async {
+           do {
+                try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error in WBValuation.save function \(nserror), \(nserror.userInfo)")
+            }
         }
     }
     
@@ -65,13 +67,8 @@ public class Share: NSManagedObject {
 
         guard let validPoints = pricePoints else { return }
 
-        do {
-            let data = try NSKeyedArchiver.archivedData(withRootObject: validPoints, requiringSecureCoding: false)
-            self.dailyPrices = data
-            save()
-        } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
-        }
+        self.dailyPrices = convertDailyPricesToData(dailyPrices: validPoints)
+        save()
     }
     
     func convertDailyPricesToData(dailyPrices: [PricePoint]?) -> Data? {

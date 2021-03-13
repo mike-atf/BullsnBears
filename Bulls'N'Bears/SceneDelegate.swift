@@ -172,6 +172,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillResignActive(_ scene: UIScene) {
         // Called when the scene will move from an active state to an inactive state.
         // This may occur due to temporary interruptions (ex. an incoming phone call).
+        
+        // updating ratingScore for fast display on next launch
+        let request = NSFetchRequest<Share>(entityName: "Share")
+        request.sortDescriptors = [NSSortDescriptor(key: "symbol", ascending: true)]
+                
+        do {
+            let shares = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(request)
+            for share in shares {
+            
+                let valueRatingData = share.wbValuation?.valuesSummaryScores()
+                let userRatingData = share.wbValuation?.userEvaluationScore()
+                
+                if let score = valueRatingData?.ratingScore() {
+                    share.valueScore = score
+                }
+                if let score = userRatingData?.ratingScore() {
+                    share.userEvaluationScore = score
+                }
+            }
+        } catch let error as NSError {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
+        }
+
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
@@ -181,25 +204,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidEnterBackground(_ scene: UIScene) {
         
-//        let request = NSFetchRequest<Share>(entityName: "Share")
-//        request.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
-//                
-//        do {
-//            let shares = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(request)
-//        } catch let error as NSError {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch shares")
-//        }
-//
-//        for share
-//        if let wbv = wbValuation {
-//            if let score  = wbv.valuesSummaryScores()?.ratingScore() {
-//                self.valueScore = score
-//            }
-//            if let score  = wbv.userEvaluationScore()?.ratingScore() {
-//                self.valueScore = score
-//            }
-//       }
-
         (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
     }
 

@@ -54,12 +54,7 @@ class StocksController: NSFetchedResultsController<Share>, StockDelegate {
             
             DispatchQueue.main.async {
 
-                do {
-                    try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-                } catch let error {
-                    fatalError("Unresolved context saving error \(error.localizedDescription)")
-                }
-
+                (UIApplication.shared.delegate as! AppDelegate).saveContext()
                 self.controllerDelegate?.updateStocksComplete()
             }
             
@@ -98,6 +93,7 @@ class StocksController: NSFetchedResultsController<Share>, StockDelegate {
         let stockName = String(lastPathComponent)
         
         let newShare = Share.init(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+        
         newShare.symbol = stockName
         newShare.creationDate = Date()
         let pricePoints = CSVImporter.extractPricePointsFromFile(url: file, symbol: stockName)
@@ -120,14 +116,7 @@ class StocksController: NSFetchedResultsController<Share>, StockDelegate {
                 newShare.name_short = String(cleanedName.dropLast())
             }
         }
-
-        do {
-            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-
+        
         if deleteFile ?? false {
             removeFile(file)
         }

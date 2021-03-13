@@ -20,7 +20,7 @@ class StocksListViewController: UITableViewController {
     
     var controller: StocksController = {
         let request = NSFetchRequest<Share>(entityName: "Share")
-        request.sortDescriptors = [NSSortDescriptor(key: "watchStatus", ascending: true), NSSortDescriptor(key: "userEvaluationScore", ascending: false), NSSortDescriptor(key: "valueScore", ascending: false),NSSortDescriptor(key: "symbol", ascending: true)]
+        request.sortDescriptors = [ NSSortDescriptor(key: "watchStatus", ascending: true), NSSortDescriptor(key: "userEvaluationScore", ascending: false), NSSortDescriptor(key: "valueScore", ascending: false),NSSortDescriptor(key: "symbol", ascending: true)]
         
         let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "watchStatus", cacheName: nil)
         
@@ -31,6 +31,8 @@ class StocksListViewController: UITableViewController {
         }
         return sL
     }()
+    
+    let managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,22 +57,22 @@ class StocksListViewController: UITableViewController {
 
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        
-        controller.delegate = nil
-        for share in controller.fetchedObjects ?? [] {
-        
-            let valueRatingData = share.wbValuation?.valuesSummaryScores()
-            let userRatingData = share.wbValuation?.userEvaluationScore()
-            
-            if let score = valueRatingData?.ratingScore() {
-                share.valueScore = score
-            }
-            if let score = userRatingData?.ratingScore() {
-                share.userEvaluationScore = score
-            }
-        }
-    }
+//    override func viewDidDisappear(_ animated: Bool) {
+//        
+//        controller.delegate = nil
+//        for share in controller.fetchedObjects ?? [] {
+//        
+//            let valueRatingData = share.wbValuation?.valuesSummaryScores()
+//            let userRatingData = share.wbValuation?.userEvaluationScore()
+//            
+//            if let score = valueRatingData?.ratingScore() {
+//                share.valueScore = score
+//            }
+//            if let score = userRatingData?.ratingScore() {
+//                share.userEvaluationScore = score
+//            }
+//        }
+//    }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -124,42 +126,30 @@ class StocksListViewController: UITableViewController {
     
     @objc
     func fileDownloaded(_ notification: Notification) {
-
+        
         if let url = notification.object as? URL {
-            if let share = StocksController.createShare(from: url, deleteFile: true){
-                let indexPath = controller.indexPath(forObject: share)
-                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
-            }
-            else {
-                ErrorController.addErrorLog(errorLocation: "StocksListVC." + #function, systemError: nil, errorInfo: "File download notification did not contain a url to creat new share from")
-            }
+            addShare(fileURL: url)
         }
     }
     
     public func addShare(fileURL: URL) {
-
+        
         if let share = StocksController.createShare(from: fileURL, deleteFile: true) {
-            if let path = controller.indexPath(forObject: share) {
-                tableView.selectRow(at: path, animated: true, scrollPosition: .bottom)
-                tableView.delegate?.tableView?(self.tableView, didSelectRowAt: path)
+            
+            do {
+                try self.managedObjectContext.save()
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Failure to add new share from file \(fileURL)")
+            }
+
+            if let indexPath = controller.indexPath(forObject: share) {
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
                 performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
             }
         }
         else {
             ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from file \(fileURL)")
        }
-        
-//        if let stock = CSVImporter.csvExtractor(url: fileURL) {
-//            stocks.append(stock)
-//
-//            tableView.reloadData()
-//            // causing crash on Hanski's iPad - why???
-//            tableView.selectRow(at: IndexPath(item: stocks.count-1, section: 0), animated: true, scrollPosition: .bottom)
-//            tableView.delegate?.tableView?(self.tableView, didSelectRowAt: IndexPath(item: stocks.count-1, section: 0))
-//            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
-//        }
-
     }
     
     @objc
@@ -179,12 +169,7 @@ class StocksListViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        if let sectionInfo = controller.sections?[section] {
-            return sectionInfo.numberOfObjects
-        }
-        else {
-            return 0
-        }
+        return controller.sections?[section].numberOfObjects ?? 0
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -305,8 +290,6 @@ class StocksListViewController: UITableViewController {
         guard let indexPath = tableView.indexPathForSelectedRow else { return }
         
         let share = controller.object(at: indexPath)
-//        let dcfValuation = share.dcfValuation
-//        let r1Valuation = share.rule1Valuation
         
         if let chartView = segue.destination as? StockChartVC {
                 
@@ -327,10 +310,7 @@ class StocksListViewController: UITableViewController {
 extension StocksListViewController: SharesUpdaterDelegate {
     
     func updateStocksComplete() {
-        
-//check if this is required of NSFRC updates list automatically
-//        self.tableView.reloadData()
-        
+                
         if (controller.fetchedObjects?.count ?? 0) > 0 {
             
             // renew chartContainerView with updated prices

@@ -94,7 +94,8 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         
         tableView.deselectRow(at: indexPath, animated: false)
         yahooStockDownload(stocksDictionary[indexPath.row].key)
-        
+        self.navigationController?.popToRootViewController(animated: true)
+
     }
 
     func yahooStockDownload(_ ticker: String?) {
@@ -184,11 +185,10 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                 }
 
                 try FileManager.default.moveItem(at: tempURL, to: targetURL)
-                
+
                 DispatchQueue.main.async  {
                     
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: targetURL, userInfo: nil) // send to StocksListVC
-                    self.navigationController?.popToRootViewController(animated: true)
                 }
 
             } catch {
@@ -211,15 +211,5 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             }
         }
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
