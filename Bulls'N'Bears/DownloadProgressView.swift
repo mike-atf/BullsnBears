@@ -11,6 +11,7 @@ protocol ProgressViewDelegate: AnyObject {
     func progressUpdate(allTasks: Int, completedTasks: Int)
     func cancelRequested()
     func downloadComplete()
+    func downloadError(error: String)
 }
 
 class DownloadProgressView: UIView {
@@ -23,7 +24,6 @@ class DownloadProgressView: UIView {
     
     class func instanceFromNib() -> DownloadProgressView {
             let view = UINib(nibName: "DownloadProgressView", bundle: nil).instantiate(withOwner: nil, options: nil)[0] as! DownloadProgressView
-//            view.backgroundColor = UIColor.systemBackground
             return view
     }
     
@@ -33,7 +33,6 @@ class DownloadProgressView: UIView {
             if completed >= tasks {
                 delegate?.downloadComplete()
             }
-//        setNeedsDisplay()
     }
             
     @IBAction func cancelAction(_ sender: UIButton) {

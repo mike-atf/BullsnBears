@@ -369,12 +369,25 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     }
     
+    //MARK: - ProgressViewDelegate funcions
+    
+    func downloadError(error: String) {
+
+        self.progressView?.title.font = UIFont.systemFont(ofSize: 14)
+        self.progressView?.title.text = error
+        self.progressView?.cancelButton.setTitle("OK", for: .normal)
+    }
+    
     func progressUpdate(allTasks: Int, completedTasks: Int) {
         self.progressView?.updateProgress(tasks: allTasks, completed: completedTasks)
     }
     
     func cancelRequested() {
+        
         controller.stopDownload()
+        progressView?.delegate = nil
+        progressView?.removeFromSuperview()
+        progressView = nil
     }
     
     func downloadComplete() {
@@ -391,7 +404,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 }
 
 extension WBValuationTVC: StockKeyratioDownloadDelegate, WBValuationCellDelegate {
-    
+        
     func keyratioDownloadComplete(errors: [String]) {
         DispatchQueue.main.async {
             self.tableView.reloadSections([0], with: .automatic)

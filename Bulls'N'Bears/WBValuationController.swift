@@ -15,7 +15,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var sectionTitles = ["Key ratios","Main parameters", "Secondary parameters","Expenses"]
     var sectionSubTitles = ["from Yahoo finance","EMA of growth rates of...","EMA of growth rates of...","EMA of growth rates of..."]
     var rowTitles: [[String]]!
-//    var stock: Stock!
     var share: Share!
     var valuation: WBValuation?
     weak var progressDelegate: ProgressViewDelegate?
@@ -468,11 +467,12 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     // MARK: - Data download functions
         
     func downloadWBValuationData() {
-        
+                
         let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios","pe-ratio", "stock-price-history"]
         
         guard share.name_short != nil else {
-            alertController.showDialog(title: "Unable to load WB valuation data for \(share.symbol ?? "missing")", alertMessage: "can't find a stock short name in dictionary.")
+            
+            progressDelegate?.downloadError(error: "Unable to load WB valuation data, can't find a short name in dictionary.")
             return
         }
                 

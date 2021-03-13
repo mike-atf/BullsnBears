@@ -286,6 +286,13 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
 extension ValuationListViewController: ProgressViewDelegate {
     
+    func downloadError(error: String) {
+        self.progressView?.updateProgress(tasks: 1, completed: 1)
+        self.progressView?.title.text = error
+        self.progressView?.cancelButton.setTitle("OK", for: .normal)
+    }
+    
+    
     func cancelRequested() {
         downloadComplete()
         helper.stopDownload()

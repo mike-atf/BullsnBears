@@ -323,6 +323,7 @@ class CombinedValuationController: ValuationHelper {
     }
     
     public func stopDownload() {
+        
         NotificationCenter.default.removeObserver(webAnalyser as Any)
         
         if let analyser = webAnalyser as? R1WebDataAnalyser {

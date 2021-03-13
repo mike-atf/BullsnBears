@@ -25,12 +25,15 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         
         super.init()
             
+        self.progressDelegate = progressDelegate
         guard stock.name_short != nil else {
-            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol!)", alertMessage: "can't find a stock short name in dictionary.")
+            
+            progressDelegate.downloadError(error: "Unable to load WB valuation data, can't find a short name in dictionary.")
+
+//            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol!)", alertMessage: "can't find a stock short name in dictionary.")
             return
         }
         
-        self.progressDelegate = progressDelegate
         self.stock = stock
         self.valuation = valuation
         self.controller = controller
