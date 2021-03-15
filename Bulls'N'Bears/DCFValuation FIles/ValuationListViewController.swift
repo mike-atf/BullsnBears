@@ -262,12 +262,6 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     @objc
     func dataUpdated(_ notification: Notification) {
                 
-        
-        print()
-        print("ValuationListVC received Download complete notification for \(share.symbol!)")
-        print("existing DCFVal = \(share.dcfValuation?.creationDate),  \(share.dcfValuation?.returnIValue())")
-        print("existing R1Val = \(share.dcfValuation?.creationDate), \(share.rule1Valuation?.stickerPrice())")
-
         self.valuationController.webAnalyser = nil
         
         if (sectionTitles?.count ?? 0) > 0 {

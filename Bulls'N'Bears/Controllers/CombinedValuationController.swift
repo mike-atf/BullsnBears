@@ -33,12 +33,6 @@ class CombinedValuationController: ValuationHelper {
         self.valuationListViewController = listView
         self.method = valuationMethod
         self.share = share
-        
-        print()
-        print("____ New Combined Val controller, method \(method)")
-        print("for share \(share.symbol!)")
-        print("existing DCFVal = \(share.dcfValuation?.creationDate),  \(share.dcfValuation?.returnIValue())")
-        print("existing R1Val = \(share.dcfValuation?.creationDate), \(share.rule1Valuation?.stickerPrice())")
 
         if valuationMethod == .rule1 {
             
@@ -52,9 +46,6 @@ class CombinedValuationController: ValuationHelper {
             }
             else {
                 self.valuation = CombinedValuationController.createR1Valuation(company: share.symbol!)
-//                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: share.symbol) {
-//                    (valuation as? Rule1Valuation)?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
-//                }
                 share.rule1Valuation = self.valuation as? Rule1Valuation
             }
         }
@@ -70,17 +61,9 @@ class CombinedValuationController: ValuationHelper {
             }
             else {
                 self.valuation = CombinedValuationController.createDCFValuation(company: share.symbol!)
-//                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: share.symbol) {
-//                    (valuation as? DCFValuation)?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
-//                }
                 share.dcfValuation = self.valuation as? DCFValuation
             }
         }
-        
-        print("...after init valuation are...")
-        print(" DCFVal = \(share.dcfValuation?.creationDate),  \(share.dcfValuation?.returnIValue())")
-        print(" R1Val = \(share.rule1Valuation?.creationDate), \(share.rule1Valuation?.stickerPrice())")
-        print()
 
     }
     
@@ -299,12 +282,7 @@ class CombinedValuationController: ValuationHelper {
             var alerts:[String]?
             
             valuation.save()
-            
-            print()
-            print("dcf val saved \(valuation.creationDate) for \(valuation.share?.symbol!), \(valuation.returnIValue())")
-            print("rule 1 is \(share.rule1Valuation?.creationDate), \(share.rule1Valuation?.stickerPrice())")
-            print()
-            
+           
             for income in valuation.netIncome ?? [] {
                 if income < 0 {
                     alerts = [String]()
@@ -326,11 +304,6 @@ class CombinedValuationController: ValuationHelper {
         }
         else if let valuation = self.valuation as? Rule1Valuation  {
             valuation.save()
-
-            print()
-            print("rule1 val saved \(valuation.creationDate) for \(valuation.share?.symbol!), \(valuation.stickerPrice())")
-            print("dcf val is \(share.dcfValuation?.creationDate), \(share.dcfValuation?.returnIValue())")
-            print()
 
             var alerts:[String]?
 

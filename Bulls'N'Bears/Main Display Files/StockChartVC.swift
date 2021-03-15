@@ -68,14 +68,6 @@ class StockChartVC: UIViewController {
             }
         }
         
-        print("......")
-        print("StockChartVC CONFIGURE()")
-        print("share is \(share?.symbol!), dcfVAL is \(share?.dcfValuation?.creationDate), price \(share?.dcfValuation?.returnIValue())")
-        print("...rule1 VAL is \(share?.rule1Valuation?.creationDate), price \(share?.rule1Valuation?.stickerPrice())")
-        print("update labels")
-        print()
-
-        
         setValuationTexts()
     }
     
@@ -173,17 +165,9 @@ class StockChartVC: UIViewController {
         guard let symbol = validShare.symbol else {
             return
         }
-        
-        var dcfValuation: DCFValuation!
-        
-        if let valuation = CombinedValuationController.returnDCFValuations(company: symbol) {
-            dcfValuation = valuation
-        }
-        else {
-            dcfValuation = CombinedValuationController.createDCFValuation(company: symbol)
-//            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: symbol) {
-//                dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
-//            }
+                
+        if CombinedValuationController.returnDCFValuations(company: symbol) == nil {
+            share?.dcfValuation = CombinedValuationController.createDCFValuation(company: symbol)
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
@@ -206,16 +190,8 @@ class StockChartVC: UIViewController {
             return
         }
 
-        var r1Valuation: Rule1Valuation!
-        
-        if let valuation = CombinedValuationController.returnR1Valuations(company: symbol) {
-            r1Valuation = valuation
-        }
-        else {
-            r1Valuation = CombinedValuationController.createR1Valuation(company: symbol)
-//            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: symbol) {
-//                r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
-//            }
+        if CombinedValuationController.returnR1Valuations(company: symbol) == nil {
+            share?.rule1Valuation = CombinedValuationController.createR1Valuation(company: symbol)
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
@@ -271,12 +247,6 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
     func valuationSummaryComplete(toDismiss: ValuationSummaryTVC?) {
 
         // return point from ValuationSummaryTVC for R1Valuations
-        print("......")
-        print("StockChartVC after r1 valuation is complete")
-        print("for share \(share?.symbol!), dcfVAL \(share?.dcfValuation?.creationDate), price \(share?.dcfValuation?.returnIValue())")
-        print("...rule11 VAL\(share?.rule1Valuation?.creationDate), price \(share?.rule1Valuation?.stickerPrice())")
-        print("update labels")
-        print()
         
         if toDismiss != nil {
 
@@ -291,13 +261,6 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
     func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?) {
 
         listView.dismiss(animated: true, completion: {
-
-            print("......")
-            print("StockChartVC after dcf/ r1 valuation is complete")
-            print("for share \(self.share?.symbol!), dcfVAL \(self.share?.dcfValuation?.creationDate), \(self.share?.dcfValuation?.tFCFo), price \(self.share?.dcfValuation?.returnIValue())")
-            print("...rule11 VAL\(self.share?.rule1Valuation?.creationDate), price \(self.share?.rule1Valuation?.stickerPrice())")
-            print("update labels")
-            print()
 
             if let _ = r1Valuation {
                 if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationSummaryTVC") as? ValuationSummaryTVC {

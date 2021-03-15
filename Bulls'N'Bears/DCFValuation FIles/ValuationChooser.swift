@@ -28,22 +28,13 @@ class ValuationChooser: UIViewController {
     }
     
     @IBAction func dcfAction(_ sender: UIButton) {
-        
-        var dcfValuation: DCFValuation!
-        
-        if let valuation = CombinedValuationController.returnDCFValuations(company: stock.symbol) {
-            dcfValuation = valuation
-        }
-        else {
-            dcfValuation = CombinedValuationController.createDCFValuation(company: stock.symbol!)
-//            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol){
-//                dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
-//            }
+                
+        if CombinedValuationController.returnDCFValuations(company: stock.symbol) == nil {
+            stock.dcfValuation = CombinedValuationController.createDCFValuation(company: stock.symbol!)
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.dcf
-//            tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
             tvc.share = stock
             
@@ -55,25 +46,15 @@ class ValuationChooser: UIViewController {
     }
     
     @IBAction func rule1Action(_ sender: UIButton) {
-        
-        var r1Valuation: Rule1Valuation!
-        
-        if let valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol) {
-            r1Valuation = valuation
-        }
-        else {
-            r1Valuation = CombinedValuationController.createR1Valuation(company: stock.symbol!)
-//            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol) {
-//                r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
-//            }
+                
+        if CombinedValuationController.returnR1Valuations(company: stock.symbol) == nil {
+            stock.rule1Valuation = CombinedValuationController.createR1Valuation(company: stock.symbol!)
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
             tvc.valuationMethod = ValuationMethods.rule1
-//            tvc.presentingListVC = rootView
             tvc.sourceIndexPath = sourceCellPath
             tvc.share = stock
-            
             
             self.dismiss(animated: true) {
                 self.rootView?.present(tvc, animated: true)

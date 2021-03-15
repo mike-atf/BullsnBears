@@ -418,7 +418,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             proportions = Calculator.proportions(array1: values?.first!, array0: values?.last!)
         }
         else {
-            if let array1 = values!.first {
+            if let array1 = values?.first {
                 proportions = array1?.growthRates()
             }
         }

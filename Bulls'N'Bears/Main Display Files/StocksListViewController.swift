@@ -73,15 +73,6 @@ class StocksListViewController: UITableViewController {
         } catch let error {
             ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Error updating Sstocks list")
         }
-        
-        print("StocksList of shares...")
-        print()
-        for share in controller.fetchedObjects ?? [] {
-            print(share.symbol!)
-            print(share.dcfValuation)
-            print(share.rule1Valuation)
-            print()
-        }
     }
     
     func updateShares() {

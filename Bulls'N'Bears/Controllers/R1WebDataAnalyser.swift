@@ -34,11 +34,6 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         }
 
         self.share = stock
-
-        print("R1WebDataAnalyzer init for share \(share.symbol!)")
-        print("existing DCFVal = \(share.dcfValuation?.creationDate), \(share.dcfValuation?.tFCFo),  \(share.dcfValuation?.returnIValue())")
-        
-//        self.valuation = share.rule1Valuation
         self.controller = controller
         
         downloader = WebDataDownloader(stock: stock, delegate: self)
@@ -61,11 +56,7 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
 extension R1WebDataAnalyser: DataDownloaderDelegate {
     
     func downloadComplete(html$: String?, pageTitle: String?) {
-        
-        print("R1WebDataAnalyzer delegate has downloaded web page \(pageTitle)")
-        print(" DCFVal  is now \(share.dcfValuation?.creationDate), \(share.dcfValuation?.tFCFo),  \(share.dcfValuation?.returnIValue())")
-
-        
+                
         downloadTasksComplete += 1
         
         guard html$ != nil else {
@@ -196,12 +187,6 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
         }
         
         if downloadTasksComplete == downloadTasks {
-            
-            print()
-            print("Data Download in R1WebDataAnalyzer complete for share \(share.symbol!)")
-            print("existing DCFVal = \(share.dcfValuation?.creationDate), \(share.dcfValuation?.tFCFo),  \(share.dcfValuation?.returnIValue())")
-            print("existing R1Val = \(share.dcfValuation?.creationDate), \(share.rule1Valuation?.stickerPrice())")
-            print("...sending notification to ValuationListVC...")
             
             self.deallocate()
             
