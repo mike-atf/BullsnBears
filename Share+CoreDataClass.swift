@@ -684,7 +684,7 @@ public class Share: NSManagedObject {
         
     // MARK: - keyRatios uopdate
     
-    func downloadKeyRatios() { //delegate: StockKeyratioDownloadDelegate
+    func downloadKeyRatios(delegate: StockKeyratioDownloadDelegate?) {
         
         var components: URLComponents?
                 
@@ -714,14 +714,13 @@ public class Share: NSManagedObject {
             }
 
             let html$ = String(decoding: validData, as: UTF8.self)
-            self.keyratioDownloadComplete(html$: html$)
+            self.keyratioDownloadComplete(html$: html$, delegate: delegate)
         }
         yahooSession.resume()
     }
 
     
-    @objc
-    func keyratioDownloadComplete(html$: String) { // (notification: Notification)
+    func keyratioDownloadComplete(html$: String, delegate: StockKeyratioDownloadDelegate?) {
         
         let rowTitles = ["Beta (5Y monthly)", "Trailing P/E", "Diluted EPS"] // titles differ from the ones displayed on webpage!
         var loaderrors = [String]()
@@ -753,6 +752,6 @@ public class Share: NSManagedObject {
         }
        
         
-//        delegate.keyratioDownloadComplete(errors: loaderrors)
+        delegate?.keyratioDownloadComplete(errors: loaderrors)
     }
 }

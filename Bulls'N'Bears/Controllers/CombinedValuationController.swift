@@ -39,14 +39,14 @@ class CombinedValuationController: ValuationHelper {
             if let valuation = share.rule1Valuation {
                 self.valuation = valuation
             }
-            else if let valuation = CombinedValuationController.returnR1Valuations(company: share.symbol!)?.first {
+            else if let valuation = CombinedValuationController.returnR1Valuations(company: share.symbol!) {
                 // any orphan valuation belonging to this compnay  left after deleting share
                 share.rule1Valuation = valuation
                 self.valuation = valuation
             }
             else {
                 self.valuation = CombinedValuationController.createR1Valuation(company: share.symbol!)
-                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: share.symbol)?.first {
+                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: share.symbol) {
                     (valuation as? Rule1Valuation)?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
                 }
                 share.rule1Valuation = self.valuation as? Rule1Valuation
@@ -57,14 +57,14 @@ class CombinedValuationController: ValuationHelper {
             if let valuation = share.dcfValuation {
                 self.valuation = valuation
             }
-            else if let valuation = CombinedValuationController.returnDCFValuations(company: share.symbol!)?.first {
+            else if let valuation = CombinedValuationController.returnDCFValuations(company: share.symbol!) {
                 // any orphan valuation belonging to this compnay left after deleting share
                 self.valuation = valuation
                 share.dcfValuation = valuation
             }
             else {
                 self.valuation = CombinedValuationController.createDCFValuation(company: share.symbol!)
-                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: share.symbol)?.first {
+                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: share.symbol) {
                     (valuation as? DCFValuation)?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
                 }
                 share.dcfValuation = self.valuation as? DCFValuation
@@ -88,10 +88,17 @@ class CombinedValuationController: ValuationHelper {
     //MARK: - Class functions
     
     static func createR1Valuation(company: String) -> Rule1Valuation? {
+        
+        if let existingValuation = returnR1Valuations() {
+            existingValuation.delete()
+        }
+        
         let newValuation:Rule1Valuation? = {
             NSEntityDescription.insertNewObject(forEntityName: "Rule1Valuation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? Rule1Valuation
         }()
+        
         newValuation?.company = company
+        
         do {
             try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
@@ -102,11 +109,12 @@ class CombinedValuationController: ValuationHelper {
         return newValuation
     }
     
-    static func returnR1Valuations(company: String? = nil) -> [Rule1Valuation]? {
+    static func returnR1Valuations(company: String? = nil) -> Rule1Valuation? {
         
         var valuations: [Rule1Valuation]?
         
         let fetchRequest = NSFetchRequest<Rule1Valuation>(entityName: "Rule1Valuation")
+        fetchRequest.sortDescriptors = [ NSSortDescriptor(key: "creationDate", ascending: false)] // newest first
         if let validName = company {
             let predicate = NSPredicate(format: "company == %@", argumentArray: [validName])
             fetchRequest.predicate = predicate
@@ -117,15 +125,22 @@ class CombinedValuationController: ValuationHelper {
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
         }
+        
+        if valuations?.count ?? 0 > 1 {
+            for i in 1..<valuations!.count {
+                valuations![i].delete()
+            }
+        }
 
-        return valuations
+        return valuations?.first
     }
     
-    static func returnDCFValuations(company: String? = nil) -> [DCFValuation]? {
+    static func returnDCFValuations(company: String? = nil) -> DCFValuation? {
         
         var valuations: [DCFValuation]?
         
         let fetchRequest = NSFetchRequest<DCFValuation>(entityName: "DCFValuation")
+        fetchRequest.sortDescriptors = [ NSSortDescriptor(key: "creationDate", ascending: false)] // newest first
         fetchRequest.returnsObjectsAsFaults = false
         if let validName = company {
             let predicate = NSPredicate(format: "company == %@", argumentArray: [validName])
@@ -138,10 +153,21 @@ class CombinedValuationController: ValuationHelper {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching dcfValuations")
         }
 
-        return valuations
+        if valuations?.count ?? 0 > 1 {
+            for i in 1..<valuations!.count {
+                valuations![i].delete()
+            }
+        }
+
+        return valuations?.first
     }
     
     static func createDCFValuation(company: String) -> DCFValuation? {
+        
+        if let existingValuation = returnDCFValuations() {
+            existingValuation.delete()
+        }
+
         let newValuation:DCFValuation? = {
             NSEntityDescription.insertNewObject(forEntityName: "DCFValuation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? DCFValuation
         }()

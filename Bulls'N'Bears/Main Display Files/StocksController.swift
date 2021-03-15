@@ -8,28 +8,35 @@
 import UIKit
 import CoreData
 
-protocol SharesUpdaterDelegate {
-//    func openStocksComplete()
-    func updateStocksComplete()
-    func updateShares()
+/// StocksController calls this delegate when all shares have updated their price to inform StocksListVC
+/// then update the stockChartVC - > chartView candleStick chart
+protocol StocksControllerDelegate {
+    func allSharesHaveUpdatedTheirPrices() // all shares prices have been updated
 }
 
+/// Share calls this when it wants to inform StocksController that the price update is complete
+protocol StockDelegate {
+    func priceUpdateComplete(symbol: String)
+}
+
+/// Share calls this when it wants to inform StocksController or ValueListTVC  that the price update is complete
+/// StocksListVC picks this up from StocksController to add any Error to the centrsal Error log
+/// ValueLIstTVC picks this up to update it's section [0]
 protocol StockKeyratioDownloadDelegate {
     func keyratioDownloadComplete(errors: [String])
 }
 
 
-class StocksController: NSFetchedResultsController<Share>, StockDelegate {
+class StocksController: NSFetchedResultsController<Share> {
     
-    var controllerDelegate: SharesUpdaterDelegate?
-    var stocksDelegate: StockDelegate?
+    var pricesUpdateDelegate: StocksControllerDelegate?
+    var keyratioUpdateDelegate: StockKeyratioDownloadDelegate?
+    var stockDelegate: StockDelegate?
     lazy var yahooRefDate: Date = getYahooRefDate()
             
     //Mark:- shares price update functions
     
     func updateStockFiles() {
-        
-//        stocks = sortStocksByRatings(stocks: stocks)
         
         // don't update on Sundays and Mondays when there's no data
         guard (Calendar.current.component(.weekday, from: Date()) > 2) else {
@@ -44,29 +51,7 @@ class StocksController: NSFetchedResultsController<Share>, StockDelegate {
             }
         }
     }
-    
-    func priceUpdateComplete(symbol: String) {
-        // gather info from all stock reporting their updates are complete then call the TVC delegte to update it's view
-        
-        let allUpdated = fetchedObjects?.compactMap{ $0.priceUpdateComplete } ?? [true]
-        
-        if !allUpdated.contains(false) {
-            
-            DispatchQueue.main.async {
-
-                (UIApplication.shared.delegate as! AppDelegate).saveContext()
-                self.controllerDelegate?.updateStocksComplete()
-            }
-            
-            // then update key ratios at leisure; display needed in WBVlautionListTVC only
-            DispatchQueue.global(qos: .userInteractive).async {
-                for share in self.fetchedObjects ?? [] {
-                    share.downloadKeyRatios()
-                }
-            }
-        }
-    }
-            
+                
     private func getYahooRefDate() -> Date {
         let calendar = Calendar.current
         let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
@@ -121,6 +106,12 @@ class StocksController: NSFetchedResultsController<Share>, StockDelegate {
             removeFile(file)
         }
         
+        // check for any exisisting valuations
+        newShare.wbValuation = WBValuationController.returnWBValuations(share: newShare)
+        newShare.dcfValuation = CombinedValuationController.returnDCFValuations(company: newShare.symbol!)
+        newShare.rule1Valuation = CombinedValuationController.returnR1Valuations(company: newShare.symbol)
+        
+        newShare.downloadKeyRatios(delegate: nil)
         return newShare
     }
     
@@ -141,8 +132,24 @@ class StocksController: NSFetchedResultsController<Share>, StockDelegate {
 
 }
 
-extension StocksController: StockKeyratioDownloadDelegate {
+extension StocksController: StockKeyratioDownloadDelegate, StockDelegate {
+    
+    func priceUpdateComplete(symbol: String) {
         
+        guard let shares = fetchedObjects else { return }
+        
+        if !(shares.compactMap { $0.priceUpdateComplete! }.contains(false)) {
+            pricesUpdateDelegate?.allSharesHaveUpdatedTheirPrices()
+
+            DispatchQueue.global(qos: .background).async {
+                for share in self.fetchedObjects ?? [] {
+                    share.downloadKeyRatios(delegate: self)
+                }
+            }
+        }
+    }
+    
+    
     func keyratioDownloadComplete(errors: [String]) {
         
         if errors.count > 0 {

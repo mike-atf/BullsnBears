@@ -52,7 +52,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         if let valuation = share.wbValuation {
             self.valuation = valuation
         }
-        else if let valuation = WBValuationController.returnWBValuations(share: share)?.first {
+        else if let valuation = WBValuationController.returnWBValuations(share: share) {
             // find old disconnected valutions persisted after share was deleted
             self.valuation = valuation
         }
@@ -72,11 +72,12 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     }
     //MARK: - class functions
     
-    static func returnWBValuations(share: Share) -> [WBValuation]? {
+    static func returnWBValuations(share: Share) -> WBValuation? {
         
         var valuations: [WBValuation]?
         
         let fetchRequest = NSFetchRequest<WBValuation>(entityName: "WBValuation")
+        fetchRequest.sortDescriptors = [ NSSortDescriptor(key: "date", ascending: false)]
         fetchRequest.returnsObjectsAsFaults = false
         if let validName = share.symbol {
             let predicate = NSPredicate(format: "company == %@", argumentArray: [validName])
@@ -88,64 +89,22 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
         }
+        
+        if valuations?.count ?? 0 > 1 {
+            for i in 1..<valuations!.count {
+                valuations![i].delete()
+            }
+        }
 
-        return valuations
+        return valuations?.first
     }
     
-//    static func summaryRating(symbol: String, type: RatingCircleSymbols) -> RatingCircleData {
-//        
-//        var data = RatingCircleData(rating: nil, maximum: nil, symbol: nil)
-//        
-//        let stock = stocks.filter { (s) -> Bool in
-//            if s.symbol == symbol { return true }
-//            else { return false }
-//        }.first
-//        
-//        guard let wbv = returnWBValuations(company: symbol)?.first else {
-//            return data
-//        }
-//        
-//        if type == .star {
-//            var userSummaryScore: Double = 0
-//            var maximumScoreSum: Double = 0
-//            
-//            for element in wbv.userEvaluations ?? [] {
-//                if let evaluation = element as? UserEvaluation {
-//                    if let valid = evaluation.userRating() {
-//                        userSummaryScore += Double(valid)
-//                        maximumScoreSum += 10.0
-//                    }
-//                }
-//            }
-//        
-//            data.max = maximumScoreSum
-//            data.rating = userSummaryScore
-//            data.symbol = .star
-//
-//            stock?.userRatingScore = data
-//        }
-//        else {
-//            
-//            if let values = valueSummaryScore(valuation: wbv) {
-//                data.rating = values[1]
-//                data.max = values[2]
-//                data.min = values[0]
-//                data.symbol = .dollar
-//            }
-//            stock?.fundamentalsScore = data
-//        }
-//        
-//        return data
-//
-//    }
-    
-    
-//    static func valueSummaryScore(valuation: WBValuation) -> [Double]? {
-//
-//        return valuation.valuesSummaryScores()
-//    }
 
     static func createWBValuation(share: Share) -> WBValuation? {
+        
+        if let existingValuation = returnWBValuations(share: share) {
+            existingValuation.delete()
+        }
         
         let newValuation:WBValuation? = {
             NSEntityDescription.insertNewObject(forEntityName: "WBValuation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? WBValuation
@@ -191,7 +150,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     }
     
     public func sectionHeaderText(section: Int) -> (String, String) {
-        return (sectionTitles[section], sectionSubTitles[section])
+        
+        var date$ = String()
+        if let date = valuation?.date {
+            date$ = dateFormatter.string(from: date)
+        }
+    
+        var datedTitles = [sectionTitles[0]] // not dated
+        for i in 1..<sectionTitles.count {
+            datedTitles.append(sectionTitles[i] + " (" + date$ + ")")
+        }
+        return (datedTitles[section], sectionSubTitles[section])
     }
 
     public func value$(path: IndexPath) -> (String, UIColor?, [String]?) {
@@ -721,7 +690,8 @@ extension WBValuationController: DataDownloaderDelegate {
         
         if downloadTasksCompleted == downloadTasks {
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: self.downloadErrors , userInfo: nil)
+                
+                self.progressDelegate?.downloadComplete()
             }
         }
     }

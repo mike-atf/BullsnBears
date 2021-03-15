@@ -200,7 +200,7 @@ class ChartView: UIView {
                 }
                 valuationLabels.removeAll()
 
-                if let existingValuation = CombinedValuationController.returnDCFValuations(company: share!.symbol)?.first {
+                if let existingValuation = CombinedValuationController.returnDCFValuations(company: share!.symbol) {
                     let (fairValue, errors) = existingValuation.returnIValue()
                     if (fairValue ?? 0.0) > 0 {
                         let ratio = currentPrice / fairValue!
@@ -227,7 +227,7 @@ class ChartView: UIView {
                 
     // R1 Label
                 // R1 Label
-                if let existingValuation = CombinedValuationController.returnR1Valuations(company: share!.symbol)?.first {
+                if let existingValuation = CombinedValuationController.returnR1Valuations(company: share!.symbol) {
                     let (fairValue,errors) = existingValuation.stickerPrice()
                         if (fairValue ?? 0) > 0 {
                             let ratio = currentPrice / fairValue!

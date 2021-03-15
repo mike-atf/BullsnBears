@@ -10,10 +10,6 @@ import Foundation
 typealias PriceDate = (date: Date, price: Double)
 typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
 
-protocol StockDelegate {
-    func priceUpdateComplete(symbol: String)
-}
-
 class Stock2 {
     
     var symbol: String
@@ -21,7 +17,7 @@ class Stock2 {
     var name_long: String?
     var dailyPrices: [PricePoint]
     var fileURL: URL?
-    var delegate: StockDelegate?
+//    var delegate: StockDelegate?
     var needsUpdate: Bool {
         return Date().timeIntervalSince(dailyPrices.last?.tradingDate ?? Date()) > 24*3600 ? true : false
     }
@@ -34,7 +30,7 @@ class Stock2 {
 
     init(name: String, dailyPrices:[PricePoint], fileURL: URL?, delegate: StockDelegate?) {
         self.symbol = name
-        self.delegate = delegate
+//        self.delegate = delegate
         
         if let dictionary = stockTickerDictionary {
             name_long = dictionary[symbol]
@@ -165,7 +161,7 @@ class Stock2 {
         if let updatedPrices = CSVImporter.extractPriceData(url: fileURL, symbol: symbol) {
             self.dailyPrices = updatedPrices
             self.fileURL = url
-            delegate?.priceUpdateComplete(symbol: symbol)
+//            delegate?.priceUpdateComplete(symbol: symbol)
         }
     }
     

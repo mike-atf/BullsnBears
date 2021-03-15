@@ -145,6 +145,19 @@ public class WBValuation: NSManagedObject {
             fatalError("Unresolved error in WBValuation.save function \(nserror), \(nserror.userInfo)")
         }
     }
+    
+    func delete() {
+       
+        (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.delete(self)
+ 
+        do {
+            try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+        } catch {
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+    }
+
 
     
     public func grossProfitMargins() -> ([Double], [String]?) {

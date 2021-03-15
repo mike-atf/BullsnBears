@@ -167,12 +167,12 @@ class StockChartVC: UIViewController {
         
         var dcfValuation: DCFValuation!
         
-        if let valuation = CombinedValuationController.returnDCFValuations(company: symbol)?.first {
+        if let valuation = CombinedValuationController.returnDCFValuations(company: symbol) {
             dcfValuation = valuation
         }
         else {
             dcfValuation = CombinedValuationController.createDCFValuation(company: symbol)
-            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: symbol)?.first {
+            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: symbol) {
                 dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
             }
         }
@@ -199,12 +199,12 @@ class StockChartVC: UIViewController {
 
         var r1Valuation: Rule1Valuation!
         
-        if let valuation = CombinedValuationController.returnR1Valuations(company: symbol)?.first {
+        if let valuation = CombinedValuationController.returnR1Valuations(company: symbol) {
             r1Valuation = valuation
         }
         else {
             r1Valuation = CombinedValuationController.createR1Valuation(company: symbol)
-            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: symbol)?.first {
+            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: symbol) {
                 r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
             }
         }

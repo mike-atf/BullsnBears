@@ -78,7 +78,7 @@ public class DCFValuation: NSManagedObject {
 //            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
 //        }
 //    }
-//        
+//
     func save() {
         
         do {
@@ -94,7 +94,7 @@ public class DCFValuation: NSManagedObject {
         (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.delete(self)
  
         do {
-            try managedObjectContext?.save()
+            try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")

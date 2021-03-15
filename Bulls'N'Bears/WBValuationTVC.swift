@@ -188,6 +188,10 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        guard indexPath.section > 0 else {
+            return
+        }
+        
         performSegue(withIdentifier: "valueListSegue", sender: nil)
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -208,7 +212,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         case 4:
             infoText = "Intrinsic value based on 10y prediction.\nTaking into account past earnings growth, pre-tax EPS and a long-term discount rate of 2.1%.\nAs calculated in 'Warren Buffet and the Interpretation of Financial Statements' (Simon & Schuster, 2008)"
         default:
-            print("Error - default")
+            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "encountered default in switch statement")
         }
         
         let view = tableView.cellForRow(at: indexPath)?.contentView
@@ -397,17 +401,17 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         controller.valuation?.save()
         
-        tableView.reloadData()
+        share.downloadKeyRatios(delegate: self)
     }
 
 
 }
 
 extension WBValuationTVC: StockKeyratioDownloadDelegate, WBValuationCellDelegate {
-        
+    
     func keyratioDownloadComplete(errors: [String]) {
         DispatchQueue.main.async {
-            self.tableView.reloadSections([0], with: .automatic)
+            self.tableView.reloadData()
 
         }
     }

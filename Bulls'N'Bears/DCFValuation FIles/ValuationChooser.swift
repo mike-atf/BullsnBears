@@ -31,12 +31,12 @@ class ValuationChooser: UIViewController {
         
         var dcfValuation: DCFValuation!
         
-        if let valuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
+        if let valuation = CombinedValuationController.returnDCFValuations(company: stock.symbol) {
             dcfValuation = valuation
         }
         else {
             dcfValuation = CombinedValuationController.createDCFValuation(company: stock.symbol!)
-            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
+            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol){
                 dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
             }
         }
@@ -58,12 +58,12 @@ class ValuationChooser: UIViewController {
         
         var r1Valuation: Rule1Valuation!
         
-        if let valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol)?.first {
+        if let valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol) {
             r1Valuation = valuation
         }
         else {
             r1Valuation = CombinedValuationController.createR1Valuation(company: stock.symbol!)
-            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol)?.first {
+            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol) {
                 r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
             }
         }

@@ -46,6 +46,8 @@ class StocksListViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateCellReturningFromWBValuationTVC(notification:)), name: NSNotification.Name(rawValue: "refreshStockListTVCRow"), object: nil)
         
         controller.delegate = self
+        controller.pricesUpdateDelegate = self
+        
         updateShares()
         if controller.fetchedObjects?.count ?? 0 > 0 {
             tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
@@ -57,23 +59,33 @@ class StocksListViewController: UITableViewController {
 
     }
     
-//    override func viewDidDisappear(_ animated: Bool) {
-//        
-//        controller.delegate = nil
-//        for share in controller.fetchedObjects ?? [] {
-//        
-//            let valueRatingData = share.wbValuation?.valuesSummaryScores()
-//            let userRatingData = share.wbValuation?.userEvaluationScore()
-//            
-//            if let score = valueRatingData?.ratingScore() {
-//                share.valueScore = score
-//            }
-//            if let score = userRatingData?.ratingScore() {
-//                share.userEvaluationScore = score
-//            }
-//        }
-//    }
+    override func viewWillDisappear(_ animated: Bool) {
+        
+        controller.delegate = nil // disconnect FRC to avoid TVC update requests in background when changes to shares are made in other VC
+    }
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+        // reconnect FRC to update shares after changing made in other VC
+        controller.delegate = self
+        do {
+            try controller.performFetch()
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Error updating Sstocks list")
+        }
+    }
+    
+    func updateShares() {
+        
+        let weekDay = Calendar.current.component(.weekday, from: Date())
+        guard (weekDay > 0 && weekDay < 6) else {
+            return
+        }
+                
+        controller.updateStockFiles()
+        // returns to 'updateStocksComplete()' once complete
+    }
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -307,29 +319,16 @@ class StocksListViewController: UITableViewController {
 
 }
 
-extension StocksListViewController: SharesUpdaterDelegate {
+extension StocksListViewController: StocksControllerDelegate {
     
-    func updateStocksComplete() {
+    
+    func allSharesHaveUpdatedTheirPrices() {
                 
-        if (controller.fetchedObjects?.count ?? 0) > 0 {
-            
-            // renew chartContainerView with updated prices
             let currentlySelectedPath = tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
             tableView.selectRow(at: currentlySelectedPath, animated: true, scrollPosition: .top)
             performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
-        }
     }
-    
-    func updateShares() {
         
-        guard (Calendar.current.component(.weekday, from: Date()) > 2) else {
-            return
-        }
-                
-        controller.updateStockFiles()
-        // returns to 'updateStocksComplete()' once complete
-    }
-    
 }
 
 extension StocksListViewController: NSFetchedResultsControllerDelegate {
