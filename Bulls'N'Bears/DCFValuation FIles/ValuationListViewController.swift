@@ -189,6 +189,8 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     @objc
     func saveValuation() {
         
+        // after 'save' button tapped in Val List VC
+        
         if let alerts = helper.saveValuation() {
             var message = alerts.first!
             for i in 1..<alerts.count {
@@ -260,6 +262,12 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     @objc
     func dataUpdated(_ notification: Notification) {
                 
+        
+        print()
+        print("ValuationListVC received Download complete notification for \(share.symbol!)")
+        print("existing DCFVal = \(share.dcfValuation?.creationDate),  \(share.dcfValuation?.returnIValue())")
+        print("existing R1Val = \(share.dcfValuation?.creationDate), \(share.rule1Valuation?.stickerPrice())")
+
         self.valuationController.webAnalyser = nil
         
         if (sectionTitles?.count ?? 0) > 0 {
@@ -279,7 +287,6 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
                 showDownloadCompleteMessage = true
             }
         }
-        
     }
 }
 
@@ -303,6 +310,8 @@ extension ValuationListViewController: ProgressViewDelegate {
     }
     
     func downloadComplete() {
+        
+        // progressView calls this on it's own once completedTasks >= tasks
         self.progressView?.delegate = nil
         progressView?.removeFromSuperview()
         progressView = nil

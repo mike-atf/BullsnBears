@@ -50,12 +50,8 @@ public class Rule1Valuation: NSManagedObject {
     
     func save() {
         
-        guard let context = managedObjectContext else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "no moc available - can't save valuation")
-            return
-        }
         do {
-            try  context.save()
+            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error in SiteDetails.save function \(nserror), \(nserror.userInfo)")
@@ -86,24 +82,24 @@ public class Rule1Valuation: NSManagedObject {
         return years.min() ?? 0
     }
     
-    func getDataFromDCFValuation(dcfValuation: DCFValuation?) {
-        
-        guard let valuation = dcfValuation else {
-            return
-        }
-        
-        var count = 0
-        for sales in valuation.tRevenueActual ?? [] {
-            self.revenue?.insert(sales, at: count)
-            count += 1
-        }
-                
-        count = 0
-        for sales in valuation.tFCFo ?? [] {
-            self.opcs?.insert(sales, at: count)
-            count += 1
-        }
-    }
+//    func getDataFromDCFValuation(dcfValuation: DCFValuation?) {
+//
+//        guard let valuation = dcfValuation else {
+//            return
+//        }
+//
+//        var count = 0
+//        for sales in valuation.tRevenueActual ?? [] {
+//            self.revenue?.insert(sales, at: count)
+//            count += 1
+//        }
+//
+//        count = 0
+//        for sales in valuation.tFCFo ?? [] {
+//            self.opcs?.insert(sales, at: count)
+//            count += 1
+//        }
+//    }
 
     
 //    internal func compoundGrowthRate(endValue: Double, startValue: Double, years: Double) -> Double {

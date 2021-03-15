@@ -34,6 +34,12 @@ class CombinedValuationController: ValuationHelper {
         self.method = valuationMethod
         self.share = share
         
+        print()
+        print("____ New Combined Val controller, method \(method)")
+        print("for share \(share.symbol!)")
+        print("existing DCFVal = \(share.dcfValuation?.creationDate),  \(share.dcfValuation?.returnIValue())")
+        print("existing R1Val = \(share.dcfValuation?.creationDate), \(share.rule1Valuation?.stickerPrice())")
+
         if valuationMethod == .rule1 {
             
             if let valuation = share.rule1Valuation {
@@ -46,9 +52,9 @@ class CombinedValuationController: ValuationHelper {
             }
             else {
                 self.valuation = CombinedValuationController.createR1Valuation(company: share.symbol!)
-                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: share.symbol) {
-                    (valuation as? Rule1Valuation)?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
-                }
+//                if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: share.symbol) {
+//                    (valuation as? Rule1Valuation)?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
+//                }
                 share.rule1Valuation = self.valuation as? Rule1Valuation
             }
         }
@@ -64,12 +70,18 @@ class CombinedValuationController: ValuationHelper {
             }
             else {
                 self.valuation = CombinedValuationController.createDCFValuation(company: share.symbol!)
-                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: share.symbol) {
-                    (valuation as? DCFValuation)?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
-                }
+//                if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: share.symbol) {
+//                    (valuation as? DCFValuation)?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
+//                }
                 share.dcfValuation = self.valuation as? DCFValuation
             }
         }
+        
+        print("...after init valuation are...")
+        print(" DCFVal = \(share.dcfValuation?.creationDate),  \(share.dcfValuation?.returnIValue())")
+        print(" R1Val = \(share.rule1Valuation?.creationDate), \(share.rule1Valuation?.stickerPrice())")
+        print()
+
     }
     
     public func removeObjectsFromMemory() {
@@ -89,7 +101,7 @@ class CombinedValuationController: ValuationHelper {
     
     static func createR1Valuation(company: String) -> Rule1Valuation? {
         
-        if let existingValuation = returnR1Valuations() {
+        if let existingValuation = returnR1Valuations(company: company) {
             existingValuation.delete()
         }
         
@@ -109,7 +121,7 @@ class CombinedValuationController: ValuationHelper {
         return newValuation
     }
     
-    static func returnR1Valuations(company: String? = nil) -> Rule1Valuation? {
+    static func returnR1Valuations(company: String?) -> Rule1Valuation? {
         
         var valuations: [Rule1Valuation]?
         
@@ -135,7 +147,7 @@ class CombinedValuationController: ValuationHelper {
         return valuations?.first
     }
     
-    static func returnDCFValuations(company: String? = nil) -> DCFValuation? {
+    static func returnDCFValuations(company: String?) -> DCFValuation? {
         
         var valuations: [DCFValuation]?
         
@@ -164,7 +176,7 @@ class CombinedValuationController: ValuationHelper {
     
     static func createDCFValuation(company: String) -> DCFValuation? {
         
-        if let existingValuation = returnDCFValuations() {
+        if let existingValuation = returnDCFValuations(company: company) {
             existingValuation.delete()
         }
 
@@ -288,6 +300,11 @@ class CombinedValuationController: ValuationHelper {
             
             valuation.save()
             
+            print()
+            print("dcf val saved \(valuation.creationDate) for \(valuation.share?.symbol!), \(valuation.returnIValue())")
+            print("rule 1 is \(share.rule1Valuation?.creationDate), \(share.rule1Valuation?.stickerPrice())")
+            print()
+            
             for income in valuation.netIncome ?? [] {
                 if income < 0 {
                     alerts = [String]()
@@ -309,7 +326,12 @@ class CombinedValuationController: ValuationHelper {
         }
         else if let valuation = self.valuation as? Rule1Valuation  {
             valuation.save()
-            
+
+            print()
+            print("rule1 val saved \(valuation.creationDate) for \(valuation.share?.symbol!), \(valuation.stickerPrice())")
+            print("dcf val is \(share.dcfValuation?.creationDate), \(share.dcfValuation?.returnIValue())")
+            print()
+
             var alerts:[String]?
 
 
@@ -339,11 +361,11 @@ class CombinedValuationController: ValuationHelper {
     public func startDataDownload() {
         
         if method == .rule1 {
-            webAnalyser = R1WebDataAnalyser(stock: self.share, valuation: self.valuation as! Rule1Valuation, controller: self, progressDelegate: self.valuationListViewController)
+            webAnalyser = R1WebDataAnalyser(stock: self.share, controller: self, progressDelegate: self.valuationListViewController)
 
         }
         else {
-            webAnalyser = DCFWebDataAnalyser(stock: share, valuation: valuation as! DCFValuation, controller: self, pDelegate: self.valuationListViewController)
+            webAnalyser = DCFWebDataAnalyser(stock: share, controller: self, pDelegate: self.valuationListViewController)
         }
         
     }

@@ -20,9 +20,9 @@ class DCFWebDataAnalyser {
     var downloader: WebDataDownloader!
     var altDebtDownload = false
     
-    init(stock: Share, valuation: DCFValuation, controller: CombinedValuationController, pDelegate: ProgressViewDelegate) {
+    init(stock: Share, controller: CombinedValuationController, pDelegate: ProgressViewDelegate) {
         self.stock = stock
-        self.valuation = valuation
+        self.valuation = stock.dcfValuation
         self.controller = controller
         self.progressDelegate = pDelegate
         
@@ -31,8 +31,9 @@ class DCFWebDataAnalyser {
         downloadTasks = yahooPages.count
     }
     
-    deinit {
+    func deallocate() {
         NotificationCenter.default.removeObserver(self)
+        downloader.webView = nil
         downloader = nil
     }
 
@@ -169,6 +170,8 @@ extension DCFWebDataAnalyser: DataDownloaderDelegate {
         }
         
         if completedDownLoadTasks == downloadTasks {
+//            self.downloader = nil
+            self.deallocate()
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: self.downloadErrors, userInfo: nil)
             }

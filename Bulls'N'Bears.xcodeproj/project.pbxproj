@@ -341,8 +341,8 @@
 			isa = PBXGroup;
 			children = (
 				EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */,
-				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
 				EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */,
+				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
 				EAC07B6E25B8950E00B6C898 /* DCFWebDataAnalyser.swift */,
 				EA52EDC725D18D760000155F /* WebpageScraper.swift */,
 				EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */,
@@ -420,11 +420,11 @@
 		EAFD824925A4D2C000D27566 /* DCFValuation FIles */ = {
 			isa = PBXGroup;
 			children = (
+				EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */,
 				EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */,
 				EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */,
 				EAC2FC6F25A23FFC0060F387 /* ValuationTableViewCell.swift */,
 				EAC2FC7025A23FFC0060F387 /* ValuationTableViewCell.xib */,
-				EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */,
 				EAFCB97C25C9A4060029AA4F /* ValuationSummaryTVC.swift */,
 				EAFCB98625C9A4DE0029AA4F /* ValuationSummaryCell.swift */,
 				EAFCB98725C9A4DE0029AA4F /* ValuationSummaryCell.xib */,

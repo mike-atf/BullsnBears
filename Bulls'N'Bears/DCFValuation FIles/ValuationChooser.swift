@@ -36,9 +36,9 @@ class ValuationChooser: UIViewController {
         }
         else {
             dcfValuation = CombinedValuationController.createDCFValuation(company: stock.symbol!)
-            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol){
-                dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
-            }
+//            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: stock.symbol){
+//                dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
+//            }
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
@@ -63,9 +63,9 @@ class ValuationChooser: UIViewController {
         }
         else {
             r1Valuation = CombinedValuationController.createR1Valuation(company: stock.symbol!)
-            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol) {
-                r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
-            }
+//            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: stock.symbol) {
+//                r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
+//            }
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {

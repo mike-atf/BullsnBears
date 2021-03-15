@@ -60,12 +60,21 @@ class StockChartVC: UIViewController {
     }
     
     func configure(share: Share?) {
+        
         loadViewIfNeeded() // leave! essential
         if let validChart = chart {
             if let validShare = share {
                 validChart.configure(with: validShare)
             }
         }
+        
+        print("......")
+        print("StockChartVC CONFIGURE()")
+        print("share is \(share?.symbol!), dcfVAL is \(share?.dcfValuation?.creationDate), price \(share?.dcfValuation?.returnIValue())")
+        print("...rule1 VAL is \(share?.rule1Valuation?.creationDate), price \(share?.rule1Valuation?.stickerPrice())")
+        print("update labels")
+        print()
+
         
         setValuationTexts()
     }
@@ -172,9 +181,9 @@ class StockChartVC: UIViewController {
         }
         else {
             dcfValuation = CombinedValuationController.createDCFValuation(company: symbol)
-            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: symbol) {
-                dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
-            }
+//            if let existingR1Valuation = CombinedValuationController.returnR1Valuations(company: symbol) {
+//                dcfValuation?.getDataFromR1Valuation(r1Valuation: existingR1Valuation)
+//            }
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
@@ -204,9 +213,9 @@ class StockChartVC: UIViewController {
         }
         else {
             r1Valuation = CombinedValuationController.createR1Valuation(company: symbol)
-            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: symbol) {
-                r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
-            }
+//            if let existingDCFValuation = CombinedValuationController.returnDCFValuations(company: symbol) {
+//                r1Valuation?.getDataFromDCFValuation(dcfValuation: existingDCFValuation)
+//            }
         }
 
         if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
@@ -261,6 +270,14 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
     
     func valuationSummaryComplete(toDismiss: ValuationSummaryTVC?) {
 
+        // return point from ValuationSummaryTVC for R1Valuations
+        print("......")
+        print("StockChartVC after r1 valuation is complete")
+        print("for share \(share?.symbol!), dcfVAL \(share?.dcfValuation?.creationDate), price \(share?.dcfValuation?.returnIValue())")
+        print("...rule11 VAL\(share?.rule1Valuation?.creationDate), price \(share?.rule1Valuation?.stickerPrice())")
+        print("update labels")
+        print()
+        
         if toDismiss != nil {
 
             toDismiss?.dismiss(animated: true, completion: nil)
@@ -274,6 +291,13 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
     func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?) {
 
         listView.dismiss(animated: true, completion: {
+
+            print("......")
+            print("StockChartVC after dcf/ r1 valuation is complete")
+            print("for share \(self.share?.symbol!), dcfVAL \(self.share?.dcfValuation?.creationDate), \(self.share?.dcfValuation?.tFCFo), price \(self.share?.dcfValuation?.returnIValue())")
+            print("...rule11 VAL\(self.share?.rule1Valuation?.creationDate), price \(self.share?.rule1Valuation?.stickerPrice())")
+            print("update labels")
+            print()
 
             if let _ = r1Valuation {
                 if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationSummaryTVC") as? ValuationSummaryTVC {

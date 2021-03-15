@@ -101,24 +101,24 @@ public class DCFValuation: NSManagedObject {
         }
     }
     
-    func getDataFromR1Valuation(r1Valuation: Rule1Valuation?) {
-        
-        guard let valuation = r1Valuation else {
-            return
-        }
-        
-        var count = 0
-        for sales in valuation.revenue ?? [] {
-            self.tRevenueActual?.insert(sales, at: count)
-            count += 1
-        }
-                
-        count = 0
-        for sales in valuation.opcs ?? [] {
-            self.tFCFo?.insert(sales, at: count)
-            count += 1
-        }
-    }
+//    func getDataFromR1Valuation(r1Valuation: Rule1Valuation?) {
+//
+//        guard let valuation = r1Valuation else {
+//            return
+//        }
+//
+//        var count = 0
+//        for sales in valuation.revenue ?? [] {
+//            self.tRevenueActual?.insert(sales, at: count)
+//            count += 1
+//        }
+//
+//        count = 0
+//        for sales in valuation.opcs ?? [] {
+//            self.tFCFo?.insert(sales, at: count)
+//            count += 1
+//        }
+//    }
     
     public func returnIValue() -> (Double?, [String]) {
         

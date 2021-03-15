@@ -73,6 +73,15 @@ class StocksListViewController: UITableViewController {
         } catch let error {
             ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Error updating Sstocks list")
         }
+        
+        print("StocksList of shares...")
+        print()
+        for share in controller.fetchedObjects ?? [] {
+            print(share.symbol!)
+            print(share.dcfValuation)
+            print(share.rule1Valuation)
+            print()
+        }
     }
     
     func updateShares() {
@@ -277,12 +286,6 @@ class StocksListViewController: UITableViewController {
         
         navigationController?.pushViewController(wbValuationView, animated: true)
         tableView.deselectRow(at: indexPath, animated: true)
-    }
-    
-    func valuationCompleted(indexPath: IndexPath) {
-        tableView.reloadRows(at: [indexPath], with: .automatic)
-        tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
-        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
     }
     
         

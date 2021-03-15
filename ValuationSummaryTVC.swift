@@ -23,6 +23,14 @@ class ValuationSummaryTVC: UITableViewController {
         super.viewDidLoad()
 
         tableView.register(UINib(nibName: "ValuationSummaryCell", bundle: nil), forCellReuseIdentifier: "valuationSummaryCell")
+        
+        print("......")
+        print("ValuationSummaryTVC view did load")
+        print("share \(self.share?.symbol!), dcfVAL \(self.share?.dcfValuation?.creationDate), price \(self.share?.dcfValuation?.returnIValue())")
+        print("...rule11 VAL\(self.share?.rule1Valuation?.creationDate), price \(self.share?.rule1Valuation?.stickerPrice())")
+        print("update labels")
+        print()
+
     }
 
     // MARK: - Table view data source
