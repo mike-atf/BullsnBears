@@ -43,7 +43,7 @@ class StocksListViewController: UITableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
                 
-        NotificationCenter.default.addObserver(self, selector: #selector(updateCellReturningFromWBValuationTVC(notification:)), name: NSNotification.Name(rawValue: "refreshStockListTVCRow"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(updateCellReturningFromWBValuationTVC(notification:)), name: NSNotification.Name(rawValue: "refreshStockListTVCRow"), object: nil)
         
         controller.delegate = self
         controller.pricesUpdateDelegate = self
@@ -73,6 +73,8 @@ class StocksListViewController: UITableViewController {
         } catch let error {
             ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Error updating Sstocks list")
         }
+        
+        tableView.reloadData()
     }
     
     func updateShares() {
@@ -164,13 +166,13 @@ class StocksListViewController: UITableViewController {
        }
     }
     
-    @objc
-    func updateCellReturningFromWBValuationTVC(notification: Notification) {
-        
-        if let path = notification.object as? IndexPath {
-            tableView.reloadRows(at: [path], with: .automatic)
-        }
-    }
+//    @objc
+//    func updateCellReturningFromWBValuationTVC(notification: Notification) {
+//
+//        if let path = notification.object as? IndexPath {
+//            tableView.reloadRows(at: [path], with: .automatic)
+//        }
+//    }
     
     // MARK: - Table view data source
 

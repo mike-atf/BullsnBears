@@ -45,14 +45,14 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         controller = nil
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        
-        guard !movingToValueListTVC else {
-            return
-        }
-
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "refreshStockListTVCRow"), object: fromIndexPath, userInfo: nil)
-    }
+//    override func viewDidDisappear(_ animated: Bool) {
+//        
+//        guard !movingToValueListTVC else {
+//            return
+//        }
+//
+//        NotificationCenter.default.post(name: Notification.Name(rawValue: "refreshStockListTVCRow"), object: fromIndexPath, userInfo: nil)
+//    }
 
     
     // MARK: - Table view data source
