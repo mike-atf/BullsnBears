@@ -40,6 +40,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             return
         }
         
+        controller.share.setUserAndValueScores()
         controller.deallocate()
         controller = nil
     }
@@ -352,10 +353,10 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             else if indexPath.row == 1 {
                 arrays = [controller.valuation?.roe ?? []]
             }
-            else if indexPath.row == 1 {
+            else if indexPath.row == 2 {
                 arrays = [controller.valuation?.roa ?? []]
             }
-            else if indexPath.row == 2 {
+            else if indexPath.row == 3 {
                 let (shEquityWithRetEarnings, _) = controller.valuation!.addElements(array1: controller.valuation?.shareholdersEquity ?? [], array2: controller.valuation!.equityRepurchased ?? [])
                 arrays = [controller.valuation?.debtLT ?? [], shEquityWithRetEarnings]
             }
@@ -399,6 +400,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         progressView?.removeFromSuperview()
         progressView = nil
         
+        controller.valuation?.date = Date()
         controller.valuation?.save()
         
         share.downloadKeyRatios(delegate: self)

@@ -128,6 +128,21 @@ public class Share: NSManagedObject {
         return nil
     }
     
+    func setUserAndValueScores() {
+        
+        var needsSaving = false
+        if let score = wbValuation?.valuesSummaryScores()?.ratingScore() {
+            self.valueScore = score
+            needsSaving = true
+        }
+        if let score = wbValuation?.userEvaluationScore()?.ratingScore() {
+            self.userEvaluationScore = score
+            needsSaving = true
+        }
+        
+        if needsSaving { save() }
+        
+    }
     
     // MARK: - price functions
     public func lowestPrice(_ from: Date? = nil,_ to: Date? = nil) -> Double? {
@@ -196,7 +211,6 @@ public class Share: NSManagedObject {
         if minDate != nil && maxDate != nil { return [minDate!, maxDate!] }
         else { return nil }
     }
-
 
     // MARK: - correlations and trends
     
@@ -495,7 +509,6 @@ public class Share: NSManagedObject {
             return Double(predictionFailed) / Double(totalCounted)
         }
     }
-
     
     func testRegressionReliability(_covering timePeriod: TimeInterval, trendType: TrendType) -> Double? {
         
@@ -578,7 +591,6 @@ public class Share: NSManagedObject {
         }
 
     }
-
 
     // MARK: - download / update functions
     
@@ -718,7 +730,6 @@ public class Share: NSManagedObject {
         }
         yahooSession.resume()
     }
-
     
     func keyratioDownloadComplete(html$: String, delegate: StockKeyratioDownloadDelegate?) {
         

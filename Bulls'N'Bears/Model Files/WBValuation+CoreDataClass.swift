@@ -34,17 +34,6 @@ public class WBValuation: NSManagedObject {
         equityRepurchased = [Double]()
         date = Date()
         
-        // when deleting a WBValuation this doe NOT delete related UserEvaluations
-        // these are linked to a company (symbol) as well as wbValuation parameters
-        // when (re-)creating a WBValuation check whether there are any old userEvaluations
-        // and if so re-add the relationships to this WBValuation via parameters
-        if let ratings = WBValuationController.allUserRatings(for: company) {
-            if ratings.count > 0 {
-                let set = NSSet(array: ratings)
-                addToUserEvaluations(set)
-            }
-        }
-
     }
     
     func peRatiosWithDates() -> [DatedValue]? {
@@ -353,7 +342,7 @@ public class WBValuation: NSManagedObject {
 
     }
     
-    func valuesSummaryScores() -> RatingCircleData? { // [min,score,max]
+    func valuesSummaryScores() -> RatingCircleData? {
         
         let peRatioWeight = 1.5
         let retEarningsGrowthWeight = 1.3

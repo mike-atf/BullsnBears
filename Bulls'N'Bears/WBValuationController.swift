@@ -58,6 +58,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         else {
             self.valuation = WBValuationController.createWBValuation(share: share)
+            // when deleting a WBValuation this doe NOT delete related UserEvaluations
+            // these are linked to a company (symbol) as well as wbValuation parameters
+            // when (re-)creating a WBValuation check whether there are any old userEvaluations
+            // and if so re-add the relationships to this WBValuation via parameters
+            if let ratings = WBValuationController.allUserRatings(for: share.symbol!) {
+                if ratings.count > 0 {
+                    let set = NSSet(array: ratings)
+                    valuation?.addToUserEvaluations(set)
+                }
+            }
+
         }
                 
         rowTitles = buildRowTitles()
@@ -129,7 +140,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         let fetchRequest = NSFetchRequest<UserEvaluation>(entityName: "UserEvaluation")
         fetchRequest.returnsObjectsAsFaults = false
         if let validName = symbol {
-            let predicate = NSPredicate(format: "company == %@", argumentArray: [validName])
+            let predicate = NSPredicate(format: "stock == %@", argumentArray: [validName])
             fetchRequest.predicate = predicate
         }
         

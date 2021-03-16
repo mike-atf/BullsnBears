@@ -318,9 +318,11 @@ extension StocksListViewController: StocksControllerDelegate {
     
     func allSharesHaveUpdatedTheirPrices() {
                 
-            let currentlySelectedPath = tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
-            tableView.selectRow(at: currentlySelectedPath, animated: true, scrollPosition: .top)
-            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+        DispatchQueue.main.async {
+            let currentlySelectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
+            self.tableView.selectRow(at: currentlySelectedPath, animated: true, scrollPosition: .top)
+            self.performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+        }
     }
         
 }
