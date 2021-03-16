@@ -291,11 +291,11 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 }
             }
             else if selectedPath.section == 2 {
-                if selectedPath.row < 2 {
+                if selectedPath.row < 3 {
                     destination.values = arrays
                     destination.formatter = percentFormatter0Digits
                 }
-                else if selectedPath.row == 2 {
+                else if selectedPath.row == 3 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     destination.higherGrowthIsBetter = false
