@@ -56,6 +56,11 @@ class StocksListViewController: UITableViewController {
         else {
             showWelcomeView()
         }
+        
+//        for object in controller.fetchedObjects ?? [] {
+//                print()
+//                print("in StocksList \(object.symbol!), \(object.macd)")
+//        }
 
     }
     
@@ -198,7 +203,7 @@ class StocksListViewController: UITableViewController {
         let valueRatingData = share.wbValuation?.valuesSummaryScores()
         let userRatingData = share.wbValuation?.userEvaluationScore()
         
-        cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData)
+        cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData, scoreDelegate: self)
         
         return cell
     }
@@ -315,7 +320,29 @@ class StocksListViewController: UITableViewController {
 
 }
 
-extension StocksListViewController: StocksControllerDelegate {
+extension StocksListViewController: StocksControllerDelegate, ScoreCircleDelegate {
+    
+    func tap(indexPath: IndexPath, isUserScoreType: Bool, sender: UIView) {
+        
+        if let evaluationsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {
+            
+            evaluationsView.modalPresentationStyle = .popover
+            evaluationsView.preferredContentSize = CGSize(width: self.view.frame.width * 0.75, height: self.view.frame.height * 0.5)
+
+            let popUpController = evaluationsView.popoverPresentationController
+            popUpController!.permittedArrowDirections = .any
+            popUpController!.sourceView = sender
+            evaluationsView.loadViewIfNeeded()
+            
+            let share = controller.object(at: indexPath)
+            let evaluations = share.wbValuation?.returnUserEvaluations()?.compactMap{ $0.comment }
+            
+            evaluationsView.errors = evaluations ?? []
+            
+            present(evaluationsView, animated: true, completion:  nil)
+        }
+
+    }
     
     
     func allSharesHaveUpdatedTheirPrices() {

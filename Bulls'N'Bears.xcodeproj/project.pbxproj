@@ -34,6 +34,12 @@
 		EA50DEF225D427B10005B23A /* StocksController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA50DEF125D427B10005B23A /* StocksController.swift */; };
 		EA52EDC825D18D760000155F /* WebpageScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA52EDC725D18D760000155F /* WebpageScraper.swift */; };
 		EA5FDBE325B1EE34008918C8 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5FDBE225B1EE34008918C8 /* AlertController.swift */; };
+		EA6AACD826050457002DE9DF /* MAC_D.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACD726050457002DE9DF /* MAC_D.swift */; };
+		EA6AACD926050457002DE9DF /* MAC_D.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACD726050457002DE9DF /* MAC_D.swift */; };
+		EA6AACDA26050457002DE9DF /* MAC_D.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACD726050457002DE9DF /* MAC_D.swift */; };
+		EA6AACDF26053294002DE9DF /* MACD_View.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACDE26053294002DE9DF /* MACD_View.swift */; };
+		EA6AACE026053294002DE9DF /* MACD_View.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACDE26053294002DE9DF /* MACD_View.swift */; };
+		EA6AACE126053294002DE9DF /* MACD_View.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACDE26053294002DE9DF /* MACD_View.swift */; };
 		EA736CCD25D7C8FF007FC981 /* ValuationDataCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */; };
 		EA736CDE25D7E72C007FC981 /* ValuationErrorsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */; };
 		EA79790225E6F24200663644 /* GradientColorFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA79790125E6F24200663644 /* GradientColorFinder.swift */; };
@@ -203,6 +209,8 @@
 		EA50DEF125D427B10005B23A /* StocksController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksController.swift; sourceTree = "<group>"; };
 		EA52EDC725D18D760000155F /* WebpageScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpageScraper.swift; sourceTree = "<group>"; };
 		EA5FDBE225B1EE34008918C8 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AlertController.swift; path = "Bulls'N'Bears/DCFValuation FIles/AlertController.swift"; sourceTree = SOURCE_ROOT; };
+		EA6AACD726050457002DE9DF /* MAC_D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MAC_D.swift; sourceTree = SOURCE_ROOT; };
+		EA6AACDE26053294002DE9DF /* MACD_View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MACD_View.swift; path = "Bulls'N'Bears/Model Files/MACD_View.swift"; sourceTree = SOURCE_ROOT; };
 		EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationDataCleaner.swift; sourceTree = "<group>"; };
 		EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationErrorsTVC.swift; sourceTree = SOURCE_ROOT; };
 		EA79790125E6F24200663644 /* GradientColorFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientColorFinder.swift; sourceTree = "<group>"; };
@@ -380,6 +388,7 @@
 		EAED148325A8CED20073C46F /* Bulls'N'Bears */ = {
 			isa = PBXGroup;
 			children = (
+				EA6AACD726050457002DE9DF /* MAC_D.swift */,
 				EA06251225D079310015FA6E /* DownloadProgressView.xib */,
 				EA06251925D07A230015FA6E /* DownloadProgressView.swift */,
 				EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */,
@@ -446,6 +455,7 @@
 				EAC190E92577E2E20030B331 /* ChartContainerView.swift */,
 				EAA099C32588020B00DBB93C /* CheckButton.swift */,
 				EAC190F32577E3B60030B331 /* ChartView.swift */,
+				EA6AACDE26053294002DE9DF /* MACD_View.swift */,
 				EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */,
 			);
 			path = "Main Display Files";
@@ -634,6 +644,7 @@
 				EAC19054257641160030B331 /* TrendMyStocks.xcdatamodeld in Sources */,
 				EA4B5F0625DD53900070CC70 /* WebDataDownloader.swift in Sources */,
 				EAC190BA257662930030B331 /* StocksListViewController.swift in Sources */,
+				EA6AACDF26053294002DE9DF /* MACD_View.swift in Sources */,
 				EAFCB97D25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
 				EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */,
 				EAC190D52576731B0030B331 /* StockChartVC.swift in Sources */,
@@ -664,6 +675,7 @@
 				EA736CCD25D7C8FF007FC981 /* ValuationDataCleaner.swift in Sources */,
 				EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */,
 				EAC2FC7125A23FFC0060F387 /* ValuationTableViewCell.swift in Sources */,
+				EA6AACD826050457002DE9DF /* MAC_D.swift in Sources */,
 				EA32082925EFDF1F00A6A6AB /* WBValuation+CoreDataProperties.swift in Sources */,
 				EA5FDBE325B1EE34008918C8 /* AlertController.swift in Sources */,
 				EAD835E025DC06EC0015C93A /* Calculator.swift in Sources */,
@@ -724,10 +736,12 @@
 				EA163F78258BA85E000974AB /* StockTrend.swift in Sources */,
 				EAC2FC3D25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */,
 				EAFCB97125C807A80029AA4F /* ValuationListCellData.swift in Sources */,
+				EA6AACD926050457002DE9DF /* MAC_D.swift in Sources */,
 				EAC190B4257661F60030B331 /* MasterSplitView.swift in Sources */,
 				EAC2FC7C25A240290060F387 /* ValuationListViewController.swift in Sources */,
 				EAFCB97E25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
 				EAC2FC4025A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
+				EA6AACE026053294002DE9DF /* MACD_View.swift in Sources */,
 				EAC0F15C25FA819E00AD9E29 /* Share+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -762,10 +776,12 @@
 				EA163F79258BA85E000974AB /* StockTrend.swift in Sources */,
 				EAC2FC3E25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */,
 				EAFCB97225C807A80029AA4F /* ValuationListCellData.swift in Sources */,
+				EA6AACDA26050457002DE9DF /* MAC_D.swift in Sources */,
 				EAC190B5257661F60030B331 /* MasterSplitView.swift in Sources */,
 				EAC2FC7D25A240290060F387 /* ValuationListViewController.swift in Sources */,
 				EAFCB97F25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
 				EAC2FC4125A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
+				EA6AACE126053294002DE9DF /* MACD_View.swift in Sources */,
 				EAC0F15D25FA819E00AD9E29 /* Share+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

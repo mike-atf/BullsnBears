@@ -57,6 +57,7 @@ class StockChartVC: UIViewController {
     override func viewWillLayoutSubviews() {
         
         chart.contentView.setNeedsDisplay()
+        chart.macdView.setNeedsDisplay()
     }
     
     func configure(share: Share?) {

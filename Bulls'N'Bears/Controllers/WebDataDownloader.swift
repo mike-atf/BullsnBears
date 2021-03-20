@@ -215,22 +215,22 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
               webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
             }
             
-//            webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { (cookies) in
-//                let appSupportDirectoryPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first
-//                var dataArray = [Data]()
-//                for cookie in cookies {
-//                    if let cookieData = cookie.archive() {
-//                        dataArray.append(cookieData)
-//                    }
-//                }
-//
-//                do {
-//                    let fileData = try NSKeyedArchiver.archivedData(withRootObject: dataArray, requiringSecureCoding: false)
-//                    try fileData.write(to: URL(fileURLWithPath: appSupportDirectoryPath! + "/" + "MTCookies"))
-//                } catch let error {
-//                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into storage object for re-use")
-//                }
-//            }
+            webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { (cookies) in
+                let appSupportDirectoryPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first
+                var dataArray = [Data]()
+                for cookie in cookies {
+                    if let cookieData = cookie.archive() {
+                        dataArray.append(cookieData)
+                    }
+                }
+
+                do {
+                    let fileData = try NSKeyedArchiver.archivedData(withRootObject: dataArray, requiringSecureCoding: false)
+                    try fileData.write(to: URL(fileURLWithPath: appSupportDirectoryPath! + "/" + "MTCookies"))
+                } catch let error {
+                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into storage object for re-use")
+                }
+            }
             
           }
           

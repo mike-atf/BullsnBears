@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol ScoreCircleDelegate {
+    func tap(indexPath: IndexPath, isUserScoreType: Bool, sender: UIView)
+}
+
 class ScoreCircle: UIView {
 
     var scoreRatio:CGFloat = 0
@@ -17,18 +21,26 @@ class ScoreCircle: UIView {
     let circleColors = [UIColor.systemRed, UIColor.systemOrange, UIColor.systemYellow, UIColor.systemGreen]
     var fillColor = UIColor.systemBackground
     var centerImageView: UIImageView!
+    var tapGestureRecognizer: UITapGestureRecognizer?
+    var cellPath: IndexPath!
+    var delegate: ScoreCircleDelegate?
+    var isUserScoreType: Bool!
 
-
-    func configure(ratingStruct: RatingCircleData?) {
+    func configure(ratingStruct: RatingCircleData?, delegate: ScoreCircleDelegate, path: IndexPath, isUserScore: Bool) {
                
         guard let validData = ratingStruct else {
             self.isHidden = true
+            self.tapGestureRecognizer?.isEnabled = false
             return
         }
         
         guard let validRatio = validData.ratingScore() else { return }
         
         self.isHidden = false
+        
+        self.isUserScoreType = isUserScore
+        self.delegate = delegate
+        self.cellPath = path
         
         self.scoreRatio = CGFloat(validRatio)
         self.symbol = validData.symbol
@@ -66,6 +78,12 @@ class ScoreCircle: UIView {
         centerImageView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.6).isActive = true
         centerImageView.widthAnchor.constraint(equalTo: centerImageView.heightAnchor).isActive = true
         
+        if tapGestureRecognizer == nil {
+            tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(userTap))
+            tapGestureRecognizer?.isEnabled = true
+            self.addGestureRecognizer(tapGestureRecognizer!)
+        }
+        
     }
     
     override func draw(_ rect: CGRect) {
@@ -96,6 +114,11 @@ class ScoreCircle: UIView {
 
         context!.restoreGState()
 
+    }
+    
+    @objc
+    func userTap() {
+        delegate?.tap(indexPath: cellPath, isUserScoreType: isUserScoreType, sender: self)
     }
 
 }

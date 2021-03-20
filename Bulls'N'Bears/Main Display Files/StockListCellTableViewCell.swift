@@ -36,17 +36,16 @@ class StockListCellTableViewCell: UITableViewCell {
         valueCircle.isHidden = true
     }
     
-    public func configureCell(indexPath: IndexPath, stock: Share, userRatingData: RatingCircleData?, valueRatingData: RatingCircleData?) {
+    public func configureCell(indexPath: IndexPath, stock: Share, userRatingData: RatingCircleData?, valueRatingData: RatingCircleData?, scoreDelegate: ScoreCircleDelegate) {
         self.indexPath = indexPath
         self.stock = stock
         
         title.text = stock.symbol
-        print("cell title for path \(indexPath) set to \(stock.symbol!)")
         if let lastPrice = stock.getDailyPrices()?.last {
             detail.text = timeFormatter.localizedString(for: lastPrice.tradingDate, relativeTo: Date())
         }
         
-        ratingCircle.configure(ratingStruct: userRatingData)
-        valueCircle.configure(ratingStruct: valueRatingData)
+        ratingCircle.configure(ratingStruct: userRatingData, delegate: scoreDelegate, path: indexPath, isUserScore: true)
+        valueCircle.configure(ratingStruct: valueRatingData, delegate: scoreDelegate, path: indexPath, isUserScore: false)
     }
 }

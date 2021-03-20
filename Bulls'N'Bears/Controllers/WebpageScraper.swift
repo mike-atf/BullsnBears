@@ -83,7 +83,84 @@ class WebpageScraper {
         }
     }
     
-    class func macrotrendsRowExtraction(table$: String, rowTitle: String, exponent: Double?=nil) -> ([Double], [String]) {
+    
+    
+    
+    
+    
+    class func scrapeTextRow(website: Website, html$: String?, rowTitle: String, rowTerminal: String, numberTerminal: String? = nil) -> ([Double]?, [String]) {
+        
+        var pageText = html$
+//        let sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
+//        let rowDataStartDelimiter: String? = (website == .macrotrends) ? "class=\"fas fa-chart-bar\"></i></div></div></div><div role=" : nil
+        let textLineStart = rowTitle
+//        let rowTerminal = rowTerminal
+//        let tableTerminal = "</div></div></div></div>"
+
+        var errors = [String]()
+        
+        guard pageText != nil else {
+            errors.append("Empty webpage for \(rowTitle), \(rowTitle)")
+            return (nil, errors)
+        }
+        
+// 1 Remove leading and trailing parts of the html code
+// A Find section header
+//        if sectionTitle != nil {
+//            guard let sectionIndex = pageText?.range(of: sectionTitle!) else {
+//                let error = "Did not find section \(sectionTitle!) on webpage"
+//                if !errors.contains(error) {
+//                    errors.append(error)
+//                }
+//                return (nil, errors)
+//            }
+//            pageText = String(pageText!.suffix(from: sectionIndex.upperBound))
+//        }
+                        
+// B Find beginning of row
+        let rowStartIndex = pageText?.range(of: textLineStart)
+        guard rowStartIndex != nil else {
+            let error = "Did not find row titled \(rowTitle) on webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
+            return (nil, errors)
+        }
+        
+//        if let validStarter = rowDataStartDelimiter {
+//            if let index = pageText?.range(of: validStarter, options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
+//                rowStartIndex = index
+//            }
+//        }
+        
+// C Find end of row - or if last row end of table - and reduce pageText to this row
+        if let rowEndIndex = pageText?.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
+            pageText = String(pageText![rowStartIndex!.upperBound..<rowEndIndex.upperBound])
+        }
+        else {
+            let error = "Did not find row end for title \(rowTitle) on webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
+            return (nil, errors)
+        }
+        
+        print()
+        print("website text:")
+        print(html$ ?? "none")
+        
+//        if website == .macrotrends {
+            return macrotrendsRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, exponent: nil)
+//            return (valueArray, errors)
+//        }
+//        else {
+//            let (valueArray, errors) = yahooRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal, exponent: webpageExponent)
+//            return (valueArray, errors)
+//        }
+    }
+
+    
+    class func macrotrendsRowExtraction(table$: String, rowTitle: String, exponent: Double?=nil, numberTerminal:String?=nil) -> ([Double], [String]) {
         
         var valueArray = [Double]()
         var errors = [String]()

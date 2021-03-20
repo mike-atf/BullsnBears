@@ -220,10 +220,19 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     }
                 }
             case 3:
+                if let earningsGrowth = valuation!.netEarnings?.growthRates()?.ema(periods: emaPeriod) {
+                    // use 10 y sums / averages, not ema according to Book Ch 51
+                    let denominator = earningsGrowth * 100 + share.divYieldCurrent * 100
+                    if share.peRatio > 0 {
+                        value$ = numberFormatterWith1Digit.string(from: (denominator / share.peRatio) as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: (denominator / share.peRatio), greenCutoff: 2.0, redCutOff: 1.0)
+                    }
+                }
+            case 4:
                 if share.beta != Double() {
                     value$ = numberFormatterDecimals.string(from: share.beta as NSNumber)
                 }
-            case 4:
+            case 5:
                 if share.peRatio != Double() {
 
                     let (valid, es$) = valuation!.ivalue()
@@ -295,15 +304,18 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     }
                 }
                 
-                // OLD EMA
-//                let (prop, es$) = valuation!.proportions(array1: valuation?.netEarnings, array2: valuation?.capExpend?.positives()) // cap expend is negative
-//                errors = es$
-//                if let propEMA = prop.ema(periods: emaPeriod) { //weightedMean()
-//                    value$ = percentFormatter0Digits.string(from: propEMA as NSNumber) ?? "-"
-//                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: propEMA, greenCutoff: 0.25, redCutOff: 0.55)
-//                }
-                //
                 return (value$,color,errors)
+//            case 5:
+//                if let earningsGrowth = valuation!.netEarnings?.growthRates()?.ema(periods: emaPeriod) {
+//                    // use 10 y sums / averages, not ema according to Book Ch 51
+//                    let denominator = earningsGrowth * 100 + share.divYieldCurrent * 100
+//                    if share.peRatio > 0 {
+//                        value$ = numberFormatterWith1Digit.string(from: (denominator / share.peRatio) as NSNumber) ?? "-"
+//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: (earningsGrowth / share.peRatio), greenCutoff: 2.0, redCutOff: 1.0)
+//                    }
+//                }
+//                return (value$,color,errors)
+
            case 5:
                 let (proportions, es$) = valuation!.longtermDebtProportion()
                 errors = es$
@@ -441,7 +453,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     private func buildRowTitles() -> [[String]] {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
-        return [["P/E ratio", "EPS", "Book value /share price","beta", "intr. value (10y)"], ["Ret. earnings", "EPS", "Net inc./ Revenue","profit margin", "Cap. expend. / earnings (av.)","LT Debt / net income"],["Op. cash flow","Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
+        return [["P/E ratio", "EPS", "Book value /share price","Earnings growth/ PE ratio","beta", "intr. value (10y)"], ["Ret. earnings", "EPS", "Net inc./ Revenue","profit margin", "Cap. expend. / earnings (av.)", "LT Debt / net income"],["Op. cash flow","Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
     }
         
     // MARK: - Data download functions
@@ -698,6 +710,7 @@ extension WBValuationController: DataDownloaderDelegate {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
             }
         }
+        
         
         if downloadTasksCompleted == downloadTasks {
             DispatchQueue.main.async {

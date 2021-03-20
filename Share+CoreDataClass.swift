@@ -23,6 +23,19 @@ public class Share: NSManagedObject {
     
     public override func awakeFromFetch() {
         priceUpdateComplete = false
+        
+        let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
+//        print()
+//        print("\(symbol!), \(macd)")
+//        if macd == nil {
+//            if dailyPrices != nil {
+//                let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
+//                print("\(symbol!) macds updated")
+//            }
+//            save()
+//        }
+//        print("\(symbol!), \(macd)")
+
     }
     
 //    func setValues(symbol: String, dailyPrices: [PricePoint]?, fileURL: URL?, deleteFile: Bool?=false) {
@@ -70,7 +83,7 @@ public class Share: NSManagedObject {
         self.dailyPrices = convertDailyPricesToData(dailyPrices: validPoints)
         save()
     }
-    
+       
     func convertDailyPricesToData(dailyPrices: [PricePoint]?) -> Data? {
         
         guard let validPoints = dailyPrices else { return nil }
@@ -80,11 +93,27 @@ public class Share: NSManagedObject {
             let data2 = try NSKeyedArchiver.archivedData(withRootObject: data1, requiringSecureCoding: false)
             return data2
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing historical price data")
         }
 
         return nil
     }
+    
+    func convertMACDToData(macds: [MAC_D]?) -> Data? {
+        
+        guard let validMacd = macds else { return nil }
+
+        do {
+            let data1 = try PropertyListEncoder().encode(validMacd)
+            let data2 = try NSKeyedArchiver.archivedData(withRootObject: data1, requiringSecureCoding: false)
+            return data2
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing MCD data")
+        }
+
+        return nil
+    }
+
     
     /// takes new prices and adds any newer ones than already saved to the exsitng list (rather than replce the existing list)
     func updateDailyPrices(newPrices: [PricePoint]?) {
@@ -93,6 +122,7 @@ public class Share: NSManagedObject {
         
         if let existingPricePoints = getDailyPrices() {
             var newList = existingPricePoints
+            var existingMACDs = getMACDs()
             if let lastExistingDate = existingPricePoints.last?.tradingDate {
                 let pointsToAdd = validNewPoints.filter { (element) -> Bool in
                     if element.tradingDate > lastExistingDate { return true }
@@ -101,8 +131,11 @@ public class Share: NSManagedObject {
                 if pointsToAdd.count > 0 {
                     for point in pointsToAdd {
                         newList.append(point)
+                        let lastMACD = existingMACDs?.last
+                        existingMACDs?.append(MAC_D(currentPrice: point.close, lastMACD: lastMACD, date: point.tradingDate))
                     }
-                    setDailyPrices(pricePoints: newList)
+                    self.macd = convertMACDToData(macds: existingMACDs) // doesn't save
+                    setDailyPrices(pricePoints: newList) // saves
                 }
             }
         }
@@ -122,11 +155,34 @@ public class Share: NSManagedObject {
                 }
             }
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
         }
         
         return nil
     }
+    
+    func getMACDs() -> [MAC_D]? {
+
+        if let valid = macd {
+        
+            do {
+                if let data = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? Data {
+
+                    let array = try PropertyListDecoder().decode([MAC_D].self, from: data)
+                    return array.sorted { (e0, e1) -> Bool in
+                        if e0.date ?? Date() < e1.date ?? Date() { return true }
+                        else { return false }
+                    }
+                }
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored MACD data")
+            }
+        }
+        else { return calculateMACDs(shortPeriod: 8, longPeriod: 17) }
+        
+        return nil
+    }
+
     
     func setUserAndValueScores() {
         
@@ -693,6 +749,54 @@ public class Share: NSManagedObject {
             }
         }
     }
+    
+    // MARk: - technicals
+    
+    /// also converts to data stored as 'macd' propoerty of share
+    func calculateMACDs(shortPeriod: Int, longPeriod: Int) -> [MAC_D]? {
+        
+        guard let dailyPrices = getDailyPrices() else { return nil }
+        guard let closePrices = (getDailyPrices()?.compactMap{ $0.close }) else { return nil }
+        
+        guard shortPeriod < dailyPrices.count else {
+            return nil
+        }
+        
+        guard longPeriod < dailyPrices.count else {
+            return nil
+        }
+
+        let initialShortSMA = closePrices[(shortPeriod-1)..<longPeriod].reduce(0, +) / Double(shortPeriod)
+        let initialLongSMA = closePrices[0..<longPeriod].reduce(0, +) / Double(longPeriod)
+        
+        var lastMACD = MAC_D(currentPrice: closePrices[longPeriod-1], lastMACD: nil, date: dailyPrices[longPeriod-1].tradingDate)
+        lastMACD.emaShort = initialShortSMA
+        lastMACD.emaLong = initialLongSMA
+
+        var mac_ds = [MAC_D(currentPrice: dailyPrices[longPeriod].close, lastMACD: lastMACD, date: dailyPrices[longPeriod].tradingDate)]
+        
+        var macdSMA = [Double?]()
+        for i in longPeriod..<(longPeriod + 9) {
+            let macd = MAC_D(currentPrice: dailyPrices[i].close, lastMACD: lastMACD, date: dailyPrices[i].tradingDate)
+            mac_ds.append(macd)
+            lastMACD = macd
+            macdSMA.append(macd.mac_d)
+        }
+        
+        mac_ds[mac_ds.count-1].signalLine = macdSMA.compactMap{$0}.reduce(0, +) / Double(macdSMA.compactMap{$0}.count)
+        lastMACD = mac_ds[mac_ds.count-1]
+
+        for i in (longPeriod+9)..<dailyPrices.count {
+            let macd = MAC_D(currentPrice: dailyPrices[i].close, lastMACD: lastMACD, date: dailyPrices[i].tradingDate)
+            mac_ds.append(macd)
+            lastMACD = macd
+        }
+        
+        self.macd = convertMACDToData(macds: mac_ds)
+        save()
+        
+        return mac_ds
+    }
         
     // MARK: - keyRatios uopdate
     
@@ -733,7 +837,7 @@ public class Share: NSManagedObject {
     
     func keyratioDownloadComplete(html$: String, delegate: StockKeyratioDownloadDelegate?) {
         
-        let rowTitles = ["Beta (5Y monthly)", "Trailing P/E", "Diluted EPS"] // titles differ from the ones displayed on webpage!
+        let rowTitles = ["Beta (5Y monthly)", "Trailing P/E", "Diluted EPS", "Forward annual dividend yield"] // titles differ from the ones displayed on webpage!
         var loaderrors = [String]()
         
         for title in rowTitles {
@@ -754,6 +858,10 @@ public class Share: NSManagedObject {
             } else if title.starts(with: "Diluted") {
                 if let valid = values?.first {
                     eps = valid
+                }
+            } else if title == "Forward annual dividend yield" {
+                if let valid = values?.first {
+                    divYieldCurrent = valid
                 }
             }
         }

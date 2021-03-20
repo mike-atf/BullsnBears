@@ -121,6 +121,7 @@ struct WBVParameters {
     let incomeOfRevenueGrowth = "Growth of net income % of revenue"
     let profitOfRevenueGrowth = "Growth of profit % of revenue"
     let capExpendOfEarningsGrowth = "Growth of cap. expend % of net income"
+    let earningsToPERratio = "Growth of earnings % of pe ratio"
     let debtOfIncomeGrowth = "Growth of LT debt % of net income"
     let opCashFlowGrowth = "Growth of op. cash flow"
     let roeGrowth = "Growth of return on equity"
@@ -436,8 +437,6 @@ struct PricePoint: Codable {
     var close: Double
     var volume: Double
     
-
-    
     init(open: Double, close: Double, low: Double, high: Double, volume: Double, date: Date) {
         
         self.open = open
@@ -472,26 +471,6 @@ struct PricePoint: Codable {
             return volume
     }
 }
-    
-//    func encode(with coder: NSCoder) {
-//        coder.encode(open, forKey: "open")
-//        coder.encode(close, forKey: "close")
-//        coder.encode(high, forKey: "high")
-//        coder.encode(low, forKey: "low")
-//        coder.encode(tradingDate, forKey: "tradingDate")
-//        coder.encode(volume, forKey: "volume")
-//    }
-//
-//    required convenience init?(coder: NSCoder) {
-//        self.close = coder.decodeDouble(forKey: "close")
-//        self.open = coder.decodeDouble(forKey: "open")
-//        self.low = coder.decodeDouble(forKey: "low")
-//        self.high = coder.decodeDouble(forKey: "high")
-//        self.tradingDate = coder.decodeObject(forKey: "tradingDate") as? Date ?? Date()
-//        self.volume = coder.decodeDouble(forKey: "volume")
-//
-//
-//    }
     
     /// expected that self.tradsingDate is LATER than pricepoint.tradingDate
     /// otherwise a negative incline would be returned instead of a positive and vice versa

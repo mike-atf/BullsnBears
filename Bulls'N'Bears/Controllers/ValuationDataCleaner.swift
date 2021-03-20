@@ -78,4 +78,29 @@ class ValuationDataCleaner {
             return (dataArrays, "data cleaning error - undefined valuation method")
         }
     }
+    
+    /// assuming descending order - early elemetns more important than later elements
+    /// removes later elements if either array to the smallest size of array1 or array2
+    /// returned as [array1Trimmed, array2Trimmed]
+    class func trimArraysToSameCount(array1: [Double], array2: [Double]) -> [[Double]] {
+                
+        let count1 = array1.count
+        let count2 = array2.count
+        
+        if count1 == count2 { return [array1, array2] }
+        else {
+            var trimmed = [Double]()
+            
+            if count1 > count2 {
+                trimmed = array1
+                trimmed.removeLast((count1 - count2))
+                return [trimmed, array2]
+            } else {
+                trimmed = array2
+                trimmed.removeLast((count2 - count1))
+                return [array1, trimmed]
+            }
+        }
+        
+    }
 }

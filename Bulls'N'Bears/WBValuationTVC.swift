@@ -44,17 +44,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         controller.deallocate()
         controller = nil
     }
-    
-//    override func viewDidDisappear(_ animated: Bool) {
-//        
-//        guard !movingToValueListTVC else {
-//            return
-//        }
-//
-//        NotificationCenter.default.post(name: Notification.Name(rawValue: "refreshStockListTVCRow"), object: fromIndexPath, userInfo: nil)
-//    }
-
-    
+        
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -209,8 +199,10 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         case 2:
             infoText = "Proportion of book value to current share price in %, as well (book value per share).\nHelps to judge the stock price in relation to company assets."
         case 3:
-            infoText = "Proportion of book value/ share to current share price in %, as well (book value per share).\nHelps to judge the stock price in relation to company assets."
+            infoText = "Earnings growth + dividend yield divided by P/E ratio.\nLess than 1.0 is poor, 1.5 is ok, >2.0 is interesting.\n'One up on Wall Street' by P Lynch. Simon & Schuster, 1989"
         case 4:
+            infoText = "Proportion of book value/ share to current share price in %, as well (book value per share).\nHelps to judge the stock price in relation to company assets."
+        case 5:
             infoText = "Intrinsic value based on 10y prediction.\nTaking into account past earnings growth, pre-tax EPS and a long-term discount rate of 2.1%.\nAs calculated in 'Warren Buffet and the Interpretation of Financial Statements' (Simon & Schuster, 2008)"
         default:
             ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "encountered default in switch statement")
@@ -342,6 +334,9 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             else if indexPath.row == 4 {
                 arrays = [controller.valuation?.capExpend ?? [], controller.valuation?.netEarnings ?? []]
             }
+//            else if indexPath.row == 5 {
+//                arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.peRatios() ?? []]
+//            }
             else if indexPath.row == 5 {
                 arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
             }
@@ -410,7 +405,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 }
 
 extension WBValuationTVC: StockKeyratioDownloadDelegate, WBValuationCellDelegate {
-    
+        
     func keyratioDownloadComplete(errors: [String]) {
         DispatchQueue.main.async {
             self.tableView.reloadData()

@@ -19,6 +19,7 @@ class ChartContainerView: UIView {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var scrollView: UIScrollView!
     @IBOutlet var contentView: ChartView!
+    @IBOutlet var macdView: MACD_View!
     
     @IBOutlet var button1: CheckButton!
     @IBOutlet var button2: CheckButton!
@@ -70,6 +71,10 @@ class ChartContainerView: UIView {
         if let view = contentView {
             view.configure(stock: with)
         }
+        if let view = macdView {
+            view.configure(share: shareToShow)
+        }
+
         if let scroll = scrollView {
             scroll.contentSize = contentView.bounds.size
             let offset = scroll.contentSize.width

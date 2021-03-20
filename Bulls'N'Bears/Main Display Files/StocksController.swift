@@ -83,6 +83,8 @@ class StocksController: NSFetchedResultsController<Share> {
         newShare.creationDate = Date()
         let pricePoints = CSVImporter.extractPricePointsFromFile(url: file, symbol: stockName)
         newShare.dailyPrices = newShare.convertDailyPricesToData(dailyPrices: pricePoints)
+        let macds = newShare.calculateMACDs(shortPeriod: 8, longPeriod: 17)
+        newShare.macd = newShare.convertMACDToData(macds: macds)
         
         if let dictionary = stockTickerDictionary {
             newShare.name_long = dictionary[stockName]

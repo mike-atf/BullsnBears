@@ -55,6 +55,8 @@ public class WBValuation: NSManagedObject {
         return nil
     }
     
+    
+    /// returns past PE ratios in date descendng order
     func peRatios() -> [Double]? {
        
         if let valid = perDates {
@@ -147,7 +149,21 @@ public class WBValuation: NSManagedObject {
         }
     }
 
-
+    func returnUserEvaluations() -> [UserEvaluation]? {
+        
+        var evaluations: [UserEvaluation]?
+        if userEvaluations?.count ?? 0 > 0 {
+            evaluations = [UserEvaluation]()
+        }
+        
+        for element in userEvaluations ?? [] {
+            if let evaluation = element as? UserEvaluation {
+                evaluations?.append(evaluation)
+            }
+        }
+        
+        return evaluations
+    }
     
     public func grossProfitMargins() -> ([Double], [String]?) {
         
@@ -224,7 +240,7 @@ public class WBValuation: NSManagedObject {
     }
     
     /// returns porportions of array 2 / array 1 elements
-    public func proportions(array1: [Double]?, array2: [Double]?) -> ([Double], [String]?) {
+    public func proportions(array1: [Double]?, array2: [Double]?, removeZeroElements: Bool?=true) -> ([Double], [String]?) {
         
         guard array1 != nil && array2 != nil else {
             return ([Double()], ["missing data"])
@@ -232,7 +248,16 @@ public class WBValuation: NSManagedObject {
         
         let rawData = [array1!, array2!]
         
-        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+        var cleanedData = [[Double]]()
+        var error: String?
+        
+        if removeZeroElements ?? true {
+            (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+        }
+        else {
+            cleanedData = ValuationDataCleaner.trimArraysToSameCount(array1: array1!, array2: array2!)
+        }
+        
         
         guard cleanedData[0].count == cleanedData[1].count else {
             return ([Double()], ["insufficient data"])
@@ -241,7 +266,9 @@ public class WBValuation: NSManagedObject {
         var proportions = [Double]()
         var errorList: [String]?
         for i in 0..<cleanedData[0].count {
-            proportions.append(cleanedData[1][i] / cleanedData[0][i])
+            if cleanedData[0][i] != 0 {
+                proportions.append(cleanedData[1][i] / cleanedData[0][i])
+            }
         }
         
         if let validError = error {
@@ -346,13 +373,14 @@ public class WBValuation: NSManagedObject {
         
         let peRatioWeight = 1.5
         let retEarningsGrowthWeight = 1.3
+        let earningsByPERWeight = 1.3
         let epsGrowthWeight = 1.0
         let netIncomeDivProfitWeight = 1.0
         let capExpendDivEarningsWeight = 1.1
         let profitMarginWeight = 1.0
-        let ltDebtDivIncomeWeight = 1.0
+        let ltDebtDivIncomeWeight = 0.8
         let opCashFlowGrowthWeight = 1.1
-        let ltDebtDivadjEq = 0.75
+        let ltDebtDivadjEq = 0.4
         let sgaDivRevenue = 0.75
         let radDivRevenue = 0.75
         
@@ -393,11 +421,11 @@ public class WBValuation: NSManagedObject {
             allFactors.append(valid * opCashFlowGrowthWeight)
             allWeights.append(opCashFlowGrowthWeight)
         }
-        if let valid = inverseValueFactor(values1: netEarnings, values2: debtLT, maxCutOff: 3, emaPeriod: emaPeriods) {
+        if let valid = inverseValueFactor(values1: netEarnings, values2: debtLT, maxCutOff: 3, emaPeriod: emaPeriods, removeZeroElements: false) {
             allFactors.append(valid * ltDebtDivIncomeWeight)
             allWeights.append(ltDebtDivIncomeWeight)
         }
-        if let valid = inverseValueFactor(values1: adjustedEquity(), values2: debtLT, maxCutOff: 1, emaPeriod: emaPeriods) {
+        if let valid = inverseValueFactor(values1: adjustedEquity(), values2: debtLT, maxCutOff: 1, emaPeriod: emaPeriods, removeZeroElements: false) {
             allFactors.append(valid * ltDebtDivadjEq)
             allWeights.append(ltDebtDivadjEq)
         }
@@ -409,12 +437,25 @@ public class WBValuation: NSManagedObject {
             allFactors.append(valid * radDivRevenue)
             allWeights.append(radDivRevenue)
         }
+        let emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
+        if let yield = share?.divYieldCurrent {
+            if let earningsGrowth = share?.wbValuation?.netEarnings?.growthRates()?.ema(periods: emaPeriod) {
+                let denominator = (earningsGrowth + yield) * 100
+                if share?.peRatio ?? 0 > 0 {
+                    var value = (denominator / share!.peRatio) - 1
+                    if value > 1 { value = 1 }
+                    else if value < 0 { value = 0 }
+//                    print(share?.symbol!, value)
+                    allFactors.append(value * earningsByPERWeight)
+                    allWeights.append(earningsByPERWeight)
+                }
+            }
+        }
         
         let scoreSum = allFactors.reduce(0, +)
         let maximum = allWeights.reduce(0, +)
         
         return RatingCircleData(rating: scoreSum, maximum: maximum, minimum: 0, symbol: .dollar)
-//        return [0, scoreSum , maximum]
     }
     
     func userEvaluationScore() -> RatingCircleData? {
@@ -448,7 +489,7 @@ public class WBValuation: NSManagedObject {
             return 0
         }
         
-        guard !(validShare.peRatio < 0) else {
+        guard !(validShare.peRatio <= 0) else {
             return 0
         }
         
@@ -460,7 +501,7 @@ public class WBValuation: NSManagedObject {
     /// for 2 arrays returns growth-ema of porportions values2 / values1
     /// values above cutOff are returned as 1.0
     /// ema < 0 is returned as 0
-    func valueFactor(values1: [Double]?, values2: [Double]?, maxCutOff: Double,emaPeriod: Int) -> Double? {
+    func valueFactor(values1: [Double]?, values2: [Double]?, maxCutOff: Double,emaPeriod: Int, removeZeroElements:Bool?=true) -> Double? {
         
         guard values1 != nil else {
             return nil
@@ -469,7 +510,7 @@ public class WBValuation: NSManagedObject {
         var array = values1!
         
         if values2 != nil {
-            (array,_) = proportions(array1: values1, array2: values2)
+            (array,_) = proportions(array1: values1, array2: values2, removeZeroElements: removeZeroElements)
         }
         
         guard let ema = array.ema(periods: emaPeriod) else { return nil }
@@ -483,7 +524,7 @@ public class WBValuation: NSManagedObject {
     /// same as velueFactor but for 'higherIsWorse' rather than 'higherIsBetter' values
     /// negative ema is good
     /// use postiive value for maxCutOff!
-    func inverseValueFactor(values1: [Double]?, values2: [Double]?, maxCutOff: Double, emaPeriod: Int) -> Double? {
+    func inverseValueFactor(values1: [Double]?, values2: [Double]?, maxCutOff: Double, emaPeriod: Int, removeZeroElements:Bool?=true) -> Double? {
         
         guard values1 != nil else {
             return nil
@@ -492,7 +533,7 @@ public class WBValuation: NSManagedObject {
         var array = values1!
         
         if values2 != nil {
-            (array,_) = proportions(array1: values1, array2: values2)
+            (array,_) = proportions(array1: values1, array2: values2, removeZeroElements: removeZeroElements)
         }
         
         guard let ema = array.ema(periods: emaPeriod) else { return nil }
