@@ -51,6 +51,28 @@ class StocksController: NSFetchedResultsController<Share> {
             }
         }
     }
+    
+    /// returns array[0] = fast oascillator K%
+    /// arrays[1] = slow oscillator D%
+//    public func slowStochasticOscillator(share: String) -> [[Double]]? {
+//        
+//        guard let share = fetchedObjects?.filter({ (object) -> Bool in
+//            if object.symbol ?? "" == share { return true }
+//            else { return false }
+//        }).first else { return nil }
+//        
+//        guard let dailyPrices = share.getDailyPrices() else { return nil }
+//        let last14 = dailyPrices[..<14].compactMap{ $0.close }
+//        let after14 = dailyPrices[14...]
+//        var lowest14 = last14.min() ?? 0
+//        var highest14 = last14.max() ?? 0
+//        var k = [Double]()
+//        
+//        for pricePoint in after14 {
+//            let newK = 100 * (pricePoint.close - lowest14) / (highest14 - lowest14)
+//            k.append(newK)
+//        }
+//    }
                 
     private func getYahooRefDate() -> Date {
         let calendar = Calendar.current

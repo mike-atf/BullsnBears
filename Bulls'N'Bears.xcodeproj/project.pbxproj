@@ -142,6 +142,8 @@
 		EAD835FE25DC16470015C93A /* WBValuationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAD835FA25DC16470015C93A /* WBValuationCell.xib */; };
 		EAD835FF25DC16470015C93A /* WBValuationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAD835FA25DC16470015C93A /* WBValuationCell.xib */; };
 		EAD8360025DC16470015C93A /* WBValuationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAD835FA25DC16470015C93A /* WBValuationCell.xib */; };
+		EAD921632607D0CA008312E0 /* StochasticOscillator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD921622607D0CA008312E0 /* StochasticOscillator.swift */; };
+		EAD921682607D980008312E0 /* StochastikOscillatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD921672607D980008312E0 /* StochastikOscillatorView.swift */; };
 		EAEA758C25ACF53F008EEC05 /* ErrorLogListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */; };
 		EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */; };
 		EAED14DF25A8D78C0073C46F /* Bulls'N'BearsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */; };
@@ -262,6 +264,8 @@
 		EAD835EE25DC12000015C93A /* ValueListCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ValueListCell.xib; sourceTree = "<group>"; };
 		EAD835F925DC16470015C93A /* WBValuationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBValuationCell.swift; sourceTree = "<group>"; };
 		EAD835FA25DC16470015C93A /* WBValuationCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WBValuationCell.xib; sourceTree = "<group>"; };
+		EAD921622607D0CA008312E0 /* StochasticOscillator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StochasticOscillator.swift; sourceTree = "<group>"; };
+		EAD921672607D980008312E0 /* StochastikOscillatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StochastikOscillatorView.swift; path = "Bulls'N'Bears/Main Display Files/StochastikOscillatorView.swift"; sourceTree = SOURCE_ROOT; };
 		EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ErrorLogListCell.xib; sourceTree = "<group>"; };
 		EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsTests.swift"; path = "TrendMyStocksTests/Bulls'N'BearsTests.swift"; sourceTree = SOURCE_ROOT; };
 		EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsUITests.swift"; path = "TrendMyStocksUITests/Bulls'N'BearsUITests.swift"; sourceTree = SOURCE_ROOT; };
@@ -389,6 +393,7 @@
 			isa = PBXGroup;
 			children = (
 				EA6AACD726050457002DE9DF /* MAC_D.swift */,
+				EAD921622607D0CA008312E0 /* StochasticOscillator.swift */,
 				EA06251225D079310015FA6E /* DownloadProgressView.xib */,
 				EA06251925D07A230015FA6E /* DownloadProgressView.swift */,
 				EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */,
@@ -456,6 +461,7 @@
 				EAA099C32588020B00DBB93C /* CheckButton.swift */,
 				EAC190F32577E3B60030B331 /* ChartView.swift */,
 				EA6AACDE26053294002DE9DF /* MACD_View.swift */,
+				EAD921672607D980008312E0 /* StochastikOscillatorView.swift */,
 				EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */,
 			);
 			path = "Main Display Files";
@@ -654,6 +660,7 @@
 				EAFCB97025C807A80029AA4F /* ValuationListCellData.swift in Sources */,
 				EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */,
 				EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */,
+				EAD921682607D980008312E0 /* StochastikOscillatorView.swift in Sources */,
 				EA32080A25EED93A00A6A6AB /* UserEvaluation+CoreDataClass.swift in Sources */,
 				EAFCB96925C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
@@ -673,6 +680,7 @@
 				EAC9890225F146E1007AE6F6 /* TrendIconView.swift in Sources */,
 				EAFCB98825C9A4DE0029AA4F /* ValuationSummaryCell.swift in Sources */,
 				EA736CCD25D7C8FF007FC981 /* ValuationDataCleaner.swift in Sources */,
+				EAD921632607D0CA008312E0 /* StochasticOscillator.swift in Sources */,
 				EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */,
 				EAC2FC7125A23FFC0060F387 /* ValuationTableViewCell.swift in Sources */,
 				EA6AACD826050457002DE9DF /* MAC_D.swift in Sources */,

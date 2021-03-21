@@ -197,7 +197,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         case 1:
             infoText = "Not implemented"
         case 2:
-            infoText = "Proportion of book value to current share price in %, as well (book value per share).\nHelps to judge the stock price in relation to company assets."
+            infoText = "Proportion of book value to current share price in %, as well (book value per share).\nHelps to judge the stock price in relation to company assets.\nCurrent real market value of assets may differ from the book value."
         case 3:
             infoText = "Earnings growth + dividend yield divided by P/E ratio.\nLess than 1.0 is poor, 1.5 is ok, >2.0 is interesting.\n'One up on Wall Street' by P Lynch. Simon & Schuster, 1989"
         case 4:

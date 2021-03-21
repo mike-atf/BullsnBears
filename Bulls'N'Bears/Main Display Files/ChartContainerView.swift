@@ -20,6 +20,7 @@ class ChartContainerView: UIView {
     @IBOutlet var scrollView: UIScrollView!
     @IBOutlet var contentView: ChartView!
     @IBOutlet var macdView: MACD_View!
+    @IBOutlet var stochOscView: StochastikOscillatorView!
     
     @IBOutlet var button1: CheckButton!
     @IBOutlet var button2: CheckButton!
@@ -74,6 +75,10 @@ class ChartContainerView: UIView {
         }
         
         if let view = macdView {
+            view.configure(share: shareToShow)
+        }
+
+        if let view = stochOscView {
             view.configure(share: shareToShow)
         }
 

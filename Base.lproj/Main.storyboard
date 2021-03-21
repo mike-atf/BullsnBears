@@ -49,6 +49,22 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doh-lM-a4B">
                                 <rect key="frame" x="20" y="141.5" width="820" height="658.5"/>
                                 <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Dm-Pf-iwX" customClass="StochastikOscillatorView" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="98.5" width="3320" height="99"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Slow Stoch Osc (3/3/14)" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="itd-Fz-tR8">
+                                                <rect key="frame" x="3036" y="39" width="184" height="21"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="itd-Fz-tR8" secondAttribute="trailing" constant="100" id="37n-cl-qbj"/>
+                                            <constraint firstItem="itd-Fz-tR8" firstAttribute="centerY" secondItem="3Dm-Pf-iwX" secondAttribute="centerY" id="WAc-rw-Wr8"/>
+                                        </constraints>
+                                    </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uEG-z0-RcJ" customClass="MACD_View" customModule="Bulls_N_Bears" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="3320" height="98.5"/>
                                         <subviews>
@@ -66,7 +82,7 @@
                                         </constraints>
                                     </view>
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="98.5" width="3320" height="560"/>
+                                        <rect key="frame" x="0.0" y="197.5" width="3320" height="461"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="3320" id="czG-4M-LQI"/>
@@ -74,13 +90,17 @@
                                     </view>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="3Dm-Pf-iwX" secondAttribute="trailing" id="3PC-4m-NDL"/>
                                     <constraint firstAttribute="trailing" secondItem="uEG-z0-RcJ" secondAttribute="trailing" id="5lo-Cl-yEr"/>
                                     <constraint firstItem="uEG-z0-RcJ" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" multiplier="0.15" id="JXK-8x-RFI"/>
                                     <constraint firstAttribute="trailing" secondItem="B5Z-ih-tAD" secondAttribute="trailing" id="Tx0-im-bCr"/>
+                                    <constraint firstItem="3Dm-Pf-iwX" firstAttribute="top" secondItem="uEG-z0-RcJ" secondAttribute="bottom" id="VG6-0q-vyP"/>
                                     <constraint firstItem="uEG-z0-RcJ" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="aDV-bS-FfN"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="top" secondItem="uEG-z0-RcJ" secondAttribute="bottom" id="o6s-JM-VGS"/>
+                                    <constraint firstItem="3Dm-Pf-iwX" firstAttribute="height" secondItem="uEG-z0-RcJ" secondAttribute="height" id="dqM-wQ-0ja"/>
+                                    <constraint firstItem="3Dm-Pf-iwX" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="fbP-me-6Fc"/>
                                     <constraint firstAttribute="bottom" secondItem="B5Z-ih-tAD" secondAttribute="bottom" id="oxk-FQ-HTC"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" multiplier="0.85" id="q13-pk-UIY"/>
+                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" multiplier="0.7" id="q13-pk-UIY"/>
+                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="top" secondItem="3Dm-Pf-iwX" secondAttribute="bottom" id="qxx-cb-QJ0"/>
                                     <constraint firstItem="B5Z-ih-tAD" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="sdu-Bv-B8A"/>
                                     <constraint firstItem="uEG-z0-RcJ" firstAttribute="top" secondItem="Doh-lM-a4B" secondAttribute="top" id="wH9-8r-LwT"/>
                                 </constraints>
@@ -218,6 +238,7 @@
                             <outlet property="contentView" destination="B5Z-ih-tAD" id="zk0-qN-Goi"/>
                             <outlet property="macdView" destination="uEG-z0-RcJ" id="Lf2-Td-efC"/>
                             <outlet property="scrollView" destination="Doh-lM-a4B" id="aU4-OR-VFs"/>
+                            <outlet property="stochOscView" destination="3Dm-Pf-iwX" id="VPA-6I-VOD"/>
                         </connections>
                     </view>
                     <navigationItem key="navigationItem" id="9tx-0k-L9K">

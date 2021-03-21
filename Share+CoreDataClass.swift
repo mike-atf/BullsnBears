@@ -797,6 +797,41 @@ public class Share: NSManagedObject {
         
         return mac_ds
     }
+    
+    /// returns array[0] = fast oascillator K%
+    /// arrays[1] = slow oscillator D%
+    func calculateSlowStochOscillators() -> [StochasticOscillator]? {
+        
+        guard let dailyPrices = getDailyPrices() else { return nil }
+        
+        var last14 = dailyPrices[..<14].compactMap{ $0.close }
+        let after14 = dailyPrices[13...]
+        
+        var last2K = [Double]()
+        var lowest14 = last14.min()
+        var highest14 = last14.max()
+        var slowOsc = [StochasticOscillator]()
+        
+        for pricePoint in after14 {
+            last14.append(pricePoint.close)
+            last14.removeFirst()
+            
+            lowest14 = last14.min()
+            highest14 = last14.max()
+            
+            let newOsc = StochasticOscillator(currentPrice: pricePoint.close, date: pricePoint.tradingDate, lowest14: lowest14, highest14: highest14, slow2: last2K)
+            slowOsc.append(newOsc)
+            
+            if let valid = newOsc.k_fast {
+                last2K.append(valid)
+                if last2K.count > 2 {
+                    last2K.removeFirst()
+                }
+            }
+        }
+        
+        return slowOsc
+    }
         
     // MARK: - keyRatios uopdate
     
