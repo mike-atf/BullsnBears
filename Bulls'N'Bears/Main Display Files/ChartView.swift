@@ -150,11 +150,25 @@ class ChartView: UIView {
            step += 1
             xAxisLabelLeft += chartAreaSize.width / CGFloat(xAxisLabels.count-1)
        }
-
-// candles
+        
         chartTimeSpan = dateRange!.last!.timeIntervalSince(dateRange!.first!)
         let boxWidth = chartAreaSize.width / CGFloat(dateRange!.last!.timeIntervalSince(dateRange!.first!) / (24*3600))
-        share?.getDailyPrices()?.forEach({ (pricePoint) in
+
+        let dailyPrices = share?.getDailyPrices()
+        var sma10:[Double]?
+        var smaLine: UIBezierPath?
+        if dailyPrices?.count ?? 0 > 11 {
+            sma10 = [Double]()
+            smaLine = UIBezierPath()
+            let firstSMA = dailyPrices![..<10].compactMap{ $0.close }.reduce(0, +) / 10
+            let x = CGFloat(dailyPrices![9].tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width + boxWidth / 2
+            let y = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - firstSMA) / (maxPrice - minPrice)))
+            smaLine?.move(to: CGPoint(x: x, y: y))
+        }
+
+// candles
+                
+        dailyPrices?.forEach({ (pricePoint) in
             let boxLeft = chartOrigin.x - (boxWidth * 0.8 / 2) + CGFloat(pricePoint.tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width
             let boxTop = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - Swift.max(pricePoint.close, pricePoint.open)) / (maxPrice - minPrice)))
             let boxBottom = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - Swift.min(pricePoint.close, pricePoint.open)) / (maxPrice - minPrice)))
@@ -173,8 +187,22 @@ class ChartView: UIView {
             tick.move(to: CGPoint(x:-1 + boxLeft + boxWidth / 2, y: highPoint))
             tick.addLine(to: CGPoint(x:-1 + boxLeft + boxWidth / 2, y: lowPoint))
             tick.stroke()
+            
+//SMA Line
+            sma10?.append(pricePoint.close)
+            if sma10?.count ?? 0 == 10 {
+                let sma = (sma10?.reduce(0, +))! / 10.0
+                let x = boxLeft + boxWidth * 0.4
+                let y = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - sma) / (maxPrice - minPrice)))
+                smaLine?.addLine(to: CGPoint(x: x, y: y))
+                sma10!.removeFirst()
+            }
 
         })
+        
+        UIColor.systemBlue.setStroke()
+        smaLine?.lineWidth = 1.2
+        smaLine?.stroke()
         
 // current price line
         

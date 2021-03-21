@@ -50,10 +50,10 @@
                                 <rect key="frame" x="20" y="141.5" width="820" height="658.5"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uEG-z0-RcJ" customClass="MACD_View" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="3320" height="85.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="3320" height="98.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mac D (8/17/9)" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="roV-AV-Ii6">
-                                                <rect key="frame" x="3108" y="32.5" width="112" height="20.5"/>
+                                                <rect key="frame" x="3108" y="39" width="112" height="20.5"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -66,7 +66,7 @@
                                         </constraints>
                                     </view>
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="85.5" width="3320" height="487"/>
+                                        <rect key="frame" x="0.0" y="98.5" width="3320" height="560"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="3320" id="czG-4M-LQI"/>
@@ -74,18 +74,16 @@
                                     </view>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="JIg-Ya-QlM" firstAttribute="trailing" secondItem="uEG-z0-RcJ" secondAttribute="trailing" id="5lo-Cl-yEr"/>
-                                    <constraint firstItem="uEG-z0-RcJ" firstAttribute="height" secondItem="JIg-Ya-QlM" secondAttribute="height" multiplier="0.15" id="JXK-8x-RFI"/>
-                                    <constraint firstAttribute="bottom" secondItem="B5Z-ih-tAD" secondAttribute="bottom" id="MNf-D6-e8g"/>
+                                    <constraint firstAttribute="trailing" secondItem="uEG-z0-RcJ" secondAttribute="trailing" id="5lo-Cl-yEr"/>
+                                    <constraint firstItem="uEG-z0-RcJ" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" multiplier="0.15" id="JXK-8x-RFI"/>
                                     <constraint firstAttribute="trailing" secondItem="B5Z-ih-tAD" secondAttribute="trailing" id="Tx0-im-bCr"/>
-                                    <constraint firstItem="uEG-z0-RcJ" firstAttribute="leading" secondItem="JIg-Ya-QlM" secondAttribute="leading" id="aDV-bS-FfN"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="centerY" secondItem="Doh-lM-a4B" secondAttribute="centerY" id="bIj-vn-oWG"/>
+                                    <constraint firstItem="uEG-z0-RcJ" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="aDV-bS-FfN"/>
                                     <constraint firstItem="B5Z-ih-tAD" firstAttribute="top" secondItem="uEG-z0-RcJ" secondAttribute="bottom" id="o6s-JM-VGS"/>
+                                    <constraint firstAttribute="bottom" secondItem="B5Z-ih-tAD" secondAttribute="bottom" id="oxk-FQ-HTC"/>
+                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" multiplier="0.85" id="q13-pk-UIY"/>
                                     <constraint firstItem="B5Z-ih-tAD" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="sdu-Bv-B8A"/>
-                                    <constraint firstItem="uEG-z0-RcJ" firstAttribute="top" secondItem="JIg-Ya-QlM" secondAttribute="top" id="wH9-8r-LwT"/>
+                                    <constraint firstItem="uEG-z0-RcJ" firstAttribute="top" secondItem="Doh-lM-a4B" secondAttribute="top" id="wH9-8r-LwT"/>
                                 </constraints>
-                                <viewLayoutGuide key="contentLayoutGuide" id="JIg-Ya-QlM"/>
-                                <viewLayoutGuide key="frameLayoutGuide" id="ZAI-FU-kZr"/>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="28E-NM-pCT" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="806.5" y="97" width="32.5" height="32.5"/>
