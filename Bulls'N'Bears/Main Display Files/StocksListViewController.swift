@@ -32,7 +32,7 @@ class StocksListViewController: UITableViewController {
         return sL
     }()
     
-    let managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var  wbValuationView: WBValuationTVC?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,8 +43,6 @@ class StocksListViewController: UITableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
                 
-//        NotificationCenter.default.addObserver(self, selector: #selector(updateCellReturningFromWBValuationTVC(notification:)), name: NSNotification.Name(rawValue: "refreshStockListTVCRow"), object: nil)
-        
         controller.delegate = self
         controller.pricesUpdateDelegate = self
         
@@ -56,12 +54,6 @@ class StocksListViewController: UITableViewController {
         else {
             showWelcomeView()
         }
-        
-//        for object in controller.fetchedObjects ?? [] {
-//                print()
-//                print("in StocksList \(object.symbol!), \(object.macd)")
-//        }
-
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -80,6 +72,11 @@ class StocksListViewController: UITableViewController {
         }
         
         tableView.reloadData()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC
+
     }
     
     func updateShares() {
@@ -156,7 +153,7 @@ class StocksListViewController: UITableViewController {
         if let share = StocksController.createShare(from: fileURL, deleteFile: true) {
             
             do {
-                try self.managedObjectContext.save()
+                try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Failure to add new share from file \(fileURL)")
             }
@@ -275,15 +272,21 @@ class StocksListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
+//        guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
 
-        wbValuationView.share = controller.object(at: indexPath)
-        wbValuationView.fromIndexPath = indexPath
 
-        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+        DispatchQueue.main.async {
+            self.wbValuationView?.share = self.controller.object(at: indexPath)
+            self.wbValuationView?.fromIndexPath = indexPath
+
+            if self.wbValuationView != nil  {
+                self.navigationController?.pushViewController(self.wbValuationView!, animated: true)
+            }
+        }
         
-        navigationController?.pushViewController(wbValuationView, animated: true)
+        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         tableView.deselectRow(at: indexPath, animated: true)
+
     }
     
         
@@ -308,12 +311,13 @@ class StocksListViewController: UITableViewController {
                 
             chartView.share = controller.object(at: indexPath)
             chartView.configure(share: share)
+            
         }
         else if let navView = segue.destination as? UINavigationController {
             if let chartView = navView.topViewController as? StockChartVC {
                     
-            chartView.share = controller.object(at: indexPath)
-            chartView.configure(share: share)
+                chartView.share = controller.object(at: indexPath)
+                chartView.configure(share: share)
             }
         }
     }

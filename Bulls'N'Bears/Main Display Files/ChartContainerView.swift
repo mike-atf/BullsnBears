@@ -68,9 +68,11 @@ class ChartContainerView: UIView {
         if let validLabel = titleLabel {
             validLabel.text = shareToShow?.name_long
         }
+        
         if let view = contentView {
             view.configure(stock: with)
         }
+        
         if let view = macdView {
             view.configure(share: shareToShow)
         }

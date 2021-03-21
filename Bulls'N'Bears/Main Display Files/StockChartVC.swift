@@ -9,7 +9,6 @@ import UIKit
 
 class StockChartVC: UIViewController {
 
-//    var stockToShow: Stock?
     var share: Share?
     
     @IBOutlet var chart: ChartContainerView!
@@ -23,11 +22,8 @@ class StockChartVC: UIViewController {
     @IBOutlet var r1ErrorsButton: UIButton!
     
     var buildLabel: UIBarButtonItem!
-//    var dcfValuation: DCFValuation?
-//    var r1Valuation: Rule1Valuation?
     var dcfErrors = [String]()
     var r1Errors: [String]?
-//    var temporaryValueChartView: ValueChartVC?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,14 +59,29 @@ class StockChartVC: UIViewController {
     func configure(share: Share?) {
         
         loadViewIfNeeded() // leave! essential
+        
+//        updateCharts {
+//            self.setValuationTexts()
+//        }
         if let validChart = chart {
             if let validShare = share {
                 validChart.configure(with: validShare)
             }
         }
-        
+
         setValuationTexts()
     }
+    
+//    private func updateCharts(completion: (@escaping () -> Void)) {
+//
+//        if let validChart = chart {
+//            if let validShare = share {
+//                validChart.configure(with: validShare)
+//            }
+//        }
+//
+//        completion()
+//    }
     
     func setValuationTexts() {
         refreshDCFLabel()

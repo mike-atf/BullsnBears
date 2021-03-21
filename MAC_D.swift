@@ -19,18 +19,13 @@ struct MAC_D : Codable {
     init(currentPrice:Double?, lastMACD: MAC_D?, date: Date,shortPeriod: Int?=nil, longPeriod: Int?=nil) {
 
         self.date = date
-        print()
-        print(date, currentPrice, lastMACD?.emaShort, lastMACD?.emaLong, lastMACD?.mac_d)
         
         if let validPRice = currentPrice {
             emaShort = ema(currentPrice: validPRice, lastEMA: lastMACD?.emaShort, periods: Double(shortPeriod ?? 8))
             emaLong = ema(currentPrice: validPRice, lastEMA: lastMACD?.emaLong, periods: Double(longPeriod ?? 17))
-            print("ema short \(emaShort), ema long \(emaLong)")
             if emaLong != nil && emaShort != nil {
                 self.mac_d = emaShort! - emaLong!
-                print("macd \(mac_d)")
                 self.signalLine = ema(currentPrice: mac_d, lastEMA: lastMACD?.signalLine, periods: 9)
-                print("signal \(signalLine)")
                 if let validSignal = signalLine {
                     self.histoBar = mac_d! - validSignal
                 }
