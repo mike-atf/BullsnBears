@@ -42,24 +42,35 @@
                             <constraint firstAttribute="width" secondItem="kHJ-Tc-GPs" secondAttribute="height" multiplier="1:1" id="Xxh-tg-0ur"/>
                         </constraints>
                     </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JcG-ab-0AL" customClass="BuySellView" customModule="Bulls_N_Bears" customModuleProvider="target">
+                        <rect key="frame" x="98.5" y="12" width="49" height="37"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="JcG-ab-0AL" secondAttribute="height" multiplier="40:30" id="agO-r1-j2F"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="JcG-ab-0AL" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.606557" id="2Na-Dl-SPj"/>
                     <constraint firstItem="ovB-7I-mf5" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.6" id="2et-0M-LiP"/>
                     <constraint firstItem="Wei-cZ-Jf6" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="Dbk-Cb-NmG"/>
-                    <constraint firstItem="kHJ-Tc-GPs" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wei-cZ-Jf6" secondAttribute="trailing" constant="5" id="Dha-hb-I7p"/>
                     <constraint firstItem="sIC-VG-f5n" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ovB-7I-mf5" secondAttribute="trailing" constant="5" id="Egn-OY-2LC"/>
                     <constraint firstItem="kHJ-Tc-GPs" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="FH3-vx-EPo"/>
                     <constraint firstItem="ovB-7I-mf5" firstAttribute="leading" secondItem="kHJ-Tc-GPs" secondAttribute="trailing" constant="10" id="MLy-b7-Iyh"/>
+                    <constraint firstItem="JcG-ab-0AL" firstAttribute="centerY" secondItem="kHJ-Tc-GPs" secondAttribute="centerY" id="ONS-vF-Ohp"/>
                     <constraint firstItem="ovB-7I-mf5" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="ObN-Wb-8Uj"/>
                     <constraint firstItem="ovB-7I-mf5" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" multiplier="1.3" id="PVz-HN-qg4"/>
                     <constraint firstItem="Wei-cZ-Jf6" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="SFQ-sc-QWq"/>
+                    <constraint firstItem="JcG-ab-0AL" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wei-cZ-Jf6" secondAttribute="trailing" constant="5" id="Ti8-TQ-gHN"/>
                     <constraint firstItem="sIC-VG-f5n" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="an1-BH-vYf"/>
                     <constraint firstAttribute="trailing" secondItem="sIC-VG-f5n" secondAttribute="trailing" constant="10" id="uSl-3u-mpY"/>
+                    <constraint firstItem="kHJ-Tc-GPs" firstAttribute="leading" secondItem="JcG-ab-0AL" secondAttribute="trailing" constant="15" id="vbc-NA-Jt5"/>
                     <constraint firstItem="kHJ-Tc-GPs" firstAttribute="height" secondItem="ovB-7I-mf5" secondAttribute="height" id="wIR-eo-BxJ"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
+                <outlet property="actionView" destination="JcG-ab-0AL" id="4tX-oH-zle"/>
                 <outlet property="detail" destination="sIC-VG-f5n" id="L1X-ZI-haI"/>
                 <outlet property="ratingCircle" destination="kHJ-Tc-GPs" id="mol-MH-DPg"/>
                 <outlet property="title" destination="Wei-cZ-Jf6" id="FqK-RQ-cey"/>

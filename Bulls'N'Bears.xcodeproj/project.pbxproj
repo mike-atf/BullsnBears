@@ -29,6 +29,8 @@
 		EA32082825EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA32082625EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift */; };
 		EA32082925EFDF1F00A6A6AB /* WBValuation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA32082725EFDF1F00A6A6AB /* WBValuation+CoreDataProperties.swift */; };
 		EA39A44725C5BF5300DE0FF9 /* R1WebDataAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */; };
+		EA3DF0C4260A1184001A0098 /* LineCrossingSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */; };
+		EA3DF0C9260B8C5A001A0098 /* BuySellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3DF0C8260B8C5A001A0098 /* BuySellView.swift */; };
 		EA4B5F0625DD53900070CC70 /* WebDataDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */; };
 		EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */; };
 		EA50DEF225D427B10005B23A /* StocksController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA50DEF125D427B10005B23A /* StocksController.swift */; };
@@ -206,6 +208,8 @@
 		EA32082625EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WBValuation+CoreDataClass.swift"; sourceTree = "<group>"; };
 		EA32082725EFDF1F00A6A6AB /* WBValuation+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WBValuation+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = R1WebDataAnalyser.swift; sourceTree = "<group>"; };
+		EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineCrossingSignal.swift; sourceTree = "<group>"; };
+		EA3DF0C8260B8C5A001A0098 /* BuySellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BuySellView.swift; path = "Bulls'N'Bears/Model Files/BuySellView.swift"; sourceTree = SOURCE_ROOT; };
 		EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDataDownloader.swift; sourceTree = "<group>"; };
 		EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueChart.swift; sourceTree = "<group>"; };
 		EA50DEF125D427B10005B23A /* StocksController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksController.swift; sourceTree = "<group>"; };
@@ -335,6 +339,7 @@
 			isa = PBXGroup;
 			children = (
 				EAC0F15925FA819E00AD9E29 /* Share+CoreDataClass.swift */,
+				EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */,
 				EAC0F15A25FA819E00AD9E29 /* Share+CoreDataProperties.swift */,
 				EA32080725EED93A00A6A6AB /* UserEvaluation+CoreDataClass.swift */,
 				EA32080825EED93A00A6A6AB /* UserEvaluation+CoreDataProperties.swift */,
@@ -450,6 +455,7 @@
 		EAFD825025A4D2D800D27566 /* Main Display Files */ = {
 			isa = PBXGroup;
 			children = (
+				EA3DF0C8260B8C5A001A0098 /* BuySellView.swift */,
 				EA805DC425D54D4E00720E68 /* StockSearchTVC.swift */,
 				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
 				EAC190B9257662930030B331 /* StocksListViewController.swift */,
@@ -664,6 +670,7 @@
 				EA32080A25EED93A00A6A6AB /* UserEvaluation+CoreDataClass.swift in Sources */,
 				EAFCB96925C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
+				EA3DF0C4260A1184001A0098 /* LineCrossingSignal.swift in Sources */,
 				EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
 				EA163F77258BA85E000974AB /* StockTrend.swift in Sources */,
@@ -671,6 +678,7 @@
 				EAC2FC4525A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
 				EA225B1D25F3DE9700871D7D /* ScoreCircle.swift in Sources */,
 				EAC1904A257641160030B331 /* AppDelegate.swift in Sources */,
+				EA3DF0C9260B8C5A001A0098 /* BuySellView.swift in Sources */,
 				EAA099C42588020B00DBB93C /* CheckButton.swift in Sources */,
 				EA736CDE25D7E72C007FC981 /* ValuationErrorsTVC.swift in Sources */,
 				EAC2FC4225A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
@@ -953,13 +961,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1867;
 				DEVELOPMENT_TEAM = 9T25ACNCQ7;
 				INFOPLIST_FILE = "Bulls'N'Bears/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4;
+				MARKETING_VERSION = 0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -973,13 +982,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1867;
 				DEVELOPMENT_TEAM = 9T25ACNCQ7;
 				INFOPLIST_FILE = "Bulls'N'Bears/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4;
+				MARKETING_VERSION = 0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

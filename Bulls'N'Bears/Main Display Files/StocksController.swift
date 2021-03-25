@@ -162,7 +162,7 @@ extension StocksController: StockKeyratioDownloadDelegate, StockDelegate {
         
         guard let shares = fetchedObjects else { return }
         
-        if !(shares.compactMap { $0.priceUpdateComplete! }.contains(false)) {
+        if !(shares.compactMap { $0.priceUpdateComplete }.contains(false)) {
             pricesUpdateDelegate?.allSharesHaveUpdatedTheirPrices()
 
             DispatchQueue.global(qos: .background).async {

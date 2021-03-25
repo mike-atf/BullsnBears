@@ -14,6 +14,7 @@ class StockListCellTableViewCell: UITableViewCell {
     @IBOutlet var detail: UILabel!
     @IBOutlet var ratingCircle: ScoreCircle!
     @IBOutlet var valueCircle: ScoreCircle!
+    @IBOutlet var actionView: BuySellView!
     
     var indexPath: IndexPath!
     var stock: Share!
@@ -45,6 +46,7 @@ class StockListCellTableViewCell: UITableViewCell {
             detail.text = timeFormatter.localizedString(for: lastPrice.tradingDate, relativeTo: Date())
         }
         
+        actionView.configure(share: stock)
         ratingCircle.configure(ratingStruct: userRatingData, delegate: scoreDelegate, path: indexPath, isUserScore: true)
         valueCircle.configure(ratingStruct: valueRatingData, delegate: scoreDelegate, path: indexPath, isUserScore: false)
     }

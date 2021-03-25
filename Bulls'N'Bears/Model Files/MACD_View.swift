@@ -17,6 +17,8 @@ class MACD_View: UIView {
     var signalMax: Double?
     var dateRange: [Date]?
     var mac_d: [MAC_D]!
+    var cp: LineCrossing?
+    var buySellLabel: UILabel?
 
     func configure(share: Share?) {
         
@@ -26,6 +28,7 @@ class MACD_View: UIView {
         
         guard let validMACDs = validShare.getMACDs() else { return }
         self.mac_d = validMACDs
+        cp = share?.latestMCDCrossing()
         
         dateRange = validShare.priceDateRange()
         dateRange![1] = Date().addingTimeInterval(foreCastTime)
@@ -60,7 +63,7 @@ class MACD_View: UIView {
 
     override func draw(_ rect: CGRect) {
         
-        guard dateRange != nil else {
+        guard dateRange?.count ?? 0 > 1 else {
             return
         }
         
@@ -73,7 +76,6 @@ class MACD_View: UIView {
         let barWidth = slotWidth * 0.8
         let histo_yScale = 0.9 * rect.height / (2 * CGFloat(histoMax ?? 1.0))
         let macd_yScale = 0.9 * rect.height / (2 * CGFloat(macdMax ?? 1.0))
-        let signal_yScale = 0.9 * rect.height / (2 * CGFloat(signalMax ?? 1.0))
 
         var count: CGFloat = 0
         var previousBarHeight: CGFloat?
@@ -171,7 +173,37 @@ class MACD_View: UIView {
         UIColor.systemGray3.setStroke()
         bottomLine.lineWidth = 1
         bottomLine.stroke()
+        
+// macd crossing point
+        if let validCP = cp {
+            let latestMACDcrossing = UIBezierPath()
+            let x = leftBorder - (barWidth / 2) + CGFloat(validCP.date.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * plotWidth
+            latestMACDcrossing.move(to: CGPoint(x: x, y: rect.minY))
+            latestMACDcrossing.addLine(to: CGPoint(x: x, y: rect.maxY))
+            
+            latestMACDcrossing.lineWidth = 2.0
+            latestMACDcrossing.stroke()
+            
+            buySellLabel?.removeFromSuperview()
+            buySellLabel = {
+                let label = UILabel()
+                label.font = UIFont.systemFont(ofSize: 12)
+                label.textAlignment = .right
+                let text = validCP.signal < 0 ? " :Sell" : " :Buy"
+                let signal$ = numberFormatter.string(from: validCP.signal as NSNumber) ?? "-"
+//                var priceText = " "
+//                if let validPrice = validCP.crossingPrice {
+//                    priceText = " @ " + (currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? "-")
+//                }
+                label.text = " " + dateFormatter.string(from: validCP.date) + text + " (" + signal$ + ") "
+                label.backgroundColor = validCP.signal < 0 ? UIColor(named: "Red") : UIColor(named: "DarkGreen")
+                label.sizeToFit()
+                self.addSubview(label)
+                return label
+            }()
+            buySellLabel?.frame.origin = CGPoint(x: x, y: rect.minY)
 
+        }
     }
 
 }

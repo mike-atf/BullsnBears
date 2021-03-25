@@ -807,11 +807,12 @@ public class Share: NSManagedObject {
         var last14 = dailyPrices[..<14].compactMap{ $0.close }
         let after14 = dailyPrices[13...]
         
-        var last2K = [Double]()
+        var last4K = [Double]()
         var lowest14 = last14.min()
         var highest14 = last14.max()
         var slowOsc = [StochasticOscillator]()
-        
+//        print()
+//        print(self.symbol!)
         for pricePoint in after14 {
             last14.append(pricePoint.close)
             last14.removeFirst()
@@ -819,19 +820,97 @@ public class Share: NSManagedObject {
             lowest14 = last14.min()
             highest14 = last14.max()
             
-            let newOsc = StochasticOscillator(currentPrice: pricePoint.close, date: pricePoint.tradingDate, lowest14: lowest14, highest14: highest14, slow2: last2K)
+            let newOsc = StochasticOscillator(currentPrice: pricePoint.close, date: pricePoint.tradingDate, lowest14: lowest14, highest14: highest14, slow4: last4K)
             slowOsc.append(newOsc)
             
+//            print(newOsc)
+            
             if let valid = newOsc.k_fast {
-                last2K.append(valid)
-                if last2K.count > 2 {
-                    last2K.removeFirst()
+                last4K.append(valid)
+                if last4K.count > 4 {
+                    last4K.removeFirst()
                 }
             }
         }
         
         return slowOsc
     }
+    
+    func latestMCDCrossing() -> LineCrossing? {
+        
+        guard let macds = getMACDs() else {
+            return nil
+        }
+        
+        let descendingMCDs = Array(macds.reversed())
+        var crossingPoint: LineCrossing?
+        
+        var latestMCD = descendingMCDs.first!
+        for i in 1..<descendingMCDs.count {
+            
+            if latestMCD.histoBar != nil && descendingMCDs[i].histoBar != nil {
+                if (latestMCD.histoBar! * descendingMCDs[i].histoBar!) <= 0 {
+                   crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs[i].histoBar!))
+                    break
+                }
+            }
+            latestMCD = descendingMCDs[i]
+        }
+        
+        return crossingPoint
+    }
+    
+    func latestSMA10Crossing() -> LineCrossing? {
+        
+        guard let dailyPrices = getDailyPrices() else {
+            return nil
+        }
+        
+        var crossingPoint: LineCrossing?
+        
+        var sma10 = Array(dailyPrices.compactMap{$0.close}[..<10])
+        var lastPrice = dailyPrices[10]
+        for i in 11..<dailyPrices.count {
+            let lastDifference = lastPrice.close - sma10.mean()!
+            sma10.append(dailyPrices[i-1].close)
+            sma10.removeFirst()
+            let currentDifference = dailyPrices[i].close - sma10.mean()!
+            
+            if (currentDifference * lastDifference) <= 0 {
+                crossingPoint = LineCrossing(date: dailyPrices[i].tradingDate, signal: (currentDifference - lastDifference), crossingPrice: ((dailyPrices[i].high + dailyPrices[i].low) / 2))
+            }
+            lastPrice = dailyPrices[i]
+        }
+        
+        return crossingPoint
+    }
+    
+    func latestStochastikCrossing() -> LineCrossing? {
+        
+        guard let oscillators = calculateSlowStochOscillators() else {
+            return nil
+        }
+
+        let descendingOscillators = Array(oscillators.reversed())
+                var crossingPoint: LineCrossing?
+        
+        var lastOsc = descendingOscillators.first!
+        for i in 1..<descendingOscillators.count {
+            let lastDifference = lastOsc.k_fast! - lastOsc.d_slow!
+            let currentDifference = descendingOscillators[i].k_fast! - descendingOscillators[i].d_slow!
+            
+            if (currentDifference * lastDifference) <= 0 {
+                let timeInBetween = lastOsc.date!.timeIntervalSince(descendingOscillators[i].date!)
+                let dateInBetween = lastOsc.date!.addingTimeInterval(-timeInBetween / 2)
+                crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference))
+                break
+            }
+            lastOsc = descendingOscillators[i]
+        }
+        
+        return crossingPoint
+    }
+
         
     // MARK: - keyRatios uopdate
     

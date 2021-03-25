@@ -559,6 +559,11 @@ extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
     
     func userEnteredNotes(notes: String?, parameter: String) {
         if let valid = notes {
+            
+            guard !valid.starts(with: "Enter your notes here") else {
+                return
+            }
+            
             for element in valuation?.userEvaluations ?? [] {
                 if let evaluation = element as? UserEvaluation {
                     if evaluation.wbvParameter == parameter {
