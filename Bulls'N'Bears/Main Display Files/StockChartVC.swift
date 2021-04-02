@@ -20,6 +20,7 @@ class StockChartVC: UIViewController {
     @IBOutlet var r1Button: UIButton!
     @IBOutlet var dcfErrorsButton: UIButton!
     @IBOutlet var r1ErrorsButton: UIButton!
+    @IBOutlet var researchButton: UIBarButtonItem!
     
     var buildLabel: UIBarButtonItem!
     var dcfErrors = [String]()
@@ -36,7 +37,7 @@ class StockChartVC: UIViewController {
         let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title1) ,NSAttributedString.Key.foregroundColor: UIColor.label]
         barTitleButton.setTitleTextAttributes(titleAttributes, for: .normal)
         
-        self.navigationItem.leftBarButtonItems = [barTitleButton]
+        self.navigationItem.leftBarButtonItems = [barTitleButton,researchButton]
         self.navigationItem.rightBarButtonItem = buildLabel
         barTitleButton.title = share?.name_long
         
@@ -114,7 +115,7 @@ class StockChartVC: UIViewController {
         
         if let validValuation = share?.rule1Valuation {
             
-            var r1Title = "R#1 value: "
+            var r1Title = "Growth-based value: "
             let (value, errors) = validValuation.stickerPrice()
             r1ErrorsButton.isHidden = (errors == nil)
             r1Errors = errors
@@ -128,7 +129,7 @@ class StockChartVC: UIViewController {
                 if let score = validValuation.moatScore() {
                     if !score.isNaN {
                         let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
-                        r1Title = r1Title + " (moat: " + n$ + ")"
+                        r1Title = r1Title + " (Compet. strength: " + n$ + ")"
                     }
                 }
                 
@@ -158,11 +159,22 @@ class StockChartVC: UIViewController {
         }
     }
     
+    @IBAction func researchAction(_ sender: UIBarButtonItem) {
+        
+        if let researchVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ResearchTVC") as? ResearchTVC {
+            researchVC.share = share
+            
+            self.navigationController?.pushViewController(researchVC, animated: true)
+        
+        }
+    }
+    
+    
     @objc
     func activateErrorButton() {
         
         DispatchQueue.main.async {
-            self.navigationItem.leftBarButtonItems = [self.barTitleButton,self.errorButton]
+            self.navigationItem.leftBarButtonItems = [self.barTitleButton,self.researchButton, self.errorButton]
             self.view.setNeedsLayout()
         }
 

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20D91" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <entity name="CompanyNews" representedClassName="CompanyNews" syncable="YES">
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="newsText" optional="YES" attributeType="String"/>
+        <relationship name="research" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="StockResearch" inverseName="news" inverseEntity="StockResearch"/>
+    </entity>
+    <entity name="DCFValuation" representedClassName="DCFValuation" syncable="YES">
+        <attribute name="beta" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="capExpend" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="company" optional="YES" attributeType="String"/>
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="debtLT" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="debtST" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="expenseIncomeTax" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="expenseInterest" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="incomePreTax" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="marketCap" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="netIncome" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="revGrowthPred" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="revGrowthPredAdj" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="sharesOutstanding" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="tFCFo" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="tRevenueActual" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="tRevenuePred" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <relationship name="share" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Share" inverseName="dcfValuation" inverseEntity="Share"/>
+    </entity>
+    <entity name="Rule1Valuation" representedClassName="Rule1Valuation" syncable="YES">
+        <attribute name="adjFuturePE" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" customClassName="Double"/>
+        <attribute name="adjGrowthEstimates" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="bvps" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="ceoRating" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="company" optional="YES" attributeType="String"/>
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="debt" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="eps" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="growthEstimates" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="hxPE" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="insiderStockBuys" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="insiderStocks" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="insiderStockSells" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="netIncome" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="opCashFlow" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="opcs" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="revenue" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="roic" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <relationship name="share" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Share" inverseName="rule1Valuation" inverseEntity="Share"/>
+    </entity>
+    <entity name="Share" representedClassName="Share" syncable="YES">
+        <attribute name="beta" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dailyPrices" optional="YES" attributeType="Binary"/>
+        <attribute name="divYieldCurrent" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="eps" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="growthType" optional="YES" attributeType="String"/>
+        <attribute name="industry" optional="YES" attributeType="String"/>
+        <attribute name="macd" optional="YES" attributeType="Binary"/>
+        <attribute name="name_long" optional="YES" attributeType="String"/>
+        <attribute name="name_short" optional="YES" attributeType="String"/>
+        <attribute name="peRatio" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="purchaseStory" optional="YES" attributeType="String"/>
+        <attribute name="symbol" optional="YES" attributeType="String"/>
+        <attribute name="userEvaluationScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="valueScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="watchStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="dcfValuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DCFValuation" inverseName="share" inverseEntity="DCFValuation"/>
+        <relationship name="research" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="StockResearch" inverseName="share" inverseEntity="StockResearch"/>
+        <relationship name="rule1Valuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Rule1Valuation" inverseName="share" inverseEntity="Rule1Valuation"/>
+        <relationship name="wbValuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WBValuation" inverseName="share" inverseEntity="WBValuation"/>
+    </entity>
+    <entity name="StockResearch" representedClassName="StockResearch" syncable="YES">
+        <attribute name="assets" optional="YES" attributeType="String"/>
+        <attribute name="companySize" optional="YES" attributeType="String"/>
+        <attribute name="competitiveEdge" optional="YES" attributeType="String"/>
+        <attribute name="competitors" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="crisisPerformance" optional="YES" attributeType="String"/>
+        <attribute name="growthPlan" optional="YES" attributeType="String"/>
+        <attribute name="insiderBuying" optional="YES" attributeType="String"/>
+        <attribute name="productsNiches" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
+        <attribute name="shareBuyBacks" optional="YES" attributeType="String"/>
+        <attribute name="symbol" optional="YES" attributeType="String"/>
+        <attribute name="theBuyStory" optional="YES" attributeType="String"/>
+        <relationship name="news" optional="YES" toMany="YES" deletionRule="No Action" destinationEntity="CompanyNews" inverseName="research" inverseEntity="CompanyNews"/>
+        <relationship name="share" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="Share" inverseName="research" inverseEntity="Share"/>
+    </entity>
+    <entity name="UserEvaluation" representedClassName="UserEvaluation" syncable="YES">
+        <attribute name="comment" optional="YES" attributeType="String"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="higherIsBetter" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="rating" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES"/>
+        <attribute name="stock" optional="YES" attributeType="String"/>
+        <attribute name="wbvParameter" optional="YES" attributeType="String"/>
+        <relationship name="wbValuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WBValuation" inverseName="userEvaluations" inverseEntity="WBValuation"/>
+    </entity>
+    <entity name="WBValuation" representedClassName="WBValuation" syncable="YES">
+        <attribute name="avAnStockPrice" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="bvps" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="capExpend" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="company" optional="YES" attributeType="String"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="debtLT" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="eps" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="equityRepurchased" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="grossProfit" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="interestExpense" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="netEarnings" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="opCashFlow" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="operatingIncome" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="perDates" optional="YES" attributeType="Binary" customClassName="[(Date, Double)]"/>
+        <attribute name="ppe" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="rAndDexpense" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="revenue" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="roa" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="roe" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="sgaExpense" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <attribute name="shareholdersEquity" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
+        <relationship name="share" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Share" inverseName="wbValuation" inverseEntity="Share"/>
+        <relationship name="userEvaluations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserEvaluation" inverseName="wbValuation" inverseEntity="UserEvaluation"/>
+    </entity>
+    <elements>
+        <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="313"/>
+        <element name="Rule1Valuation" positionX="-194.4807128906249" positionY="573.2761535644531" width="128" height="314"/>
+        <element name="Share" positionX="-233.677978515625" positionY="114.121826171875" width="128" height="329"/>
+        <element name="UserEvaluation" positionX="187.350341796875" positionY="352.4636840820313" width="128" height="148"/>
+        <element name="WBValuation" positionX="-37.604248046875" positionY="-7.48974609375" width="128" height="374"/>
+        <element name="StockResearch" positionX="-200.3316650390625" positionY="-256.4151153564453" width="128" height="253"/>
+        <element name="CompanyNews" positionX="-225" positionY="-90" width="128" height="74"/>
+    </elements>
+</model>

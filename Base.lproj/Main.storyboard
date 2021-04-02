@@ -134,8 +134,8 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rule # 1 Valuation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miC-j2-Brw">
-                                <rect key="frame" x="53" y="103.5" width="128" height="19.5"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Growth-based Valuation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miC-j2-Brw">
+                                <rect key="frame" x="53" y="103.5" width="175.5" height="19.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -173,7 +173,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s3a-vi-G4m">
-                                <rect key="frame" x="189" y="104" width="20" height="18"/>
+                                <rect key="frame" x="236.5" y="104" width="20" height="18"/>
                                 <color key="tintColor" systemColor="systemYellowColor"/>
                                 <state key="normal" backgroundImage="exclamationmark.triangle" catalog="system"/>
                                 <connections>
@@ -252,6 +252,12 @@
                                     <action selector="errorButtonAction:" destination="GS7-IZ-4uD" id="d2h-RN-d78"/>
                                 </connections>
                             </barButtonItem>
+                            <barButtonItem image="binoculars.fill" catalog="system" id="ift-0I-bW6">
+                                <color key="tintColor" systemColor="linkColor"/>
+                                <connections>
+                                    <action selector="researchAction:" destination="GS7-IZ-4uD" id="FZ1-kz-8id"/>
+                                </connections>
+                            </barButtonItem>
                         </leftBarButtonItems>
                     </navigationItem>
                     <connections>
@@ -264,6 +270,7 @@
                         <outlet property="r1Button" destination="fni-R7-t11" id="fvV-UG-dTt"/>
                         <outlet property="r1ErrorsButton" destination="s3a-vi-G4m" id="lfo-xr-fDb"/>
                         <outlet property="r1ValuationLabel" destination="miC-j2-Brw" id="9JR-jq-c4e"/>
+                        <outlet property="researchButton" destination="ift-0I-bW6" id="DNs-ts-B0j"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="R1G-6f-cB6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -800,12 +807,41 @@
             </objects>
             <point key="canvasLocation" x="2122" y="492"/>
         </scene>
+        <!--ResearchTVC-->
+        <scene sceneID="udl-Pn-MRV">
+            <objects>
+                <tableViewController storyboardIdentifier="ResearchTVC" id="CSD-JA-A2I" customClass="ResearchTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="cAo-Eo-KgT">
+                        <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="8qG-a0-hId">
+                                <rect key="frame" x="20" y="55.5" width="1140" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="8qG-a0-hId" id="HYE-Kh-j0G">
+                                    <rect key="frame" x="0.0" y="0.0" width="1140" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="CSD-JA-A2I" id="EHM-RH-PAT"/>
+                            <outlet property="delegate" destination="CSD-JA-A2I" id="PDt-4o-Wbu"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kPc-Qu-tZr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2124" y="1209"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="HCm-I9-2PD"/>
         <segue reference="Kjm-sZ-WT1"/>
     </inferredMetricsTieBreakers>
     <resources>
+        <image name="binoculars.fill" catalog="system" width="128" height="90"/>
         <image name="dollarsign.square.fill" catalog="system" width="128" height="114"/>
         <image name="exclamationmark.triangle" catalog="system" width="128" height="112"/>
         <image name="exclamationmark.triangle.fill" catalog="system" width="128" height="112"/>
@@ -814,6 +850,9 @@
         <image name="xmark.circle" catalog="system" width="128" height="121"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="linkColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

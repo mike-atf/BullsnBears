@@ -35,6 +35,7 @@ extension Share {
     @NSManaged public var wbValuation: WBValuation?
     @NSManaged public var dcfValuation: DCFValuation?
     @NSManaged public var rule1Valuation: Rule1Valuation?
+    @NSManaged public var research: StockResearch?
 
 }
 

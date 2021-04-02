@@ -89,7 +89,7 @@ class ChartView: UIView {
                 label.font = UIFont.preferredFont(forTextStyle: .footnote)
                 label.textAlignment = .right
                 label.text = currencyFormatterNoGapWithPence.string(from: NSNumber(value: labelPrice))
-                label.sizeToFit()
+//                label.sizeToFit()
                 self.addSubview(label)
                 return label
             }()
@@ -115,9 +115,9 @@ class ChartView: UIView {
                 
         
 // Y axis
-       chartOrigin.x = rect.width * 0
+        chartOrigin.x = rect.width * 0
         chartEnd.y = rect.height * 0
-       chartOrigin.y = rect.height * 0.95
+        chartOrigin.y = rect.height * 0.95
         chartEnd.x = rect.width * 0.95
         chartAreaSize.height = chartOrigin.y - chartEnd.y
         chartAreaSize.width = chartEnd.x - chartOrigin.x
@@ -138,9 +138,9 @@ class ChartView: UIView {
        
        guard let validStock = share else { return }
        
-       
         var index = 0
         yAxisLabels.forEach { (label) in
+            label.sizeToFit()
             let labelY: CGFloat = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - yAxisNumbers[index]) / (maxPrice - minPrice))
             label.frame.origin = CGPoint(x: chartEnd.x + 15, y: labelY - label.frame.height / 2)
             index += 1
@@ -294,7 +294,7 @@ class ChartView: UIView {
                     let (fairValue,errors) = existingValuation.stickerPrice()
                         if (fairValue ?? 0) > 0 {
                             let ratio = currentPrice / fairValue!
-                            let ratio$ = " R1 " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
+                            let ratio$ = " Growth " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
 
                             let newLabel: UILabel = {
                                 let label = UILabel()

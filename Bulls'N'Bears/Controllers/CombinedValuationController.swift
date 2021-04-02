@@ -182,11 +182,18 @@ class CombinedValuationController: ValuationHelper {
         
         var titles = [String]()
         
+        var valuationDate$: String!
+        if let dcf = valuation as? DCFValuation {
+            valuationDate$ = dateFormatter.string(from: dcf.creationDate ?? Date())
+        } else if let r1 = valuation as? Rule1Valuation {
+            valuationDate$ = dateFormatter.string(from: r1.creationDate ?? Date())
+        }
+        
         if method == .dcf {
-            titles = ["DCF Valuation - \(share.symbol!)","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
+            titles = ["DCF Valuation - \(share.symbol!) from " + valuationDate$,"Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
         } else
         if method == .rule1 {
-            titles = ["Rule 1 Valuation - \(share.symbol!)",
+            titles = ["Growth-based Valuation - \(share.symbol!) from " + valuationDate$,
             "Moat parameters: Values 5-10 years back",
             "", "", "", "",
             "PE Ratios", "Growth predictions",

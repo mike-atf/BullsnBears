@@ -39,9 +39,9 @@ class StocksController: NSFetchedResultsController<Share> {
     func updateStockFiles() {
         
         // don't update on Sundays and Mondays when there's no data
-        guard (Calendar.current.component(.weekday, from: Date()) > 2) else {
-            return
-        }
+//        guard (Calendar.current.component(.weekday, from: Date()) > 2) else {
+//            return
+//        }
         
                 
         for share in fetchedObjects ?? [] {
@@ -161,6 +161,8 @@ extension StocksController: StockKeyratioDownloadDelegate, StockDelegate {
     func priceUpdateComplete(symbol: String) {
         
         guard let shares = fetchedObjects else { return }
+        
+        print("\(symbol) - prices update complete")
         
         if !(shares.compactMap { $0.priceUpdateComplete }.contains(false)) {
             pricesUpdateDelegate?.allSharesHaveUpdatedTheirPrices()

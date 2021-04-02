@@ -25,46 +25,8 @@ public class Share: NSManagedObject {
         priceUpdateComplete = false
         
         let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
-//        print()
-//        print("\(symbol!), \(macd)")
-//        if macd == nil {
-//            if dailyPrices != nil {
-//                let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
-//                print("\(symbol!) macds updated")
-//            }
-//            save()
-//        }
-//        print("\(symbol!), \(macd)")
-
     }
-    
-//    func setValues(symbol: String, dailyPrices: [PricePoint]?, fileURL: URL?, deleteFile: Bool?=false) {
-//
-//        self.symbol = symbol
-//        self.dailyPrices = convertDailyPricesToData(dailyPrices: dailyPrices)
-//        self.fileURL = fileURL
-//
-//        if (deleteFile ?? false) {
-//            if let url = fileURL {
-//                removeFile(url)
-//            }
-//        }
-//    }
-        
-//    func extractPriceFromData(url: URL) -> [PricePoint]? {
-//
-//        guard let validSymbol = symbol else {
-//            return nil
-//        }
-//
-//        if let extractedPrices = CSVImporter.extractPriceData(url: fileURL, symbol: validSymbol) {
-//            return extractedPrices
-//        }
-//
-//        return nil
-//    }
-
-    func save() {
+   func save() {
               
         DispatchQueue.main.async {
            do {
@@ -651,6 +613,8 @@ public class Share: NSManagedObject {
     // MARK: - download / update functions
     
     func startPriceUpdate(yahooRefDate: Date, delegate: StockDelegate) {
+        
+        print("\(symbol) - starting prices update")
         
         let nowSinceRefDate = Date().timeIntervalSince(yahooRefDate)
         let start = nowSinceRefDate - TimeInterval(3600 * 24 * 366)
