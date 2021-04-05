@@ -614,8 +614,6 @@ public class Share: NSManagedObject {
     
     func startPriceUpdate(yahooRefDate: Date, delegate: StockDelegate) {
         
-        print("\(symbol) - starting prices update")
-        
         let nowSinceRefDate = Date().timeIntervalSince(yahooRefDate)
         let start = nowSinceRefDate - TimeInterval(3600 * 24 * 366)
         

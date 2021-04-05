@@ -394,10 +394,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         self.progressView?.delegate = nil
         progressView?.removeFromSuperview()
         progressView = nil
-        
-        controller.valuation?.date = Date()
-        controller.valuation?.save()
-        
+                
         share.downloadKeyRatios(delegate: self)
     }
 

@@ -18,11 +18,12 @@ class ResearchTVC: UITableViewController {
         super.viewDidLoad()
 
         tableView.register(UINib(nibName: "ResearchCell", bundle: nil), forCellReuseIdentifier: "researchCell")
+        self.title = "\(share?.name_short ?? "missing") research"
         
-        let controller =  ResearchController(share: share)
-        if let titles = controller.titleDictionary {
-            sectionTitles = Array(titles.values)
-        }
+        controller =  ResearchController(share: share, researchList: self)
+        
+        research = share?.research
+        sectionTitles = controller?.sectionTitles()
     }
 
     // MARK: - Table view data source
@@ -34,9 +35,16 @@ class ResearchTVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        if sectionTitles?[section] ?? "" == "news" {
+        if (sectionTitles?[section] ?? "").contains("news") {
             return research?.news?.count ?? 0
-        } else {
+        }
+        else if (sectionTitles?[section] ?? "").contains("Competitors") {
+            return research?.competitors?.count ?? 0
+        }
+        else if (sectionTitles?[section] ?? "").contains("products") {
+            return research?.productsNiches?.count ?? 0
+        }
+        else {
             return 1
         }
     }
@@ -45,20 +53,115 @@ class ResearchTVC: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "researchCell", for: indexPath) as! ResearchCell
 
-        let parameter = controller?.parameter(title: sectionTitles?[indexPath.section] ?? "") ?? "missing"
-        cell.configure(delegate: self, parameter: parameter)
+        cell.configure(delegate: controller, path: indexPath)
 
         return cell
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sectionTitles?[section] ?? ""
-    }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
     }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
+        let header = UIView()
+        let height: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 100 : 60
+        header.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: height)
+        
+        let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 22 : 20
+        
+        let titleLabel: UILabel = {
+            let label = UILabel()
+            let fontSize = largeFontSize
+            label.font = UIFont.systemFont(ofSize: fontSize, weight: .bold)
+            label.text = sectionTitles?[section] ?? ""
+            return label
+        }()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        header.addSubview(titleLabel)
+                                        
+        let margins = header.layoutMarginsGuide
+        
+        titleLabel.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+        titleLabel.heightAnchor.constraint(equalTo: margins.heightAnchor).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: margins.leadingAnchor).isActive = true
+        titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: margins.trailingAnchor, constant: 50).isActive = true
+             
+        if titleLabel.text!.contains("news") || titleLabel.text!.contains("Competitors") || titleLabel.text!.contains("products") {
+            let infoButton = UIButton()
+            infoButton.setBackgroundImage(UIImage(systemName: "plus.circle"), for: .normal)
+            infoButton.tag = section
+            infoButton.tintColor = UIColor.systemOrange
+            infoButton.addTarget(self, action: #selector(addNews(button:)), for: .touchUpInside)
+            infoButton.translatesAutoresizingMaskIntoConstraints = false
+            header.addSubview(infoButton)
 
+            infoButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+            infoButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 20).isActive = true
+            infoButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 1).isActive = true
+            infoButton.widthAnchor.constraint(equalTo: infoButton.heightAnchor).isActive = true
+        }
+        return header
+    }
+
+
+    @objc
+    func addNews(button: UIButton) {
+        
+        let section = button.tag
+        let title = sectionTitles?[section] ?? ""
+        
+        if title.contains("news") {
+            let news = CompanyNews.init(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+            news.creationDate = Date()
+            research?.addToNews(news)
+            news.save()
+            tableView.reloadSections([section], with: .automatic)
+        }
+        else if title.contains("Competitors") {
+            if research?.competitors == nil {
+                research?.competitors = [String()]
+            }
+            else {
+                research?.competitors?.append(String())
+            }
+            research?.save()
+            tableView.reloadSections([section], with: .automatic)
+        }
+        else if title.contains("products") {
+            if research?.productsNiches == nil {
+                research?.productsNiches = [String()]
+            }
+            else {
+                research?.productsNiches?.append(String())
+            }
+            research?.save()
+            tableView.reloadSections([section], with: .automatic)
+        }
+        
+    }
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let title = sectionTitles?[indexPath.section] ?? ""
+        
+        guard title.contains("news") || title.contains("Competitors") || title.contains("products") else { return nil }
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete")
+        { (action, view, bool) in
+            
+            self.controller?.deleteObject(cellPath: indexPath)
+            tableView.reloadSections([indexPath.section], with: .automatic)
+        }
+            
+        let swipeActions = UISwipeActionsConfiguration(actions: [deleteAction])
+    
+        return swipeActions
+
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -103,19 +206,5 @@ class ResearchTVC: UITableViewController {
         // Pass the selected object to the new view controller.
     }
     */
-    
-}
-
-extension ResearchTVC: ResearchCellDelegate {
-    
-    func userEnteredNotes(notes: String, parameter: String) {
-        
-        for sectionTitle in sectionTitles ?? [] {
-            if sectionTitle == parameter {
-                research?.userEnteredText(text: notes, parameter: parameter)
-            }
-        }
-    }
-    
     
 }

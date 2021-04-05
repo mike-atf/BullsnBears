@@ -8,7 +8,8 @@
 import UIKit
 
 protocol ResearchCellDelegate {
-    func userEnteredNotes(notes: String, parameter: String)
+    func userEnteredNotes(notes: String, cellPath: IndexPath)
+    func value(indexPath: IndexPath) -> String?
 }
 
 
@@ -16,27 +17,27 @@ class ResearchCell: UITableViewCell {
 
     @IBOutlet var textView: UITextView!
     var cellDelegate: ResearchCellDelegate!
-    var researchParameter: String!
+//    var researchParameter: String!
     var originalText: String?
+    var indexPath: IndexPath!
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
+        
+        textView.delegate = self
     }
     
     override func prepareForReuse() {
         textView.text = " "
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-    
-    func configure(delegate: ResearchCellDelegate, parameter: String) {
+    func configure(delegate: ResearchCellDelegate?, path: IndexPath) {
+        
         self.cellDelegate = delegate
-        self.researchParameter = parameter
+        self.indexPath = path
+        
+        
+        textView.text = delegate?.value(indexPath: path)
         originalText = textView.text
     }
     
@@ -44,15 +45,9 @@ class ResearchCell: UITableViewCell {
 
 extension ResearchCell: UITextViewDelegate {
     
-    
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         
         addDoneButtonToKeyboard(sender: textView)
-
-        if textView.text == "Enter your notes here..." {
-            textView.text = ""
-            textView.textColor = UIColor.label
-        }
         
         return true
     }
@@ -62,7 +57,7 @@ extension ResearchCell: UITextViewDelegate {
         
         textView.resignFirstResponder()
         if let validText = textView.text {
-            cellDelegate?.userEnteredNotes(notes: validText, parameter: researchParameter)
+            cellDelegate?.userEnteredNotes(notes: validText, cellPath: indexPath)
         }
     }
     

@@ -162,8 +162,6 @@ extension StocksController: StockKeyratioDownloadDelegate, StockDelegate {
         
         guard let shares = fetchedObjects else { return }
         
-        print("\(symbol) - prices update complete")
-        
         if !(shares.compactMap { $0.priceUpdateComplete }.contains(false)) {
             pricesUpdateDelegate?.allSharesHaveUpdatedTheirPrices()
 

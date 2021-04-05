@@ -720,6 +720,9 @@ extension WBValuationController: DataDownloaderDelegate {
         if downloadTasksCompleted == downloadTasks {
             DispatchQueue.main.async {
                 
+                self.valuation?.date = Date()
+                self.valuation?.save()
+
                 self.progressDelegate?.downloadComplete()
             }
         }
