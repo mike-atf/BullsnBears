@@ -294,7 +294,7 @@ class ChartView: UIView {
                     let (fairValue,errors) = existingValuation.stickerPrice()
                         if (fairValue ?? 0) > 0 {
                             let ratio = currentPrice / fairValue!
-                            let ratio$ = " Growth " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
+                            let ratio$ = " GBV " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
 
                             let newLabel: UILabel = {
                                 let label = UILabel()

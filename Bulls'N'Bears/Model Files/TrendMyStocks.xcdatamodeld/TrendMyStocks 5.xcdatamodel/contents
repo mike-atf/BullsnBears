@@ -64,7 +64,7 @@
         <attribute name="valueScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="watchStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="dcfValuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DCFValuation" inverseName="share" inverseEntity="DCFValuation"/>
-        <relationship name="research" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="StockResearch" inverseName="share" inverseEntity="StockResearch"/>
+        <relationship name="research" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="StockResearch" inverseName="share" inverseEntity="StockResearch"/>
         <relationship name="rule1Valuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Rule1Valuation" inverseName="share" inverseEntity="Rule1Valuation"/>
         <relationship name="wbValuation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WBValuation" inverseName="share" inverseEntity="WBValuation"/>
     </entity>
@@ -81,8 +81,8 @@
         <attribute name="shareBuyBacks" optional="YES" attributeType="String"/>
         <attribute name="symbol" optional="YES" attributeType="String"/>
         <attribute name="theBuyStory" optional="YES" attributeType="String"/>
-        <relationship name="news" optional="YES" toMany="YES" deletionRule="No Action" destinationEntity="CompanyNews" inverseName="research" inverseEntity="CompanyNews"/>
-        <relationship name="share" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="Share" inverseName="research" inverseEntity="Share"/>
+        <relationship name="news" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CompanyNews" inverseName="research" inverseEntity="CompanyNews"/>
+        <relationship name="share" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Share" inverseName="research" inverseEntity="Share"/>
     </entity>
     <entity name="UserEvaluation" representedClassName="UserEvaluation" syncable="YES">
         <attribute name="comment" optional="YES" attributeType="String"/>
@@ -119,12 +119,12 @@
         <relationship name="userEvaluations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserEvaluation" inverseName="wbValuation" inverseEntity="UserEvaluation"/>
     </entity>
     <elements>
+        <element name="CompanyNews" positionX="-225" positionY="-90" width="128" height="74"/>
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="313"/>
         <element name="Rule1Valuation" positionX="-194.4807128906249" positionY="573.2761535644531" width="128" height="314"/>
         <element name="Share" positionX="-233.677978515625" positionY="114.121826171875" width="128" height="329"/>
+        <element name="StockResearch" positionX="-200.3316650390625" positionY="-256.4151153564453" width="128" height="239"/>
         <element name="UserEvaluation" positionX="187.350341796875" positionY="352.4636840820313" width="128" height="148"/>
         <element name="WBValuation" positionX="-37.604248046875" positionY="-7.48974609375" width="128" height="374"/>
-        <element name="StockResearch" positionX="-200.3316650390625" positionY="-256.4151153564453" width="128" height="253"/>
-        <element name="CompanyNews" positionX="-225" positionY="-90" width="128" height="74"/>
     </elements>
 </model>

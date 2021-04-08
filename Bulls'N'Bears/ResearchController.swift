@@ -25,8 +25,74 @@ class ResearchController {
             share?.research?.save()
         }
         
-        titleDictionary = titleParameterDictionary()
+        fillParameters()
         
+        titleDictionary = titleParameterDictionary()
+    }
+    
+    func fillParameters() {
+        
+        if let validShare = share {
+            
+            if validShare.research?.companySize == nil {
+                if let validDCF = validShare.dcfValuation {
+                    let mcap = validDCF.marketCap
+                    share?.research?.companySize = "MCap = " + (currencyFormatterGapNoPence.string(from: mcap as NSNumber) ?? "-")
+                }
+            }
+
+            if let validR1 = validShare.rule1Valuation {
+                
+                if validShare.research?.insiderBuying == nil {
+                    if validR1.insiderStocks > 0 {
+                        let buying = validR1.insiderStockBuys / validR1.insiderStocks
+                        let selling = validR1.insiderStockSells / validR1.insiderStocks
+                        var text = "Buying: " + (percentFormatter0Digits.string(from: buying as NSNumber) ?? "-")
+                        text += ", selling: " + (percentFormatter0Digits.string(from: selling as NSNumber) ?? "-")
+                        share?.research?.insiderBuying = text
+                    }
+                }
+                
+                if validShare.research?.competitiveEdge == nil {
+                    if let score = validR1.moatScore() {
+                        share?.research?.competitiveEdge = "Competitive strength score = " + (percentFormatter0Digits.string(from: score as NSNumber) ?? "-")
+                    }
+                }
+            }
+            
+            if let wbValuation = validShare.wbValuation {
+                
+                if validShare.research?.assets == nil {
+                    let lastStockPrice =  validShare.getDailyPrices()?.last?.close //stock.dailyPrices.last?.close
+                    if let valid = wbValuation.bvps?.first {
+                        if lastStockPrice != nil {
+                            if let t$ = percentFormatter0Digits.string(from: (valid / lastStockPrice!) as NSNumber) {
+                                if let t2$ = currencyFormatterGapWithPence.string(from: valid as NSNumber) {
+                                    validShare.research?.assets = "Book value per share / price per share: " + t$ + " (" + t2$ + ")"
+                                }
+                            }
+                        }
+                    }
+
+                }
+                
+                if validShare.research?.shareBuyBacks == nil {
+                    if let retEarningsGrowths = wbValuation.equityRepurchased?.growthRates() {
+                        if let meanGrowth = retEarningsGrowths.ema(periods: 7) {
+                            let lastValue = wbValuation.equityRepurchased!.first!
+                            let lastValue$ = lastValue > 0 ? "Retained earnings positive" : "Retained earnings negative"
+                            validShare.research?.shareBuyBacks = lastValue$ + ", EMA7: " + (percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-")
+                        }
+                    }
+                }
+            }
+ 
+            if validShare.research?.crisisPerformance == nil {
+                validShare.research?.crisisPerformance = "2020 Corona:\n2008 Crash:\n2000 Bubble:"
+            }
+            validShare.save()
+        }
+
     }
     
     func titleParameterDictionary() -> [String : String]? {
@@ -79,35 +145,35 @@ class ResearchController {
         return Array(titleDictionary!.values.sorted())
     }
     
-    func findEntityParameter(title: String) -> String? {
-        
-        switch title {
-        case "Future growth plan":
-            return "growthPlan"
-        case "Performance during last crises":
-            return "crisisPerformance"
-        case "Company size":
-            return "companySize"
-        case "Competitors":
-            return "competitors"
-        case "Special products or niches and their impact":
-            return "productsNiches"
-        case "Competitive advantages":
-            return "competitiveEdge"
-        case "Assets and their value":
-            return "assets"
-        case "Insider buying & selling":
-            return "insiderBuying"
-        case "Retained earnings":
-            return "shareBuyBacks"
-        case "Why do you want to buy this stock?":
-            return "theBuyStory"
-        case "Important company news":
-            return "news"
-        default:
-            return nil
-        }
-    }
+//    func findEntityParameter(title: String) -> String? {
+//        
+//        switch title {
+//        case "Future growth plan":
+//            return "growthPlan"
+//        case "Performance during last crises":
+//            return "crisisPerformance"
+//        case "Company size":
+//            return "companySize"
+//        case "Competitors":
+//            return "competitors"
+//        case "Special products or niches and their impact":
+//            return "productsNiches"
+//        case "Competitive advantages":
+//            return "competitiveEdge"
+//        case "Assets and their value":
+//            return "assets"
+//        case "Insider buying & selling":
+//            return "insiderBuying"
+//        case "Retained earnings":
+//            return "shareBuyBacks"
+//        case "Why do you want to buy this stock?":
+//            return "theBuyStory"
+//        case "Important company news":
+//            return "news"
+//        default:
+//            return nil
+//        }
+//    }
     
     func values(indexPath: IndexPath) -> [String]? {
         
@@ -238,18 +304,9 @@ extension ResearchController: ResearchCellDelegate {
             share?.research?.companySize = notes
         case "competitors":
             share?.research?.competitors?[cellPath.row] = notes
-//            if share?.research?.competitors == nil {
-//                share?.research?.competitors = [notes]
-//            } else {
-//                share?.research?.competitors?.append(notes)
-//            }
+            transferCompetitors(symbol: notes)
         case "productsNiches":
             share?.research?.productsNiches?[cellPath.row] = notes
-//            if share?.research?.productsNiches == nil {
-//                share?.research?.productsNiches = [notes]
-//            } else {
-//                share?.research?.productsNiches?.append(notes)
-//            }
         case "competitiveEdge":
             share?.research?.competitiveEdge = notes
         case "assets":
@@ -262,11 +319,6 @@ extension ResearchController: ResearchCellDelegate {
             share?.research?.theBuyStory = notes
         case "news":
             share?.research?.returnNews()![cellPath.row].newsText = notes
-//            for news in share?.research?.returnNews() ?? [] {
-//                if news.creationDate == date {
-//                    news.newsText =  notes
-//                }
-//            }
         case "industry":
             share?.industry = notes
         case "growthType":
@@ -288,59 +340,34 @@ extension ResearchController: ResearchCellDelegate {
         else { return nil }
     }
     
-//    func saveUserEntry(text: String, parameter: String, newsCreationDate: Date?=nil) {
-//
-//        switch parameter {
-//        case "symbol":
-//            share?.research?.symbol = text
-//        case "growthPlan":
-//            share?.research?.growthPlan = text
-//        case "crisisPerformance":
-//            share?.research?.crisisPerformance = text
-//        case "companySize":
-//            share?.research?.companySize = text
-//        case "competitors":
-//            if share?.research?.competitors == nil {
-//                share?.research?.competitors = [text]
-//            } else {
-//                share?.research?.competitors?.append(text)
-//            }
-//        case "productsNiches":
-//            if share?.research?.productsNiches == nil {
-//                share?.research?.productsNiches = [text]
-//            } else {
-//                share?.research?.productsNiches?.append(text)
-//            }
-//        case "competitiveEdge":
-//            share?.research?.competitiveEdge = text
-//        case "assets":
-//            share?.research?.assets = text
-//        case "insiderBuying":
-//            share?.research?.insiderBuying = text
-//        case "shareBuyBacks":
-//            share?.research?.shareBuyBacks = text
-//        case "theBuyStory":
-//            share?.research?.theBuyStory = text
-//        case "news":
-//            if let date = newsCreationDate {
-//                for news in share?.research?.returnNews() ?? [] {
-//                    if news.creationDate == date {
-//                        news.newsText = text
-//                    }
-//                }
-//            }
-//        case "industry":
-//            share?.industry = text
-//        case "growthType":
-//            share?.growthType = text
-//        default:
-//            print("error: default")
-//        }
-//
-//        share?.save()
-//        share?.research?.save()
-//    }
-
-    
-    
+    func transferCompetitors(symbol: String) {
+        
+        if let competitor = StocksController.allShares()?.filter({ (share) -> Bool in
+            if share.symbol == symbol { return true }
+            else { return false }
+        }).first {
+            if competitor.research == nil {
+                let newResearch = StockResearch.init(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+                newResearch.symbol = competitor.symbol
+                newResearch.competitors = [self.share?.symbol ?? ""]
+                newResearch.save()
+            }
+            else {
+                if competitor.research!.competitors == nil {
+                    competitor.research!.competitors = [self.share?.symbol ?? ""]
+                }
+                else {
+                    if !competitor.research!.competitors!.contains(self.share?.symbol ?? "") {
+                        competitor.research!.competitors!.append(self.share?.symbol ?? "")
+                    }
+                }
+                competitor.research?.save()
+            }
+            if competitor.industry == nil && self.share?.industry != nil {
+                competitor.industry = self.share?.industry!
+                competitor.save()
+            }
+        }
+        
+    }
 }

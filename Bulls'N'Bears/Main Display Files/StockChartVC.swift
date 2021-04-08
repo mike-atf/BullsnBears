@@ -34,9 +34,9 @@ class StockChartVC: UIViewController {
         }
         
         buildLabel = UIBarButtonItem(title: "Build: " + appBuild, style: .plain, target: nil, action: nil)
-        let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title1) ,NSAttributedString.Key.foregroundColor: UIColor.label]
+        let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3) ,NSAttributedString.Key.foregroundColor: UIColor.label]
         barTitleButton.setTitleTextAttributes(titleAttributes, for: .normal)
-        
+                
         self.navigationItem.leftBarButtonItems = [barTitleButton,researchButton]
         self.navigationItem.rightBarButtonItem = buildLabel
         barTitleButton.title = share?.name_long
@@ -115,7 +115,7 @@ class StockChartVC: UIViewController {
         
         if let validValuation = share?.rule1Valuation {
             
-            var r1Title = "Growth-based value: "
+            var r1Title = "GBV: "
             let (value, errors) = validValuation.stickerPrice()
             r1ErrorsButton.isHidden = (errors == nil)
             r1Errors = errors

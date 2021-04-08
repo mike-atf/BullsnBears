@@ -37,43 +37,81 @@ class StocksController: NSFetchedResultsController<Share> {
     //Mark:- shares price update functions
     
     func updateStockFiles() {
-        
-        // don't update on Sundays and Mondays when there's no data
-//        guard (Calendar.current.component(.weekday, from: Date()) > 2) else {
-//            return
-//        }
-        
-                
+                        
         for share in fetchedObjects ?? [] {
             if !(share.priceUpdateComplete ?? false) {
                 share.startPriceUpdate(yahooRefDate: yahooRefDate, delegate: self)
                 // returns to 'priceUpdateComplete()' just below via the delegate
             }
+            
+            updateResearch(share: share)
         }
     }
     
-    /// returns array[0] = fast oascillator K%
-    /// arrays[1] = slow oscillator D%
-//    public func slowStochasticOscillator(share: String) -> [[Double]]? {
-//        
-//        guard let share = fetchedObjects?.filter({ (object) -> Bool in
-//            if object.symbol ?? "" == share { return true }
-//            else { return false }
-//        }).first else { return nil }
-//        
-//        guard let dailyPrices = share.getDailyPrices() else { return nil }
-//        let last14 = dailyPrices[..<14].compactMap{ $0.close }
-//        let after14 = dailyPrices[14...]
-//        var lowest14 = last14.min() ?? 0
-//        var highest14 = last14.max() ?? 0
-//        var k = [Double]()
-//        
-//        for pricePoint in after14 {
-//            let newK = 100 * (pricePoint.close - lowest14) / (highest14 - lowest14)
-//            k.append(newK)
-//        }
-//    }
+    func updateResearch(share: Share) {
+        
+        let allShares = StocksController.allShares()
+        
+        if let competitors = share.research?.competitors {
+            for competitor in competitors {
                 
+                if let storedCompetitors = allShares?.filter({ (aShare) -> Bool in
+                    if aShare.symbol == competitor { return true }
+                    else { return false }
+                }) {
+                    for company in storedCompetitors {
+                        
+                        if company.research == nil {
+                            let newResearch = StockResearch.init(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+                            newResearch.symbol = company.symbol
+                            newResearch.competitors = [share.symbol!]
+                            share.research = newResearch
+                            newResearch.save()
+                        }
+                        else {
+                            if company.research!.competitors != nil {
+                                if !company.research!.competitors!.contains(share.symbol!) {
+                                    company.research!.competitors!.append(share.symbol!)
+                                    company.research?.save()
+                                }
+                            }
+                            else {
+                                company.research!.competitors = [share.symbol!]
+                            }
+                        }
+                        
+                        if share.industry == nil {
+                            share.industry = company.industry
+                            share.save()
+                        }
+                        else if company.industry == nil {
+                            company.industry = share.industry
+                            company.save()
+                        }
+                    }
+                }
+            }
+        }
+                
+    }
+    
+    class func allShares() -> [Share]? {
+
+        var shares: [Share]?
+        
+        let fetchRequest = NSFetchRequest<Share>(entityName: "Share")
+        fetchRequest.sortDescriptors = [ NSSortDescriptor(key: "symbol", ascending: true)]
+        fetchRequest.returnsObjectsAsFaults = false
+        
+        do {
+            shares = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+        }
+        
+        return shares
+    }
+                    
     private func getYahooRefDate() -> Date {
         let calendar = Calendar.current
         let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]

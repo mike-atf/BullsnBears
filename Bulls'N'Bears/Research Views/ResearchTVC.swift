@@ -60,7 +60,49 @@ class ResearchTVC: UITableViewController {
     
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
+        
+        if indexPath.section == 0 {
+            return 70
+        }
+        else if indexPath.section == 1	 {
+            return 44
+        }
+        else if indexPath.section == 2 {
+            return 44
+        }
+        else if indexPath.section == 3 {
+            return 44
+        }
+        else if indexPath.section == 4 {
+            return 70
+        }
+        else if indexPath.section == 5 {
+            return 44
+        }
+        else if indexPath.section == 6 {
+            return 44
+        }
+        else if indexPath.section == 7 {
+            return 44
+        }
+        else if indexPath.section == 8 {
+            return 44
+        }
+        else if indexPath.section == 9 {
+            return 100
+        }
+        else if indexPath.section == 10 {
+            return 70
+        }
+        else if indexPath.section == 11 {
+            return 70
+        }
+        else if indexPath.section == 12 {
+            return 120
+        }
+        else {
+            return 100
+        }
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

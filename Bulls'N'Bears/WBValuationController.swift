@@ -13,7 +13,7 @@ import WebKit
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     var sectionTitles = ["Key ratios","Main parameters", "Secondary parameters","Expenses"]
-    var sectionSubTitles = ["from Yahoo finance","EMA of growth rates of...","EMA of growth rates of...","EMA of growth rates of..."]
+    var sectionSubTitles = ["from Yahoo finance","Growth trend EMA","Growth trend EMA","Growth trend EMA"]
     var rowTitles: [[String]]!
     var share: Share!
     var valuation: WBValuation?

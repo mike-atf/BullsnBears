@@ -14,6 +14,7 @@ public class StockResearch: NSManagedObject {
 
     public override func awakeFromInsert() {
         self.creationDate = Date()
+        
     }
     
     
