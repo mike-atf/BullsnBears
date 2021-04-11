@@ -132,9 +132,8 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
             downLoadWebFile(sourceURL, stockName: name)
         }
-
     }
-    
+        
     func downLoadWebFile(_ url: URL, stockName: String) {
         
         let downloadTask = URLSession.shared.downloadTask(with: url) { [self]
@@ -189,6 +188,8 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                 DispatchQueue.main.async  {
                     
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: targetURL, userInfo: nil) // send to StocksListVC
+                    
+                    // the Company profile (industry, sector and employees) is downloaded after this in StocksController called from StocksListVC as delegate of this here download
                 }
 
             } catch {

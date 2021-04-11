@@ -96,17 +96,17 @@ class StockChartVC: UIViewController {
             dcfErrors = errors
             
             if let intrinsicValue = value {
-                dcfValuationLabrl.text = "DCF value:"
+                dcfValuationLabrl.text = "DCF :"
                 if intrinsicValue > 0 {
                     let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber) ?? "--"
-                    dcfValuationLabrl.text = "DCF value: " + iv$
+                    dcfValuationLabrl.text = "DCF : " + iv$
                 }
                 else {
-                    dcfValuationLabrl.text = "DCF value: negative"
+                    dcfValuationLabrl.text = "DCF : negative"
                 }
             }
             else {
-                dcfValuationLabrl.text = "DCF value: invalid"
+                dcfValuationLabrl.text = "DCF : invalid"
             }
         }
     }

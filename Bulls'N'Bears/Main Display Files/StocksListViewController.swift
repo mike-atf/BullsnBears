@@ -162,19 +162,12 @@ class StocksListViewController: UITableViewController {
                 tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
                 performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
             }
+            
         }
         else {
             ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from file \(fileURL)")
        }
     }
-    
-//    @objc
-//    func updateCellReturningFromWBValuationTVC(notification: Notification) {
-//
-//        if let path = notification.object as? IndexPath {
-//            tableView.reloadRows(at: [path], with: .automatic)
-//        }
-//    }
     
     // MARK: - Table view data source
 
@@ -200,7 +193,12 @@ class StocksListViewController: UITableViewController {
         let valueRatingData = share.wbValuation?.valuesSummaryScores()
         let userRatingData = share.wbValuation?.userEvaluationScore()
         
-        cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData, scoreDelegate: self)
+        let evaluationsCount = share.wbValuation?.returnUserEvaluations()?.compactMap{ $0.comment }.filter({ (comment) -> Bool in
+            if !comment.starts(with: "Enter your notes here...") { return true }
+            else { return false }
+        }).count ?? 0
+        
+        cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData, scoreDelegate: self, userCommentCount: evaluationsCount)
         
         return cell
     }
@@ -339,9 +337,16 @@ extension StocksListViewController: StocksControllerDelegate, ScoreCircleDelegat
             evaluationsView.loadViewIfNeeded()
             
             let share = controller.object(at: indexPath)
-            let evaluations = share.wbValuation?.returnUserEvaluations()?.compactMap{ $0.comment }
             
-            evaluationsView.errors = evaluations ?? []
+            var texts:[String]?
+            if isUserScoreType {
+                texts = share.wbValuation?.returnUserCommentsTexts()
+            }
+            else {
+                texts = share.wbValuation?.valuesSummaryTexts()
+            }
+            
+            evaluationsView.errors = texts ?? []
             
             present(evaluationsView, animated: true, completion:  nil)
         }

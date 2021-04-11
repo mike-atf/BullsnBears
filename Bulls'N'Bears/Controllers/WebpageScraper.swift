@@ -10,7 +10,7 @@ import Foundation
 class WebpageScraper {
     
     /// webpageExponent = the exponent used by the webpage to listing financial figures, e.g. 'thousands' on yahoo = 3.0
-    class func scrapeRow(website: Website, html$: String?, sectionHeader: String?=nil, rowTitle: String, rowTerminal: String? = nil, numberTerminal: String? = nil, webpageExponent: Double?=nil) -> ([Double]?, [String]) {
+    class func scrapeRowForDoubles(website: Website, html$: String?, sectionHeader: String?=nil, rowTitle: String, rowTerminal: String? = nil, numberTerminal: String? = nil, webpageExponent: Double?=nil) -> ([Double]?, [String]) {
         
         var pageText = html$
         let sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
@@ -78,24 +78,65 @@ class WebpageScraper {
             return (valueArray, errors)
         }
         else {
-            let (valueArray, errors) = yahooRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal, exponent: webpageExponent)
+            let (valueArray, errors) = yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal, exponent: webpageExponent)
             return (valueArray, errors)
         }
     }
     
-    
-    
-    
-    
-    
-    class func scrapeTextRow(website: Website, html$: String?, rowTitle: String, rowTerminal: String, numberTerminal: String? = nil) -> ([Double]?, [String]) {
+    class func scrapeYahooRowForDoubles(html$: String?, rowTitle: String, rowTerminal: String? = nil, numberTerminal: String? = nil) -> ([Double]?, [String]) {
         
         var pageText = html$
-//        let sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
-//        let rowDataStartDelimiter: String? = (website == .macrotrends) ? "class=\"fas fa-chart-bar\"></i></div></div></div><div role=" : nil
-        let textLineStart = rowTitle
-//        let rowTerminal = rowTerminal
-//        let tableTerminal = "</div></div></div></div>"
+        let rowStart = rowTitle
+        let rowTerminal = rowTerminal ?? "\""
+
+        var errors = [String]()
+        
+        guard pageText != nil else {
+            errors.append("Empty webpage for \(rowTitle), \(rowTitle)")
+            return (nil, errors)
+        }
+        
+                        
+// B Find beginning of row
+        let rowStartIndex = pageText?.range(of: rowStart)
+        guard rowStartIndex != nil else {
+            let error = "Did not find row titled \(rowTitle) on webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
+            return (nil, errors)
+        }
+                
+// C Find end of row - or if last row end of table - and reduce pageText to this row
+        if let rowEndIndex = pageText?.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
+            pageText = String(pageText![rowStartIndex!.upperBound..<rowEndIndex.upperBound])
+        }
+        else {
+            let error = "Did not find row end for title \(rowTitle) on webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
+            return (nil, errors)
+        }
+        
+//        print()
+//        print("website text:")
+//        print(html$ ?? "none")
+        
+
+        return yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal)
+//        return (valueArray, errors)
+    }
+
+    
+    class func scrapeRowForText(website: Website, html$: String?, sectionHeader: String?=nil, sectionTerminal: String?=nil, rowTitle: String, rowTerminal: String? = nil, textTerminal: String? = nil, webpageExponent: Double?=nil) -> ([String]?, [String]) {
+        
+        var pageText = html$
+        let sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
+        let rowDataStartDelimiter: String? = (website == .macrotrends) ? "class=\"fas fa-chart-bar\"></i></div></div></div><div role=" : nil
+        let rowStart = website == .macrotrends ? ">" + rowTitle + "</a></div></div>" : rowTitle
+        let rowTerminal = website == .macrotrends ? "</div></div></div>" : (rowTerminal ?? ",")
+        let paraTerminal = sectionTerminal ?? "</p>"
 
         var errors = [String]()
         
@@ -106,16 +147,76 @@ class WebpageScraper {
         
 // 1 Remove leading and trailing parts of the html code
 // A Find section header
-//        if sectionTitle != nil {
-//            guard let sectionIndex = pageText?.range(of: sectionTitle!) else {
-//                let error = "Did not find section \(sectionTitle!) on webpage"
-//                if !errors.contains(error) {
-//                    errors.append(error)
-//                }
-//                return (nil, errors)
-//            }
-//            pageText = String(pageText!.suffix(from: sectionIndex.upperBound))
-//        }
+        if sectionTitle != nil {
+            guard let sectionIndex = pageText?.range(of: sectionTitle!) else {
+                let error = "Did not find section \(sectionTitle!) on webpage"
+                if !errors.contains(error) {
+                    errors.append(error)
+                }
+                return (nil, errors)
+            }
+            pageText = String(pageText!.suffix(from: sectionIndex.upperBound))
+        }
+                        
+// B Find beginning of row
+        var rowStartIndex = pageText?.range(of: rowStart)
+        guard rowStartIndex != nil else {
+            let error = "Did not find row titled \(rowTitle) on webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
+            return (nil, errors)
+        }
+        
+        if let validStarter = rowDataStartDelimiter {
+            if let index = pageText?.range(of: validStarter, options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
+                rowStartIndex = index
+            }
+        }
+        
+// C Find end of row - or if last row end of table - and reduce pageText to this row
+        if let rowEndIndex = pageText?.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
+            pageText = String(pageText![rowStartIndex!.upperBound..<rowEndIndex.lowerBound])
+        } else if let tableEndIndex = pageText?.range(of: paraTerminal,options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
+            pageText = String(pageText![rowStartIndex!.upperBound..<tableEndIndex.lowerBound])
+        }
+        else {
+            let error = "Did not find row end for title \(rowTitle) on webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
+            return (nil, errors)
+        }
+        
+//        print()
+//        print("website text:")
+//        print(html$ ?? "none")
+        
+        if website == .macrotrends {
+//            let (textArray, errors) = macrotrendsRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, exponent: webpageExponent)
+//            return (textArray, errors)
+            return (nil, ["macrotrends text extraction not implemented"])
+        }
+        else {
+            let (textArray, errors) = yahooRowStringExtraction(table$: pageText ?? "", rowTitle: rowTitle, textTerminal: textTerminal)
+            return (textArray, errors)
+        }
+    }
+
+    
+    class func scrapeTextRow(website: Website, html$: String?, rowTitle: String, rowTerminal: String, numberTerminal: String? = nil) -> ([Double]?, [String]) {
+        
+        var pageText = html$
+        let textLineStart = rowTitle
+        var errors = [String]()
+        
+        guard pageText != nil else {
+            errors.append("Empty webpage for \(rowTitle), \(rowTitle)")
+            return (nil, errors)
+        }
+        
+// 1 Remove leading and trailing parts of the html code
+// A Find section header
                         
 // B Find beginning of row
         let rowStartIndex = pageText?.range(of: textLineStart)
@@ -127,11 +228,6 @@ class WebpageScraper {
             return (nil, errors)
         }
         
-//        if let validStarter = rowDataStartDelimiter {
-//            if let index = pageText?.range(of: validStarter, options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
-//                rowStartIndex = index
-//            }
-//        }
         
 // C Find end of row - or if last row end of table - and reduce pageText to this row
         if let rowEndIndex = pageText?.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
@@ -145,18 +241,11 @@ class WebpageScraper {
             return (nil, errors)
         }
         
-        print()
-        print("website text:")
-        print(html$ ?? "none")
+//        print()
+//        print("website text:")
+//        print(html$ ?? "none")
         
-//        if website == .macrotrends {
-            return macrotrendsRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, exponent: nil)
-//            return (valueArray, errors)
-//        }
-//        else {
-//            let (valueArray, errors) = yahooRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal, exponent: webpageExponent)
-//            return (valueArray, errors)
-//        }
+        return macrotrendsRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, exponent: nil)
     }
 
     
@@ -193,12 +282,12 @@ class WebpageScraper {
         return (valueArray, errors)
     }
     
-    class func yahooRowExtraction(table$: String, rowTitle: String, numberTerminal: String?=nil, exponent: Double?=nil) -> ([Double], [String]) {
+    class func yahooRowNumbersExtraction(table$: String, rowTitle: String, numberTerminal: String?=nil, exponent: Double?=nil) -> ([Double], [String]) {
         
         var valueArray = [Double]()
         var errors = [String]()
-        let numberTerminal = numberTerminal ?? "</span>"
-        let numberStarter = ">"
+        let numberTerminal = numberTerminal ?? ","
+        let numberStarter = ":"
         var tableText = table$
         
         var labelEndIndex = tableText.range(of: numberTerminal, options: .backwards, range: nil, locale: nil)
@@ -235,6 +324,48 @@ class WebpageScraper {
 //        )
         return (valueArray, errors)
     }
+    
+    class func yahooRowStringExtraction(table$: String, rowTitle: String, textTerminal: String?=nil) -> ([String], [String]) {
+        
+        var textArray = [String]()
+        var errors = [String]()
+        let textTerminal = textTerminal ?? "\""
+        let textStarter = "\""
+        var tableText = table$
+        
+        var labelEndIndex = tableText.range(of: textTerminal, options: .backwards, range: nil, locale: nil)
+        if let index = labelEndIndex {
+            tableText.removeSubrange(index.lowerBound...)
+        }
+
+//        print("row text:")
+//        print(tableText)
+        repeat {
+            guard let labelStartIndex = tableText.range(of: textStarter, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil) else {
+                let error = "Did not find text start in \(rowTitle) on webpage"
+                if !errors.contains(error) {
+                    errors.append(error)
+                }
+                continue
+            }
+            
+            let value$ = String(tableText[labelStartIndex.upperBound...])
+//            print("value$ extracted: \(value$)")
+            textArray.append(value$)
+            
+            labelEndIndex = tableText.range(of: textTerminal, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil)
+            if let index = labelEndIndex {
+                tableText.removeSubrange(index.lowerBound...)
+            }
+
+        } while labelEndIndex != nil && (tableText.count > 1)
+
+//        print("values extracted: \(valueArray)")
+//        print("======================================="
+//        )
+        return (textArray, errors)
+    }
+
     
     class func numberFromText(value$: String, rowTitle: String, exponent: Double?=nil) -> Double {
         

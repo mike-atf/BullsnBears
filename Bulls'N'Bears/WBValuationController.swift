@@ -610,31 +610,31 @@ extension WBValuationController: DataDownloaderDelegate {
         var result:(array: [Double]?, errors: [String])
 
         if section == "financial-statements" {
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Revenue")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Revenue")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.revenue = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Gross Profit")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Gross Profit")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.grossProfit = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Research And Development Expenses")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Research And Development Expenses")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.rAndDexpense = result.array
 
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "SG&amp;A Expenses")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "SG&amp;A Expenses")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.sgaExpense = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Net Income")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Net Income")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.netEarnings = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Operating Income")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Operating Income")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.operatingIncome = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "EPS - Earnings Per Share")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "EPS - Earnings Per Share")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.eps = result.array
 
@@ -643,19 +643,19 @@ extension WBValuationController: DataDownloaderDelegate {
             }
         }
         else if section == "balance-sheet" {
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.debtLT = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Propoerty, Plant, And Equipment")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Propoerty, Plant, And Equipment")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.ppe = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Retained Earnings (Accumulated Deficit)")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Retained Earnings (Accumulated Deficit)")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.equityRepurchased = result.array
 
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Share Holder Equity")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Share Holder Equity")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.shareholdersEquity = result.array
             
@@ -664,11 +664,11 @@ extension WBValuationController: DataDownloaderDelegate {
             }
         }
         else if section == "cash-flow-statement" {
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Investing Activities")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Investing Activities")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.capExpend = result.array?.positives() // converted from negative for more intuitive correlation display in ValueLIstTVC and WBValuationTVC
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Operating Activities")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Operating Activities")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.opCashFlow = result.array
 
@@ -677,15 +677,15 @@ extension WBValuationController: DataDownloaderDelegate {
             }
         }
         else if section == "financial-ratios" {
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROE - Return On Equity")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROE - Return On Equity")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.roe = result.array
 
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROA - Return On Assets")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROA - Return On Assets")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.roa = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Book Value Per Share")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Book Value Per Share")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.bvps = result.array
             

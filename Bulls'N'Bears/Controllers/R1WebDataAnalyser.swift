@@ -71,15 +71,15 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
         
         var result:(array: [Double]?, errors: [String])
         if section == webpages[0] {
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Revenue")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Revenue")
             downloadErrors.append(contentsOf: result.errors)
             share.rule1Valuation?.revenue = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "EPS - Earnings Per Share")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "EPS - Earnings Per Share")
             downloadErrors.append(contentsOf: result.errors)
             share.rule1Valuation?.eps = result.array
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Net Income")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Net Income")
             downloadErrors.append(contentsOf: result.errors)
             if let income = result.array?.first {
                 share.rule1Valuation?.netIncome = income * pow(10, 3)
@@ -91,7 +91,7 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
         }
         else if section == webpages[1] {
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROI - Return On Investment")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROI - Return On Investment")
             downloadErrors.append(contentsOf: result.errors)
             var roicPct = [Double]()
             for number in result.array ?? [] {
@@ -99,11 +99,11 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
             }
             share.rule1Valuation?.roic = roicPct
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Book Value Per Share")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Book Value Per Share")
             downloadErrors.append(contentsOf: result.errors)
             share.rule1Valuation?.bvps = result.array
 
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Operating Cash Flow Per Share")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Operating Cash Flow Per Share")
             downloadErrors.append(contentsOf: result.errors)
             share.rule1Valuation?.opcs = result.array
 
@@ -113,7 +113,7 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
         }
         else if section == webpages[2] {
             
-            result = WebpageScraper.scrapeRow(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
             downloadErrors.append(contentsOf: result.errors)
             let cleanedResult = result.array?.filter({ (element) -> Bool in
                 return element != Double()
@@ -142,7 +142,7 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
         }
         else if section == webpages[4] {
            
-            result = WebpageScraper.scrapeRow(website: .yahoo, html$: html$, sectionHeader: "Revenue estimate</span>", rowTitle: "Sales growth (year/est)")
+            result = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: "Revenue estimate</span>", rowTitle: "Sales growth (year/est)")
             downloadErrors.append(contentsOf: result.errors)
             if let validResult = result.array?.reversed() {
                 var growth = [validResult.last!]
@@ -157,7 +157,7 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
             }
         } else if section == webpages[5] {
 
-            result = WebpageScraper.scrapeRow(website: .yahoo, html$: html$, sectionHeader: "Cash flow</span>", rowTitle: "Operating cash flow")
+            result = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: "Cash flow</span>", rowTitle: "Operating cash flow")
             downloadErrors.append(contentsOf: result.errors)
             share.rule1Valuation?.opCashFlow = result.array?.first ?? Double()
 
@@ -168,7 +168,7 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
             let rowTitles = ["Purchases","Sales","Total insider shares held"]
             
             for rtitle in rowTitles {
-                result = WebpageScraper.scrapeRow(website: .yahoo, html$: html$, sectionHeader: "Insider purchases - Last 6 months</span>", rowTitle: rtitle, rowTerminal: "</td></tr>", numberTerminal: "</td>")
+                result = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: "Insider purchases - Last 6 months</span>", rowTitle: rtitle, rowTerminal: "</td></tr>", numberTerminal: "</td>")
                 downloadErrors.append(contentsOf: result.errors)
                 if rtitle.contains("Purchases") {
                     share.rule1Valuation?.insiderStockBuys = result.array?.last ?? Double()

@@ -37,7 +37,7 @@ class StockListCellTableViewCell: UITableViewCell {
         valueCircle.isHidden = true
     }
     
-    public func configureCell(indexPath: IndexPath, stock: Share, userRatingData: RatingCircleData?, valueRatingData: RatingCircleData?, scoreDelegate: ScoreCircleDelegate) {
+    public func configureCell(indexPath: IndexPath, stock: Share, userRatingData: RatingCircleData?, valueRatingData: RatingCircleData?, scoreDelegate: ScoreCircleDelegate, userCommentCount: Int) {
         self.indexPath = indexPath
         self.stock = stock
         
@@ -47,7 +47,7 @@ class StockListCellTableViewCell: UITableViewCell {
         }
         
         actionView.configure(share: stock)
-        ratingCircle.configure(ratingStruct: userRatingData, delegate: scoreDelegate, path: indexPath, isUserScore: true)
-        valueCircle.configure(ratingStruct: valueRatingData, delegate: scoreDelegate, path: indexPath, isUserScore: false)
+        ratingCircle.configure(ratingStruct: userRatingData, delegate: scoreDelegate, path: indexPath, isUserScore: true, userCommentsCount: userCommentCount)
+        valueCircle.configure(ratingStruct: valueRatingData, delegate: scoreDelegate, path: indexPath, isUserScore: false, userCommentsCount: 1)
     }
 }

@@ -25,7 +25,12 @@ public class Share: NSManagedObject {
         priceUpdateComplete = false
         
         let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
+        
+        if industry == nil {
+            industry = "Unknown"
+        }
     }
+    
    func save() {
               
         DispatchQueue.main.async {
@@ -873,8 +878,7 @@ public class Share: NSManagedObject {
         return crossingPoint
     }
 
-        
-    // MARK: - keyRatios uopdate
+    // MARK: - keyRatios update
     
     func downloadKeyRatios(delegate: StockKeyratioDownloadDelegate?) {
         
@@ -888,7 +892,10 @@ public class Share: NSManagedObject {
             return
         }
         
-        let yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
+        let yahooSession = URLSession(configuration: .default)
+        var dataTask: URLSessionDataTask?
+        
+        dataTask = yahooSession.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock keyratio download error")
@@ -908,7 +915,7 @@ public class Share: NSManagedObject {
             let html$ = String(decoding: validData, as: UTF8.self)
             self.keyratioDownloadComplete(html$: html$, delegate: delegate)
         }
-        yahooSession.resume()
+        dataTask?.resume()
     }
     
     func keyratioDownloadComplete(html$: String, delegate: StockKeyratioDownloadDelegate?) {
@@ -920,7 +927,7 @@ public class Share: NSManagedObject {
             
             let pageText = html$
             
-            let (values, errors) = WebpageScraper.scrapeRow(website: .yahoo, html$: pageText, rowTitle: title , rowTerminal: "</tr>", numberTerminal: "</td>")
+            let (values, errors) = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: pageText, rowTitle: title , rowTerminal: "</tr>", numberTerminal: "</td>")
             loaderrors.append(contentsOf: errors)
             
             if title.starts(with: "Beta") {
@@ -949,4 +956,91 @@ public class Share: NSManagedObject {
         
         delegate?.keyratioDownloadComplete(errors: loaderrors)
     }
+    
+    // MARK: - yahoo profile download
+    func downloadProfile(delegate: StockKeyratioDownloadDelegate?) {
+        
+        var components: URLComponents?
+                
+        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol!)/pfile")
+        components?.queryItems = [URLQueryItem(name: "p", value: symbol!)]
+            
+        
+        guard let validURL = components?.url else {
+            return
+        }
+        
+        let yahooSession = URLSession(configuration: .default)
+        var dataTask: URLSessionDataTask?
+        
+        dataTask = yahooSession.dataTask(with: validURL) { (data, urlResponse, error) in
+
+            guard error == nil else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock profile download error")
+                return
+            }
+            
+            guard urlResponse != nil else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock profile download error \(urlResponse.debugDescription)")
+                return
+            }
+            
+            guard let validData = data else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock profile download error - empty website data")
+                return
+            }
+
+            let html$ = String(decoding: validData, as: UTF8.self)
+            self.profileDownloadComplete(html$: html$, delegate: delegate)
+        }
+        dataTask?.resume()
+    }
+    
+    func profileDownloadComplete(html$: String, delegate: StockKeyratioDownloadDelegate?) {
+        
+        let rowTitles = ["\"sector\":", "\"industry\":", "\"fullTimeEmployees\""] // titles differ from the ones displayed on webpage!
+        var loaderrors = [String]()
+        
+        for title in rowTitles {
+            
+            let pageText = html$
+            
+            
+            if title.starts(with: "\"sector") {
+                let (strings, errors) = WebpageScraper.scrapeRowForText(website: .yahoo, html$: pageText, rowTitle: title , rowTerminal: ",", textTerminal: "\"")
+                loaderrors.append(contentsOf: errors)
+
+                if let valid = strings?.first {
+                    sector = valid
+                }
+            } else if title.starts(with: "\"industry") {
+                let (strings, errors) = WebpageScraper.scrapeRowForText(website: .yahoo, html$: pageText, rowTitle: title , rowTerminal: ",", textTerminal: "\"")
+                loaderrors.append(contentsOf: errors)
+                
+                if let valid = strings?.first {
+                    industry = valid
+                }
+            } else if title.starts(with: "\"fullTimeEmployees") {
+                let (values, errors) = WebpageScraper.scrapeYahooRowForDoubles(html$: pageText, rowTitle: title , rowTerminal: "\"", numberTerminal: ",")
+                loaderrors.append(contentsOf: errors)
+                
+                if let valid = values?.first {
+                    employees = valid
+                }
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self.save()
+        }
+       
+        if loaderrors.count > 0 {
+            for error in loaderrors {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
+
+            }
+        }
+    }
+
+
 }

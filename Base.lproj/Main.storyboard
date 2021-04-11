@@ -17,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MVz-dh-kgA" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="700.5" y="55" width="33" height="33"/>
+                                <rect key="frame" x="726" y="55" width="33" height="33"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="MVz-dh-kgA" secondAttribute="height" multiplier="1:1" id="5gW-w3-Pb5"/>
@@ -27,7 +27,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pyF-an-nSb" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="753.5" y="55" width="32.5" height="33"/>
+                                <rect key="frame" x="769" y="55" width="32.5" height="33"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="pyF-an-nSb" secondAttribute="height" multiplier="1:1" id="gaw-0U-0y7"/>
@@ -37,7 +37,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vMW-cw-G3E" userLabel="Button3" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="806" y="55" width="33" height="33"/>
+                                <rect key="frame" x="811.5" y="55" width="33" height="33"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="vMW-cw-G3E" secondAttribute="height" multiplier="1:1" id="r58-tf-wky"/>
@@ -106,7 +106,7 @@
                                 </constraints>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="28E-NM-pCT" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="806.5" y="97" width="32.5" height="32.5"/>
+                                <rect key="frame" x="812" y="97" width="32.5" height="32.5"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="28E-NM-pCT" secondAttribute="height" multiplier="1:1" id="vRr-eX-9QY"/>
@@ -116,27 +116,27 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hAd-Vi-f51" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="753.5" y="97" width="32.5" height="32.5"/>
+                                <rect key="frame" x="769" y="97" width="32.5" height="32.5"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="yGM-Sn-b0n"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hrq-ff-sUC" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="701" y="97" width="32.5" height="32.5"/>
+                                <rect key="frame" x="726.5" y="97" width="32.5" height="32.5"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="g4A-rZ-Kbq"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DCF Valuation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A2B-RG-uHy">
-                                <rect key="frame" x="53" y="61.5" width="102.5" height="19.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <rect key="frame" x="53" y="63" width="91.5" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Growth-based Valuation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miC-j2-Brw">
-                                <rect key="frame" x="53" y="103.5" width="175.5" height="19.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Growth-based Valuation" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miC-j2-Brw">
+                                <rect key="frame" x="53" y="104.5" width="156.5" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QfP-lA-cgL">
@@ -144,14 +144,14 @@
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="QfP-lA-cgL" secondAttribute="height" multiplier="1:1" id="a73-lo-oVN"/>
                                 </constraints>
-                                <color key="tintColor" systemColor="systemOrangeColor"/>
+                                <color key="tintColor" systemColor="linkColor"/>
                                 <state key="normal" backgroundImage="dollarsign.square.fill" catalog="system"/>
                                 <connections>
                                     <action selector="dcfButtonAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="QcI-zI-hwo"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PWI-rZ-xja">
-                                <rect key="frame" x="163" y="62" width="20" height="18"/>
+                                <rect key="frame" x="152" y="61" width="20" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="PWI-rZ-xja" secondAttribute="height" multiplier="1:1" id="5sA-qP-vWN"/>
                                 </constraints>
@@ -166,14 +166,14 @@
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="fni-R7-t11" secondAttribute="height" multiplier="1:1" id="yrz-ly-1Cf"/>
                                 </constraints>
-                                <color key="tintColor" systemColor="systemOrangeColor"/>
+                                <color key="tintColor" systemColor="linkColor"/>
                                 <state key="normal" backgroundImage="dollarsign.square.fill" catalog="system"/>
                                 <connections>
                                     <action selector="r1ButtonAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="9Kw-RA-52T"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s3a-vi-G4m">
-                                <rect key="frame" x="236.5" y="104" width="20" height="18"/>
+                                <rect key="frame" x="217.5" y="102.5" width="20" height="18"/>
                                 <color key="tintColor" systemColor="systemYellowColor"/>
                                 <state key="normal" backgroundImage="exclamationmark.triangle" catalog="system"/>
                                 <connections>
@@ -189,7 +189,7 @@
                             <constraint firstItem="Hrq-ff-sUC" firstAttribute="top" secondItem="MVz-dh-kgA" secondAttribute="bottom" constant="9" id="1FK-Of-x3d"/>
                             <constraint firstItem="HJZ-h8-yHo" firstAttribute="bottom" secondItem="Doh-lM-a4B" secondAttribute="bottom" id="7TE-1M-Zc0"/>
                             <constraint firstItem="28E-NM-pCT" firstAttribute="height" secondItem="DMz-IK-SGN" secondAttribute="height" multiplier="0.04" constant="-0.29999999999999716" id="7l0-A4-FeV"/>
-                            <constraint firstItem="pyF-an-nSb" firstAttribute="leading" secondItem="MVz-dh-kgA" secondAttribute="trailing" constant="20" id="886-U6-eXb"/>
+                            <constraint firstItem="pyF-an-nSb" firstAttribute="leading" secondItem="MVz-dh-kgA" secondAttribute="trailing" constant="10" id="886-U6-eXb"/>
                             <constraint firstItem="hAd-Vi-f51" firstAttribute="centerY" secondItem="28E-NM-pCT" secondAttribute="centerY" id="8yK-ME-WDe"/>
                             <constraint firstItem="Doh-lM-a4B" firstAttribute="top" secondItem="Hrq-ff-sUC" secondAttribute="bottom" constant="12" id="94w-JU-8ro"/>
                             <constraint firstItem="vMW-cw-G3E" firstAttribute="height" secondItem="pyF-an-nSb" secondAttribute="height" id="B3d-Z0-YSd"/>
@@ -205,7 +205,7 @@
                             <constraint firstItem="fni-R7-t11" firstAttribute="leading" secondItem="QfP-lA-cgL" secondAttribute="leading" id="OJy-Bw-1oe"/>
                             <constraint firstItem="hAd-Vi-f51" firstAttribute="width" secondItem="hAd-Vi-f51" secondAttribute="height" multiplier="1:1" id="OQ0-Q1-4DP"/>
                             <constraint firstItem="pyF-an-nSb" firstAttribute="height" secondItem="MVz-dh-kgA" secondAttribute="height" id="QXf-MA-k0p"/>
-                            <constraint firstItem="vMW-cw-G3E" firstAttribute="leading" secondItem="pyF-an-nSb" secondAttribute="trailing" constant="20" id="QwG-G3-Ppu"/>
+                            <constraint firstItem="vMW-cw-G3E" firstAttribute="leading" secondItem="pyF-an-nSb" secondAttribute="trailing" constant="10" id="QwG-G3-Ppu"/>
                             <constraint firstItem="Hrq-ff-sUC" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="s3a-vi-G4m" secondAttribute="trailing" constant="10" id="VAw-gi-lr8"/>
                             <constraint firstItem="MVz-dh-kgA" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="5" id="VSM-dg-lDx"/>
                             <constraint firstItem="A2B-RG-uHy" firstAttribute="centerY" secondItem="QfP-lA-cgL" secondAttribute="centerY" id="Vz6-mJ-ds4"/>
@@ -215,7 +215,7 @@
                             <constraint firstItem="PWI-rZ-xja" firstAttribute="bottom" secondItem="A2B-RG-uHy" secondAttribute="bottom" id="af7-EF-COx"/>
                             <constraint firstItem="s3a-vi-G4m" firstAttribute="leading" secondItem="miC-j2-Brw" secondAttribute="trailing" constant="8" symbolic="YES" id="bC4-t7-kCk"/>
                             <constraint firstItem="QfP-lA-cgL" firstAttribute="top" secondItem="MVz-dh-kgA" secondAttribute="top" id="bM0-of-rWn"/>
-                            <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="vMW-cw-G3E" secondAttribute="trailing" constant="20.5" id="cAM-CS-hJx"/>
+                            <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="vMW-cw-G3E" secondAttribute="trailing" constant="15" id="cAM-CS-hJx"/>
                             <constraint firstItem="vMW-cw-G3E" firstAttribute="centerY" secondItem="pyF-an-nSb" secondAttribute="centerY" id="e5v-Ir-beX"/>
                             <constraint firstItem="fni-R7-t11" firstAttribute="width" secondItem="QfP-lA-cgL" secondAttribute="width" id="ehI-Jz-1yM"/>
                             <constraint firstItem="Hrq-ff-sUC" firstAttribute="centerX" secondItem="MVz-dh-kgA" secondAttribute="centerX" id="f0c-b1-EHc"/>
@@ -815,16 +815,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="8qG-a0-hId">
-                                <rect key="frame" x="20" y="55.5" width="1140" height="43.5"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="8qG-a0-hId" id="HYE-Kh-j0G">
-                                    <rect key="frame" x="0.0" y="0.0" width="1140" height="43.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="CSD-JA-A2I" id="EHM-RH-PAT"/>
                             <outlet property="delegate" destination="CSD-JA-A2I" id="PDt-4o-Wbu"/>

@@ -28,6 +28,8 @@ extension Share {
     @NSManaged public var purchaseStory: String?
     @NSManaged public var growthType: String?
     @NSManaged public var industry: String?
+    @NSManaged public var sector: String?
+    @NSManaged public var employees: Double
     @NSManaged public var symbol: String?
     @NSManaged public var name_short: String?
     @NSManaged public var name_long: String?

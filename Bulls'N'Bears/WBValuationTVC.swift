@@ -334,9 +334,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             else if indexPath.row == 4 {
                 arrays = [controller.valuation?.capExpend ?? [], controller.valuation?.netEarnings ?? []]
             }
-//            else if indexPath.row == 5 {
-//                arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.peRatios() ?? []]
-//            }
             else if indexPath.row == 5 {
                 arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
             }

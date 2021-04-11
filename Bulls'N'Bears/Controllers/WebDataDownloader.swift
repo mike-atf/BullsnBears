@@ -51,7 +51,6 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
 
         
         yahooDownloadPage(url: components?.url, for: yahooDownloadTasks.first!)
-
     }
     
     public func macroTrendsDownload(pageTitles: [String]) {

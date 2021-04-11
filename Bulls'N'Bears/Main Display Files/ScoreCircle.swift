@@ -26,7 +26,7 @@ class ScoreCircle: UIView {
     var delegate: ScoreCircleDelegate?
     var isUserScoreType: Bool!
 
-    func configure(ratingStruct: RatingCircleData?, delegate: ScoreCircleDelegate, path: IndexPath, isUserScore: Bool) {
+    func configure(ratingStruct: RatingCircleData?, delegate: ScoreCircleDelegate, path: IndexPath, isUserScore: Bool, userCommentsCount: Int) {
                
         guard let validData = ratingStruct else {
             self.isHidden = true
@@ -69,7 +69,7 @@ class ScoreCircle: UIView {
             centerImageView = UIImageView(image: UIImage(systemName: "dollarsign.circle")!)
         }
 
-        centerImageView.tintColor = UIColor.systemGray
+        centerImageView.tintColor = userCommentsCount > 0 ? UIColor.link : UIColor.systemGray
         addSubview(centerImageView)
         centerImageView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -78,12 +78,15 @@ class ScoreCircle: UIView {
         centerImageView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.6).isActive = true
         centerImageView.widthAnchor.constraint(equalTo: centerImageView.heightAnchor).isActive = true
         
-        if tapGestureRecognizer == nil {
+        if userCommentsCount > 0 {
             tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(userTap))
             tapGestureRecognizer?.isEnabled = true
             self.addGestureRecognizer(tapGestureRecognizer!)
         }
-        
+        else {
+            tapGestureRecognizer = nil
+        }
+                
     }
     
     override func draw(_ rect: CGRect) {

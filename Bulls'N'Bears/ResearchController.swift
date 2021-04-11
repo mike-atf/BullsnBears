@@ -202,8 +202,14 @@ class ResearchController {
             if let valid = share?.research?.crisisPerformance { return [valid] }
             else { return nil }
         case "companySize":
-            if let valid = share?.research?.companySize { return [valid] }
-            else { return nil }
+            var employees$ = String()
+            if let validEmployees = share?.employees {
+                employees$ = "Employees: " + (numberFormatterNoFraction.string(from: validEmployees as NSNumber) ?? "")
+            }
+            if let valid = share?.research?.companySize {
+                return [valid + ", " + employees$]
+            }
+            else { return [employees$] }
         case "competitors":
             if let valid = share?.research?.competitors { return valid }
             else { return nil }
