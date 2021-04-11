@@ -124,7 +124,7 @@ class WebpageScraper {
 //        print(html$ ?? "none")
         
 
-        return yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal)
+        return yahooNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal)
 //        return (valueArray, errors)
     }
 
@@ -286,6 +286,49 @@ class WebpageScraper {
         
         var valueArray = [Double]()
         var errors = [String]()
+        let numberTerminal = numberTerminal ?? "</span>"
+        let numberStarter = ">"
+        var tableText = table$
+        
+        var labelEndIndex = tableText.range(of: numberTerminal, options: .backwards, range: nil, locale: nil)
+        if let index = labelEndIndex {
+            tableText.removeSubrange(index.lowerBound...)
+        }
+
+//        print("row text:")
+//        print(tableText)
+        repeat {
+            guard let labelStartIndex = tableText.range(of: numberStarter, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil) else {
+                let error = "Did not find number start in \(rowTitle) on webpage"
+                if !errors.contains(error) {
+                    errors.append(error)
+                }
+                continue
+            }
+            
+            let value$ = tableText[labelStartIndex.upperBound...]
+//            print("value$ extracted: \(value$)")
+            let value = numberFromText(value$: String(value$), rowTitle: rowTitle, exponent: exponent)
+            valueArray.append(value)
+            
+            
+            labelEndIndex = tableText.range(of: numberTerminal, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil)
+            if let index = labelEndIndex {
+                tableText.removeSubrange(index.lowerBound...)
+            }
+
+        } while labelEndIndex != nil && (tableText.count > 1)
+
+//        print("values extracted: \(valueArray)")
+//        print("======================================="
+//        )
+        return (valueArray, errors)
+    }
+    
+    class func yahooNumbersExtraction(table$: String, rowTitle: String, numberTerminal: String?=nil, exponent: Double?=nil) -> ([Double], [String]) {
+        
+        var valueArray = [Double]()
+        var errors = [String]()
         let numberTerminal = numberTerminal ?? ","
         let numberStarter = ":"
         var tableText = table$
@@ -324,6 +367,7 @@ class WebpageScraper {
 //        )
         return (valueArray, errors)
     }
+
     
     class func yahooRowStringExtraction(table$: String, rowTitle: String, textTerminal: String?=nil) -> ([String], [String]) {
         
