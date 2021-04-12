@@ -35,6 +35,7 @@ class StocksController: NSFetchedResultsController<Share> {
     lazy var yahooRefDate: Date = getYahooRefDate()
     var downloadErrors = [String]()
     var webDownLoader: WebDataDownloader?
+    var sortParameter = UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as! String
             
     //Mark:- shares price update functions
     
@@ -179,14 +180,7 @@ class StocksController: NSFetchedResultsController<Share> {
         newShare.downloadProfile(delegate: nil)
         return newShare
     }
-    
-//    func getCompanyProfile(share: Share) {
-//
-//        webDownLoader = WebDataDownloader(stock: share, delegate: self)
-//        webDownLoader?.yahooDownload(pageTitles: ["profile"])
-//
-//    }
-    
+        
     static func removeFile(_ atURL: URL?) {
        
         guard atURL != nil else {
@@ -206,43 +200,6 @@ class StocksController: NSFetchedResultsController<Share> {
 
 extension StocksController: StockKeyratioDownloadDelegate, StockDelegate {
     
-//    func downloadComplete(html$: String?, pageTitle: String?, share: Share?) {
-//
-//        guard html$ != nil else {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "profile download failure, html string is empty")
-//            return
-//        }
-//
-//        guard let section = pageTitle else {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "profile download failure - notification did not contain section info!!")
-//            return
-//        }
-//
-//        guard let validShare = share else {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "profile download failure - notification did not contain share object")
-//            return
-//        }
-//
-//        var textResult:(array: [String]?, errors: [String])
-//        var numberResult:(array: [Double]?, errors: [String])
-//
-//        if section == "profile" {
-//            textResult = WebpageScraper.scrapeRowForText(website: .yahoo, html$: html$, sectionHeader: nil, rowTitle: "Sector(s)")
-//            downloadErrors.append(contentsOf: textResult.errors)
-//            validShare.sector = textResult.array?.first
-//
-//            textResult = WebpageScraper.scrapeRowForText(website: .yahoo, html$: html$, sectionHeader: nil, rowTitle: "Industry")
-//            downloadErrors.append(contentsOf: textResult.errors)
-//            validShare.industry = textResult.array?.first
-//
-//            numberResult = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: nil, rowTitle: "Full-time employees")
-//            downloadErrors.append(contentsOf: numberResult.errors)
-//            validShare.employees = numberResult.array?.first ?? Double()
-//        }
-//
-//        webDownLoader?.delegate = nil
-//        webDownLoader = nil
-//    }
         
     func priceUpdateComplete(symbol: String) {
         

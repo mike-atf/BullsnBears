@@ -29,6 +29,11 @@ public class Share: NSManagedObject {
         if industry == nil {
             industry = "Unknown"
         }
+        
+        if sector == nil {
+            sector = "Unknown"
+        }
+
     }
     
    func save() {

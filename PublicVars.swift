@@ -14,6 +14,7 @@ var errorLog: [ErrorLog]?
 let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
 let gradientBar = UIImage(named: "GradientBar")
 let userDefaultTerms = UserDefaultTerms()
+let sharesListSortParameter = SharesListSortParameter()
 
 var stockTickerDictionary: [String:String]? = {
         
@@ -211,7 +212,33 @@ struct UserDefaultTerms {
     let perpetualGrowthRate = "PerpetualGrowthRate"
     let longTermMarketReturn = "LongTermMarketReturn"
     let emaPeriodAnnualData = "emaPeriodAnnualData"
+    let sortParameter = "sortParameter"
 }
+
+struct SharesListSortParameter {
+    
+    let userRatingScore = "userEvaluationScore"
+    let financialsScore = "valueScore"
+    let industry = "industry"
+    let sector = "sector"
+    let symbol = "symbol"
+    let watchStatus = "watchStatus"
+    
+    func options() -> [String] {
+        
+        var properties = [String]()
+        
+        let mirror = Mirror(reflecting: self)
+        
+        for child in mirror.children {
+            if let label = child.value as? String {
+            properties.append(label)
+            }
+        }
+        return properties
+    }
+}
+
 
 let currencyFormatterGapNoPence: NumberFormatter = {
     let formatter = NumberFormatter()

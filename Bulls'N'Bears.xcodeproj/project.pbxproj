@@ -13,6 +13,9 @@
 		EA06251A25D07A230015FA6E /* DownloadProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA06251925D07A230015FA6E /* DownloadProgressView.swift */; };
 		EA06251B25D07A230015FA6E /* DownloadProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA06251925D07A230015FA6E /* DownloadProgressView.swift */; };
 		EA06251C25D07A230015FA6E /* DownloadProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA06251925D07A230015FA6E /* DownloadProgressView.swift */; };
+		EA0E2F1B2624E4AA00602BEE /* SortSelectorTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0E2F1A2624E4AA00602BEE /* SortSelectorTVC.swift */; };
+		EA0E2F1C2624E4AA00602BEE /* SortSelectorTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0E2F1A2624E4AA00602BEE /* SortSelectorTVC.swift */; };
+		EA0E2F1D2624E4AA00602BEE /* SortSelectorTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0E2F1A2624E4AA00602BEE /* SortSelectorTVC.swift */; };
 		EA163F77258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA163F78258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA163F79258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
@@ -218,6 +221,7 @@
 /* Begin PBXFileReference section */
 		EA06251225D079310015FA6E /* DownloadProgressView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DownloadProgressView.xib; sourceTree = SOURCE_ROOT; };
 		EA06251925D07A230015FA6E /* DownloadProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadProgressView.swift; sourceTree = "<group>"; };
+		EA0E2F1A2624E4AA00602BEE /* SortSelectorTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortSelectorTVC.swift; sourceTree = SOURCE_ROOT; };
 		EA163F76258BA85E000974AB /* StockTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockTrend.swift; sourceTree = "<group>"; };
 		EA1F86D625DC247C006791BD /* WBValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBValuationController.swift; sourceTree = "<group>"; };
 		EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCircle.swift; sourceTree = "<group>"; };
@@ -506,6 +510,7 @@
 		EAFD825025A4D2D800D27566 /* Main Display Files */ = {
 			isa = PBXGroup;
 			children = (
+				EA0E2F1A2624E4AA00602BEE /* SortSelectorTVC.swift */,
 				EA3DF0C8260B8C5A001A0098 /* BuySellView.swift */,
 				EA805DC425D54D4E00720E68 /* StockSearchTVC.swift */,
 				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
@@ -758,6 +763,7 @@
 				EA32082825EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift in Sources */,
 				EAF5D73225AE1A8000E7A681 /* CombinedValuationController.swift in Sources */,
 				EA39A44725C5BF5300DE0FF9 /* R1WebDataAnalyser.swift in Sources */,
+				EA0E2F1B2624E4AA00602BEE /* SortSelectorTVC.swift in Sources */,
 				EA32080B25EED93A00A6A6AB /* UserEvaluation+CoreDataProperties.swift in Sources */,
 				EAA69FBD261222AF0067EE1A /* ResearchCell.swift in Sources */,
 				EA3207F125EEA13200A6A6AB /* ValueListRatingCell.swift in Sources */,
@@ -826,6 +832,7 @@
 				EAC2FC7C25A240290060F387 /* ValuationListViewController.swift in Sources */,
 				EAFCB97E25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
 				EAC2FC4025A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
+				EA0E2F1C2624E4AA00602BEE /* SortSelectorTVC.swift in Sources */,
 				EAA69F9626121CA30067EE1A /* StockResearch+CoreDataProperties.swift in Sources */,
 				EA6AACE026053294002DE9DF /* MACD_View.swift in Sources */,
 				EAC0F15C25FA819E00AD9E29 /* Share+CoreDataClass.swift in Sources */,
@@ -873,6 +880,7 @@
 				EAC2FC7D25A240290060F387 /* ValuationListViewController.swift in Sources */,
 				EAFCB97F25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
 				EAC2FC4125A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
+				EA0E2F1D2624E4AA00602BEE /* SortSelectorTVC.swift in Sources */,
 				EAA69F9726121CA30067EE1A /* StockResearch+CoreDataProperties.swift in Sources */,
 				EA6AACE126053294002DE9DF /* MACD_View.swift in Sources */,
 				EAC0F15D25FA819E00AD9E29 /* Share+CoreDataClass.swift in Sources */,

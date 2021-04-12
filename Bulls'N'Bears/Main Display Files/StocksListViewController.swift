@@ -8,21 +8,35 @@
 import UIKit
 import CoreData
 
-//protocol StocksListDelegate: NSObject {
-//    func showValueListChart(array: [Double]?)
-//    func removeValueListChart()
-//}
-
 class StocksListViewController: UITableViewController {
     
     @IBOutlet var addButton: UIBarButtonItem!
     @IBOutlet var downloadButton: UIBarButtonItem!
+    @IBOutlet var sortParameter: UILabel!
     
     var controller: StocksController = {
         let request = NSFetchRequest<Share>(entityName: "Share")
-        request.sortDescriptors = [ NSSortDescriptor(key: "watchStatus", ascending: true), NSSortDescriptor(key: "userEvaluationScore", ascending: false), NSSortDescriptor(key: "valueScore", ascending: false),NSSortDescriptor(key: "symbol", ascending: true)]
+        let sortParameter = (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore"
+        var secondSortParameter = sharesListSortParameter.userRatingScore
+        if sortParameter == sharesListSortParameter.userRatingScore {
+            secondSortParameter = sharesListSortParameter.financialsScore
+        }
+
+        request.sortDescriptors = [ NSSortDescriptor(key: sortParameter, ascending: false), NSSortDescriptor(key: secondSortParameter, ascending: false), NSSortDescriptor(key: "symbol", ascending: true)]
         
-        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "watchStatus", cacheName: nil)
+        var sectionKeyPath: String?
+        switch sortParameter {
+        case "watchStatus":
+            sectionKeyPath = sortParameter
+        case "industry":
+            sectionKeyPath = sortParameter
+        case "sector":
+            sectionKeyPath = sortParameter
+        default:
+            sectionKeyPath = sharesListSortParameter.watchStatus
+        }
+        
+        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: sectionKeyPath, cacheName: nil)
         
         do {
             try sL.performFetch()
@@ -45,6 +59,8 @@ class StocksListViewController: UITableViewController {
                 
         controller.delegate = self
         controller.pricesUpdateDelegate = self
+        
+        sortParameter.text = controller.sortParameter
         
         updateShares()
         if controller.fetchedObjects?.count ?? 0 > 0 {
@@ -182,7 +198,14 @@ class StocksListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return ["Watch list", "Owned", "Archived"][section]
+        if let sectionInfo = controller.sections?[section] {
+            if sectionInfo.name == "0" || sectionInfo.name == "1" {
+                return ["Watch list", "Owned"][section]
+            }
+            else { return sectionInfo.name }
+        }
+        else { return nil }
+//        return ["Watch list", "Owned", "Archived"][section]
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -270,9 +293,6 @@ class StocksListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-//        guard let wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC else { return }
-
-
         DispatchQueue.main.async {
             self.wbValuationView?.share = self.controller.object(at: indexPath)
             self.wbValuationView?.fromIndexPath = indexPath
@@ -297,6 +317,24 @@ class StocksListViewController: UITableViewController {
         navigationController?.pushViewController(entryView, animated: true)
     }
 
+    @IBAction func sortAction(_ sender: UIButton) {
+        
+        let sortSelector = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SortSelectorTVC") as! SortSelectorTVC
+        
+
+        sortSelector.modalPresentationStyle = .popover
+        sortSelector.preferredContentSize = CGSize(width: self.view.frame.width * 0.5, height: 250)
+            
+        let popUpController = sortSelector.popoverPresentationController
+        popUpController!.permittedArrowDirections = .up
+        popUpController!.sourceView = sender
+        popUpController?.sourceRect = sender.frame
+        popUpController!.delegate = self
+        
+        present(sortSelector, animated: true, completion: nil)
+
+    }
+    
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -319,6 +357,56 @@ class StocksListViewController: UITableViewController {
             }
         }
     }
+
+}
+
+extension StocksListViewController: UIPopoverPresentationControllerDelegate {
+    
+        
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return UIModalPresentationStyle.none
+    }
+    
+    func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
+        
+        let sortParameter = (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore"
+        self.sortParameter.text = sortParameter
+        var secondSortParameter = sharesListSortParameter.userRatingScore
+        if sortParameter == sharesListSortParameter.userRatingScore {
+            secondSortParameter = sharesListSortParameter.financialsScore
+        }
+        
+        let newController: StocksController = {
+            let request = NSFetchRequest<Share>(entityName: "Share")
+            request.sortDescriptors = [NSSortDescriptor(key: sortParameter, ascending: false), NSSortDescriptor(key: secondSortParameter, ascending: false), NSSortDescriptor(key: "symbol", ascending: true)]
+            
+            var sectionKeyPath: String?
+            switch sortParameter {
+            case "watchStatus":
+                sectionKeyPath = sortParameter
+            case "industry":
+                sectionKeyPath = sortParameter
+            case "sector":
+                sectionKeyPath = sortParameter
+            default:
+                sectionKeyPath = sharesListSortParameter.watchStatus
+            }
+
+            let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: sectionKeyPath, cacheName: nil)
+            
+            do {
+                try sL.performFetch()
+            } catch let error as NSError {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
+            }
+            return sL
+        }()
+        
+        controller = newController
+        tableView.reloadData()
+        
+    }
+
 
 }
 
