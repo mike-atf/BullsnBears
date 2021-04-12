@@ -113,8 +113,8 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         let height: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 90 : 50
         header.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: height)
         
-        let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 22 : 20
-        let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 16 : 12
+        let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 18 : 18
+        let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 15 : 12
         
         let titleLabel: UILabel = {
             let label = UILabel()
