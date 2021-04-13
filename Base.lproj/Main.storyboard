@@ -347,11 +347,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <view key="tableHeaderView" contentMode="scaleToFill" id="4ok-yc-Dap">
-                            <rect key="frame" x="0.0" y="0.0" width="420" height="30"/>
+                            <rect key="frame" x="0.0" y="0.0" width="420" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eMe-q8-JvV">
-                                    <rect key="frame" x="112" y="3" width="26" height="24"/>
+                                    <rect key="frame" x="112" y="7" width="28" height="26"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="eMe-q8-JvV" secondAttribute="height" multiplier="1:1" id="RHM-it-Bbq"/>
                                     </constraints>
@@ -361,26 +361,26 @@
                                     </connections>
                                 </button>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eKA-o4-zlZ">
-                                    <rect key="frame" x="146" y="4.5" width="42" height="21"/>
-                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <rect key="frame" x="148" y="10" width="43.5" height="20.5"/>
+                                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                             </subviews>
                             <viewLayoutGuide key="safeArea" id="oNK-y7-H3P"/>
-                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <color key="backgroundColor" systemColor="systemGray5Color"/>
                             <constraints>
                                 <constraint firstItem="eKA-o4-zlZ" firstAttribute="centerY" secondItem="oNK-y7-H3P" secondAttribute="centerY" id="5AB-rT-Z9z"/>
                                 <constraint firstItem="eKA-o4-zlZ" firstAttribute="leading" secondItem="eMe-q8-JvV" secondAttribute="trailing" constant="8" symbolic="YES" id="I3a-8u-e0t"/>
                                 <constraint firstItem="oNK-y7-H3P" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="eKA-o4-zlZ" secondAttribute="trailing" constant="10" id="XkK-Rd-bg3"/>
-                                <constraint firstItem="oNK-y7-H3P" firstAttribute="bottom" secondItem="eMe-q8-JvV" secondAttribute="bottom" constant="2" id="aHV-u0-cQD"/>
+                                <constraint firstItem="oNK-y7-H3P" firstAttribute="bottom" secondItem="eMe-q8-JvV" secondAttribute="bottom" constant="6" id="aHV-u0-cQD"/>
                                 <constraint firstItem="eMe-q8-JvV" firstAttribute="leading" secondItem="oNK-y7-H3P" secondAttribute="leading" constant="12" id="pVY-uO-E8y"/>
-                                <constraint firstItem="eMe-q8-JvV" firstAttribute="top" secondItem="oNK-y7-H3P" secondAttribute="top" constant="2" id="yHA-4j-3mG"/>
+                                <constraint firstItem="eMe-q8-JvV" firstAttribute="top" secondItem="oNK-y7-H3P" secondAttribute="top" constant="6" id="yHA-4j-3mG"/>
                             </constraints>
                         </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="stockListCell" id="cg2-P5-XAy" customClass="StockListCellTableViewCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="58" width="420" height="43.5"/>
+                                <rect key="frame" x="0.0" y="68" width="420" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cg2-P5-XAy" id="kvh-gM-G2b">
                                     <rect key="frame" x="100" y="0.0" width="320" height="43.5"/>
@@ -917,6 +917,9 @@
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray5Color">
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
             <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

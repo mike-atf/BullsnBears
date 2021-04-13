@@ -60,7 +60,7 @@ class StocksListViewController: UITableViewController {
         controller.delegate = self
         controller.pricesUpdateDelegate = self
         
-        sortParameter.text = controller.sortParameter
+        sortParameter.text = "Sorted by " + controller.sortParameter
         
         updateShares()
         if controller.fetchedObjects?.count ?? 0 > 0 {
@@ -370,7 +370,7 @@ extension StocksListViewController: UIPopoverPresentationControllerDelegate {
     func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
         
         let sortParameter = (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore"
-        self.sortParameter.text = sortParameter
+        self.sortParameter.text = "Sorted by " + sortParameter
         var secondSortParameter = sharesListSortParameter.userRatingScore
         if sortParameter == sharesListSortParameter.userRatingScore {
             secondSortParameter = sharesListSortParameter.financialsScore
@@ -399,6 +399,7 @@ extension StocksListViewController: UIPopoverPresentationControllerDelegate {
             } catch let error as NSError {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
             }
+            sL.delegate = self
             return sL
         }()
         
