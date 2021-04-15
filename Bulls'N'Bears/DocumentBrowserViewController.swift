@@ -10,7 +10,7 @@ import UIKit
 
 class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate {
     
-    var stockListVC: StocksListViewController?
+    var stockListVC: StocksListTVC?
     
     override func viewDidLoad() {
         super.viewDidLoad()

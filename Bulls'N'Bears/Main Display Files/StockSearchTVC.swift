@@ -10,7 +10,7 @@ import UIKit
 class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResultsUpdating, UISearchControllerDelegate {
     
     var searchController: UISearchController?
-    weak var callingVC: StocksListViewController!
+    weak var callingVC: StocksListTVC!
     
     var stocksDictionary = Array<(key:String, value:String)>() // [String:String]()
     

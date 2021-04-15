@@ -9,7 +9,7 @@ import UIKit
 
 class MasterSplitView: UISplitViewController, UISplitViewControllerDelegate {
     
-    var listView: StocksListViewController?
+    var listView: StocksListTVC?
     var detailView: StockChartVC?
 
     override func viewDidLoad() {
@@ -25,7 +25,7 @@ class MasterSplitView: UISplitViewController, UISplitViewControllerDelegate {
 
         
         for vc in viewControllers {
-            if let lv = vc as? StocksListViewController {
+            if let lv = vc as? StocksListTVC {
                 listView = lv
             }
             else if let dv = vc as? StockChartVC {

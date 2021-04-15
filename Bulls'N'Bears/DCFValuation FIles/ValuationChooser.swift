@@ -14,7 +14,7 @@ class ValuationChooser: UIViewController {
     @IBOutlet weak var rule1Button: UIButton!
 
     var stock: Share!
-    weak var rootView: StocksListViewController?
+    weak var rootView: StocksListTVC?
     var sourceCellPath: IndexPath!
     
     override func viewDidLoad() {

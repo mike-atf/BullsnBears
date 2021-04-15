@@ -1,42 +1,58 @@
 //
-//  StocksListViewController.swift
-//  TrendMyStocks
+//  StocksListTVC.swift
+//  Bulls'N'Bears
 //
-//  Created by aDav on 01/12/2020.
+//  Created by aDav on 13/04/2021.
 //
 
 import UIKit
 import CoreData
-/*
-class StocksListViewController: UITableViewController {
+
+class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    @IBOutlet var addButton: UIBarButtonItem!
+    
+    @IBOutlet var tableView: UITableView!
     @IBOutlet var downloadButton: UIBarButtonItem!
-    @IBOutlet var sortParameter: UILabel!
+    @IBOutlet var sortView: SortView!
     
-    var controller: StocksController = {
-        let request = NSFetchRequest<Share>(entityName: "Share")
-        let sortParameter = (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore"
-        var secondSortParameter = sharesListSortParameter.userRatingScore
-        if sortParameter == sharesListSortParameter.userRatingScore {
-            secondSortParameter = sharesListSortParameter.financialsScore
+    lazy var controller: StocksController = {
+        
+        // how to sort:
+        // default: 1. watchStatus, 2 user evaluation
+        // same for valueScore, symbol
+        // for industry and sector don't use watchStatus
+
+        var firstSortParameter = String()
+        var secondSortParameter = String()
+        var thirdSortParameter = String()
+        
+        let userSortChoice = (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore"
+        if [sharesListSortParameter.industry, sharesListSortParameter.sector].contains(userSortChoice) {
+            firstSortParameter = userSortChoice
+            secondSortParameter = sharesListSortParameter.userEvaluationScore
+            thirdSortParameter = sharesListSortParameter.valueScore
+        }
+        else if userSortChoice == sharesListSortParameter.userEvaluationScore {
+            firstSortParameter = "watchStatus"
+            secondSortParameter = userSortChoice
+            thirdSortParameter = sharesListSortParameter.valueScore
+        }
+        else if userSortChoice == sharesListSortParameter.valueScore {
+            firstSortParameter = "watchStatus"
+            secondSortParameter = userSortChoice
+            thirdSortParameter = sharesListSortParameter.userEvaluationScore
+        }
+        else if userSortChoice == sharesListSortParameter.symbol {
+            firstSortParameter = "watchStatus"
+            secondSortParameter = userSortChoice
+            thirdSortParameter = sharesListSortParameter.userEvaluationScore
         }
 
-        request.sortDescriptors = [ NSSortDescriptor(key: sortParameter, ascending: false), NSSortDescriptor(key: secondSortParameter, ascending: false), NSSortDescriptor(key: "symbol", ascending: true)]
+        let request = NSFetchRequest<Share>(entityName: "Share")
+
+        request.sortDescriptors = [ NSSortDescriptor(key: firstSortParameter, ascending: false), NSSortDescriptor(key: secondSortParameter, ascending: false), NSSortDescriptor(key: thirdSortParameter, ascending: true)]
         
-        var sectionKeyPath: String?
-        switch sortParameter {
-        case "watchStatus":
-            sectionKeyPath = sortParameter
-        case "industry":
-            sectionKeyPath = sortParameter
-        case "sector":
-            sectionKeyPath = sortParameter
-        default:
-            sectionKeyPath = sharesListSortParameter.watchStatus
-        }
-        
-        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: sectionKeyPath, cacheName: nil)
+        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: firstSortParameter, cacheName: nil)
         
         do {
             try sL.performFetch()
@@ -58,9 +74,7 @@ class StocksListViewController: UITableViewController {
                 
         controller.delegate = self
         controller.pricesUpdateDelegate = self
-        
-        sortParameter.text = "Sorted by " + controller.sortParameter
-        
+                
         updateShares()
         if controller.fetchedObjects?.count ?? 0 > 0 {
             tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
@@ -69,7 +83,13 @@ class StocksListViewController: UITableViewController {
         else {
             showWelcomeView()
         }
+        
+        sortView.delegate = self
+        sortView.label?.text = "Sorted by " + ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore")
+
     }
+    
+    // MARK: - ViewController functions
     
     override func viewWillDisappear(_ animated: Bool) {
         
@@ -83,7 +103,7 @@ class StocksListViewController: UITableViewController {
         do {
             try controller.performFetch()
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Error updating Sstocks list")
+            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Error updating Stocks list")
         }
         
         tableView.reloadData()
@@ -105,19 +125,7 @@ class StocksListViewController: UITableViewController {
         // returns to 'updateStocksComplete()' once complete
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    @IBAction func addButtonAction(_ sender: Any) {
-        
-        if let docBrowser = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DocBrowserView") as? DocumentBrowserViewController {
-
-            docBrowser.stockListVC = self
-            self.present(docBrowser, animated: true)
-            
-        }
-    }
+    // MARK: - Shares functions
     
     func showWelcomeView() {
         
@@ -183,31 +191,39 @@ class StocksListViewController: UITableViewController {
             ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from file \(fileURL)")
        }
     }
-    
-    // MARK: - Table view data source
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    
+    // MARK: - TableView functions
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
         
         return controller.sections?.count ?? 0
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return controller.sections?[section].numberOfObjects ?? 0
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 75
+    }
+
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        
         if let sectionInfo = controller.sections?[section] {
-            if sectionInfo.name == "0" || sectionInfo.name == "1" {
-                return ["Watch list", "Owned"][section]
+            if sectionInfo.name == "0"  {
+                return "Watch list"
+            }
+            else if sectionInfo.name == "1" {
+                return "Owned"
             }
             else { return sectionInfo.name }
         }
         else { return nil }
-//        return ["Watch list", "Owned", "Archived"][section]
     }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
@@ -224,8 +240,8 @@ class StocksListViewController: UITableViewController {
         
         return cell
     }
-
-    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete")
@@ -241,8 +257,8 @@ class StocksListViewController: UITableViewController {
             return swipeActions
 
     }
-    
-    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         let objectOwned = self.controller.object(at: indexPath)
 
@@ -285,12 +301,9 @@ class StocksListViewController: UITableViewController {
             return UISwipeActionsConfiguration(actions: [watchAction, ownAction])
         }
     }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 75
-    }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         DispatchQueue.main.async {
             self.wbValuationView?.share = self.controller.object(at: indexPath)
@@ -305,112 +318,97 @@ class StocksListViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
 
     }
-    
-        
+
+    // MARK: - Navigation
+
+ override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     
+     guard let indexPath = tableView.indexPathForSelectedRow else { return }
+     
+     let share = controller.object(at: indexPath)
+     
+     if let chartView = segue.destination as? StockChartVC {
+             
+         chartView.share = controller.object(at: indexPath)
+         chartView.configure(share: share)
+         
+     }
+     else if let navView = segue.destination as? UINavigationController {
+         if let chartView = navView.topViewController as? StockChartVC {
+                 
+             chartView.share = controller.object(at: indexPath)
+             chartView.configure(share: share)
+         }
+     }
+ }
+
     @IBAction func downloadAction(_ sender: Any) {
         
         guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSearchTVC") as? StockSearchTVC else { return }
 
-//        entryView.callingVC = self
+        entryView.callingVC = self
         
         navigationController?.pushViewController(entryView, animated: true)
     }
 
-    @IBAction func sortAction(_ sender: UIButton) {
-        
-        let sortSelector = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SortSelectorTVC") as! SortSelectorTVC
-        
-
-        sortSelector.modalPresentationStyle = .popover
-        sortSelector.preferredContentSize = CGSize(width: self.view.frame.width * 0.5, height: 250)
-            
-        let popUpController = sortSelector.popoverPresentationController
-        popUpController!.permittedArrowDirections = .up
-        popUpController!.sourceView = sender
-        popUpController?.sourceRect = sender.frame
-        popUpController!.delegate = self
-        
-        present(sortSelector, animated: true, completion: nil)
-
-    }
-    
-    // MARK: - Navigation
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        guard let indexPath = tableView.indexPathForSelectedRow else { return }
-        
-        let share = controller.object(at: indexPath)
-        
-        if let chartView = segue.destination as? StockChartVC {
-                
-            chartView.share = controller.object(at: indexPath)
-            chartView.configure(share: share)
-            
-        }
-        else if let navView = segue.destination as? UINavigationController {
-            if let chartView = navView.topViewController as? StockChartVC {
-                    
-                chartView.share = controller.object(at: indexPath)
-                chartView.configure(share: share)
-            }
-        }
-    }
-
 }
 
-extension StocksListViewController: UIPopoverPresentationControllerDelegate {
+extension StocksListTVC: SortDelegate {
     
+    func sortParameterChanged() {
         
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-        return UIModalPresentationStyle.none
-    }
-    
-    func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
-        
-        let sortParameter = (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore"
-        self.sortParameter.text = "Sorted by " + sortParameter
-        var secondSortParameter = sharesListSortParameter.userRatingScore
-        if sortParameter == sharesListSortParameter.userRatingScore {
-            secondSortParameter = sharesListSortParameter.financialsScore
-        }
         
         let newController: StocksController = {
-            let request = NSFetchRequest<Share>(entityName: "Share")
-            request.sortDescriptors = [NSSortDescriptor(key: sortParameter, ascending: false), NSSortDescriptor(key: secondSortParameter, ascending: false), NSSortDescriptor(key: "symbol", ascending: true)]
             
-            var sectionKeyPath: String?
-            switch sortParameter {
-            case "watchStatus":
-                sectionKeyPath = sortParameter
-            case "industry":
-                sectionKeyPath = sortParameter
-            case "sector":
-                sectionKeyPath = sortParameter
-            default:
-                sectionKeyPath = sharesListSortParameter.watchStatus
+            var firstSortParameter = String()
+            var secondSortParameter = String()
+            var thirdSortParameter = String()
+            
+            let userSortChoice = (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore"
+            if [sharesListSortParameter.industry, sharesListSortParameter.sector].contains(userSortChoice) {
+                firstSortParameter = userSortChoice
+                secondSortParameter = sharesListSortParameter.userEvaluationScore
+                thirdSortParameter = sharesListSortParameter.valueScore
+            }
+            else if userSortChoice == sharesListSortParameter.userEvaluationScore {
+                firstSortParameter = "watchStatus"
+                secondSortParameter = userSortChoice
+                thirdSortParameter = sharesListSortParameter.valueScore
+            }
+            else if userSortChoice == sharesListSortParameter.valueScore {
+                firstSortParameter = "watchStatus"
+                secondSortParameter = userSortChoice
+                thirdSortParameter = sharesListSortParameter.userEvaluationScore
+            }
+            else if userSortChoice == sharesListSortParameter.symbol {
+                firstSortParameter = "watchStatus"
+                secondSortParameter = userSortChoice
+                thirdSortParameter = sharesListSortParameter.userEvaluationScore
             }
 
-            let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: sectionKeyPath, cacheName: nil)
+            let request = NSFetchRequest<Share>(entityName: "Share")
+
+            request.sortDescriptors = [ NSSortDescriptor(key: firstSortParameter, ascending: false), NSSortDescriptor(key: secondSortParameter, ascending: false), NSSortDescriptor(key: thirdSortParameter, ascending: true)]
+
+            let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: firstSortParameter, cacheName: nil)
             
             do {
                 try sL.performFetch()
             } catch let error as NSError {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
             }
-            sL.delegate = self
+
             return sL
         }()
         
         controller = newController
+        controller.delegate = self
         tableView.reloadData()
-        
     }
-
-
+    
 }
 
-extension StocksListViewController: StocksControllerDelegate, ScoreCircleDelegate {
+extension StocksListTVC: StocksControllerDelegate, ScoreCircleDelegate {
     
     func tap(indexPath: IndexPath, isUserScoreType: Bool, sender: UIView) {
         
@@ -453,7 +451,8 @@ extension StocksListViewController: StocksControllerDelegate, ScoreCircleDelegat
         
 }
 
-extension StocksListViewController: NSFetchedResultsControllerDelegate {
+
+extension StocksListTVC: NSFetchedResultsControllerDelegate {
 
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
@@ -501,4 +500,4 @@ extension StocksListViewController: NSFetchedResultsControllerDelegate {
     }
     
 }
-*/
+

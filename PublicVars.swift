@@ -217,12 +217,11 @@ struct UserDefaultTerms {
 
 struct SharesListSortParameter {
     
-    let userRatingScore = "userEvaluationScore"
-    let financialsScore = "valueScore"
+    let userEvaluationScore = "userEvaluationScore"
+    let valueScore = "valueScore"
     let industry = "industry"
     let sector = "sector"
     let symbol = "symbol"
-    let watchStatus = "watchStatus"
     
     func options() -> [String] {
         
