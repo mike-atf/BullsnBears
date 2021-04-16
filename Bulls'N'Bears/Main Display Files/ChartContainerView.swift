@@ -17,8 +17,10 @@ class ChartContainerView: UIView {
 
     var shareToShow: Share?
     @IBOutlet var titleLabel: UILabel!
+    @IBOutlet var chartsContentView: UIView!
+    @IBOutlet var chartsContentViewWidth: NSLayoutConstraint!
     @IBOutlet var scrollView: UIScrollView!
-    @IBOutlet var contentView: ChartView!
+    @IBOutlet var chartView: ChartView!
     @IBOutlet var macdView: MACD_View!
     @IBOutlet var stochOscView: StochastikOscillatorView!
     
@@ -38,6 +40,18 @@ class ChartContainerView: UIView {
     }()
     
     var buttonDelegate: ChartButtonDelegate?
+    var zoomFactor: CGFloat!
+    var contentOffsetFromRight : CGFloat {
+        set {
+            self.scrollView.isScrollEnabled = false
+            self.scrollView.setContentOffset(CGPoint(x: self.scrollView.contentSize.width - self.scrollView.frame.width, y: 0), animated: false)
+            self.scrollView.isScrollEnabled = true
+        }
+        get {
+            return self.scrollView.contentSize.width - self.scrollView.frame.width - self.scrollView.contentOffset.x
+        }
+    }
+ 
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -70,7 +84,7 @@ class ChartContainerView: UIView {
             validLabel.text = shareToShow?.name_long
         }
         
-        if let view = contentView {
+        if let view = chartView {
             view.configure(stock: with)
         }
         
@@ -83,12 +97,20 @@ class ChartContainerView: UIView {
         }
 
         if let scroll = scrollView {
-            scroll.contentSize = contentView.bounds.size
+//            scroll.delegate = self
+            scroll.minimumZoomScale = 0.2
+            scroll.maximumZoomScale = 2.0
+            scroll.zoomScale = 1.0
+            scroll.pinchGestureRecognizer?.addTarget(self, action: #selector(customZoom(pinchGesture:)))
+
+            scroll.contentSize = chartView.bounds.size
             let offset = scroll.contentSize.width
             scroll.setContentOffset(CGPoint(x: offset, y: 0), animated: false)
-            buttonDelegate = contentView
+            buttonDelegate = chartView
             buttonDelegate?.timeButtons = [button4, button5, button6]
             buttonDelegate?.typeButtons = [button1, button2, button3]
+            
+            zoomFactor = 1.0
         }
         
     }
@@ -98,5 +120,29 @@ class ChartContainerView: UIView {
         sender.setNeedsDisplay()
         buttonDelegate?.trendButtonPressed(button: sender)
     }
+    
+    @objc
+    func customZoom(pinchGesture: UIPinchGestureRecognizer) {
+        
+        let currentWidth = chartsContentViewWidth.constant
+        let change = (pinchGesture.scale > 1.0) ? currentWidth * 0.025 : currentWidth * -0.025
+        let newWidth = currentWidth + change
+
+        
+        guard newWidth < 6640 && newWidth > scrollView.bounds.width else {
+            return
+        }
+        
+        chartsContentViewWidth.constant = newWidth
+        chartsContentView.setNeedsDisplay()
+        macdView.setNeedsDisplay()
+        stochOscView.setNeedsDisplay()
+        chartView.setNeedsDisplay()
+//        contentOffsetFromRight = 0.0
+//        self.scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x + change , y: 0.0), animated: true)
+        
+        zoomFactor = change
+    }
+
     
 }

@@ -40,10 +40,17 @@ class StocksController: NSFetchedResultsController<Share> {
     //Mark:- shares price update functions
     
     func updateStockFiles() {
-                        
+        
+        let yRD = getYahooRefDate()
         for share in fetchedObjects ?? [] {
-            if !(share.priceUpdateComplete ?? false) {
-                share.startPriceUpdate(yahooRefDate: yahooRefDate, delegate: self)
+            var sharePriceNeedsUpdate = true
+            if let lastPriceDate = share.getDailyPrices()?.last?.tradingDate {
+                if (Date().timeIntervalSince(lastPriceDate) < 12 * 3600) {
+                    sharePriceNeedsUpdate = false
+                }
+            }
+            if sharePriceNeedsUpdate {
+                share.startPriceUpdate(yahooRefDate: yRD, delegate: self)
                 // returns to 'priceUpdateComplete()' just below via the delegate
             }
             

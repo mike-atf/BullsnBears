@@ -25,8 +25,9 @@ class BuySellView: UIView {
         transactionLabel = {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.font = UIFont.systemFont(ofSize: 17)
+            label.font = UIFont.systemFont(ofSize: 14)
             label.textAlignment = .center
+            label.numberOfLines = 0
             return label
         }()
         
@@ -42,14 +43,18 @@ class BuySellView: UIView {
         addSubview(transactionLabel!)
         addSubview(readinessLabel!)
         
-//        let margins = layoutMarginsGuide
-        
         readinessLabel?.topAnchor.constraint(equalTo: topAnchor).isActive = true
         readinessLabel?.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         
         transactionLabel?.topAnchor.constraint(equalTo: readinessLabel!.bottomAnchor).isActive = true
         transactionLabel?.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         
+    }
+    
+    func resetForReuse() {
+        readyText = String()
+        buySellText = String()
+
     }
 
     
@@ -75,8 +80,8 @@ class BuySellView: UIView {
             if lc0.date < lc1.date { return true }
             else { return false }
         }
-        
         buySellText = indicators.last!.signal > 0 ? "Buy" : "Sell"
+
         let fontColor = indicators.last!.signal > 0 ? UIColor(named: "Green") : UIColor(named: "Red")
         let earlierSignalsSame = indicators[..<2].compactMap{ $0.signalIsBuy() }.filter { (buySignal) -> Bool in
             if buySignal == indicators.last!.signalIsBuy() { return true }
@@ -84,6 +89,14 @@ class BuySellView: UIView {
         }
         
         readyText = earlierSignalsSame.count == 2 ? "Ready to" : "Wait to"
+        
+        if readyText.starts(with: "Ready") {
+            var price$ = String()
+            if let validPrice = indicators.last!.crossingPrice {
+                price$ = currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? ""
+                buySellText += " @\n " + price$
+            }
+        }
         
         readinessLabel?.text = readyText
         transactionLabel?.text = buySellText

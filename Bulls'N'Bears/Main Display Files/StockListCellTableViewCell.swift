@@ -34,6 +34,7 @@ class StockListCellTableViewCell: UITableViewCell {
         self.title.text = " "
         self.detail.text = " "
         self.ratingCircle.isHidden = true
+        actionView.resetForReuse()
         valueCircle.isHidden = true
     }
     

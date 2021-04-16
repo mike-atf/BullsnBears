@@ -117,7 +117,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func updateShares() {
         
         let weekDay = Calendar.current.component(.weekday, from: Date())
-        guard (weekDay > 0 && weekDay < 6) else {
+        guard (weekDay > 0 && weekDay < 7) else {
             return
         }
                 

@@ -86,7 +86,6 @@ class ScoreCircle: UIView {
         else {
             tapGestureRecognizer = nil
         }
-                
     }
     
     override func draw(_ rect: CGRect) {

@@ -239,6 +239,30 @@ public class Share: NSManagedObject {
         if minDate != nil && maxDate != nil { return [minDate!, maxDate!] }
         else { return nil }
     }
+    
+    func priceAtDate(date: Date, priceOption: PricePointOptions) -> Double? {
+        
+        guard let prices = getDailyPrices() else { return nil }
+        
+        let exactDates = prices.filter({ (pricePoint) -> Bool in
+            if pricePoint.tradingDate == date { return true }
+            else { return false }
+        })
+        if let exactDate = exactDates.first {
+            return exactDate.returnPrice(option: priceOption)
+        }
+        
+        else {
+            var previousPrice = prices.first!
+            for i in 1..<prices.count {
+                if prices[i].tradingDate > date {
+                    return (prices[i].returnPrice(option: priceOption) + previousPrice.returnPrice(option: priceOption)) / 2
+                }
+                previousPrice = prices[i]
+            }
+        }
+        return nil
+    }
 
     // MARK: - correlations and trends
     
@@ -822,7 +846,8 @@ public class Share: NSManagedObject {
             
             if latestMCD.histoBar != nil && descendingMCDs[i].histoBar != nil {
                 if (latestMCD.histoBar! * descendingMCDs[i].histoBar!) <= 0 {
-                   crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs[i].histoBar!))
+                    let crossingPrice = priceAtDate(date: latestMCD.date!, priceOption: .close)
+                   crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs[i].histoBar!), crossingPrice: crossingPrice)
                     break
                 }
             }
@@ -874,7 +899,8 @@ public class Share: NSManagedObject {
             if (currentDifference * lastDifference) <= 0 {
                 let timeInBetween = lastOsc.date!.timeIntervalSince(descendingOscillators[i].date!)
                 let dateInBetween = lastOsc.date!.addingTimeInterval(-timeInBetween / 2)
-                crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference))
+                let crossingPrice = priceAtDate(date: dateInBetween, priceOption: .close)
+                crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference), crossingPrice: crossingPrice)
                 break
             }
             lastOsc = descendingOscillators[i]

@@ -53,7 +53,7 @@ class StockChartVC: UIViewController {
     
     override func viewWillLayoutSubviews() {
         
-        chart.contentView.setNeedsDisplay()
+        chart.chartView.setNeedsDisplay()
         chart.macdView.setNeedsDisplay()
     }
     

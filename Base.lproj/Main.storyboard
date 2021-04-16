@@ -144,60 +144,71 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doh-lM-a4B">
                                 <rect key="frame" x="20" y="141.5" width="820" height="658.5"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Dm-Pf-iwX" customClass="StochastikOscillatorView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="98.5" width="3320" height="99"/>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cg7-eQ-58P">
+                                        <rect key="frame" x="0.0" y="0.0" width="3320" height="658.5"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Slow Stoch Osc (5/14)" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="itd-Fz-tR8">
-                                                <rect key="frame" x="3051" y="39" width="169" height="21"/>
-                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                                <nil key="textColor"/>
-                                                <nil key="highlightedColor"/>
-                                            </label>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Dm-Pf-iwX" customClass="StochastikOscillatorView" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="98.5" width="3320" height="99.5"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Slow Stoch Osc (5/14)" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="itd-Fz-tR8">
+                                                        <rect key="frame" x="3051" y="39.5" width="169" height="21"/>
+                                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="trailing" secondItem="itd-Fz-tR8" secondAttribute="trailing" constant="100" id="Fic-63-QG1"/>
+                                                    <constraint firstItem="itd-Fz-tR8" firstAttribute="centerY" secondItem="3Dm-Pf-iwX" secondAttribute="centerY" id="WAc-rw-Wr8"/>
+                                                    <constraint firstItem="itd-Fz-tR8" firstAttribute="centerY" secondItem="3Dm-Pf-iwX" secondAttribute="centerY" id="knU-XM-cCF"/>
+                                                </constraints>
+                                            </view>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uEG-z0-RcJ" customClass="MACD_View" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="3320" height="98.5"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mac D (8/17/9)" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="roV-AV-Ii6">
+                                                        <rect key="frame" x="3108" y="39" width="112" height="20.5"/>
+                                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="trailing" secondItem="roV-AV-Ii6" secondAttribute="trailing" constant="100" id="7zZ-VJ-CfY"/>
+                                                    <constraint firstItem="roV-AV-Ii6" firstAttribute="centerY" secondItem="uEG-z0-RcJ" secondAttribute="centerY" id="QD6-7P-tyz"/>
+                                                </constraints>
+                                            </view>
+                                            <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="198" width="3320" height="460.5"/>
+                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                            </view>
                                         </subviews>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
-                                            <constraint firstAttribute="trailing" secondItem="itd-Fz-tR8" secondAttribute="trailing" constant="100" id="37n-cl-qbj"/>
-                                            <constraint firstItem="itd-Fz-tR8" firstAttribute="centerY" secondItem="3Dm-Pf-iwX" secondAttribute="centerY" id="WAc-rw-Wr8"/>
-                                        </constraints>
-                                    </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uEG-z0-RcJ" customClass="MACD_View" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="3320" height="98.5"/>
-                                        <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mac D (8/17/9)" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="roV-AV-Ii6">
-                                                <rect key="frame" x="3108" y="39" width="112" height="20.5"/>
-                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                                <nil key="textColor"/>
-                                                <nil key="highlightedColor"/>
-                                            </label>
-                                        </subviews>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                        <constraints>
-                                            <constraint firstAttribute="trailing" secondItem="roV-AV-Ii6" secondAttribute="trailing" constant="100" id="7zZ-VJ-CfY"/>
-                                            <constraint firstItem="roV-AV-Ii6" firstAttribute="centerY" secondItem="uEG-z0-RcJ" secondAttribute="centerY" id="yWz-cg-LbN"/>
-                                        </constraints>
-                                    </view>
-                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="197.5" width="3320" height="461"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="3320" id="czG-4M-LQI"/>
+                                            <constraint firstItem="uEG-z0-RcJ" firstAttribute="height" secondItem="Cg7-eQ-58P" secondAttribute="height" multiplier="0.15" id="1mO-vF-Meo"/>
+                                            <constraint firstAttribute="bottom" secondItem="B5Z-ih-tAD" secondAttribute="bottom" id="5F9-4I-9bM"/>
+                                            <constraint firstItem="3Dm-Pf-iwX" firstAttribute="height" secondItem="uEG-z0-RcJ" secondAttribute="height" multiplier="1.00508" id="Gt4-Ct-VXG"/>
+                                            <constraint firstItem="uEG-z0-RcJ" firstAttribute="top" secondItem="Cg7-eQ-58P" secondAttribute="top" id="N0e-b0-BCe"/>
+                                            <constraint firstItem="B5Z-ih-tAD" firstAttribute="top" secondItem="3Dm-Pf-iwX" secondAttribute="bottom" id="PWj-Yz-IVy"/>
+                                            <constraint firstAttribute="trailing" secondItem="uEG-z0-RcJ" secondAttribute="trailing" id="THo-ld-c1F"/>
+                                            <constraint firstItem="3Dm-Pf-iwX" firstAttribute="top" secondItem="uEG-z0-RcJ" secondAttribute="bottom" id="Y0l-62-4dK"/>
+                                            <constraint firstItem="B5Z-ih-tAD" firstAttribute="leading" secondItem="Cg7-eQ-58P" secondAttribute="leading" id="cre-K4-rl7"/>
+                                            <constraint firstAttribute="trailing" secondItem="B5Z-ih-tAD" secondAttribute="trailing" id="du0-rI-hiO"/>
+                                            <constraint firstAttribute="trailing" secondItem="3Dm-Pf-iwX" secondAttribute="trailing" id="tr2-dN-rFF"/>
+                                            <constraint firstAttribute="width" constant="3320" id="vPw-JW-IMX"/>
+                                            <constraint firstItem="uEG-z0-RcJ" firstAttribute="leading" secondItem="Cg7-eQ-58P" secondAttribute="leading" id="w4K-uy-TDc"/>
+                                            <constraint firstItem="3Dm-Pf-iwX" firstAttribute="leading" secondItem="Cg7-eQ-58P" secondAttribute="leading" id="x2Q-ka-K4m"/>
                                         </constraints>
                                     </view>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="3Dm-Pf-iwX" secondAttribute="trailing" id="3PC-4m-NDL"/>
-                                    <constraint firstAttribute="trailing" secondItem="uEG-z0-RcJ" secondAttribute="trailing" id="5lo-Cl-yEr"/>
-                                    <constraint firstItem="uEG-z0-RcJ" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" multiplier="0.15" id="JXK-8x-RFI"/>
-                                    <constraint firstAttribute="trailing" secondItem="B5Z-ih-tAD" secondAttribute="trailing" id="Tx0-im-bCr"/>
-                                    <constraint firstItem="3Dm-Pf-iwX" firstAttribute="top" secondItem="uEG-z0-RcJ" secondAttribute="bottom" id="VG6-0q-vyP"/>
-                                    <constraint firstItem="uEG-z0-RcJ" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="aDV-bS-FfN"/>
-                                    <constraint firstItem="3Dm-Pf-iwX" firstAttribute="height" secondItem="uEG-z0-RcJ" secondAttribute="height" id="dqM-wQ-0ja"/>
-                                    <constraint firstItem="3Dm-Pf-iwX" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="fbP-me-6Fc"/>
-                                    <constraint firstAttribute="bottom" secondItem="B5Z-ih-tAD" secondAttribute="bottom" id="oxk-FQ-HTC"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" multiplier="0.7" id="q13-pk-UIY"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="top" secondItem="3Dm-Pf-iwX" secondAttribute="bottom" id="qxx-cb-QJ0"/>
-                                    <constraint firstItem="B5Z-ih-tAD" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="sdu-Bv-B8A"/>
-                                    <constraint firstItem="uEG-z0-RcJ" firstAttribute="top" secondItem="Doh-lM-a4B" secondAttribute="top" id="wH9-8r-LwT"/>
+                                    <constraint firstItem="Cg7-eQ-58P" firstAttribute="height" secondItem="Doh-lM-a4B" secondAttribute="height" id="9Vn-VZ-DCB"/>
+                                    <constraint firstItem="Cg7-eQ-58P" firstAttribute="top" secondItem="Doh-lM-a4B" secondAttribute="top" id="WOY-47-jCf"/>
+                                    <constraint firstItem="Cg7-eQ-58P" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="leading" id="ZIe-te-WeF"/>
+                                    <constraint firstAttribute="trailing" secondItem="Cg7-eQ-58P" secondAttribute="trailing" id="fOe-21-J5K"/>
+                                    <constraint firstAttribute="bottom" secondItem="Cg7-eQ-58P" secondAttribute="bottom" id="qwf-tY-wz7"/>
                                 </constraints>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="28E-NM-pCT" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
@@ -330,7 +341,9 @@
                             <outlet property="button4" destination="Hrq-ff-sUC" id="VPn-ps-2aL"/>
                             <outlet property="button5" destination="hAd-Vi-f51" id="Jkj-wC-zDZ"/>
                             <outlet property="button6" destination="28E-NM-pCT" id="bgv-RZ-vEb"/>
-                            <outlet property="contentView" destination="B5Z-ih-tAD" id="zk0-qN-Goi"/>
+                            <outlet property="chartView" destination="B5Z-ih-tAD" id="rLP-Zb-1tP"/>
+                            <outlet property="chartsContentView" destination="Cg7-eQ-58P" id="Xx5-Lh-Kmw"/>
+                            <outlet property="chartsContentViewWidth" destination="vPw-JW-IMX" id="u7G-9Y-Lmc"/>
                             <outlet property="macdView" destination="uEG-z0-RcJ" id="Lf2-Td-efC"/>
                             <outlet property="scrollView" destination="Doh-lM-a4B" id="aU4-OR-VFs"/>
                             <outlet property="stochOscView" destination="3Dm-Pf-iwX" id="VPA-6I-VOD"/>

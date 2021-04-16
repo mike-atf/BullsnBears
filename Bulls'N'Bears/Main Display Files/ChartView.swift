@@ -110,10 +110,9 @@ class ChartView: UIView {
         self.setNeedsDisplay()
         
     }
-
+    
     override func draw(_ rect: CGRect) {
                 
-        
 // Y axis
         chartOrigin.x = rect.width * 0
         chartEnd.y = rect.height * 0
@@ -169,7 +168,7 @@ class ChartView: UIView {
             smaLine?.move(to: CGPoint(x: x, y: y))
         }
 
-// candles
+        // MARK: - candles
                 
         dailyPrices?.forEach({ (pricePoint) in
             let boxLeft = chartOrigin.x - (boxWidth * 0.8 / 2) + CGFloat(pricePoint.tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width
@@ -191,7 +190,7 @@ class ChartView: UIView {
             tick.addLine(to: CGPoint(x:-1 + boxLeft + boxWidth / 2, y: lowPoint))
             tick.stroke()
             
-//SMA Line
+            //MARK: - SMA Line
             sma10?.append(pricePoint.close)
             if sma10?.count ?? 0 == 10 {
                 let sma = (sma10?.reduce(0, +))! / 10.0
@@ -201,7 +200,7 @@ class ChartView: UIView {
                 sma10!.removeFirst()
             }
             
-// latest SMA10 crossing
+            //MARK: -  latest SMA10 crossing
             if let crossingPoint = latestSMA10crossing {
                 let latestSMAcrossing = UIBezierPath()
                 let x = chartOrigin.x - (boxWidth * 0.8 / 2) + CGFloat(crossingPoint.date.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width
@@ -219,11 +218,11 @@ class ChartView: UIView {
                     label.textAlignment = .right
                     let text = crossingPoint.signal < 0 ? " :Sell" : " :Buy"
                     let signal$ = numberFormatter.string(from: crossingPoint.signal as NSNumber) ?? "-"
-                    var priceText = " "
-                    if let validPrice = crossingPoint.crossingPrice {
-                        priceText = " @ " + (currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? "-")
-                    }
-                    label.text = " " + dateFormatter.string(from: crossingPoint.date) + text + priceText + " (" + signal$ + ") "
+//                    var priceText = " "
+//                    if let validPrice = crossingPoint.crossingPrice {
+//                        priceText = " @ " + (currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? "-")
+//                    }
+                    label.text = " " + dateFormatter.string(from: crossingPoint.date) + text + " (" + signal$ + ") "
                     label.backgroundColor = crossingPoint.signal < 0 ? UIColor(named: "Red") : UIColor(named: "DarkGreen")
                     label.sizeToFit()
                     self.addSubview(label)
@@ -239,7 +238,7 @@ class ChartView: UIView {
         smaLine?.lineWidth = 1.2
         smaLine?.stroke()
         
-// current price line
+        //MARK: - current price line
         
         if let dailyPrices = share?.getDailyPrices(){
             if let currentPrice = dailyPrices.last?.close {
@@ -256,7 +255,7 @@ class ChartView: UIView {
                 UIColor.label.setStroke()
                 currentPriceLine.stroke()
       
-    // DCF Label
+                //MARK: - DCF Label
                 
                 for label in valuationLabels {
                     label.removeFromSuperview()
@@ -288,7 +287,7 @@ class ChartView: UIView {
                     }
                 }
                 
-    // R1 Label
+    //MARK: - R1 Label
                 // R1 Label
                 if let existingValuation = CombinedValuationController.returnR1Valuations(company: share!.symbol) {
                     let (fairValue,errors) = existingValuation.stickerPrice()
