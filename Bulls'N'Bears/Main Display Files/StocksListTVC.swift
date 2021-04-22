@@ -211,22 +211,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
             }
             
-            //create separate MOC that can be accessed from a background thread such as download tasks
-//            let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-//            backgroundContext.parent = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-//            let request = NSFetchRequest<Share>(entityName:"Share")
-//            let predicate = NSPredicate(format: "symbol == %@", argumentArray: [share.symbol!])
-//            request.predicate = predicate
-//
-//            request.sortDescriptors = [NSSortDescriptor(key:  "symbol" , ascending:  true )]
-//
-//            var shares: [Share]?
-//            do {
-//                shares  =  try backgroundContext.fetch(request)
-//            } catch let error as NSError{
-//                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
-//            }
-
             let placeHolder = SharePlaceHolder(share: share)
             placeHolder.downloadKeyRatios(delegate: controller)
             placeHolder.downloadProfile(delegate: controller)

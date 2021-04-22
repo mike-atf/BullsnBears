@@ -20,18 +20,10 @@ protocol StockDelegate {
     func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String])
 }
 
-/// Share calls this when it wants to inform StocksController or ValueListTVC  that the price update is complete
-/// StocksListVC picks this up from StocksController to add any Error to the centrsal Error log
-/// ValueLIstTVC picks this up to update it's section [0]
-//protocol StockKeyratioDownloadDelegate {
-//    func keyratioDownloadComplete(errors: [String])
-//}
-
 
 class StocksController: NSFetchedResultsController<Share> {
     
     var pricesUpdateDelegate: StocksControllerDelegate?
-//    var keyratioUpdateDelegate: StockKeyratioDownloadDelegate?
     var stockDelegate: StockDelegate?
     lazy var yahooRefDate: Date = getYahooRefDate()
     var downloadErrors = [String]()
@@ -152,10 +144,7 @@ class StocksController: NSFetchedResultsController<Share> {
         }
         let stockName = String(lastPathComponent)
         
-//        let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-//        backgroundContext.parent = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let newShare = Share.init(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
-        // required for data downloading background tasks
         
         newShare.symbol = stockName
         newShare.creationDate = Date()
@@ -190,9 +179,6 @@ class StocksController: NSFetchedResultsController<Share> {
         newShare.wbValuation = WBValuationController.returnWBValuations(share: newShare)
         newShare.dcfValuation = CombinedValuationController.returnDCFValuations(company: newShare.symbol!)
         newShare.rule1Valuation = CombinedValuationController.returnR1Valuations(company: newShare.symbol)
-        
-//        newShare.downloadKeyRatios(delegate: nil)
-//        newShare.downloadProfile(delegate: nil)
         
         return newShare
     }
@@ -238,22 +224,6 @@ class StocksController: NSFetchedResultsController<Share> {
 }
 
 extension StocksController: StockDelegate {
-    
-        
-//    func priceUpdateComplete(symbol: String) {
-//
-//        guard let moc = backgroundContext else { return }
-//
-//        if !(shares.compactMap { $0.priceUpdateComplete }.contains(false)) {
-//            pricesUpdateDelegate?.allSharesHaveUpdatedTheirPrices()
-//
-//            DispatchQueue.global(qos: .background).async {
-//                for share in self.fetchedObjects ?? [] {
-//                    share.downloadKeyRatios(delegate: self)
-//                }
-//            }
-//        }
-//    }
     
     
     /// caller must have dispatched this fucntion call on the main thread!!

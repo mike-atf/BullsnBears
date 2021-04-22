@@ -276,15 +276,11 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 return (value$,color,errors)
             case 2:
                 let (proportions, es$) = valuation!.netIncomeProportion()
-//                print()
-//                print("\(stock.symbol) net income props \(proportions)")
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: average, greenCutoff: 0.2, redCutOff: 0.1)
                 }
-//                print("\(stock.symbol) net income ema \(value$)")
-//                print()
                 return (value$, color, errors)
             case 3:
                 let (margins, es$) = valuation!.grossProfitMargins()
@@ -305,16 +301,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
                 
                 return (value$,color,errors)
-//            case 5:
-//                if let earningsGrowth = valuation!.netEarnings?.growthRates()?.ema(periods: emaPeriod) {
-//                    // use 10 y sums / averages, not ema according to Book Ch 51
-//                    let denominator = earningsGrowth * 100 + share.divYieldCurrent * 100
-//                    if share.peRatio > 0 {
-//                        value$ = numberFormatterWith1Digit.string(from: (denominator / share.peRatio) as NSNumber) ?? "-"
-//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: (earningsGrowth / share.peRatio), greenCutoff: 2.0, redCutOff: 1.0)
-//                    }
-//                }
-//                return (value$,color,errors)
 
            case 5:
                 let (proportions, es$) = valuation!.longtermDebtProportion()
@@ -409,10 +395,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 let (proportions, es$) = valuation!.sgaProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) { //proportions.mean()
-                    //.filter({ (element) -> Bool in
-//                    if element != 0.0 { return true }
-//                    else { return false }
-//                })
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: average, greenCutoff: 0.3, redCutOff: 1.0)
                 }
@@ -518,8 +500,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         let parameter = parameters[indexPath.section-1][indexPath.row].first!
-
-        // [["P/E ratio", "EPS", "beta", "intr. value (10y)"], ["Ret. earnings growth", "EPS growth", "Net inc./ Revenue growth","profit margin growth","LT Debt / net income growth"],["Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
         
         let storedEvaluations = valuation?.userEvaluations
         if storedEvaluations?.count ?? 0 != 0 {
@@ -642,9 +622,7 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.eps = result.array
 
-//            DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-//            }
+            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
         }
         else if section == "balance-sheet" {
             result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
@@ -663,9 +641,7 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.shareholdersEquity = result.array
             
-//            DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-//            }
+            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
         }
         else if section == "cash-flow-statement" {
             result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Investing Activities")
@@ -676,9 +652,7 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.opCashFlow = result.array
 
-//            DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-//            }
+            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
         }
         else if section == "financial-ratios" {
             result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROE - Return On Equity")
@@ -693,9 +667,7 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.bvps = result.array
             
-//            DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-//            }
+            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
         }
         else if section == "pe-ratio" {
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
@@ -706,29 +678,22 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: errors)
             valuation?.savePERWithDateArray(datesValuesArray: results)
 
-//            DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
-//            }
+            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
         }
         else if section == "stock-price-history" {
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "Historical Annual Stock Price Data</th>", tableTerminal: "</td>\n\t\t\t\t </tr>\n\n\t\t\t\t\t\t\n\t\t\t\t</tbody>\n\t\t\t",noOfColumns: 7, targetColumnFromRight: 5) //    </table>\t\t\t\n\t\t\t\n\t\t\t</div>
             valuation?.avAnStockPrice = result.array?.reversed()
             downloadErrors.append(contentsOf: result.errors)
 
-//            DispatchQueue.main.async {
-                self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
-//            }
+            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
         }
         
         
         if downloadTasksCompleted == downloadTasks {
-//            DispatchQueue.main.async {
-                
-                self.valuation?.date = Date()
-                self.valuation?.save()
+            self.valuation?.date = Date()
+            self.valuation?.save()
 
-                self.progressDelegate?.downloadComplete()
-//            }
+            self.progressDelegate?.downloadComplete()
         }
     }
 }

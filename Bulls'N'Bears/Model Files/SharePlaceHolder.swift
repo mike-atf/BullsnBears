@@ -8,6 +8,8 @@
 import Foundation
 
 class SharePlaceHolder: NSObject {
+    // required for catching download data on background threads
+    // this would create concurrency problems if using the NSManagedObject Share from the AppDel viewContext which can only be accessed on the main thread
     
     var macd: Data?
    var divYieldCurrent: Double = 0.0
