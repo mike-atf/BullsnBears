@@ -48,8 +48,6 @@ class SortSelectorTVC: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         UserDefaults.standard.set(sharesListSortParameter.options()[indexPath.row], forKey: userDefaultTerms.sortParameter)
         tableView.reloadData()
-//        self.dismiss(animated: true, completion: nil)
-        
     }
 
 }

@@ -36,7 +36,9 @@ class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         self.share = stock
         self.controller = controller
         
-        downloader = WebDataDownloader(stock: stock, delegate: self)
+        let placeholder = SharePlaceHolder(share: share)
+        
+        downloader = WebDataDownloader(stock: placeholder, delegate: self)
         let macroTrendPageNames = ["financial-statements", "financial-ratios", "balance-sheet", "pe-ratio"]
         let yahooPageNames = ["analysis", "cash-flow","insider-transactions"]
         downloader.macroTrendsDownload(pageTitles: macroTrendPageNames)

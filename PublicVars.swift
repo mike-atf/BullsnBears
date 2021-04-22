@@ -7,6 +7,9 @@
 
 import UIKit
 
+typealias PriceDate = (date: Date, price: Double)
+typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
+
 //var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
 //var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -221,6 +224,7 @@ struct SharesListSortParameter {
     let valueScore = "valueScore"
     let industry = "industry"
     let sector = "sector"
+    let growthType = "growthType"
     let symbol = "symbol"
     
     func options() -> [String] {

@@ -15,7 +15,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet var downloadButton: UIBarButtonItem!
     @IBOutlet var sortView: SortView!
     
-    lazy var controller: StocksController = {
+    var controller: StocksController = {
         
         // how to sort:
         // default: 1. watchStatus, 2 user evaluation
@@ -26,11 +26,16 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         var secondSortParameter = String()
         var thirdSortParameter = String()
         
+        var firstSortAscending = true
+        let secondSortAscending = false
+        let thirdSortAscending = false
+
         let userSortChoice = (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore"
         if [sharesListSortParameter.industry, sharesListSortParameter.sector].contains(userSortChoice) {
             firstSortParameter = userSortChoice
             secondSortParameter = sharesListSortParameter.userEvaluationScore
             thirdSortParameter = sharesListSortParameter.valueScore
+            firstSortAscending = false
         }
         else if userSortChoice == sharesListSortParameter.userEvaluationScore {
             firstSortParameter = "watchStatus"
@@ -47,10 +52,16 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             secondSortParameter = userSortChoice
             thirdSortParameter = sharesListSortParameter.userEvaluationScore
         }
+        else if userSortChoice == sharesListSortParameter.growthType {
+            firstSortParameter = userSortChoice
+            secondSortParameter = sharesListSortParameter.userEvaluationScore
+            thirdSortParameter = sharesListSortParameter.valueScore
+        }
+
 
         let request = NSFetchRequest<Share>(entityName: "Share")
 
-        request.sortDescriptors = [ NSSortDescriptor(key: firstSortParameter, ascending: false), NSSortDescriptor(key: secondSortParameter, ascending: false), NSSortDescriptor(key: thirdSortParameter, ascending: true)]
+        request.sortDescriptors = [ NSSortDescriptor(key: firstSortParameter, ascending: firstSortAscending), NSSortDescriptor(key: secondSortParameter, ascending: secondSortAscending), NSSortDescriptor(key: thirdSortParameter, ascending: thirdSortAscending)]
         
         let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: firstSortParameter, cacheName: nil)
         
@@ -75,7 +86,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         controller.delegate = self
         controller.pricesUpdateDelegate = self
                 
-        updateShares()
         if controller.fetchedObjects?.count ?? 0 > 0 {
             tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
             performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
@@ -86,7 +96,12 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         sortView.delegate = self
         sortView.label?.text = "Sorted by " + ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore")
+        
+        updateShares()
 
+// temp
+        self.controller.research()
+// temp
     }
     
     // MARK: - ViewController functions
@@ -117,11 +132,21 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func updateShares() {
         
         let weekDay = Calendar.current.component(.weekday, from: Date())
-        guard (weekDay > 0 && weekDay < 7) else {
+        guard (weekDay > 1 && weekDay < 7) else {
             return
         }
-                
-        controller.updateStockFiles()
+        
+        // jobs to do:
+        // 1. - update prices in controller.updatePrices() downloading all shares csv. files from Yahoo
+        // 2. - update 'Research' data: harmonize competitors and industries
+        // 3. - download keyRatios in share.downloadKeyratios()
+        // 4. - inform the StocksListTVC to update charts and infos displayed
+        // all this needs to be thread-safe as the AppDelegate's viewContext and all fetch objects from it (!) can only be accessed from the main thread!
+        // background tasks - and all downloads are background tasks - that need access to NSManagedObjects and their data need their own private NSMOC as a child of the main viewContext.
+        // the merge happens in the saveContext() function of the AppDelegate
+        // saving an NSManagedObject in it's moc can be done via e.g. .save(self.context?)
+        
+        controller.updatePrices()
         // returns to 'updateStocksComplete()' once complete
     }
 
@@ -186,6 +211,26 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
             }
             
+            //create separate MOC that can be accessed from a background thread such as download tasks
+//            let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//            backgroundContext.parent = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//            let request = NSFetchRequest<Share>(entityName:"Share")
+//            let predicate = NSPredicate(format: "symbol == %@", argumentArray: [share.symbol!])
+//            request.predicate = predicate
+//
+//            request.sortDescriptors = [NSSortDescriptor(key:  "symbol" , ascending:  true )]
+//
+//            var shares: [Share]?
+//            do {
+//                shares  =  try backgroundContext.fetch(request)
+//            } catch let error as NSError{
+//                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+//            }
+
+            let placeHolder = SharePlaceHolder(share: share)
+            placeHolder.downloadKeyRatios(delegate: controller)
+            placeHolder.downloadProfile(delegate: controller)
+
         }
         else {
             ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from file \(fileURL)")
@@ -218,6 +263,10 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             else if sectionInfo.name == "1" {
                 return "Owned"
             }
+            else if sectionInfo.name == "2" {
+                return "Archive"
+            }
+
             else { return sectionInfo.name }
         }
         else { return nil }
@@ -364,11 +413,17 @@ extension StocksListTVC: SortDelegate {
             var secondSortParameter = String()
             var thirdSortParameter = String()
             
+            var firstSortAscending = true
+            let secondSortAscending = false
+            let thirdSortAscending = false
+
+            
             let userSortChoice = (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore"
             if [sharesListSortParameter.industry, sharesListSortParameter.sector].contains(userSortChoice) {
                 firstSortParameter = userSortChoice
                 secondSortParameter = sharesListSortParameter.userEvaluationScore
                 thirdSortParameter = sharesListSortParameter.valueScore
+                firstSortAscending = false
             }
             else if userSortChoice == sharesListSortParameter.userEvaluationScore {
                 firstSortParameter = "watchStatus"
@@ -385,10 +440,16 @@ extension StocksListTVC: SortDelegate {
                 secondSortParameter = userSortChoice
                 thirdSortParameter = sharesListSortParameter.userEvaluationScore
             }
+            else if userSortChoice == sharesListSortParameter.growthType {
+                firstSortParameter = userSortChoice
+                secondSortParameter = sharesListSortParameter.userEvaluationScore
+                thirdSortParameter = sharesListSortParameter.valueScore
+            }
+
 
             let request = NSFetchRequest<Share>(entityName: "Share")
 
-            request.sortDescriptors = [ NSSortDescriptor(key: firstSortParameter, ascending: false), NSSortDescriptor(key: secondSortParameter, ascending: false), NSSortDescriptor(key: thirdSortParameter, ascending: true)]
+            request.sortDescriptors = [ NSSortDescriptor(key: firstSortParameter, ascending: firstSortAscending), NSSortDescriptor(key: secondSortParameter, ascending: secondSortAscending), NSSortDescriptor(key: thirdSortParameter, ascending: thirdSortAscending)]
 
             let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: firstSortParameter, cacheName: nil)
             

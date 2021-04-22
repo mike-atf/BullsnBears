@@ -27,6 +27,7 @@ extension Share {
     @NSManaged public var creationDate: Date?
     @NSManaged public var purchaseStory: String?
     @NSManaged public var growthType: String?
+    @NSManaged public var growthSubType: String?
     @NSManaged public var industry: String?
     @NSManaged public var sector: String?
     @NSManaged public var employees: Double

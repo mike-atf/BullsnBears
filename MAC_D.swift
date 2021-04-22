@@ -9,8 +9,8 @@ import Foundation
 
 struct MAC_D : Codable {
     
-    var mac_d: Double?
-    var signalLine: Double?
+    var mac_d: Double? // blue
+    var signalLine: Double? // yellow
     var histoBar: Double?
     var emaShort: Double?
     var emaLong: Double?

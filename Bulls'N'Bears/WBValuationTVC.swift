@@ -6,11 +6,12 @@
 //
 
 import UIKit
+import CoreData
 
 class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     var downloadButton: UIBarButtonItem!
-    var controller: WBValuationController!
+    var controller: WBValuationController?
     var share: Share!
     var progressView: DownloadProgressView?
     var fromIndexPath: IndexPath!
@@ -32,6 +33,8 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        controller?.deallocate()
+        controller = nil
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -40,19 +43,18 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             return
         }
         
-        controller.share.setUserAndValueScores()
-        controller.deallocate()
-        controller = nil
+        controller?.share.setUserAndValueScores()
+        // don't deinit() controller as this function will also be called when maximising the detailView
     }
         
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return controller.sectionTitles.count
+        return controller?.sectionTitles.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return controller.rowTitles[section].count
+        return controller?.rowTitles[section].count ?? 0
     }
 
 
@@ -60,15 +62,15 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "wbValuationCell", for: indexPath) as! WBValuationCell
 
-        let (value$, color, errors) = controller.value$(path: indexPath)
-        let evaluation = controller.userEvaluation(for: indexPath)
+        let (value$, color, errors) = controller!.value$(path: indexPath)
+        let evaluation = controller!.userEvaluation(for: indexPath)
         var correlation: Correlation?
         if let arrays = arraysForValueListTVC(indexPath: indexPath) {
-            let proportions = controller.valueListTVCProportions(values: arrays)
+            let proportions = controller!.valueListTVCProportions(values: arrays)
             let sendArrays = [arrays[0], proportions]
             correlation = Calculator.valueChartCorrelation(arrays:sendArrays)
         }
-        cell.configure(title: controller.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self, userEvaluation: evaluation, correlation: correlation)
+        cell.configure(title: controller!.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self, userEvaluation: evaluation, correlation: correlation)
         
         if indexPath.section == 0 {
             cell.accessoryType = .detailButton
@@ -101,7 +103,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         let height: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 60 : 50
         header.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: height)
         
-        let (title, subtitle) = controller.sectionHeaderText(section: section)
+        let (title, subtitle) = controller?.sectionHeaderText(section: section) ?? ("","")
         
         let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 22 : 20
         let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 16 : 12
@@ -166,7 +168,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         progressView?.delegate = self
         progressView?.title.text = "Public data download..."
 
-        controller.downloadWBValuationData()
+        controller?.downloadWBValuationData()
     }
     
     @objc
@@ -227,12 +229,16 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             return
         }
         
-        guard let wbVal = controller.valuation else {
+        guard let wbVal = controller?.valuation else {
             return
         }
         
         
         if let destination = segue.destination as? ValueListTVC {
+            
+            guard let validController = controller else {
+                return
+            }
             
             movingToValueListTVC = true
             
@@ -240,9 +246,9 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             
             destination.controller = controller
             destination.indexPath = selectedPath
-            let titles = controller.wbvParameters.structuredTitlesParameters()[selectedPath.section-1][selectedPath.row]
+            let titles = validController.wbvParameters.structuredTitlesParameters()[selectedPath.section-1][selectedPath.row]
             destination.sectionTitles.append(contentsOf: titles)
-            destination.cellLegendTitles = controller.valueListChartLegendTitles[selectedPath.section-1][selectedPath.row]
+            destination.cellLegendTitles = validController.valueListChartLegendTitles[selectedPath.section-1][selectedPath.row]
             
             let arrays = arraysForValueListTVC(indexPath: selectedPath)
             
@@ -258,26 +264,26 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 2 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = controller.valuation!.netIncomeProportion()
+                    let (margins, _) = validController.valuation!.netIncomeProportion()
                     destination.proportions = margins
                 }
                 else if selectedPath.row == 3 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = controller.valuation!.grossProfitMargins()
+                    let (margins, _) = validController.valuation!.grossProfitMargins()
                     destination.proportions = margins
                 }
                 else if selectedPath.row == 4 {
                     destination.values = arrays
                     destination.formatter = percentFormatter0Digits
-                    let (prop, _) = controller.valuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
+                    let (prop, _) = validController.valuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
                     destination.proportions = prop
                     destination.higherGrowthIsBetter = false
                 }
                else if selectedPath.row == 5 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = controller.valuation!.longtermDebtProportion()
+                    let (margins, _) = validController.valuation!.longtermDebtProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                 }
@@ -297,7 +303,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 if selectedPath.row == 0 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = controller.valuation!.sgaProportion()
+                    let (margins, _) = validController.valuation!.sgaProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                     
@@ -305,7 +311,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 1 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, errors) = controller.valuation!.rAndDProportion()
+                    let (margins, errors) = validController.valuation!.rAndDProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                 }
@@ -320,45 +326,47 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         if indexPath.section == 1 {
             if indexPath.row == 0 {
-                arrays = [controller.valuation?.equityRepurchased ?? []]
+                arrays = [controller?.valuation?.equityRepurchased ?? []]
             }
             else if indexPath.row == 1 {
-                arrays = [controller.valuation?.eps ?? []]
+                arrays = [controller?.valuation?.eps ?? []]
             }
             else if indexPath.row == 2 {
-                arrays = [controller.valuation?.netEarnings ?? [], controller.valuation?.revenue ?? []]
+                arrays = [controller?.valuation?.netEarnings ?? [], controller?.valuation?.revenue ?? []]
             }
             else if indexPath.row == 3 {
-                arrays = [controller.valuation?.grossProfit ?? [], controller.valuation?.revenue ?? []]
+                arrays = [controller?.valuation?.grossProfit ?? [], controller?.valuation?.revenue ?? []]
             }
             else if indexPath.row == 4 {
-                arrays = [controller.valuation?.capExpend ?? [], controller.valuation?.netEarnings ?? []]
+                arrays = [controller?.valuation?.capExpend ?? [], controller?.valuation?.netEarnings ?? []]
             }
             else if indexPath.row == 5 {
-                arrays = [controller.valuation?.debtLT ?? [], controller.valuation?.netEarnings ?? []]
+                arrays = [controller?.valuation?.debtLT ?? [], controller?.valuation?.netEarnings ?? []]
             }
         }
         else if indexPath.section == 2 {
             if indexPath.row == 0 {
-                arrays = [controller.valuation?.opCashFlow ?? []]
+                arrays = [controller?.valuation?.opCashFlow ?? []]
             }
             else if indexPath.row == 1 {
-                arrays = [controller.valuation?.roe ?? []]
+                arrays = [controller?.valuation?.roe ?? []]
             }
             else if indexPath.row == 2 {
-                arrays = [controller.valuation?.roa ?? []]
+                arrays = [controller?.valuation?.roa ?? []]
             }
             else if indexPath.row == 3 {
-                let (shEquityWithRetEarnings, _) = controller.valuation!.addElements(array1: controller.valuation?.shareholdersEquity ?? [], array2: controller.valuation!.equityRepurchased ?? [])
-                arrays = [controller.valuation?.debtLT ?? [], shEquityWithRetEarnings]
+                if let validController = controller {
+                    let (shEquityWithRetEarnings, _) = validController.valuation!.addElements(array1: validController.valuation?.shareholdersEquity ?? [], array2: validController.valuation!.equityRepurchased ?? [])
+                    arrays = [validController.valuation?.debtLT ?? [], shEquityWithRetEarnings]
+                }
             }
         }
         else if indexPath.section == 3 {
             if indexPath.row == 0 {
-                arrays = [controller.valuation?.sgaExpense ?? [], controller.valuation?.grossProfit ?? []]
+                arrays = [controller?.valuation?.sgaExpense ?? [], controller?.valuation?.grossProfit ?? []]
             }
             else if indexPath.row == 1 {
-                arrays = [controller.valuation?.rAndDexpense ?? [], controller.valuation?.grossProfit ?? []]
+                arrays = [controller?.valuation?.rAndDexpense ?? [], controller?.valuation?.grossProfit ?? []]
             }
         }
 
@@ -381,7 +389,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     
     func cancelRequested() {
         
-        controller.stopDownload()
+        controller?.stopDownload()
         progressView?.delegate = nil
         progressView?.removeFromSuperview()
         progressView = nil
@@ -391,21 +399,42 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         self.progressView?.delegate = nil
         progressView?.removeFromSuperview()
         progressView = nil
+        
+        //create separate MOC that can be accessed from a background thread such as download tasks
+//        let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        backgroundContext.parent = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//        let request = NSFetchRequest<Share>(entityName:"Share")
+//        let predicate = NSPredicate(format: "symbol == %@", argumentArray: [share.symbol!])
+//        request.predicate = predicate
+//
+//        request.sortDescriptors = [NSSortDescriptor(key:  "symbol" , ascending:  true )]
+//
+//        var shares: [Share]?
+//        do {
+//            shares  =  try backgroundContext.fetch(request)
+//        } catch let error as NSError{
+//            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+//        }
+        
+        let placeholder = SharePlaceHolder(share: share)
+
+        placeholder.downloadKeyRatios(delegate: self)
                 
-        share.downloadKeyRatios(delegate: self)
+//        share.downloadKeyRatios(delegate: self)
     }
 
 
 }
 
-extension WBValuationTVC: StockKeyratioDownloadDelegate, WBValuationCellDelegate {
+extension WBValuationTVC: StockDelegate, WBValuationCellDelegate {
+    
+    func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String]) {
         
-    func keyratioDownloadComplete(errors: [String]) {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-
-        }
+        share.shareFromPlaceholder(share: self.share)
+        self.share.save()
+        self.tableView.reloadData()
     }
+    
     
     func infoButtonAction(errors: [String]?, sender: UIView) {
         

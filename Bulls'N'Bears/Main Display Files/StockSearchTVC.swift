@@ -136,7 +136,13 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         
     func downLoadWebFile(_ url: URL, stockName: String) {
         
-        let downloadTask = URLSession.shared.downloadTask(with: url) { [self]
+        let configuration = URLSessionConfiguration.default
+        configuration.httpCookieAcceptPolicy = .always
+        configuration.httpShouldSetCookies = true
+        let session = URLSession(configuration: configuration)
+        var downloadTask: URLSessionDownloadTask? // URLSessionDataTask stores downloaded data in memory, DownloadTask as File
+
+        downloadTask = session.downloadTask(with: url) { [self]
             urlOrNil, responseOrNil, errorOrNil in
             
             guard errorOrNil == nil else {
@@ -169,28 +175,29 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                     removeFile(tempURL)
                 }
 
-                try FileManager.default.moveItem(at: fileURL, to: tempURL)
+                    try FileManager.default.moveItem(at: fileURL, to: tempURL)
                 
-                guard CSVImporter.matchesExpectedFormat(url: tempURL) else {
-                    removeFile(tempURL)
-                    DispatchQueue.main.async {
-                        alertController.showDialog(title: "Download error", alertMessage: "downloaded file for \(stockName) is not in the expected format", viewController: self, delegate: nil)
+
+                    guard CSVImporter.matchesExpectedFormat(url: tempURL) else {
+                        removeFile(tempURL)
+//                        DispatchQueue.main.async {
+//                            alertController.showDialog(title: "Download error", alertMessage: "downloaded file for \(stockName) is not in the expected format", viewController: self, delegate: nil)
+//                        }
+                        return
                     }
-                    return
-                }
                 
-                if FileManager.default.fileExists(atPath: targetURL.path) {
-                    removeFile(targetURL)
-                }
+                    if FileManager.default.fileExists(atPath: targetURL.path) {
+                        removeFile(targetURL)
+                    }
 
-                try FileManager.default.moveItem(at: tempURL, to: targetURL)
+                    try FileManager.default.moveItem(at: tempURL, to: targetURL)
 
-                DispatchQueue.main.async  {
-                    
-                    NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: targetURL, userInfo: nil) // send to StocksListVC
+                    DispatchQueue.main.async {
+
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object:   targetURL, userInfo: nil) // send to StocksListVC
                     
                     // the Company profile (industry, sector and employees) is downloaded after this in StocksController called from StocksListVC as delegate of this here download
-                }
+                    }
 
             } catch {
                 DispatchQueue.main.async {
@@ -199,7 +206,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             }
         }
 
-        downloadTask.resume()
+        downloadTask?.resume()
     }
     
     private func removeFile(_ atURL: URL) {

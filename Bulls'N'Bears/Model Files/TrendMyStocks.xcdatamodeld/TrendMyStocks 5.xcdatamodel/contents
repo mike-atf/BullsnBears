@@ -53,6 +53,7 @@
         <attribute name="divYieldCurrent" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="employees" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="eps" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="growthSubType" optional="YES" attributeType="String"/>
         <attribute name="growthType" optional="YES" attributeType="String"/>
         <attribute name="industry" optional="YES" attributeType="String"/>
         <attribute name="macd" optional="YES" attributeType="Binary"/>
@@ -124,7 +125,7 @@
         <element name="CompanyNews" positionX="-225" positionY="-90" width="128" height="74"/>
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="313"/>
         <element name="Rule1Valuation" positionX="-194.4807128906249" positionY="573.2761535644531" width="128" height="314"/>
-        <element name="Share" positionX="-233.677978515625" positionY="114.121826171875" width="128" height="359"/>
+        <element name="Share" positionX="-233.677978515625" positionY="114.121826171875" width="128" height="374"/>
         <element name="StockResearch" positionX="-200.3316650390625" positionY="-256.4151153564453" width="128" height="239"/>
         <element name="UserEvaluation" positionX="187.350341796875" positionY="352.4636840820313" width="128" height="148"/>
         <element name="WBValuation" positionX="-37.604248046875" positionY="-7.48974609375" width="128" height="374"/>

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+/*
 typealias PriceDate = (date: Date, price: Double)
 typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
 
@@ -773,3 +773,4 @@ class Stock2 {
     }
 }
 
+*/

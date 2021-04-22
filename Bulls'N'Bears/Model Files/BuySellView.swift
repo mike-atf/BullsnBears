@@ -91,10 +91,15 @@ class BuySellView: UIView {
         readyText = earlierSignalsSame.count == 2 ? "Ready to" : "Wait to"
         
         if readyText.starts(with: "Ready") {
-            var price$ = String()
-            if let validPrice = indicators.last!.crossingPrice {
-                price$ = currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? ""
-                buySellText += " @\n " + price$
+//            var price$ = String()
+//            if let validPrice = indicators.last!.crossingPrice {
+//                price$ = currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? ""
+//                buySellText += " @\n " + price$
+//            }
+            var date$ = String()
+            if let validDate = indicators.last!.date {
+                date$ = dateFormatter.string(from: validDate)
+                buySellText += "\n" + date$
             }
         }
         

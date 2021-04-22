@@ -510,3 +510,20 @@ extension UIView {
     }
 }
 
+extension Array where Element == CGFloat {
+    
+    func mean() -> CGFloat? {
+        
+        guard self.count > 0 else {
+            return nil
+        }
+        
+        let sum = self.reduce(0, +)
+        
+        if count > 0 {
+            return sum / CGFloat(self.count)
+        }
+        else { return nil }
+    }
+
+}

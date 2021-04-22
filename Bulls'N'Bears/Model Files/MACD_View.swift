@@ -30,8 +30,7 @@ class MACD_View: UIView {
         self.mac_d = validMACDs
         cp = share?.latestMCDCrossing()
         
-        dateRange = validShare.priceDateRange()
-        dateRange![1] = Date().addingTimeInterval(foreCastTime)
+        dateRange = validShare.priceDateRangeWorkWeeksForCharts()
 
         macdLine = validMACDs.compactMap{ $0.mac_d }
         signals = validMACDs.compactMap{ $0.signalLine }
@@ -56,8 +55,6 @@ class MACD_View: UIView {
         if abs(histoMin) > signalMax ?? 0 {
             signalMax = abs(signalMin)
         }
-
-
         
     }
 
@@ -68,7 +65,7 @@ class MACD_View: UIView {
         }
         
         let leftBorder: CGFloat = 0.0
-        let plotWidth = rect.width * 0.95
+        let plotWidth = rect.width
         let chartTimeSpan = dateRange!.last!.timeIntervalSince(dateRange!.first!)
         
 // histogram
@@ -116,7 +113,7 @@ class MACD_View: UIView {
         
         for macd in mac_d ?? [] {
             // histogram
-            let barLeft = leftBorder - (barWidth / 2) + CGFloat(macd.date!.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * plotWidth
+            let barLeft = leftBorder + CGFloat(macd.date!.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * plotWidth
             let barHeight = histo_yScale * CGFloat((macd.histoBar ?? 0))
             let barTop = barHeight < 0 ? rect.midY : rect.midY - barHeight
             let barRect = CGRect(x: barLeft, y: barTop, width: barWidth, height: abs(barHeight))
@@ -168,41 +165,26 @@ class MACD_View: UIView {
         
         
         let bottomLine = UIBezierPath()
-        bottomLine.move(to: CGPoint(x: 0, y: rect.maxY - 2))
-        bottomLine.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - 2))
+        bottomLine.move(to: CGPoint(x: 0, y: rect.maxY))
+        bottomLine.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
         UIColor.systemGray3.setStroke()
-        bottomLine.lineWidth = 1
+        bottomLine.lineWidth = 2.0
         bottomLine.stroke()
         
 // macd crossing point
         if let validCP = cp {
             let latestMACDcrossing = UIBezierPath()
-            let x = leftBorder - (barWidth / 2) + CGFloat(validCP.date.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * plotWidth
+            let x = rect.maxX - CGFloat((dateRange!.last!.timeIntervalSince(validCP.date) / chartTimeSpan)) * rect.width
+
             latestMACDcrossing.move(to: CGPoint(x: x, y: rect.minY))
             latestMACDcrossing.addLine(to: CGPoint(x: x, y: rect.maxY))
             
-            latestMACDcrossing.lineWidth = 2.0
+            latestMACDcrossing.lineWidth = 2.1
+            let color = validCP.signal < 0 ? UIColor(named: "Red")! : UIColor(named: "DarkGreen")!
+            color.setStroke()
+
             latestMACDcrossing.stroke()
             
-            buySellLabel?.removeFromSuperview()
-            buySellLabel = {
-                let label = UILabel()
-                label.font = UIFont.systemFont(ofSize: 12)
-                label.textAlignment = .right
-                let text = validCP.signal < 0 ? " :Sell" : " :Buy"
-                let signal$ = numberFormatter.string(from: validCP.signal as NSNumber) ?? "-"
-//                var priceText = " "
-//                if let validPrice = validCP.crossingPrice {
-//                    priceText = " @ " + (currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? "-")
-//                }
-                label.text = " " + dateFormatter.string(from: validCP.date) + text + " (" + signal$ + ") "
-                label.backgroundColor = validCP.signal < 0 ? UIColor(named: "Red") : UIColor(named: "DarkGreen")
-                label.sizeToFit()
-                self.addSubview(label)
-                return label
-            }()
-            buySellLabel?.frame.origin = CGPoint(x: x, y: rect.minY)
-
         }
     }
 

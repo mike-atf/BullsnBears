@@ -11,9 +11,6 @@ class ChartView: UIView {
     
     @IBOutlet var widthConstraint: NSLayoutConstraint!
     
-    var yAxisLabels = [UILabel]()
-    var yAxisNumbers = [Double]()
-    var xAxisLabels = [UILabel]()
     var trendLabels = [UILabel]()
     var valuationLabels = [UILabel]()
     var buySellLabel: UILabel?
@@ -39,6 +36,8 @@ class ChartView: UIView {
     var buttonGroupType = [CheckButton]()
 
     var latestSMA10crossing: LineCrossing?
+    
+    let week: TimeInterval = 7*24*3600
        
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -48,17 +47,7 @@ class ChartView: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
                 
-
-        for _ in 0...30 {
-            let aLabel: UILabel = {
-                let label = UILabel()
-                label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                self.addSubview(label)
-                return label
-            }()
-            xAxisLabels.append(aLabel)
-        }
-        
+        self.backgroundColor = UIColor.systemBackground
     }
     
     public func configure(stock: Share) {
@@ -69,43 +58,15 @@ class ChartView: UIView {
 
         lowestPriceInRange = validStock.lowestPrice()
         highestPriceInRange = validStock.highestPrice()
-        dateRange = validStock.priceDateRange()
-        dateRange![1] = Date().addingTimeInterval(foreCastTime)
-        
+        dateRange = validStock.priceDateRangeWorkWeeksForCharts()
+
         guard lowestPriceInRange != nil else { return }
         guard highestPriceInRange != nil else { return }
         guard dateRange != nil else { return }
         
         minPrice = (lowestPriceInRange! * 0.9).rounded()
         maxPrice = (highestPriceInRange! * 1.1).rounded() + 1
-
-        let step = findYAxisValues(min: minPrice, max: maxPrice)
-        yAxisLabels.removeAll()
-        yAxisNumbers.removeAll()
-        var labelPrice = Double(Int(maxPrice / step)) * step
-        while labelPrice >= minPrice {
-            let newLabel: UILabel = {
-                let label = UILabel()
-                label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                label.textAlignment = .right
-                label.text = currencyFormatterNoGapWithPence.string(from: NSNumber(value: labelPrice))
-//                label.sizeToFit()
-                self.addSubview(label)
-                return label
-            }()
-            yAxisLabels.append(newLabel)
-            yAxisNumbers.append(labelPrice)
-            labelPrice -= step
-        }
-                
-        let timeInterval = dateRange![1].timeIntervalSince(dateRange![0])
-        var count = 0.0
-        xAxisLabels.forEach { (label) in
-            label.text = dateFormatter.string(from: dateRange![0].addingTimeInterval(count * timeInterval / Double(xAxisLabels.count-1)))
-            label.sizeToFit()
-            count += 1
-        }
-                
+        
         latestSMA10crossing = share?.latestSMA10Crossing()
         self.setNeedsDisplay()
         
@@ -113,48 +74,34 @@ class ChartView: UIView {
     
     override func draw(_ rect: CGRect) {
                 
-// Y axis
         chartOrigin.x = rect.width * 0
         chartEnd.y = rect.height * 0
-        chartOrigin.y = rect.height * 0.95
-        chartEnd.x = rect.width * 0.95
+        chartOrigin.y = rect.height
+        chartEnd.x = rect.width
         chartAreaSize.height = chartOrigin.y - chartEnd.y
         chartAreaSize.width = chartEnd.x - chartOrigin.x
-       
-       let yAxis = UIBezierPath()
-       yAxis.move(to: CGPoint(x: chartOrigin.x, y:chartEnd.y))
-       yAxis.addLine(to: CGPoint(x: chartOrigin.x, y: chartOrigin.y))
-       yAxis.lineWidth = 2
-        UIColor.systemGray.setStroke()
-       yAxis.stroke()
-       
-// x axis
-       let xAxis = UIBezierPath()
-       xAxis.move(to: CGPoint(x: chartOrigin.x, y: chartOrigin.y))
-       xAxis.addLine(to: CGPoint(x: chartEnd.x, y: chartOrigin.y))
-       xAxis.lineWidth = 2
-       xAxis.stroke()
-       
-       guard let validStock = share else { return }
-       
-        var index = 0
-        yAxisLabels.forEach { (label) in
-            label.sizeToFit()
-            let labelY: CGFloat = chartEnd.y + chartAreaSize.height * CGFloat((maxPrice - yAxisNumbers[index]) / (maxPrice - minPrice))
-            label.frame.origin = CGPoint(x: chartEnd.x + 15, y: labelY - label.frame.height / 2)
-            index += 1
-       }
-       
-        var step: CGFloat = 0
-       var xAxisLabelLeft = chartOrigin.x
-       xAxisLabels.forEach { (label) in
-           label.frame.origin = CGPoint(x: xAxisLabelLeft - label.frame.width / 2, y: chartOrigin.y + 5)
-           step += 1
-            xAxisLabelLeft += chartAreaSize.width / CGFloat(xAxisLabels.count-1)
-       }
         
+        guard let validStock = share else { return }
+    
         chartTimeSpan = dateRange!.last!.timeIntervalSince(dateRange!.first!)
         let boxWidth = chartAreaSize.width / CGFloat(dateRange!.last!.timeIntervalSince(dateRange!.first!) / (24*3600))
+        
+        // MARK: - Week Fields
+        
+        let weekWidth = CGFloat(week / chartTimeSpan) * chartAreaSize.width
+        var weekX = rect.maxX - weekWidth
+        let weekRects = UIBezierPath()
+        while weekX >= rect.minX {
+            
+            let weekRect = CGRect(x: weekX, y: rect.minY, width: weekWidth, height: rect.height)
+            let path = UIBezierPath(rect: weekRect)
+            weekRects.append(path)
+
+            weekX -= 2*weekWidth
+        }
+        
+        UIColor.systemGray6.setFill()
+        weekRects.fill()
 
         let dailyPrices = share?.getDailyPrices()
         var sma10:[Double]?
@@ -171,7 +118,7 @@ class ChartView: UIView {
         // MARK: - candles
                 
         dailyPrices?.forEach({ (pricePoint) in
-            let boxLeft = chartOrigin.x - (boxWidth * 0.8 / 2) + CGFloat(pricePoint.tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width
+            let boxLeft = chartOrigin.x + CGFloat(pricePoint.tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width //- (boxWidth * 0.8 / 2)
             let boxTop = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - Swift.max(pricePoint.close, pricePoint.open)) / (maxPrice - minPrice)))
             let boxBottom = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - Swift.min(pricePoint.close, pricePoint.open)) / (maxPrice - minPrice)))
             let boxHeight = boxBottom - boxTop
@@ -203,33 +150,15 @@ class ChartView: UIView {
             //MARK: -  latest SMA10 crossing
             if let crossingPoint = latestSMA10crossing {
                 let latestSMAcrossing = UIBezierPath()
-                let x = chartOrigin.x - (boxWidth * 0.8 / 2) + CGFloat(crossingPoint.date.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width
+                let x = rect.maxX - CGFloat((dateRange!.last!.timeIntervalSince(crossingPoint.date) / chartTimeSpan)) * rect.width
                 latestSMAcrossing.move(to: CGPoint(x: x, y: rect.minY))
                 latestSMAcrossing.addLine(to: CGPoint(x: x, y: chartOrigin.y))
                 
-                UIColor.systemGray3.setStroke()
-                latestSMAcrossing.lineWidth = 2.0
+                let color = crossingPoint.signal < 0 ? UIColor(named: "Red")! : UIColor(named: "DarkGreen")!
+                color.setStroke()
+                latestSMAcrossing.lineWidth = 1.3
                 latestSMAcrossing.stroke()
                 
-                buySellLabel?.removeFromSuperview()
-                buySellLabel = {
-                    let label = UILabel()
-                    label.font = UIFont.systemFont(ofSize: 12)
-                    label.textAlignment = .right
-                    let text = crossingPoint.signal < 0 ? " :Sell" : " :Buy"
-                    let signal$ = numberFormatter.string(from: crossingPoint.signal as NSNumber) ?? "-"
-//                    var priceText = " "
-//                    if let validPrice = crossingPoint.crossingPrice {
-//                        priceText = " @ " + (currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? "-")
-//                    }
-                    label.text = " " + dateFormatter.string(from: crossingPoint.date) + text + " (" + signal$ + ") "
-                    label.backgroundColor = crossingPoint.signal < 0 ? UIColor(named: "Red") : UIColor(named: "DarkGreen")
-                    label.sizeToFit()
-                    self.addSubview(label)
-                    return label
-                }()
-                buySellLabel?.frame.origin = CGPoint(x: x, y: rect.minY)
-
             }
 
         })
@@ -248,7 +177,7 @@ class ChartView: UIView {
                 
                 let startPoint = plotPricePoint(pricePoint: pp1)
                 var endPoint = plotPricePoint(pricePoint: pp2)
-                endPoint.x = yAxisLabels.first!.frame.maxX + 5
+                endPoint.x = rect.maxX // yAxisLabels.first!.frame.maxX + 5
                 currentPriceLine.move(to: startPoint)
                 currentPriceLine.addLine(to: endPoint)
                 
@@ -370,11 +299,10 @@ class ChartView: UIView {
         }
         else {
             // twoPoints
-//            let trend = stock.twoPointTrend(properties: trendProperties)
             guard let trend = stock.lowHighTrend(properties: trendProperties) else {
                 return
             }
-//            guard let trend = stock.lowHighTrend(properties: trendProperties) else { return }
+
             startPrice = trend.startPrice!
             projectedPrice = startPrice + trend.incline! * dateRange!.last!.timeIntervalSince(trend.startDate)
             startPoint = plotPricePoint(pricePoint: PriceDate(trend.startDate,startPrice))
@@ -492,21 +420,6 @@ class ChartView: UIView {
                 }
             }
         }
-    }
-    
-    private func findYAxisValues(min: Double, max: Double) -> Double {
-        
-        let options = [2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0]
-        let range = max - min
-        
-        var count = 100.0
-        var index = -1
-        repeat {
-            index += 1
-            count = range / options[index]
-        } while count > 11.0
-        
-        return options[index]
     }
     
 }

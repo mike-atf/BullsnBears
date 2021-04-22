@@ -23,11 +23,11 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
     var mt_html$: String?
     var yahoo_html$: String?
     var webView: HiddenWebView?
-    var stock: Share!
+    var stock: SharePlaceHolder!
     var hyphenatedShortName: String?
     var errors = [String]()
     
-    init(stock: Share, delegate: DataDownloaderDelegate) {
+    init(stock: SharePlaceHolder, delegate: DataDownloaderDelegate) {
         super.init()
         
         self.stock = stock
@@ -44,10 +44,10 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         yahooDownloadTasks = pageTitles
-        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol!)/\(pageTitles.first!)")
+        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(pageTitles.first!)")
         components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
         
-        NotificationCenter.default.addObserver(self, selector: #selector(yahooDownloadCompleted(notification:)), name: Notification.Name(rawValue: "YahooDataDownloadComplete"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(yahooDownloadCompleted(notification:)), name: Notification.Name(rawValue: "YahooDataDownloadComplete"), object: nil)
 
         
         yahooDownloadPage(url: components?.url, for: yahooDownloadTasks.first!)
@@ -60,14 +60,14 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         guard let shortName = stock.name_short else {
-            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol!)", alertMessage: "can't find a stock short name in dictionary.")
+            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
             return
         }
                      
         let shortNameComponents = shortName.split(separator: " ")
         hyphenatedShortName = String(shortNameComponents.first ?? "")
         guard hyphenatedShortName != nil && hyphenatedShortName != "" else {
-            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol!)", alertMessage: "can't construct a stock term for the macrotrends website.")
+            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't construct a stock term for the macrotrends website.")
             return
         }
         
@@ -110,9 +110,9 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             return nil
         }()
 
-        NotificationCenter.default.addObserver(self, selector: #selector(mtDownloadCompleted(_:)), name: Notification.Name(rawValue: "MTDataDownloadComplete"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(mtDownloadCompleted(_:)), name: Notification.Name(rawValue: "MTDataDownloadComplete"), object: nil)
 
-        loadWebView(url: nil, stockSymbol: stock.symbol!, stockShortname: hyphenatedShortName!.lowercased(), section: mtDownloadTasks.first! )
+        loadWebView(url: nil, stockSymbol: stock.symbol, stockShortname: hyphenatedShortName!.lowercased(), section: mtDownloadTasks.first! )
     }
     
     // MARK: - WebView functions
@@ -191,7 +191,8 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             if error == nil {
                 self.mt_html$ = html as? String
                 let section = (webView as! HiddenWebView).section
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "MTDataDownloadComplete"), object: section , userInfo: nil)
+                self.mtDownloadCompleted(section: section)
+//                NotificationCenter.default.post(name: Notification.Name(rawValue: "MTDataDownloadComplete"), object: section , userInfo: nil)
 
             }
             else {
@@ -240,8 +241,8 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     func yahooDownloadPage(url: URL?, for section: String) {
         
-        var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol!)/\(section)")
-        components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol!)]
+        var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(section)")
+        components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
 
         
         guard let validURL = components?.url else {
@@ -249,6 +250,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             return
         }
         
+        //backgrodun thread. Don't access NSManagedObjects properties, hence using SharePlaceholder
         yahooSession = URLSession.shared.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
@@ -267,8 +269,9 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             }
 
             self.yahoo_html$ = String(decoding: validData, as: UTF8.self)
+            self.yahooDownloadCompleted(section: section)
             
-           NotificationCenter.default.post(name: Notification.Name(rawValue: "YahooDataDownloadComplete"), object: section , userInfo: nil)
+//           NotificationCenter.default.post(name: Notification.Name(rawValue: "YahooDataDownloadComplete"), object: section , userInfo: nil)
         }
         yahooSession?.resume()
     }
@@ -276,11 +279,11 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
 
     // MARK: - completed download functions
     
-    @objc
-    func mtDownloadCompleted(_ notification: Notification) {
-
+//    @objc
+    func mtDownloadCompleted(section: String) {
+        // is called from a background thread!
         
-        let section = notification.object as? String
+//        let section = notification.object as? String
         
         var remove = Int()
         for i in 0..<mtDownloadTasks.count {
@@ -292,18 +295,21 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             mtDownloadTasks.remove(at: remove)
         }
 
-        delegate?.downloadComplete(html$: mt_html$, pageTitle: section)
-        
+        DispatchQueue.main.async {
+            self.delegate?.downloadComplete(html$: self.mt_html$, pageTitle: section)
+        }
+
         if let nextTask = mtDownloadTasks.first {
-            loadWebView(stockSymbol: stock.symbol!, stockShortname: hyphenatedShortName!.lowercased(), section: nextTask)
+            loadWebView(stockSymbol: stock.symbol, stockShortname: hyphenatedShortName!.lowercased(), section: nextTask)
         }
 
     }
     
-    @objc
-    func yahooDownloadCompleted(notification: Notification) {
+//    @objc
+    func yahooDownloadCompleted(section: String) {
+        // is called from a background thread!
 
-        let section = notification.object as? String
+//        let section = notification.object as? String
         
         var remove = Int()
         for i in 0..<yahooDownloadTasks.count {
@@ -315,7 +321,9 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             yahooDownloadTasks.remove(at: remove)
         }
 
-        delegate?.downloadComplete(html$: yahoo_html$, pageTitle: section)
+        DispatchQueue.main.async {
+            self.delegate?.downloadComplete(html$: self.yahoo_html$, pageTitle: section)
+        }
         
         if let nextTask = yahooDownloadTasks.first {
             yahooDownloadPage(url: nil, for: nextTask)

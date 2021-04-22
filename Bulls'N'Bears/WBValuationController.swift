@@ -467,8 +467,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             progressDelegate?.downloadError(error: "Unable to load WB valuation data, can't find a short name in dictionary.")
             return
         }
+        
+        let placeholder = SharePlaceHolder(share: share)
                 
-        downloader = WebDataDownloader(stock: share, delegate: self)
+        downloader = WebDataDownloader(stock: placeholder, delegate: self)
         downloader?.macroTrendsDownload(pageTitles: webPageNames)
         downloadTasks = webPageNames.count
     }
@@ -593,12 +595,14 @@ extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
 
 extension WBValuationController: DataDownloaderDelegate {
     
+    /// caller MUST ensure this is called on the main thread to avoid viewContext concurrency problems
     func downloadComplete(html$: String?, pageTitle: String?) {
         
         downloadTasksCompleted += 1
         
         guard html$ != nil else {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
+            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
             return
         }
         
@@ -638,9 +642,9 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.eps = result.array
 
-            DispatchQueue.main.async {
+//            DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-            }
+//            }
         }
         else if section == "balance-sheet" {
             result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
@@ -659,9 +663,9 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.shareholdersEquity = result.array
             
-            DispatchQueue.main.async {
+//            DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-            }
+//            }
         }
         else if section == "cash-flow-statement" {
             result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Investing Activities")
@@ -672,9 +676,9 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.opCashFlow = result.array
 
-            DispatchQueue.main.async {
+//            DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-            }
+//            }
         }
         else if section == "financial-ratios" {
             result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROE - Return On Equity")
@@ -689,9 +693,9 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.bvps = result.array
             
-            DispatchQueue.main.async {
+//            DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-            }
+//            }
         }
         else if section == "pe-ratio" {
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
@@ -702,29 +706,29 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: errors)
             valuation?.savePERWithDateArray(datesValuesArray: results)
 
-            DispatchQueue.main.async {
+//            DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
-            }
+//            }
         }
         else if section == "stock-price-history" {
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "Historical Annual Stock Price Data</th>", tableTerminal: "</td>\n\t\t\t\t </tr>\n\n\t\t\t\t\t\t\n\t\t\t\t</tbody>\n\t\t\t",noOfColumns: 7, targetColumnFromRight: 5) //    </table>\t\t\t\n\t\t\t\n\t\t\t</div>
             valuation?.avAnStockPrice = result.array?.reversed()
             downloadErrors.append(contentsOf: result.errors)
 
-            DispatchQueue.main.async {
+//            DispatchQueue.main.async {
                 self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
-            }
+//            }
         }
         
         
         if downloadTasksCompleted == downloadTasks {
-            DispatchQueue.main.async {
+//            DispatchQueue.main.async {
                 
                 self.valuation?.date = Date()
                 self.valuation?.save()
 
                 self.progressDelegate?.downloadComplete()
-            }
+//            }
         }
     }
 }

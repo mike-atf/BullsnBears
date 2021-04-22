@@ -101,7 +101,8 @@ class ResearchController {
         var allNames = names
         allNames.append("industry")
         allNames.append("growthType")
-        
+        allNames.append("growthSubType")
+
         var sectionTitles = [String: String]()
         
         for name in allNames {
@@ -132,6 +133,8 @@ class ResearchController {
                 sectionTitles[name] = "Industry"
             case "growthType":
                 sectionTitles[name] = "Growth Category" // enum GrowthCategoryNames
+            case "growthSubType":
+                sectionTitles[name] = "Growth Sub Category" // enum GrowthCategoryNames
             default:
                 print("error: default")
             }
@@ -144,37 +147,7 @@ class ResearchController {
         
         return Array(titleDictionary!.values.sorted())
     }
-    
-//    func findEntityParameter(title: String) -> String? {
-//        
-//        switch title {
-//        case "Future growth plan":
-//            return "growthPlan"
-//        case "Performance during last crises":
-//            return "crisisPerformance"
-//        case "Company size":
-//            return "companySize"
-//        case "Competitors":
-//            return "competitors"
-//        case "Special products or niches and their impact":
-//            return "productsNiches"
-//        case "Competitive advantages":
-//            return "competitiveEdge"
-//        case "Assets and their value":
-//            return "assets"
-//        case "Insider buying & selling":
-//            return "insiderBuying"
-//        case "Retained earnings":
-//            return "shareBuyBacks"
-//        case "Why do you want to buy this stock?":
-//            return "theBuyStory"
-//        case "Important company news":
-//            return "news"
-//        default:
-//            return nil
-//        }
-//    }
-    
+        
     func values(indexPath: IndexPath) -> [String]? {
         
         guard let validDict = titleDictionary else {
@@ -240,7 +213,12 @@ class ResearchController {
             else { return nil }
         case "growthType":
             if let valid = share?.growthType {
-                return [valid]
+                if let v = share?.growthSubType {
+                    return [valid, v]
+                }
+                else {
+                    return [valid]
+                }
             }
             else { return nil }
         default:
@@ -329,6 +307,8 @@ extension ResearchController: ResearchCellDelegate {
             share?.industry = notes
         case "growthType":
             share?.growthType = notes
+        case "growthSubType":
+            share?.growthSubType = notes
         default:
             print("error: default")
         }

@@ -23,6 +23,8 @@ class ChartContainerView: UIView {
     @IBOutlet var chartView: ChartView!
     @IBOutlet var macdView: MACD_View!
     @IBOutlet var stochOscView: StochastikOscillatorView!
+    @IBOutlet var timeLineView: ChartTimeLineView!
+    @IBOutlet var chartPricesView: ChartPricesView!
     
     @IBOutlet var button1: CheckButton!
     @IBOutlet var button2: CheckButton!
@@ -41,16 +43,16 @@ class ChartContainerView: UIView {
     
     var buttonDelegate: ChartButtonDelegate?
     var zoomFactor: CGFloat!
-    var contentOffsetFromRight : CGFloat {
-        set {
-            self.scrollView.isScrollEnabled = false
-            self.scrollView.setContentOffset(CGPoint(x: self.scrollView.contentSize.width - self.scrollView.frame.width, y: 0), animated: false)
-            self.scrollView.isScrollEnabled = true
-        }
-        get {
-            return self.scrollView.contentSize.width - self.scrollView.frame.width - self.scrollView.contentOffset.x
-        }
-    }
+//    var contentOffsetFromRight : CGFloat {
+//        set {
+//            self.scrollView.isScrollEnabled = false
+//            self.scrollView.setContentOffset(CGPoint(x: self.scrollView.contentSize.width - self.scrollView.frame.width, y: 0), animated: false)
+//            self.scrollView.isScrollEnabled = true
+//        }
+//        get {
+//            return self.scrollView.contentSize.width - self.scrollView.frame.width - self.scrollView.contentOffset.x
+//        }
+//    }
  
     
     override init(frame: CGRect) {
@@ -95,13 +97,21 @@ class ChartContainerView: UIView {
         if let view = stochOscView {
             view.configure(share: shareToShow)
         }
+        
+        if let view = chartPricesView {
+            view.configure(share: shareToShow)
+        }
 
+        if let view = timeLineView {
+            view.configure(share: shareToShow)
+        }
         if let scroll = scrollView {
 //            scroll.delegate = self
             scroll.minimumZoomScale = 0.2
             scroll.maximumZoomScale = 2.0
             scroll.zoomScale = 1.0
             scroll.pinchGestureRecognizer?.addTarget(self, action: #selector(customZoom(pinchGesture:)))
+//            scroll.delegate = self
 
             scroll.contentSize = chartView.bounds.size
             let offset = scroll.contentSize.width
@@ -124,25 +134,54 @@ class ChartContainerView: UIView {
     @objc
     func customZoom(pinchGesture: UIPinchGestureRecognizer) {
         
-        let currentWidth = chartsContentViewWidth.constant
-        let change = (pinchGesture.scale > 1.0) ? currentWidth * 0.025 : currentWidth * -0.025
-        let newWidth = currentWidth + change
-
+        let change = pinchGesture.scale - 1.0
+        var modifiedScale = 1.0 + change * scrollView.frame.width / scrollView.contentSize.width
         
-        guard newWidth < 6640 && newWidth > scrollView.bounds.width else {
+        
+        if modifiedScale > 1.0 {
+            if chartsContentViewWidth.constant > 6440 {
+                modifiedScale = 1.0
+            }
+        }
+        else if chartsContentViewWidth.constant <= scrollView.bounds.width {
+            chartsContentViewWidth.isActive = false
+            chartsContentViewWidth.constant = scrollView.bounds.width
+            chartsContentViewWidth.isActive = true
+            modifiedScale = 1.0
             return
         }
         
-        chartsContentViewWidth.constant = newWidth
-        chartsContentView.setNeedsDisplay()
-        macdView.setNeedsDisplay()
-        stochOscView.setNeedsDisplay()
-        chartView.setNeedsDisplay()
-//        contentOffsetFromRight = 0.0
-//        self.scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x + change , y: 0.0), animated: true)
+        UIView.animate(withDuration: 0) {
+            self.chartsContentView.transform = CGAffineTransform(scaleX: modifiedScale, y: 1.0)
+            self.chartsContentViewWidth.constant *= modifiedScale
+        }
         
-        zoomFactor = change
+        if pinchGesture.state == .ended {
+            scrollView.zoomScale = modifiedScale
+            macdView.setNeedsDisplay()
+            stochOscView.setNeedsDisplay()
+            chartView.setNeedsDisplay()
+            timeLineView.resetAfterZoom()
+            
+            scrollView.contentSize = chartView.bounds.size
+            let offset = scrollView.contentSize.width
+            scrollView.setContentOffset(CGPoint(x: offset, y: 0), animated: false)
+        }
+        
+//        chartsContentViewWidth.constant = newWidth
+//        chartsContentView.setNeedsDisplay()
+//        macdView.setNeedsDisplay()
+//        stochOscView.setNeedsDisplay()
+//        chartView.setNeedsDisplay()
+//
+//        zoomFactor = change
     }
-
     
 }
+
+//extension ChartContainerView: UIScrollViewDelegate {
+//
+//    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+//        print("zoom changed - \(scrollView.zoomScale)")
+//    }
+//}

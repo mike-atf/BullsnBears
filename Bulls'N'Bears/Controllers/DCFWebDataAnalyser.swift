@@ -26,7 +26,8 @@ class DCFWebDataAnalyser {
         self.controller = controller
         self.progressDelegate = pDelegate
         
-        downloader = WebDataDownloader(stock: stock, delegate: self)
+        let placeholder = SharePlaceHolder(share: stock)
+        downloader = WebDataDownloader(stock: placeholder, delegate: self)
         downloader.yahooDownload(pageTitles: yahooPages)
         downloadTasks = yahooPages.count
     }

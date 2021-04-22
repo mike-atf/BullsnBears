@@ -16,49 +16,55 @@ protocol StocksControllerDelegate {
 
 /// Share calls this when it wants to inform StocksController that the price update is complete
 protocol StockDelegate {
-    func priceUpdateComplete(symbol: String)
+//    func priceUpdateComplete(symbol: String)
+    func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String])
 }
 
 /// Share calls this when it wants to inform StocksController or ValueListTVC  that the price update is complete
 /// StocksListVC picks this up from StocksController to add any Error to the centrsal Error log
 /// ValueLIstTVC picks this up to update it's section [0]
-protocol StockKeyratioDownloadDelegate {
-    func keyratioDownloadComplete(errors: [String])
-}
+//protocol StockKeyratioDownloadDelegate {
+//    func keyratioDownloadComplete(errors: [String])
+//}
 
 
 class StocksController: NSFetchedResultsController<Share> {
     
     var pricesUpdateDelegate: StocksControllerDelegate?
-    var keyratioUpdateDelegate: StockKeyratioDownloadDelegate?
+//    var keyratioUpdateDelegate: StockKeyratioDownloadDelegate?
     var stockDelegate: StockDelegate?
     lazy var yahooRefDate: Date = getYahooRefDate()
     var downloadErrors = [String]()
     var webDownLoader: WebDataDownloader?
     var sortParameter = UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as! String
+    
+    var backgroundContext: NSManagedObjectContext?
             
     //Mark:- shares price update functions
     
-    func updateStockFiles() {
+    func updatePrices() {
         
         let yRD = getYahooRefDate()
+        
         for share in fetchedObjects ?? [] {
+            let placeholder = SharePlaceHolder(share: share)
+            
             var sharePriceNeedsUpdate = true
-            if let lastPriceDate = share.getDailyPrices()?.last?.tradingDate {
+            if let lastPriceDate = placeholder.getDailyPrices()?.last?.tradingDate {
                 if (Date().timeIntervalSince(lastPriceDate) < 12 * 3600) {
                     sharePriceNeedsUpdate = false
                 }
             }
             if sharePriceNeedsUpdate {
-                share.startPriceUpdate(yahooRefDate: yRD, delegate: self)
-                // returns to 'priceUpdateComplete()' just below via the delegate
+                placeholder.startPriceUpdate(yahooRefDate: yRD, delegate: self)
+                // returns to 'keyRatioDownloadComplete()' just below via the delegate
             }
-            
-            updateResearch(share: share)
         }
     }
     
     func updateResearch(share: Share) {
+        
+        // this can safely be done using the main viewContext on the main thread as the function does not involve downloads and background tasks
         
         let allShares = StocksController.allShares()
         
@@ -102,7 +108,6 @@ class StocksController: NSFetchedResultsController<Share> {
                 }
             }
         }
-                
     }
     
     class func allShares() -> [Share]? {
@@ -147,7 +152,10 @@ class StocksController: NSFetchedResultsController<Share> {
         }
         let stockName = String(lastPathComponent)
         
+//        let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        backgroundContext.parent = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let newShare = Share.init(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+        // required for data downloading background tasks
         
         newShare.symbol = stockName
         newShare.creationDate = Date()
@@ -183,9 +191,30 @@ class StocksController: NSFetchedResultsController<Share> {
         newShare.dcfValuation = CombinedValuationController.returnDCFValuations(company: newShare.symbol!)
         newShare.rule1Valuation = CombinedValuationController.returnR1Valuations(company: newShare.symbol)
         
-        newShare.downloadKeyRatios(delegate: nil)
-        newShare.downloadProfile(delegate: nil)
+//        newShare.downloadKeyRatios(delegate: nil)
+//        newShare.downloadProfile(delegate: nil)
+        
         return newShare
+    }
+    
+    class func fetchSpecificShare(symbol: String, context: NSManagedObjectContext?=nil) -> Share? {
+        
+        let request = NSFetchRequest<Share>(entityName:"Share")
+        let predicate = NSPredicate(format: "symbol == %@", argumentArray: [symbol])
+        request.predicate = predicate
+
+        request.sortDescriptors = [NSSortDescriptor(key:  "symbol" , ascending:  true )]
+        
+        let theContext = context ?? (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        
+        var shares: [Share]?
+        do {
+            shares  =  try theContext.fetch(request)
+        } catch let error as NSError{
+            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+        }
+        
+        return shares?.first
     }
         
     static func removeFile(_ atURL: URL?) {
@@ -203,34 +232,53 @@ class StocksController: NSFetchedResultsController<Share> {
         }
     }
 
+    // MARK: - download functions
+    
+    
 }
 
-extension StocksController: StockKeyratioDownloadDelegate, StockDelegate {
+extension StocksController: StockDelegate {
     
         
-    func priceUpdateComplete(symbol: String) {
+//    func priceUpdateComplete(symbol: String) {
+//
+//        guard let moc = backgroundContext else { return }
+//
+//        if !(shares.compactMap { $0.priceUpdateComplete }.contains(false)) {
+//            pricesUpdateDelegate?.allSharesHaveUpdatedTheirPrices()
+//
+//            DispatchQueue.global(qos: .background).async {
+//                for share in self.fetchedObjects ?? [] {
+//                    share.downloadKeyRatios(delegate: self)
+//                }
+//            }
+//        }
+//    }
+    
+    
+    /// caller must have dispatched this fucntion call on the main thread!!
+    func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String]) {
         
-        guard let shares = fetchedObjects else { return }
-        
-        if !(shares.compactMap { $0.priceUpdateComplete }.contains(false)) {
-            pricesUpdateDelegate?.allSharesHaveUpdatedTheirPrices()
-
-            DispatchQueue.global(qos: .background).async {
-                for share in self.fetchedObjects ?? [] {
-                    share.downloadKeyRatios(delegate: self)
-                }
-            }
+        if let matchingShare = fetchedObjects?.filter({ (shareObject) -> Bool in
+            if share.symbol == shareObject.symbol { return true }
+            else { return false }
+        }).first {
+            share.shareFromPlaceholder(share: matchingShare)
+            // TODO: - saving changes to the main viewContext here assumes that this NSFR controller updates the shares and the associated StocksListTVC
+            matchingShare.save()
         }
-    }
-    
-    
-    func keyratioDownloadComplete(errors: [String]) {
         
         if errors.count > 0 {
             for error in errors {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
-
             }
+        }
+    }
+    
+    func research() {
+        for share in self.fetchedObjects ?? [] {
+//            share.priceIncreaseAfterMCDCrossings()
+//            share.priceIncreaseAfterOscCrossings()
         }
     }
 }

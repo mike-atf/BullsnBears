@@ -24,7 +24,7 @@ public class Share: NSManagedObject {
     public override func awakeFromFetch() {
         priceUpdateComplete = false
         
-        let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
+//        let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
         
         if industry == nil {
             industry = "Unknown"
@@ -34,18 +34,52 @@ public class Share: NSManagedObject {
             sector = "Unknown"
         }
 
+        if growthType == nil {
+            growthType = "Unknown"
+        }
+        
+        if growthSubType == nil {
+            growthSubType = "Unknown"
+        }
+        
+//        else {
+//            if growthType!.contains("Sluggard") {
+//                growthType = GrowthCategoryNames.sluggard
+//            }
+//            else if growthType!.contains("Stalwart") {
+//                growthType = "Stalwart"
+//            }
+//            else if growthType!.contains("Fast grower") {
+//                growthType = "Fast grower"
+//            }
+//            else if growthType!.contains("Fast grower") {
+//                growthType = "Fast grower"
+//            }
+//
+//        }
+        
+        
     }
     
    func save() {
-              
-        DispatchQueue.main.async {
-           do {
-                try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-            } catch {
-                let nserror = error as NSError
-                fatalError("Unresolved error in WBValuation.save function \(nserror), \(nserror.userInfo)")
-            }
+    
+    
+    if self.managedObjectContext?.hasChanges ?? false {
+        do {
+            try self.managedObjectContext?.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
+    }
+
+              
+//        DispatchQueue.main.async {
+//
+//            (UIApplication.shared.delegate as! AppDelegate).saveContext(context: self.managedObjectContext)
+//        }
     }
     
     func setDailyPrices(pricePoints: [PricePoint]?) {
@@ -53,7 +87,7 @@ public class Share: NSManagedObject {
         guard let validPoints = pricePoints else { return }
 
         self.dailyPrices = convertDailyPricesToData(dailyPrices: validPoints)
-        save()
+        save() // saves in the context the object was fetched in
     }
        
     func convertDailyPricesToData(dailyPrices: [PricePoint]?) -> Data? {
@@ -240,6 +274,44 @@ public class Share: NSManagedObject {
         else { return nil }
     }
     
+    
+    /// returns the dates of first Monday before first available tradingDate and the next Monday after today
+    public func priceDateRangeWorkWeeksForCharts() -> [Date]? {
+        
+        guard let dailyPrices = getDailyPrices() else {
+            return nil
+        }
+        
+        let minDate = dailyPrices.compactMap { $0.tradingDate }.min()
+        
+        if let minDate_v = minDate {
+                var calendar = NSCalendar.current
+                calendar.timeZone = NSTimeZone.default
+                let components: Set<Calendar.Component> = [.year, .month, .hour, .minute, .weekOfYear ,.weekday]
+                var firstDateComponents = calendar.dateComponents(components, from: minDate_v)
+                var lastDateComponents = calendar.dateComponents(components, from: Date().addingTimeInterval(foreCastTime))
+                firstDateComponents.second = 0
+                firstDateComponents.minute = 0
+                firstDateComponents.hour = 0
+                firstDateComponents.weekOfYear = (firstDateComponents.weekOfYear! > 0) ? (firstDateComponents.weekOfYear! - 1) : 0
+                firstDateComponents.weekday = 2 // Monday, days are numbered 1-7, starting with Sunday
+                
+                lastDateComponents.second = 0
+                lastDateComponents.minute = 0
+                lastDateComponents.hour = 0
+                lastDateComponents.weekOfYear = (lastDateComponents.weekOfYear! < 52) ? (lastDateComponents.weekOfYear! + 1) : 52
+                lastDateComponents.weekday = 2 // Monday, days are numbered 1-7, starting with Sunday
+
+                let firstMondayMidNight = calendar.date(from: firstDateComponents) ?? Date()
+                let lastMondayMidNight = calendar.date(from: lastDateComponents) ?? Date()
+                
+                return [firstMondayMidNight, lastMondayMidNight]
+        }
+        
+        return nil
+    }
+
+    
     func priceAtDate(date: Date, priceOption: PricePointOptions) -> Double? {
         
         guard let prices = getDailyPrices() else { return nil }
@@ -262,6 +334,12 @@ public class Share: NSManagedObject {
             }
         }
         return nil
+    }
+    
+    func latestPrice(option: PricePointOptions) -> Double? {
+        
+        return getDailyPrices()?.last?.returnPrice(option: option)
+        
     }
 
     // MARK: - correlations and trends
@@ -645,7 +723,7 @@ public class Share: NSManagedObject {
     }
 
     // MARK: - download / update functions
-    
+    /*
     func startPriceUpdate(yahooRefDate: Date, delegate: StockDelegate) {
         
         let nowSinceRefDate = Date().timeIntervalSince(yahooRefDate)
@@ -670,6 +748,12 @@ public class Share: NSManagedObject {
     
     func downLoadWebFile(_ url: URL, delegate: StockDelegate) {
         
+
+        guard let shareSymbol = self.symbol else { return }
+        
+        // this will start a background thread
+        // do not access the main viewContext or NSManagedObjects fetched from it!
+        // the StocksController sending this via startPriceUpdate uses a seperate backgroundMOC and shares fetched from this to execute this tasks
         let downloadTask = URLSession.shared.downloadTask(with: url) { [self]
             urlOrNil, responseOrNil, errorOrNil in
             
@@ -696,8 +780,8 @@ public class Share: NSManagedObject {
                                             appropriateFor: nil,
                                             create: true)
                 
-                let tempURL = documentsURL.appendingPathComponent(symbol! + "-temp.csv")
-                let targetURL = documentsURL.appendingPathComponent(symbol! + ".csv")
+                let tempURL = documentsURL.appendingPathComponent(shareSymbol + "-temp.csv")
+                let targetURL = documentsURL.appendingPathComponent(shareSymbol + ".csv")
                 
                 if FileManager.default.fileExists(atPath: tempURL.path) {
                     removeFile(tempURL)
@@ -718,13 +802,16 @@ public class Share: NSManagedObject {
 
                 try FileManager.default.moveItem(at: tempURL, to: targetURL)
                 
-                if let updatedPrices = CSVImporter.extractPriceData(url: targetURL, symbol: symbol!) {
-                    priceUpdateComplete = true
-                    updateDailyPrices(newPrices: updatedPrices)
-                    delegate.priceUpdateComplete(symbol: symbol!)
-                    removeFile(targetURL)
+//                DispatchQueue.main.async {
+
+                    if let updatedPrices = CSVImporter.extractPriceData(url: targetURL, symbol: shareSymbol) {
+                        priceUpdateComplete = true
+                        updateDailyPrices(newPrices: updatedPrices) // this saves the downloaded data to the backgroundMOC used
+//                        delegate.priceUpdateComplete(symbol: shareSymbol)
+                        removeFile(targetURL)
+                        downloadKeyRatios(delegate: delegate)
+//                    }
                 }
-                
             } catch {
                 DispatchQueue.main.async {
                     ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't move and save downloaded file")
@@ -734,7 +821,8 @@ public class Share: NSManagedObject {
         
         downloadTask.resume()
     }
-
+    */
+    
     private func removeFile(_ atURL: URL) {
        
         do {
@@ -748,7 +836,7 @@ public class Share: NSManagedObject {
     
     // MARk: - technicals
     
-    /// also converts to data stored as 'macd' propoerty of share
+    /// also converts to data stored as 'macd' property of share
     func calculateMACDs(shortPeriod: Int, longPeriod: Int) -> [MAC_D]? {
         
         guard let dailyPrices = getDailyPrices() else { return nil }
@@ -807,8 +895,7 @@ public class Share: NSManagedObject {
         var lowest14 = last14.min()
         var highest14 = last14.max()
         var slowOsc = [StochasticOscillator]()
-//        print()
-//        print(self.symbol!)
+
         for pricePoint in after14 {
             last14.append(pricePoint.close)
             last14.removeFirst()
@@ -818,8 +905,6 @@ public class Share: NSManagedObject {
             
             let newOsc = StochasticOscillator(currentPrice: pricePoint.close, date: pricePoint.tradingDate, lowest14: lowest14, highest14: highest14, slow4: last4K)
             slowOsc.append(newOsc)
-            
-//            print(newOsc)
             
             if let valid = newOsc.k_fast {
                 last4K.append(valid)
@@ -910,8 +995,8 @@ public class Share: NSManagedObject {
     }
 
     // MARK: - keyRatios update
-    
-    func downloadKeyRatios(delegate: StockKeyratioDownloadDelegate?) {
+    /*
+    func downloadKeyRatios(delegate: StockDelegate?) {
         
         var components: URLComponents?
                 
@@ -926,6 +1011,9 @@ public class Share: NSManagedObject {
         let yahooSession = URLSession(configuration: .default)
         var dataTask: URLSessionDataTask?
         
+        // this will start a background thread
+        // do not access the main viewContext or NSManagedObjects fetched from it!
+        // the StocksController sending this via startPriceUpdate uses a seperate backgroundMOC and shares fetched from this to execute this tasks
         dataTask = yahooSession.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
@@ -949,7 +1037,7 @@ public class Share: NSManagedObject {
         dataTask?.resume()
     }
     
-    func keyratioDownloadComplete(html$: String, delegate: StockKeyratioDownloadDelegate?) {
+    func keyratioDownloadComplete(html$: String, delegate: StockDelegate?) {
         
         let rowTitles = ["Beta (5Y monthly)", "Trailing P/E", "Diluted EPS", "Forward annual dividend yield"] // titles differ from the ones displayed on webpage!
         var loaderrors = [String]()
@@ -963,33 +1051,41 @@ public class Share: NSManagedObject {
             
             if title.starts(with: "Beta") {
                 if let valid = values?.first {
-                    beta = valid
+                    DispatchQueue.main.async {
+                        self.beta = valid
+                    }
                 }
             } else if title.starts(with: "Trailing") {
                 if let valid = values?.first {
-                    peRatio = valid
+                    DispatchQueue.main.async {
+                        self.peRatio = valid
+                    }
                 }
             } else if title.starts(with: "Diluted") {
                 if let valid = values?.first {
-                    eps = valid
+                    DispatchQueue.main.async {
+                        self.eps = valid
+                    }
                 }
             } else if title == "Forward annual dividend yield" {
                 if let valid = values?.first {
-                    divYieldCurrent = valid
+                    DispatchQueue.main.async {
+                        self.divYieldCurrent = valid
+                    }
                 }
             }
         }
         
-        DispatchQueue.main.async {
-            self.save()
-        }
+//        DispatchQueue.main.async {
+            self.save() // thread safe, saves to the moc the share was fetched from
+//        }
        
-        
-        delegate?.keyratioDownloadComplete(errors: loaderrors)
+        delegate?.keyratioDownloadComplete(symbol: self.symbol!, errors: loaderrors)
     }
-    
+    */
     // MARK: - yahoo profile download
-    func downloadProfile(delegate: StockKeyratioDownloadDelegate?) {
+    /*
+    func downloadProfile(delegate: StockDelegate?) {
         
         var components: URLComponents?
                 
@@ -1027,7 +1123,7 @@ public class Share: NSManagedObject {
         dataTask?.resume()
     }
     
-    func profileDownloadComplete(html$: String, delegate: StockKeyratioDownloadDelegate?) {
+    func profileDownloadComplete(html$: String, delegate: StockDelegate?) {
         
         let rowTitles = ["\"sector\":", "\"industry\":", "\"fullTimeEmployees\""] // titles differ from the ones displayed on webpage!
         var loaderrors = [String]()
@@ -1042,28 +1138,34 @@ public class Share: NSManagedObject {
                 loaderrors.append(contentsOf: errors)
 
                 if let valid = strings?.first {
-                    sector = valid
+//                    DispatchQueue.main.async {
+                        self.sector = valid
+//                    }
                 }
             } else if title.starts(with: "\"industry") {
                 let (strings, errors) = WebpageScraper.scrapeRowForText(website: .yahoo, html$: pageText, rowTitle: title , rowTerminal: ",", textTerminal: "\"")
                 loaderrors.append(contentsOf: errors)
                 
                 if let valid = strings?.first {
-                    industry = valid
+//                    DispatchQueue.main.async {
+                        self.industry = valid
+//                    }
                 }
             } else if title.starts(with: "\"fullTimeEmployees") {
                 let (values, errors) = WebpageScraper.scrapeYahooRowForDoubles(html$: pageText, rowTitle: title , rowTerminal: "\"", numberTerminal: ",")
                 loaderrors.append(contentsOf: errors)
                 
                 if let valid = values?.first {
-                    employees = valid
+//                    DispatchQueue.main.async {
+                        self.employees = valid
+//                    }
                 }
             }
         }
         
-        DispatchQueue.main.async {
-            self.save()
-        }
+//        DispatchQueue.main.async {
+        self.save() // thread and context safe
+//        }
        
         if loaderrors.count > 0 {
             for error in loaderrors {
@@ -1071,7 +1173,306 @@ public class Share: NSManagedObject {
 
             }
         }
+            
+    }
+    */
+    //MARK: - signals research
+    
+    /// returns all macd line and signalLine crossings if macd.signalLine > 0 as [LineCrossing]
+    /// in time ascending order - latest = last
+    func macDCrossingsAboveZero() -> [LineCrossing]? {
+        
+        guard let macds = getMACDs() else {
+            return nil
+        }
+        
+        let descendingMCDs = Array(macds.reversed()).filter { (macd) -> Bool in
+            if macd.signalLine ?? 0 > 0 { return true }
+            else { return false }
+        }
+        
+        
+        var crossingPoints = [LineCrossing]()
+        
+        var latestMCD = descendingMCDs.first!
+        for i in 1..<descendingMCDs.count {
+            
+            if latestMCD.histoBar != nil && descendingMCDs[i].histoBar != nil {
+                if (latestMCD.histoBar! * descendingMCDs[i].histoBar!) <= 0 { // crossing
+                                        
+                    let crossingPrice = priceAtDate(date: latestMCD.date!, priceOption: .close)
+                    let crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs[i].histoBar!), crossingPrice: crossingPrice)
+                    crossingPoints.append(crossingPoint)
+                }
+            }
+            latestMCD = descendingMCDs[i]
+        }
+
+        return crossingPoints.reversed()
+    }
+    
+    /// returns all macd line and signalLine crossings if macd.signalLine < 0 as [LineCrossing]
+    /// in time ascending order - latest = last
+    func macDCrossingsBelowZero() -> [LineCrossing]? {
+        
+        guard let macds = getMACDs() else {
+            return nil
+        }
+        
+        let descendingMCDs = Array(macds.reversed()).filter { (macd) -> Bool in
+            if macd.signalLine ?? 0 < 0 { return true }
+            else { return false }
+        }
+        
+        
+        var crossingPoints = [LineCrossing]()
+        
+        var latestMCD = descendingMCDs.first!
+        for i in 1..<descendingMCDs.count {
+            
+            if latestMCD.histoBar != nil && descendingMCDs[i].histoBar != nil {
+                if (latestMCD.histoBar! * descendingMCDs[i].histoBar!) <= 0 { // crossing
+                                        
+                    let crossingPrice = priceAtDate(date: latestMCD.date!, priceOption: .close)
+                    let crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs[i].histoBar!), crossingPrice: crossingPrice)
+                    crossingPoints.append(crossingPoint)
+                }
+            }
+            latestMCD = descendingMCDs[i]
+        }
+
+        return crossingPoints.reversed()
+    }
+    
+    
+    /// returns all stoch osc line slow-d and fast-k crossings if slow_d < 20 as [LineCrossing]
+    /// in time ascending order - latest = last
+    func oscCrossingsUndersold() -> [LineCrossing]? {
+        
+        guard let oscillators = calculateSlowStochOscillators() else {
+            return nil
+        }
+
+        let descendingOscillators = Array(oscillators.reversed()).filter { (stOsc) -> Bool in
+            if stOsc.d_slow ?? 100 < 20 { return true }
+            else { return false }
+        }
+        
+        var crossingPoints = [LineCrossing]()
+        
+        var lastOsc = descendingOscillators.first!
+        for i in 1..<descendingOscillators.count {
+            let lastDifference = lastOsc.k_fast! - lastOsc.d_slow!
+            let currentDifference = descendingOscillators[i].k_fast! - descendingOscillators[i].d_slow!
+            
+            if (currentDifference * lastDifference) <= 0 {
+                let timeInBetween = lastOsc.date!.timeIntervalSince(descendingOscillators[i].date!)
+                let dateInBetween = lastOsc.date!.addingTimeInterval(-timeInBetween / 2)
+                let crossingPrice = priceAtDate(date: dateInBetween, priceOption: .close)
+                let crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference), crossingPrice: crossingPrice)
+                crossingPoints.append(crossingPoint)
+            }
+            lastOsc = descendingOscillators[i]
+        }
+        
+        return crossingPoints.reversed()
+    }
+    
+    /// returns all stoch osc line slow-d and fast-k crossings if slow_d > 80 as [LineCrossing]
+    /// in time ascending order - latest = last
+    func oscCrossingsOversold() -> [LineCrossing]? {
+        
+        guard let oscillators = calculateSlowStochOscillators() else {
+            return nil
+        }
+
+        let descendingOscillators = Array(oscillators.reversed()).filter { (stOsc) -> Bool in
+            if stOsc.d_slow ?? 0 > 80 { return true }
+            else { return false }
+        }
+        
+        var crossingPoints = [LineCrossing]()
+        
+        var lastOsc = descendingOscillators.first!
+        for i in 1..<descendingOscillators.count {
+            let lastDifference = lastOsc.k_fast! - lastOsc.d_slow!
+            let currentDifference = descendingOscillators[i].k_fast! - descendingOscillators[i].d_slow!
+            
+            if (currentDifference * lastDifference) <= 0 {
+                let timeInBetween = lastOsc.date!.timeIntervalSince(descendingOscillators[i].date!)
+                let dateInBetween = lastOsc.date!.addingTimeInterval(-timeInBetween / 2)
+                let crossingPrice = priceAtDate(date: dateInBetween, priceOption: .close)
+                let crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference), crossingPrice: crossingPrice)
+                crossingPoints.append(crossingPoint)
+            }
+            lastOsc = descendingOscillators[i]
+        }
+        
+        return crossingPoints.reversed()
     }
 
+    func priceIncreaseAfterMCDCrossings() {
+        
+        guard let aboveCrossingPoints = macDCrossingsAboveZero() else {
+            return
+        }
+        
+        var abovePriceIncreases = [Double]()
+        
+        var firstPositiveCrossingIndex = 0
+        for crossing in aboveCrossingPoints {
+            if crossing.signal > 0 {
+                break
+            }
+            firstPositiveCrossingIndex += 1
+        }
+
+        var lastCrossing = aboveCrossingPoints[firstPositiveCrossingIndex]
+        for i in (firstPositiveCrossingIndex+1)..<aboveCrossingPoints.count {
+            
+            if aboveCrossingPoints[i].crossingPrice != nil && lastCrossing.crossingPrice != nil {
+                let percentIncrease = (aboveCrossingPoints[i].crossingPrice! - lastCrossing.crossingPrice!) / lastCrossing.crossingPrice!
+                abovePriceIncreases.append(percentIncrease)
+            }
+            
+            lastCrossing = aboveCrossingPoints[i]
+        }
+        
+        guard let belowCrossingPoints = macDCrossingsBelowZero() else {
+            return
+        }
+        
+        var belowPriceIncreases = [Double]()
+        
+        firstPositiveCrossingIndex = 0
+        for crossing in aboveCrossingPoints {
+            if crossing.signal > 0 {
+                break
+            }
+            firstPositiveCrossingIndex += 1
+        }
+
+        lastCrossing = belowCrossingPoints[firstPositiveCrossingIndex]
+        for i in (firstPositiveCrossingIndex+1)..<belowCrossingPoints.count {
+            
+            if belowCrossingPoints[i].crossingPrice != nil && lastCrossing.crossingPrice != nil {
+                let percentIncrease = (belowCrossingPoints[i].crossingPrice! - lastCrossing.crossingPrice!) / lastCrossing.crossingPrice!
+                belowPriceIncreases.append(percentIncrease)
+            }
+            
+            lastCrossing = belowCrossingPoints[i]
+        }
+
+        let actualIncreasesAbove = abovePriceIncreases.filter { (increase) -> Bool in
+            if increase > 0 { return true }
+            else { return false }
+        }
+        let actualIncreasesBelow = belowPriceIncreases.filter { (increase) -> Bool in
+            if increase > 0 { return true }
+            else { return false }
+        }
+
+        
+        let above$ = percentFormatter2Digits.string(from: abovePriceIncreases.mean()! as NSNumber) ?? ""
+        let below$ = percentFormatter2Digits.string(from: belowPriceIncreases.mean()! as NSNumber) ?? ""
+        
+        let abovePct = Double(actualIncreasesAbove.count) / Double(abovePriceIncreases.count)
+        let belowPct = Double(actualIncreasesBelow.count) / Double(belowPriceIncreases.count)
+        
+        let abovePct$ = percentFormatter2Digits.string(from: abovePct as NSNumber) ?? ""
+        let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
+
+        print()
+        print("\(symbol) mean price increase after MACD crossings above zero is " + above$)
+        print( abovePct$ + " of \(abovePriceIncreases.count) are actual increases")
+//        print(abovePriceIncreases)
+        print("\(symbol) mean price increase after MACD crossings BELOW zero is " +  below$)
+        print( belowPct$ + " of \(belowPriceIncreases.count) are actual increases")
+//        print(belowPriceIncreases)
+        print()
+
+    }
+    
+    func priceIncreaseAfterOscCrossings() {
+        
+        guard let aboveCrossingPoints = oscCrossingsOversold() else {
+            return
+        }
+        
+        var abovePriceIncreases = [Double]()
+        
+        var firstPositiveCrossingIndex = 0
+        for crossing in aboveCrossingPoints {
+            if crossing.signal > 0 {
+                break
+            }
+            firstPositiveCrossingIndex += 1
+        }
+
+        var lastCrossing = aboveCrossingPoints[firstPositiveCrossingIndex]
+        for i in (firstPositiveCrossingIndex+1)..<aboveCrossingPoints.count {
+            
+            if aboveCrossingPoints[i].crossingPrice != nil && lastCrossing.crossingPrice != nil {
+                let percentIncrease = (aboveCrossingPoints[i].crossingPrice! - lastCrossing.crossingPrice!) / lastCrossing.crossingPrice!
+                abovePriceIncreases.append(percentIncrease)
+            }
+            
+            lastCrossing = aboveCrossingPoints[i]
+        }
+        
+        guard let belowCrossingPoints = oscCrossingsUndersold() else {
+            return
+        }
+        
+        var belowPriceIncreases = [Double]()
+        
+        firstPositiveCrossingIndex = 0
+        for crossing in aboveCrossingPoints {
+            if crossing.signal > 0 {
+                break
+            }
+            firstPositiveCrossingIndex += 1
+        }
+
+        lastCrossing = belowCrossingPoints[firstPositiveCrossingIndex]
+        for i in (firstPositiveCrossingIndex+1)..<belowCrossingPoints.count {
+            
+            if belowCrossingPoints[i].crossingPrice != nil && lastCrossing.crossingPrice != nil {
+                let percentIncrease = (belowCrossingPoints[i].crossingPrice! - lastCrossing.crossingPrice!) / lastCrossing.crossingPrice!
+                belowPriceIncreases.append(percentIncrease)
+            }
+            
+            lastCrossing = belowCrossingPoints[i]
+        }
+
+        let actualIncreasesAbove = abovePriceIncreases.filter { (increase) -> Bool in
+            if increase > 0 { return true }
+            else { return false }
+        }
+        let actualIncreasesBelow = belowPriceIncreases.filter { (increase) -> Bool in
+            if increase > 0 { return true }
+            else { return false }
+        }
+
+        
+        let above$ = percentFormatter2Digits.string(from: (abovePriceIncreases.mean() ?? 0) as NSNumber) ?? ""
+        let below$ = percentFormatter2Digits.string(from: (belowPriceIncreases.mean() ?? 0) as NSNumber) ?? ""
+        
+        let abovePct = Double(actualIncreasesAbove.count) / Double(abovePriceIncreases.count)
+        let belowPct = Double(actualIncreasesBelow.count) / Double(belowPriceIncreases.count)
+        
+        let abovePct$ = percentFormatter2Digits.string(from: abovePct as NSNumber) ?? ""
+        let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
+
+        print()
+        print("\(symbol) mean price increase after OSC crossings in oversold area (>80)" + above$)
+        print( abovePct$ + " of \(abovePriceIncreases.count) are actual increases")
+//        print(abovePriceIncreases)
+        print("\(symbol) mean price increase after OSC crossings in undersold area (<20)" +  below$)
+        print( belowPct$ + " of \(belowPriceIncreases.count) are actual increases")
+//        print(belowPriceIncreases)
+        print()
+
+    }
 
 }

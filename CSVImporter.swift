@@ -301,6 +301,7 @@ class CSVImporter: NSObject {
 
         let expectedOrder = ["Date","Open","High","Low","Close","Adj Close","Volume"]
         var headerError = false
+
         if let headerArray = rows.first?.components(separatedBy: ",") {
             var count = 0
             headerArray.forEach { (header) in
@@ -311,7 +312,10 @@ class CSVImporter: NSObject {
             }
         }
         
-        if headerError { return false }
+        if headerError {
+            return false
+            
+        }
         else { return true }
     }
     

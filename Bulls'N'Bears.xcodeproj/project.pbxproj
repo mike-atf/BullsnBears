@@ -43,10 +43,17 @@
 		EA39A44725C5BF5300DE0FF9 /* R1WebDataAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */; };
 		EA3DF0C4260A1184001A0098 /* LineCrossingSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */; };
 		EA3DF0C9260B8C5A001A0098 /* BuySellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3DF0C8260B8C5A001A0098 /* BuySellView.swift */; };
+		EA3E1D6C26317F8A0021B973 /* SharePlaceHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3E1D6B26317F8A0021B973 /* SharePlaceHolder.swift */; };
 		EA4B5F0625DD53900070CC70 /* WebDataDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */; };
 		EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */; };
 		EA50DEF225D427B10005B23A /* StocksController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA50DEF125D427B10005B23A /* StocksController.swift */; };
 		EA52EDC825D18D760000155F /* WebpageScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA52EDC725D18D760000155F /* WebpageScraper.swift */; };
+		EA5639E1262C47F700010964 /* ChartTimeLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E0262C47F700010964 /* ChartTimeLineView.swift */; };
+		EA5639E2262C47F700010964 /* ChartTimeLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E0262C47F700010964 /* ChartTimeLineView.swift */; };
+		EA5639E3262C47F700010964 /* ChartTimeLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E0262C47F700010964 /* ChartTimeLineView.swift */; };
+		EA5639E8262C481600010964 /* ChartPricesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E7262C481600010964 /* ChartPricesView.swift */; };
+		EA5639E9262C481600010964 /* ChartPricesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E7262C481600010964 /* ChartPricesView.swift */; };
+		EA5639EA262C481600010964 /* ChartPricesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E7262C481600010964 /* ChartPricesView.swift */; };
 		EA5FDBE325B1EE34008918C8 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5FDBE225B1EE34008918C8 /* AlertController.swift */; };
 		EA6AACD826050457002DE9DF /* MAC_D.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACD726050457002DE9DF /* MAC_D.swift */; };
 		EA6AACD926050457002DE9DF /* MAC_D.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACD726050457002DE9DF /* MAC_D.swift */; };
@@ -251,10 +258,13 @@
 		EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = R1WebDataAnalyser.swift; sourceTree = "<group>"; };
 		EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineCrossingSignal.swift; sourceTree = "<group>"; };
 		EA3DF0C8260B8C5A001A0098 /* BuySellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BuySellView.swift; path = "Bulls'N'Bears/Model Files/BuySellView.swift"; sourceTree = SOURCE_ROOT; };
+		EA3E1D6B26317F8A0021B973 /* SharePlaceHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePlaceHolder.swift; sourceTree = "<group>"; };
 		EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDataDownloader.swift; sourceTree = "<group>"; };
 		EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueChart.swift; sourceTree = "<group>"; };
 		EA50DEF125D427B10005B23A /* StocksController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksController.swift; sourceTree = "<group>"; };
 		EA52EDC725D18D760000155F /* WebpageScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpageScraper.swift; sourceTree = "<group>"; };
+		EA5639E0262C47F700010964 /* ChartTimeLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTimeLineView.swift; sourceTree = SOURCE_ROOT; };
+		EA5639E7262C481600010964 /* ChartPricesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPricesView.swift; sourceTree = "<group>"; };
 		EA5FDBE225B1EE34008918C8 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AlertController.swift; path = "Bulls'N'Bears/DCFValuation FIles/AlertController.swift"; sourceTree = SOURCE_ROOT; };
 		EA6AACD726050457002DE9DF /* MAC_D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MAC_D.swift; sourceTree = SOURCE_ROOT; };
 		EA6AACDE26053294002DE9DF /* MACD_View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MACD_View.swift; path = "Bulls'N'Bears/Model Files/MACD_View.swift"; sourceTree = SOURCE_ROOT; };
@@ -407,6 +417,7 @@
 				EAA69F72260E52550067EE1A /* GrowthCategory.swift */,
 				EAC0F15925FA819E00AD9E29 /* Share+CoreDataClass.swift */,
 				EAC0F15A25FA819E00AD9E29 /* Share+CoreDataProperties.swift */,
+				EA3E1D6B26317F8A0021B973 /* SharePlaceHolder.swift */,
 				EA32080725EED93A00A6A6AB /* UserEvaluation+CoreDataClass.swift */,
 				EA32080825EED93A00A6A6AB /* UserEvaluation+CoreDataProperties.swift */,
 				EA32082625EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift */,
@@ -535,8 +546,10 @@
 				EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */,
 				EAC190D42576731B0030B331 /* StockChartVC.swift */,
 				EAC190E92577E2E20030B331 /* ChartContainerView.swift */,
+				EA5639E7262C481600010964 /* ChartPricesView.swift */,
 				EAA099C32588020B00DBB93C /* CheckButton.swift */,
 				EAC190F32577E3B60030B331 /* ChartView.swift */,
+				EA5639E0262C47F700010964 /* ChartTimeLineView.swift */,
 				EA6AACDE26053294002DE9DF /* MACD_View.swift */,
 				EAD921672607D980008312E0 /* StochastikOscillatorView.swift */,
 				EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */,
@@ -759,6 +772,7 @@
 				EAC2FC4225A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EA50DEF225D427B10005B23A /* StocksController.swift in Sources */,
 				EA3207F825EEA15900A6A6AB /* ValueListTextEntryCell.swift in Sources */,
+				EA5639E1262C47F700010964 /* ChartTimeLineView.swift in Sources */,
 				EAC0F15E25FA819E00AD9E29 /* Share+CoreDataProperties.swift in Sources */,
 				EAC9890225F146E1007AE6F6 /* TrendIconView.swift in Sources */,
 				EAA69F9226121CA30067EE1A /* StockResearch+CoreDataClass.swift in Sources */,
@@ -794,6 +808,8 @@
 				EA06251A25D07A230015FA6E /* DownloadProgressView.swift in Sources */,
 				EAD835E725DC10700015C93A /* ValueListTVC.swift in Sources */,
 				EAC2FC7B25A240290060F387 /* ValuationListViewController.swift in Sources */,
+				EA5639E8262C481600010964 /* ChartPricesView.swift in Sources */,
+				EA3E1D6C26317F8A0021B973 /* SharePlaceHolder.swift in Sources */,
 				EAC190B3257661F60030B331 /* MasterSplitView.swift in Sources */,
 				EAA69FB22612221B0067EE1A /* ResearchTVC.swift in Sources */,
 				EAC190CB257663730030B331 /* Stock.swift in Sources */,
@@ -820,10 +836,12 @@
 				EAC190F52577E3B60030B331 /* ChartView.swift in Sources */,
 				EA06251B25D07A230015FA6E /* DownloadProgressView.swift in Sources */,
 				EA0E2F312625E32500602BEE /* RimmedLabel.swift in Sources */,
+				EA5639E9262C481600010964 /* ChartPricesView.swift in Sources */,
 				EAC190EB2577E2E20030B331 /* ChartContainerView.swift in Sources */,
 				EAC0F15F25FA819E00AD9E29 /* Share+CoreDataProperties.swift in Sources */,
 				EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */,
 				EAD835E125DC06EC0015C93A /* Calculator.swift in Sources */,
+				EA5639E2262C47F700010964 /* ChartTimeLineView.swift in Sources */,
 				EA0E2F232625CBD500602BEE /* StocksListTVC.swift in Sources */,
 				EAC190CC257663730030B331 /* Stock.swift in Sources */,
 				EAA69F7F26121A940067EE1A /* CompanyNews+CoreDataClass.swift in Sources */,
@@ -871,10 +889,12 @@
 				EAC190F62577E3B60030B331 /* ChartView.swift in Sources */,
 				EA06251C25D07A230015FA6E /* DownloadProgressView.swift in Sources */,
 				EA0E2F322625E32500602BEE /* RimmedLabel.swift in Sources */,
+				EA5639EA262C481600010964 /* ChartPricesView.swift in Sources */,
 				EAC190EC2577E2E20030B331 /* ChartContainerView.swift in Sources */,
 				EAC0F16025FA819E00AD9E29 /* Share+CoreDataProperties.swift in Sources */,
 				EAC190CD257663730030B331 /* Stock.swift in Sources */,
 				EAD835E225DC06EC0015C93A /* Calculator.swift in Sources */,
+				EA5639E3262C47F700010964 /* ChartTimeLineView.swift in Sources */,
 				EA0E2F242625CBD500602BEE /* StocksListTVC.swift in Sources */,
 				EAC190D72576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAA69F8026121A940067EE1A /* CompanyNews+CoreDataClass.swift in Sources */,
