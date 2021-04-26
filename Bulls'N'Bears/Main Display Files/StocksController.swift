@@ -234,8 +234,7 @@ extension StocksController: StockDelegate {
             else { return false }
         }).first {
             share.shareFromPlaceholder(share: matchingShare)
-            // TODO: - saving changes to the main viewContext here assumes that this NSFR controller updates the shares and the associated StocksListTVC
-            matchingShare.save()
+            matchingShare.save() // will trigger update of StocksListTVC via FRC functionality
         }
         
         if errors.count > 0 {
@@ -247,8 +246,8 @@ extension StocksController: StockDelegate {
     
     func research() {
         for share in self.fetchedObjects ?? [] {
-//            share.priceIncreaseAfterMCDCrossings()
-//            share.priceIncreaseAfterOscCrossings()
+            share.priceIncreaseAfterMCDCrossings()
+            share.priceIncreaseAfterOscCrossings()
         }
     }
 }

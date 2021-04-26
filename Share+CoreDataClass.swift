@@ -13,6 +13,10 @@ import CoreData
 public class Share: NSManagedObject {
     
     var priceUpdateComplete: Bool?
+    var prices: [PricePoint]?
+    var macds: [MAC_D]?
+    var osc: [StochasticOscillator]?
+    var latestBuySellSignals: [LineCrossing?]?
     
     public override func awakeFromInsert() {
         eps = Double()
@@ -41,23 +45,6 @@ public class Share: NSManagedObject {
         if growthSubType == nil {
             growthSubType = "Unknown"
         }
-        
-//        else {
-//            if growthType!.contains("Sluggard") {
-//                growthType = GrowthCategoryNames.sluggard
-//            }
-//            else if growthType!.contains("Stalwart") {
-//                growthType = "Stalwart"
-//            }
-//            else if growthType!.contains("Fast grower") {
-//                growthType = "Fast grower"
-//            }
-//            else if growthType!.contains("Fast grower") {
-//                growthType = "Fast grower"
-//            }
-//
-//        }
-        
         
     }
     
@@ -144,16 +131,21 @@ public class Share: NSManagedObject {
     
     func getDailyPrices() -> [PricePoint]? {
 
+        if let alreadyConverted = prices {
+            return alreadyConverted
+        }
+        
         guard let valid = dailyPrices else { return nil }
         
         do {
             if let data = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? Data {
 
                 let array = try PropertyListDecoder().decode([PricePoint].self, from: data)
-                return array.sorted { (e0, e1) -> Bool in
+                prices = array.sorted { (e0, e1) -> Bool in
                     if e0.tradingDate < e1.tradingDate { return true }
                     else { return false }
                 }
+                return prices
             }
         } catch let error {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
@@ -164,16 +156,21 @@ public class Share: NSManagedObject {
     
     func getMACDs() -> [MAC_D]? {
 
+        if let alreadyCalculated = macds {
+            return alreadyCalculated
+        }
+        
         if let valid = macd {
         
             do {
                 if let data = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? Data {
 
                     let array = try PropertyListDecoder().decode([MAC_D].self, from: data)
-                    return array.sorted { (e0, e1) -> Bool in
+                    macds = array.sorted { (e0, e1) -> Bool in
                         if e0.date ?? Date() < e1.date ?? Date() { return true }
                         else { return false }
                     }
+                    return macds
                 }
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored MACD data")
@@ -733,6 +730,10 @@ public class Share: NSManagedObject {
     /// also converts to data stored as 'macd' property of share
     func calculateMACDs(shortPeriod: Int, longPeriod: Int) -> [MAC_D]? {
         
+        if let alreadyCalculated = macds {
+            return alreadyCalculated
+        }
+        
         guard let dailyPrices = getDailyPrices() else { return nil }
         guard let closePrices = (getDailyPrices()?.compactMap{ $0.close }) else { return nil }
         
@@ -770,6 +771,7 @@ public class Share: NSManagedObject {
             lastMACD = macd
         }
         
+        macds = mac_ds
         self.macd = convertMACDToData(macds: mac_ds)
         save()
         
@@ -779,6 +781,10 @@ public class Share: NSManagedObject {
     /// returns array[0] = fast oascillator K%
     /// arrays[1] = slow oscillator D%
     func calculateSlowStochOscillators() -> [StochasticOscillator]? {
+        
+        if let alreadyCalculated = osc {
+            return alreadyCalculated
+        }
         
         guard let dailyPrices = getDailyPrices() else { return nil }
         
@@ -808,6 +814,7 @@ public class Share: NSManagedObject {
             }
         }
         
+        osc = slowOsc
         return slowOsc
     }
     
@@ -826,7 +833,7 @@ public class Share: NSManagedObject {
             if latestMCD.histoBar != nil && descendingMCDs[i].histoBar != nil {
                 if (latestMCD.histoBar! * descendingMCDs[i].histoBar!) <= 0 {
                     let crossingPrice = priceAtDate(date: latestMCD.date!, priceOption: .close)
-                   crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs[i].histoBar!), crossingPrice: crossingPrice)
+                    crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs[i].histoBar!), crossingPrice: crossingPrice, type:"macd")
                     break
                 }
             }
@@ -842,20 +849,24 @@ public class Share: NSManagedObject {
             return nil
         }
         
+        let descendingDailyPrices = Array(dailyPrices.reversed())
+        
         var crossingPoint: LineCrossing?
         
-        var sma10 = Array(dailyPrices.compactMap{$0.close}[..<10])
-        var lastPrice = dailyPrices[10]
-        for i in 11..<dailyPrices.count {
-            let lastDifference = lastPrice.close - sma10.mean()!
-            sma10.append(dailyPrices[i-1].close)
+        var sma10 = Array(descendingDailyPrices[1...10].compactMap{$0.close})
+        
+        var lastPrice = descendingDailyPrices.first!
+        for i in 1..<descendingDailyPrices.count-10 {
+            let laterDifference = lastPrice.close - sma10.reduce(0,+)/10.0
+            sma10.append(descendingDailyPrices[i+10].close)
             sma10.removeFirst()
-            let currentDifference = dailyPrices[i].close - sma10.mean()!
+            let earlierDifference = descendingDailyPrices[i].close - sma10.reduce(0,+)/10.0
             
-            if (currentDifference * lastDifference) <= 0 {
-                crossingPoint = LineCrossing(date: dailyPrices[i].tradingDate, signal: (currentDifference - lastDifference), crossingPrice: ((dailyPrices[i].high + dailyPrices[i].low) / 2))
+            if (earlierDifference * laterDifference) <= 0 {
+                crossingPoint = LineCrossing(date: lastPrice.tradingDate, signal: (laterDifference - earlierDifference), crossingPrice: (lastPrice.close), type:"sma10")
+                break
             }
-            lastPrice = dailyPrices[i]
+            lastPrice = descendingDailyPrices[i]
         }
         
         return crossingPoint
@@ -868,7 +879,7 @@ public class Share: NSManagedObject {
         }
 
         let descendingOscillators = Array(oscillators.reversed())
-                var crossingPoint: LineCrossing?
+        var crossingPoint: LineCrossing?
         
         var lastOsc = descendingOscillators.first!
         for i in 1..<descendingOscillators.count {
@@ -879,7 +890,7 @@ public class Share: NSManagedObject {
                 let timeInBetween = lastOsc.date!.timeIntervalSince(descendingOscillators[i].date!)
                 let dateInBetween = lastOsc.date!.addingTimeInterval(-timeInBetween / 2)
                 let crossingPrice = priceAtDate(date: dateInBetween, priceOption: .close)
-                crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference), crossingPrice: crossingPrice)
+                crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference), crossingPrice: crossingPrice, type:"osc")
                 break
             }
             lastOsc = descendingOscillators[i]
@@ -887,145 +898,282 @@ public class Share: NSManagedObject {
         
         return crossingPoint
     }
+    
+    func latest3Crossings() -> [LineCrossing?]? {
+        
+        if let alreadyCalculated = latestBuySellSignals {
+            return alreadyCalculated
+        }
+        
+        guard let latestMACDCrossing = latestMCDCrossing() else {
+            return nil
+        }
+        
+        guard let latestOSCDCrossing = latestStochastikCrossing() else {
+            return nil
+        }
+
+        guard let latestSMACrossing = latestSMA10Crossing() else {
+            return nil
+        }
+
+        
+        guard let firstSignal = [latestSMACrossing, latestMACDCrossing, latestOSCDCrossing].sorted(by: { (lc0, lc1) -> Bool in
+            if lc0.date < lc1.date { return true }
+            else { return false }
+        }).first else { return nil }
+        
+        
+        // find the earliest of the three and determine its'type'
+        // check the other two types for the nearest crossings matching the upward/downwards signal of the earliest
+        // if there are none take their latest crossings as default
+        // otherwise take the later of the two as the 'buy' or sell signal
+        
+        guard let smaCrossings = sma10Crossings(after: firstSignal.date) else {
+            return nil
+        }
+        
+        guard let macdCrossings = macDCrossings(aboveZero: nil, after: firstSignal.date) else {
+            return nil
+        }
+        
+        guard let oscCrossings = oscCrossings(oversold: nil, after: firstSignal.date) else {
+            return nil
+        }
+        
+        var allCrossings = [LineCrossing]()
+
+        allCrossings = smaCrossings
+        allCrossings.append(contentsOf: macdCrossings)
+        allCrossings.append(contentsOf: oscCrossings)
+        
+        // remove all firstSignals types
+        allCrossings = allCrossings.filter({ (crossing) -> Bool in
+            if crossing.type == firstSignal.type { return false }
+            else { return true }
+        })
+        
+//        allCrossings.sort { (cp0, cp1) -> Bool in
+//            if cp0.date < cp1.date { return true }
+//            else { return false }
+//        }
+        
+        var secondSignal = allCrossings.filter({ (crossing) -> Bool in
+//            if crossing.date < firstSignal.date { return false }
+            if crossing.signalIsBuy() != firstSignal.signalIsBuy() { return false }
+//            else if crossing.type == firstSignal.type { return false }
+            else { return true }
+        }).sorted( by: { (cp0, cp1) -> Bool in
+            if cp0.date < cp1.date { return true }
+            else { return false }
+        }).first
+        
+        if secondSignal == nil {
+            secondSignal = allCrossings.last
+        }
+        
+        if secondSignal == nil { return [firstSignal, nil, nil] }
+        
+        var thirdSignal = allCrossings.filter({ (crossing) -> Bool in
+//            if crossing.date < secondSignal!.date { return false }
+            if crossing.signalIsBuy() != firstSignal.signalIsBuy() { return false }
+            else if crossing.type == secondSignal!.type { return false }
+            else { return true }
+        }).first
+        
+        if thirdSignal == nil {
+            thirdSignal = allCrossings.filter({ (crossing) -> Bool in
+//                if crossing.date < secondSignal!.date { return false }
+                if crossing.type == secondSignal!.type { return false }
+                else { return true }
+            }).last
+        }
+
+        latestBuySellSignals = [firstSignal, secondSignal, thirdSignal]
+        return latestBuySellSignals
+    }
 
     //MARK: - signals research
-    
-    /// returns all macd line and signalLine crossings if macd.signalLine > 0 as [LineCrossing]
-    /// in time ascending order - latest = last
-    func macDCrossingsAboveZero() -> [LineCrossing]? {
         
-        guard let macds = getMACDs() else {
+    /// returns all macd line and signalLine crossings,  in time ascending order - latest = last
+    /// if aboveZero = true  only if  macd.signalLine > 0
+    /// if aboveZero = false  only if  macd.signalLine < 0
+    /// if aboveZero = nil all crossings
+    func macDCrossings(aboveZero: Bool?, after:Date?=nil) -> [LineCrossing]? {
+        
+        guard var macds = getMACDs() else {
             return nil
         }
         
-        let descendingMCDs = Array(macds.reversed()).filter { (macd) -> Bool in
-            if macd.signalLine ?? 0 > 0 { return true }
-            else { return false }
+        if let validDate = after {
+            macds = macds.filter({ (macd) -> Bool in
+                if macd.date! < validDate { return false }
+                else { return true }
+            })
+        }
+        
+        var descendingMCDs: [MAC_D]?
+        
+        if aboveZero == nil {
+            descendingMCDs = Array(macds.reversed())
+        }
+        else if (aboveZero ?? false) {
+            descendingMCDs = Array(macds.reversed()).filter { (macd) -> Bool in
+                if macd.signalLine ?? 0 > 0 { return true }
+                else { return false }
+            }
+        }
+        else if !(aboveZero ?? true) {
+            descendingMCDs = Array(macds.reversed()).filter { (macd) -> Bool in
+                if macd.signalLine ?? 0 < 0 { return true }
+                else { return false }
+            }
         }
         
         
+        guard descendingMCDs?.count ?? 0 > 1 else {
+            return nil
+        }
+        
         var crossingPoints = [LineCrossing]()
         
-        var latestMCD = descendingMCDs.first!
-        for i in 1..<descendingMCDs.count {
+        var latestMCD = descendingMCDs!.first!
+        for i in 1..<descendingMCDs!.count {
             
-            if latestMCD.histoBar != nil && descendingMCDs[i].histoBar != nil {
-                if (latestMCD.histoBar! * descendingMCDs[i].histoBar!) <= 0 { // crossing
+            if latestMCD.histoBar != nil && descendingMCDs![i].histoBar != nil {
+                if (latestMCD.histoBar! * descendingMCDs![i].histoBar!) <= 0 { // crossing
                                         
-                    let crossingPrice = priceAtDate(date: latestMCD.date!, priceOption: .close)
-                    let crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs[i].histoBar!), crossingPrice: crossingPrice)
+                    let crossingPrice = priceAtDate(date: (latestMCD.date!), priceOption: .close)
+                    let crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs![i].histoBar!), crossingPrice: crossingPrice,type: "macd")
                     crossingPoints.append(crossingPoint)
                 }
             }
-            latestMCD = descendingMCDs[i]
+            latestMCD = descendingMCDs![i]
         }
 
         return crossingPoints.reversed()
     }
     
-    /// returns all macd line and signalLine crossings if macd.signalLine < 0 as [LineCrossing]
-    /// in time ascending order - latest = last
-    func macDCrossingsBelowZero() -> [LineCrossing]? {
+    /// returns all stoch osc line slow-d and fast-k crossingsas [LineCrossing] in time ascending order - latest = last
+    /// if oversold = true  only if  slow_d  >  80
+    /// if oversold = false  only if   slow_d < 20
+    /// if oversold = nil all crossings
+    func oscCrossings(oversold: Bool?, after: Date?=nil) -> [LineCrossing]? {
         
-        guard let macds = getMACDs() else {
+        guard var oscillators = calculateSlowStochOscillators() else {
             return nil
         }
-        
-        let descendingMCDs = Array(macds.reversed()).filter { (macd) -> Bool in
-            if macd.signalLine ?? 0 < 0 { return true }
-            else { return false }
+
+        if let validDate = after {
+            oscillators = oscillators.filter({ (oscillator) -> Bool in
+                if oscillator.date! < validDate { return false }
+                else { return true }
+            })
         }
         
+        var descendingOscillators: [StochasticOscillator]?
         
-        var crossingPoints = [LineCrossing]()
-        
-        var latestMCD = descendingMCDs.first!
-        for i in 1..<descendingMCDs.count {
-            
-            if latestMCD.histoBar != nil && descendingMCDs[i].histoBar != nil {
-                if (latestMCD.histoBar! * descendingMCDs[i].histoBar!) <= 0 { // crossing
-                                        
-                    let crossingPrice = priceAtDate(date: latestMCD.date!, priceOption: .close)
-                    let crossingPoint = LineCrossing(date: latestMCD.date!, signal: (latestMCD.histoBar! - descendingMCDs[i].histoBar!), crossingPrice: crossingPrice)
-                    crossingPoints.append(crossingPoint)
-                }
+        if oversold == nil {
+            descendingOscillators = Array(oscillators.reversed())
+        }
+        else if (oversold ?? false) {
+             descendingOscillators = Array(oscillators.reversed()).filter { (stOsc) -> Bool in
+                if stOsc.d_slow ?? 100 < 20 { return true }
+                else { return false }
             }
-            latestMCD = descendingMCDs[i]
         }
-
-        return crossingPoints.reversed()
-    }
-    
-    
-    /// returns all stoch osc line slow-d and fast-k crossings if slow_d < 20 as [LineCrossing]
-    /// in time ascending order - latest = last
-    func oscCrossingsUndersold() -> [LineCrossing]? {
+        else {
+            descendingOscillators = Array(oscillators.reversed()).filter { (stOsc) -> Bool in
+               if stOsc.d_slow ?? 0 > 80 { return true }
+               else { return false }
+           }
+        }
         
-        guard let oscillators = calculateSlowStochOscillators() else {
+        guard descendingOscillators?.count ?? 0 > 1 else {
             return nil
-        }
-
-        let descendingOscillators = Array(oscillators.reversed()).filter { (stOsc) -> Bool in
-            if stOsc.d_slow ?? 100 < 20 { return true }
-            else { return false }
         }
         
         var crossingPoints = [LineCrossing]()
         
-        var lastOsc = descendingOscillators.first!
-        for i in 1..<descendingOscillators.count {
+        var lastOsc = descendingOscillators!.first!
+        for i in 1..<descendingOscillators!.count {
             let lastDifference = lastOsc.k_fast! - lastOsc.d_slow!
-            let currentDifference = descendingOscillators[i].k_fast! - descendingOscillators[i].d_slow!
+            
+            guard descendingOscillators![i].k_fast != nil && descendingOscillators![i].d_slow != nil else {
+                continue
+            }
+            
+            let currentDifference = descendingOscillators![i].k_fast! - descendingOscillators![i].d_slow!
             
             if (currentDifference * lastDifference) <= 0 {
-                let timeInBetween = lastOsc.date!.timeIntervalSince(descendingOscillators[i].date!)
+                let timeInBetween = lastOsc.date!.timeIntervalSince(descendingOscillators![i].date!)
                 let dateInBetween = lastOsc.date!.addingTimeInterval(-timeInBetween / 2)
                 let crossingPrice = priceAtDate(date: dateInBetween, priceOption: .close)
-                let crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference), crossingPrice: crossingPrice)
+                let crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference), crossingPrice: crossingPrice,type: "osc")
                 crossingPoints.append(crossingPoint)
             }
-            lastOsc = descendingOscillators[i]
+            lastOsc = descendingOscillators![i]
         }
         
         return crossingPoints.reversed()
     }
     
-    /// returns all stoch osc line slow-d and fast-k crossings if slow_d > 80 as [LineCrossing]
-    /// in time ascending order - latest = last
-    func oscCrossingsOversold() -> [LineCrossing]? {
+    func sma10Crossings(after: Date?=nil) -> [LineCrossing]? {
         
-        guard let oscillators = calculateSlowStochOscillators() else {
+        guard let dailyPrices = getDailyPrices() else {
             return nil
         }
+        let earliestDate = after ?? dailyPrices.first!.tradingDate
 
-        let descendingOscillators = Array(oscillators.reversed()).filter { (stOsc) -> Bool in
-            if stOsc.d_slow ?? 0 > 80 { return true }
-            else { return false }
-        }
+        let descendingDailyPrices = Array(dailyPrices.reversed())
         
         var crossingPoints = [LineCrossing]()
         
-        var lastOsc = descendingOscillators.first!
-        for i in 1..<descendingOscillators.count {
-            let lastDifference = lastOsc.k_fast! - lastOsc.d_slow!
-            let currentDifference = descendingOscillators[i].k_fast! - descendingOscillators[i].d_slow!
+        var sma10 = Array(descendingDailyPrices[1...10].compactMap{$0.close})
+        var lastPrice = descendingDailyPrices.first!
+        for i in 1..<descendingDailyPrices.count-10 {
             
-            if (currentDifference * lastDifference) <= 0 {
-                let timeInBetween = lastOsc.date!.timeIntervalSince(descendingOscillators[i].date!)
-                let dateInBetween = lastOsc.date!.addingTimeInterval(-timeInBetween / 2)
-                let crossingPrice = priceAtDate(date: dateInBetween, priceOption: .close)
-                let crossingPoint = LineCrossing(date: dateInBetween, signal: (lastDifference - currentDifference), crossingPrice: crossingPrice)
+//            if symbol == "ALL" {
+//                let calendar = Calendar.current
+//                let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+//                var dateComponents = calendar.dateComponents(components, from: Date())
+//                dateComponents.day = 22
+//                dateComponents.month = 3
+//                dateComponents.year = 2021
+//                dateComponents.second = 0
+//                dateComponents.minute = 0
+//                dateComponents.hour = 0
+//                let theDate = calendar.date(from: dateComponents) ?? Date()
+//
+//                if descendingDailyPrices[i].tradingDate >= theDate {
+//                    print("ALL closing price \(descendingDailyPrices[i].close) @ \(descendingDailyPrices[i].tradingDate)")
+//                    print("SMA 10 = \((sma10[..<10].reduce(0, +)) / 10.0)")
+//                }
+//
+//            }
+            
+            let laterDifference = lastPrice.close - sma10.reduce(0, +)/10.0
+            sma10.append(descendingDailyPrices[i+10].close)
+            sma10.removeFirst()
+            let earlierDifference = descendingDailyPrices[i].close - sma10.reduce(0, +)/10.0
+            
+            if (earlierDifference * laterDifference) <= 0 {
+                let crossingPoint = LineCrossing(date: lastPrice.tradingDate, signal: (laterDifference - earlierDifference), crossingPrice:lastPrice.close, type: "sma10")
                 crossingPoints.append(crossingPoint)
             }
-            lastOsc = descendingOscillators[i]
+            lastPrice = descendingDailyPrices[i]
+            if descendingDailyPrices[i].tradingDate <= earliestDate {
+                break
+            }
+            
         }
         
         return crossingPoints.reversed()
     }
-
+       
     func priceIncreaseAfterMCDCrossings() {
         
-        guard let aboveCrossingPoints = macDCrossingsAboveZero() else {
+        guard let aboveCrossingPoints = macDCrossings(aboveZero: true) else {
             return
         }
         
@@ -1050,7 +1198,7 @@ public class Share: NSManagedObject {
             lastCrossing = aboveCrossingPoints[i]
         }
         
-        guard let belowCrossingPoints = macDCrossingsBelowZero() else {
+        guard let belowCrossingPoints = macDCrossings(aboveZero: false) else {
             return
         }
         
@@ -1095,19 +1243,17 @@ public class Share: NSManagedObject {
         let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
 
         print()
-        print("\(symbol) mean price increase after MACD crossings above zero is " + above$)
+        print("\(symbol!) mean price increase after MACD crossings above zero is " + above$)
         print( abovePct$ + " of \(abovePriceIncreases.count) are actual increases")
-//        print(abovePriceIncreases)
-        print("\(symbol) mean price increase after MACD crossings BELOW zero is " +  below$)
+        print("\(symbol!) mean price increase after MACD crossings BELOW zero is " +  below$)
         print( belowPct$ + " of \(belowPriceIncreases.count) are actual increases")
-//        print(belowPriceIncreases)
         print()
 
     }
     
     func priceIncreaseAfterOscCrossings() {
         
-        guard let aboveCrossingPoints = oscCrossingsOversold() else {
+        guard let aboveCrossingPoints = oscCrossings(oversold: true) else {
             return
         }
         
@@ -1132,7 +1278,7 @@ public class Share: NSManagedObject {
             lastCrossing = aboveCrossingPoints[i]
         }
         
-        guard let belowCrossingPoints = oscCrossingsUndersold() else {
+        guard let belowCrossingPoints = oscCrossings(oversold: false) else {
             return
         }
         
@@ -1177,14 +1323,108 @@ public class Share: NSManagedObject {
         let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
 
         print()
-        print("\(symbol) mean price increase after OSC crossings in oversold area (>80)" + above$)
+        print("\(symbol!) mean price increase after OSC crossings in oversold area (>80) " + above$)
         print( abovePct$ + " of \(abovePriceIncreases.count) are actual increases")
 //        print(abovePriceIncreases)
-        print("\(symbol) mean price increase after OSC crossings in undersold area (<20)" +  below$)
+        print("\(symbol!) mean price increase after OSC crossings in undersold area (<20) " +  below$)
         print( belowPct$ + " of \(belowPriceIncreases.count) are actual increases")
 //        print(belowPriceIncreases)
         print()
 
     }
+    
+    func buyTriggersThreeAnywhere() {
+        
+        guard let smaCrossings = sma10Crossings() else {
+            return
+        }
+        
+        guard let macdCrossings = macDCrossings(aboveZero: nil) else {
+            return
+        }
+        
+        guard let oscCrossings = oscCrossings(oversold: nil) else {
+            return
+        }
+
+        var allCrossings = smaCrossings
+        allCrossings.append(contentsOf: macdCrossings)
+        allCrossings.append(contentsOf: oscCrossings)
+
+        allCrossings = allCrossings.sorted { (cp0, cp1) -> Bool in
+            if cp0.date > cp1.date { return false }
+            else { return true }
+        }
+        
+        guard let firstUpwardCrossing = allCrossings.filter({ (crossing) -> Bool in
+            if crossing.signal < 0 { return false }
+            else { return true }
+        }).first else { return }
+        
+        var buySellPriceDifferencePct = [Double]()
+        
+        //find first signal > 0 with date, then find subsequent crossing.signal > 0 of the other two types
+        //take last of the three as buy signal -> price
+        //then find first signal < 0 with date, then two <0 signals of the other two tyoe
+        //take last of the three as sell signal -> price
+        //calculate price difference % between buy date and sell date
+        
+//        var smaBuy: LineCrossing
+//        var macDBuy: LineCrossing
+//        var oscBuy: LineCrossing
+//
+//        var smaSell: LineCrossing
+//        var macDSell: LineCrossing
+//        var oscSell: LineCrossing
+        
+        var upwardCrossing = firstUpwardCrossing
+        var secondCrossing = allCrossings.filter { (crossing) -> Bool in
+            if crossing.date <= upwardCrossing.date { return false }
+            else if crossing.signal < 0 { return false }
+            else if crossing.type != upwardCrossing.type { return true }
+            else { return false }
+        }.first
+        if secondCrossing == nil { return }
+        var thirdCrossing = allCrossings.filter { (crossing) -> Bool in
+            if crossing.date <= secondCrossing!.date { return false }
+            else if crossing.signal < 0 { return false }
+            else if ![upwardCrossing.type, secondCrossing!.type ?? ""].contains(crossing.type) { return true }
+            else { return false }
+        }.first
+        if thirdCrossing == nil { return }
+        
+        print(upwardCrossing)
+        print(secondCrossing!)
+        print(thirdCrossing!)
+        
+//        let firstDownwardCrossing = allCrossings.filter { (crossing) -> Bool in
+//            if crossing.date <= firstDownwardCrossing.date { return false }
+//            else if crossing.signal > 0 { return false }
+//            else if crossing.type != upwardCrossing.type { return true }
+//            else { return false }
+//        }.first
+
+//        var count = 0
+//        for crossing in allCrossings {
+//
+//            if crossing.signal > 0 {
+//                let type = crossing.type ?? ""
+//
+//                if type == "sma10" {
+//                    smaBuy = crossing
+//                } else if type == "macd" {
+//                    macDBuy = crossing
+//                } else if type == "osc" {
+//                    oscBuy = crossing
+//                }
+//
+//            }
+//            count += 1
+        }
+        
+    func buyTriggersThreeLowOnly() {
+        
+    }
+
 
 }

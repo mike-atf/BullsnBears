@@ -56,7 +56,6 @@ class BuySellView: UIView {
         buySellText = String()
 
     }
-
     
     func configure(share: Share?) {
         
@@ -66,6 +65,68 @@ class BuySellView: UIView {
             return
         }
         
+//        getBuySellData(share: validShare) { (last3Crossings) in
+//            self.completeConfigure(latest3Crossings: last3Crossings)
+//        }
+
+        guard let latest3Crossings = validShare.latest3Crossings() else {
+            return
+        }
+        
+        var lastCrossing: LineCrossing
+        var has3Signals = false
+        if latest3Crossings[2] == nil {
+            if latest3Crossings[1] == nil {
+                lastCrossing = latest3Crossings.first!!
+            }
+            else {
+                lastCrossing = latest3Crossings[1]!
+            }
+        }
+        else {
+            lastCrossing = latest3Crossings.last!!
+            has3Signals = true
+        }
+
+        buySellText = lastCrossing.signal > 0 ? "Buy" : "Sell"
+
+        buySellText = lastCrossing.signal > 0 ? "Buy" : "Sell"
+
+        let fontColor = lastCrossing.signal > 0 ? UIColor(named: "Green") : UIColor(named: "Red")
+        var earlierSignalsSame = [Bool]()
+        if has3Signals {
+            earlierSignalsSame = latest3Crossings[..<2].compactMap{ $0!.signalIsBuy() }.filter { (buySignal) -> Bool in
+                if buySignal == lastCrossing.signalIsBuy() { return true }
+                else { return false }
+            }
+        }
+
+        readyText = earlierSignalsSame.count == 2 ? "Ready to" : "Wait to"
+
+        if readyText.starts(with: "Ready") {
+//            var price$ = String()
+//            if let validPrice = indicators.last!.crossingPrice {
+//                price$ = currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? ""
+//                buySellText += " @\n " + price$
+//            }
+            var date$ = String()
+            if let validDate = lastCrossing.date {
+                date$ = dateFormatter.string(from: validDate)
+                buySellText += "\n" + date$
+            }
+        }
+
+        readinessLabel?.text = readyText
+        transactionLabel?.text = buySellText
+
+        readinessLabel?.textColor = fontColor
+        transactionLabel?.textColor = fontColor
+
+        setNeedsDisplay()
+
+        
+// OLD
+        /*
         guard let validMACD = validShare.latestMCDCrossing() else {
             return
         }
@@ -91,11 +152,6 @@ class BuySellView: UIView {
         readyText = earlierSignalsSame.count == 2 ? "Ready to" : "Wait to"
         
         if readyText.starts(with: "Ready") {
-//            var price$ = String()
-//            if let validPrice = indicators.last!.crossingPrice {
-//                price$ = currencyFormatterNoGapWithPence.string(from: validPrice as NSNumber) ?? ""
-//                buySellText += " @\n " + price$
-//            }
             var date$ = String()
             if let validDate = indicators.last!.date {
                 date$ = dateFormatter.string(from: validDate)
@@ -110,7 +166,70 @@ class BuySellView: UIView {
         transactionLabel?.textColor = fontColor
         
         setNeedsDisplay()
-
+        */
     }
+    
+//    func getBuySellData(share: Share, completion: (@escaping ( [LineCrossing?] ) -> Void)) {
+//
+//        DispatchQueue.main.async {
+//
+//            guard let latest3Crossings = share.latestCrossings() else {
+//                return
+//            }
+//
+//            completion(latest3Crossings)
+//        }
+//    }
+    
+//    func completeConfigure(latest3Crossings: [LineCrossing?]) {
+//
+//        var lastCrossing: LineCrossing
+//        var has3Signals = false
+//        if latest3Crossings[2] == nil {
+//            if latest3Crossings[1] == nil {
+//                lastCrossing = latest3Crossings.first!!
+//            }
+//            else {
+//                lastCrossing = latest3Crossings[1]!
+//            }
+//        }
+//        else {
+//            lastCrossing = latest3Crossings.last!!
+//            has3Signals = true
+//        }
+//
+//        buySellText = lastCrossing.signal > 0 ? "Buy" : "Sell"
+//
+//        buySellText = lastCrossing.signal > 0 ? "Buy" : "Sell"
+//
+//        let fontColor = lastCrossing.signal > 0 ? UIColor(named: "Green") : UIColor(named: "Red")
+//        var earlierSignalsSame = [Bool]()
+//        if has3Signals {
+//            earlierSignalsSame = latest3Crossings[..<2].compactMap{ $0!.signalIsBuy() }.filter { (buySignal) -> Bool in
+//                if buySignal == lastCrossing.signalIsBuy() { return true }
+//                else { return false }
+//            }
+//        }
+//
+//        readyText = earlierSignalsSame.count == 2 ? "Ready to" : "Wait to"
+//
+//        if readyText.starts(with: "Ready") {
+//            var date$ = String()
+//            if let validDate = lastCrossing.date {
+//                date$ = dateFormatter.string(from: validDate)
+//                buySellText += "\n" + date$
+//            }
+//        }
+//
+//        readinessLabel?.text = readyText
+//        transactionLabel?.text = buySellText
+//
+//        readinessLabel?.textColor = fontColor
+//        transactionLabel?.textColor = fontColor
+//
+//        setNeedsDisplay()
+//
+//
+//    }
 
 }

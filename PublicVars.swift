@@ -216,6 +216,7 @@ struct UserDefaultTerms {
     let longTermMarketReturn = "LongTermMarketReturn"
     let emaPeriodAnnualData = "emaPeriodAnnualData"
     let sortParameter = "sortParameter"
+    let lastCitation = "lastCitation"
 }
 
 struct SharesListSortParameter {

@@ -23,7 +23,15 @@ class StochastikOscillatorView: UIView {
         self.ssO = validShare.calculateSlowStochOscillators()
         dateRange = validShare.priceDateRangeWorkWeeksForCharts()
                 
-        latestCrossing = validShare.latestStochastikCrossing()
+//        latestCrossing = validShare.latestStochastikCrossing()
+        
+        if let latestCrossings = share?.latest3Crossings() {
+            latestCrossing = latestCrossings.filter({ (crossing) -> Bool in
+                if crossing?.type ?? "" == "osc" { return true }
+                else { return false }
+            }).first as? LineCrossing
+        }
+
     }
 
     override func draw(_ rect: CGRect) {

@@ -67,7 +67,13 @@ class ChartView: UIView {
         minPrice = (lowestPriceInRange! * 0.9).rounded()
         maxPrice = (highestPriceInRange! * 1.1).rounded() + 1
         
-        latestSMA10crossing = share?.latestSMA10Crossing()
+        if let latestCrossings = share?.latest3Crossings() {
+            latestSMA10crossing = latestCrossings.filter({ (crossing) -> Bool in
+                if crossing?.type ?? "" == "sma10" { return true }
+                else { return false }
+            }).first as? LineCrossing
+        }
+
         self.setNeedsDisplay()
         
     }
@@ -109,15 +115,16 @@ class ChartView: UIView {
         if dailyPrices?.count ?? 0 > 11 {
             sma10 = [Double]()
             smaLine = UIBezierPath()
-            let firstSMA = dailyPrices![..<10].compactMap{ $0.close }.reduce(0, +) / 10
-            let x = CGFloat(dailyPrices![9].tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width + boxWidth / 2
-            let y = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - firstSMA) / (maxPrice - minPrice)))
+            let firstSMA10 = dailyPrices![..<10].compactMap{ $0.close }.reduce(0, +) / 10
+            let x = chartOrigin.x + CGFloat(dailyPrices![10].tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width + boxWidth / 2
+            let y = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - firstSMA10) / (maxPrice - minPrice)))
             smaLine?.move(to: CGPoint(x: x, y: y))
         }
 
         // MARK: - candles
                 
-        dailyPrices?.forEach({ (pricePoint) in
+        for i in 0..<(dailyPrices ?? []).count {
+            let pricePoint = dailyPrices![i]
             let boxLeft = chartOrigin.x + CGFloat(pricePoint.tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width //- (boxWidth * 0.8 / 2)
             let boxTop = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - Swift.max(pricePoint.close, pricePoint.open)) / (maxPrice - minPrice)))
             let boxBottom = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - Swift.min(pricePoint.close, pricePoint.open)) / (maxPrice - minPrice)))
@@ -136,36 +143,37 @@ class ChartView: UIView {
             tick.move(to: CGPoint(x:-1 + boxLeft + boxWidth / 2, y: highPoint))
             tick.addLine(to: CGPoint(x:-1 + boxLeft + boxWidth / 2, y: lowPoint))
             tick.stroke()
-            
+                        
             //MARK: - SMA Line
             sma10?.append(pricePoint.close)
-            if sma10?.count ?? 0 == 10 {
-                let sma = (sma10?.reduce(0, +))! / 10.0
-                let x = boxLeft + boxWidth * 0.4
+            if sma10?.count ?? 0 > 10 {
+                let sma = (sma10?[..<10].reduce(0, +))! / 10.0 // exclude elements just added so it's sma until day before nbut not including current day
+                let x = boxLeft + boxWidth / 2
                 let y = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - sma) / (maxPrice - minPrice)))
                 smaLine?.addLine(to: CGPoint(x: x, y: y))
-                sma10!.removeFirst()
+                sma10?.removeFirst()
             }
-            
-            //MARK: -  latest SMA10 crossing
-            if let crossingPoint = latestSMA10crossing {
-                let latestSMAcrossing = UIBezierPath()
-                let x = rect.maxX - CGFloat((dateRange!.last!.timeIntervalSince(crossingPoint.date) / chartTimeSpan)) * rect.width
-                latestSMAcrossing.move(to: CGPoint(x: x, y: rect.minY))
-                latestSMAcrossing.addLine(to: CGPoint(x: x, y: chartOrigin.y))
-                
-                let color = crossingPoint.signal < 0 ? UIColor(named: "Red")! : UIColor(named: "DarkGreen")!
-                color.setStroke()
-                latestSMAcrossing.lineWidth = 1.3
-                latestSMAcrossing.stroke()
-                
-            }
-
-        })
+        }
         
         UIColor.systemBlue.setStroke()
-        smaLine?.lineWidth = 1.2
-        smaLine?.stroke()
+        smaLine!.lineWidth = 1.2
+        smaLine!.stroke()
+        
+        
+        //MARK: -  latest SMA10 crossing
+        if let crossingPoint = latestSMA10crossing {
+            let latestSMAcrossing = UIBezierPath()
+            let x = chartOrigin.x + CGFloat((crossingPoint.date.timeIntervalSince(dateRange!.first!) / chartTimeSpan)) * chartAreaSize.width + boxWidth / 2
+            latestSMAcrossing.move(to: CGPoint(x: x, y: rect.minY))
+            latestSMAcrossing.addLine(to: CGPoint(x: x, y: chartOrigin.y))
+            
+            let color = crossingPoint.signal < 0 ? UIColor(named: "Red")! : UIColor(named: "DarkGreen")!
+            color.setStroke()
+            latestSMAcrossing.lineWidth = 1.3
+            latestSMAcrossing.stroke()
+            
+        }
+
         
         //MARK: - current price line
         

@@ -28,7 +28,14 @@ class MACD_View: UIView {
         
         guard let validMACDs = validShare.getMACDs() else { return }
         self.mac_d = validMACDs
-        cp = share?.latestMCDCrossing()
+//        cp = share?.latestMCDCrossing()
+        if let latestCrossings = share?.latest3Crossings() {
+            cp = latestCrossings.filter({ (crossing) -> Bool in
+                if crossing?.type ?? "" == "macd" { return true }
+                else { return false }
+            }).first as? LineCrossing
+        }
+
         
         dateRange = validShare.priceDateRangeWorkWeeksForCharts()
 

@@ -119,7 +119,7 @@ class SharePlaceHolder: NSObject {
     func updateDailyPrices(newPrices: [PricePoint]?) {
         
         guard let validNewPoints = newPrices else { return }
-        
+
         if let existingPricePoints = getDailyPrices() {
             var newList = existingPricePoints
             var existingMACDs = getMACDs()

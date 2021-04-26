@@ -44,7 +44,24 @@ class ChartTimeLineView: UIView {
         
         dateLabels = getDateLabels()
         
-        sma10Crossing = share?.latestSMA10Crossing()
+        if let crossings = share?.latest3Crossings() {
+            sma10Crossing = crossings.filter({ (crossing) -> Bool in
+                if crossing?.type == "sma10" { return true }
+                else { return false }
+            }).first as? LineCrossing
+            
+            macdCrossing = crossings.filter({ (crossing) -> Bool in
+                if crossing?.type == "macd" { return true }
+                else { return false }
+            }).first as? LineCrossing
+            
+            oscCrossing = crossings.filter({ (crossing) -> Bool in
+                if crossing?.type == "osc" { return true }
+                else { return false }
+            }).first as? LineCrossing
+
+        }
+        
         if let sma10Crossing_v = sma10Crossing {
 
             sma10Label?.removeFromSuperview()
@@ -65,7 +82,7 @@ class ChartTimeLineView: UIView {
             }()
         }
         
-        macdCrossing = share?.latestMCDCrossing()
+//        macdCrossing = share?.latestMCDCrossing()
         if let macdc_v = macdCrossing {
             macdLabel?.removeFromSuperview()
             macdLabel = {
@@ -85,7 +102,7 @@ class ChartTimeLineView: UIView {
             }()
         }
         
-        oscCrossing = share?.latestStochastikCrossing()
+//        oscCrossing = share?.latestStochastikCrossing()
         if let osc_v = oscCrossing {
             oscLabel?.removeFromSuperview()
             oscLabel = {
@@ -164,7 +181,9 @@ class ChartTimeLineView: UIView {
 
     override func draw(_ rect: CGRect) {
         
-        
+        let daysWidth = rect.width / CGFloat(dateRange.last!.timeIntervalSince(dateRange.first!) / (24*3600))
+
+    
         let xAxis = UIBezierPath()
         xAxis.move(to: CGPoint(x: 0, y: rect.maxY-1))
         xAxis.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY-1))
@@ -200,7 +219,7 @@ class ChartTimeLineView: UIView {
         
         if let label = sma10Label {
             
-            let x = rect.maxX - CGFloat((dateRange.last!.timeIntervalSince(sma10Crossing!.date) / totalChartTimeInterval)) * rect.width
+            let x = rect.maxX - CGFloat((dateRange.last!.timeIntervalSince(sma10Crossing!.date) / totalChartTimeInterval)) * rect.width + daysWidth / 2
             label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: x).isActive = true
             
             let smaLine = UIBezierPath()

@@ -87,6 +87,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         controller.pricesUpdateDelegate = self
                 
         if controller.fetchedObjects?.count ?? 0 > 0 {
+//            showCitation()
             tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
             performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         }
@@ -100,7 +101,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         updateShares()
 
 // temp
-        self.controller.research()
+//        self.controller.research()
 // temp
     }
     
@@ -158,7 +159,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         welcomeView.loadViewIfNeeded()
         
-        self.present(welcomeView, animated: true) {
+        self.navigationController?.present(welcomeView, animated: true) {
             if let textView = welcomeView.view.viewWithTag(10) as? UITextView {
                 let text = "Welcome and thank you for choosing Bulls 'N' Bears as your shares research and investment tool\n\nBulls N Bears downloads publicly available finance and trading data (from Yahoo Finance, MacroTrends.com and other websites) about shares traded on the NYSE and displays analyses and summaries. Trading prices from the last 12 months are displayed in a stock chart.\n\nStart with ↓ to add a stock.\nOr with + you can import a .csv file with historical trading prices that you have downloaded from Yahoo finance.\n\nIn the stock price chart, tap the coloured and A,3,1 buttons to add trend lines (red = support, green = ceiling, blue = average, A = all, 3 = last 3 months, 1 = last month). The chart also shows a 10-day moving average line.\n\nAt the top there are graph plots for Mac D and the Slow stochastic oscillator.\nVertical lines are shown for the latest buy or sell thresholds.\n\nTapping on a stock in the list will show detailed financial data. Key data will be downloaded automatically, further data can be downloaded via the Cloud button at the top.\nEach row will contain a key financial indicator. In the lower sections these will be the EMA (exponentially moving average) of annual data downloaded from MacroTrends.\n\nTap on a row to show a chart of the numbers and a change trend for the last 10 years. This will allow judging growth trends at a glance and you can enter a personal value score in the top row by tapping repeatedly on the stars. You can also enter comments here to help your stock research and valuation.\n\nFinancial data and your rating scores are summarised in two icons in the stock list. The circle with a star in the centre shows a summary of all your ratings, the $ circle shows summarised financial data, to allow a quick overview in the list.\nTap on the star-centred circle to see a list of your evaluation comments.\n\nBased on the buy / sell thresholds detected in the stock price chart a Wait or Ready to Buy / Sell message is shown.\n\nAdd stock valuations by tapping on the yellow $ buttons at the top of the price chart. These are for Discounted Cash Flow- and Value based stock valuations and will give an idea of an estimated current stock value"
                 textView.text = text
@@ -167,6 +168,24 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         
     }
+    
+    func showCitation() {
+        
+        let citationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WelcomeViewController")
+        
+        citationView.loadViewIfNeeded()
+        citationView.preferredContentSize = CGSize(width: view.bounds.width / 2, height: view.bounds.height / 2)
+        
+        self.navigationController?.present(citationView, animated: true) {
+            if let textView = citationView.view.viewWithTag(10) as? UITextView {
+                textView.font = UIFont.preferredFont(forTextStyle: .largeTitle)
+                let citation = CitationsManager.cite()
+
+                textView.text = citation
+            }
+        }
+    }
+
         
     public func openDocumentBrowser(with remoteURL: URL, importIfNeeded: Bool) {
         
@@ -513,6 +532,7 @@ extension StocksListTVC: NSFetchedResultsControllerDelegate {
         
         switch type {
         case .update:
+            let share = controller.object(at: indexPath!) as! Share
             tableView.reloadRows(at: [indexPath!], with: .none)
         case .insert:
             tableView.insertRows(at: [newIndexPath!], with: .automatic)

@@ -47,6 +47,7 @@
 		EA4B5F0625DD53900070CC70 /* WebDataDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */; };
 		EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */; };
 		EA50DEF225D427B10005B23A /* StocksController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA50DEF125D427B10005B23A /* StocksController.swift */; };
+		EA51A9C02632FD3200C857A8 /* CitationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA51A9BF2632FD3200C857A8 /* CitationsManager.swift */; };
 		EA52EDC825D18D760000155F /* WebpageScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA52EDC725D18D760000155F /* WebpageScraper.swift */; };
 		EA5639E1262C47F700010964 /* ChartTimeLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E0262C47F700010964 /* ChartTimeLineView.swift */; };
 		EA5639E2262C47F700010964 /* ChartTimeLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E0262C47F700010964 /* ChartTimeLineView.swift */; };
@@ -117,15 +118,9 @@
 		EAC190B3257661F60030B331 /* MasterSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B2257661F60030B331 /* MasterSplitView.swift */; };
 		EAC190B4257661F60030B331 /* MasterSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B2257661F60030B331 /* MasterSplitView.swift */; };
 		EAC190B5257661F60030B331 /* MasterSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B2257661F60030B331 /* MasterSplitView.swift */; };
-		EAC190BA257662930030B331 /* StocksListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B9257662930030B331 /* StocksListViewController.swift */; };
-		EAC190BB257662930030B331 /* StocksListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B9257662930030B331 /* StocksListViewController.swift */; };
-		EAC190BC257662930030B331 /* StocksListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190B9257662930030B331 /* StocksListViewController.swift */; };
 		EAC190C1257663200030B331 /* PublicVars.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190C0257663200030B331 /* PublicVars.swift */; };
 		EAC190C2257663200030B331 /* PublicVars.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190C0257663200030B331 /* PublicVars.swift */; };
 		EAC190C3257663200030B331 /* PublicVars.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190C0257663200030B331 /* PublicVars.swift */; };
-		EAC190CB257663730030B331 /* Stock.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190CA257663730030B331 /* Stock.swift */; };
-		EAC190CC257663730030B331 /* Stock.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190CA257663730030B331 /* Stock.swift */; };
-		EAC190CD257663730030B331 /* Stock.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190CA257663730030B331 /* Stock.swift */; };
 		EAC190D52576731B0030B331 /* StockChartVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190D42576731B0030B331 /* StockChartVC.swift */; };
 		EAC190D62576731B0030B331 /* StockChartVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190D42576731B0030B331 /* StockChartVC.swift */; };
 		EAC190D72576731B0030B331 /* StockChartVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC190D42576731B0030B331 /* StockChartVC.swift */; };
@@ -262,6 +257,7 @@
 		EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDataDownloader.swift; sourceTree = "<group>"; };
 		EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueChart.swift; sourceTree = "<group>"; };
 		EA50DEF125D427B10005B23A /* StocksController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksController.swift; sourceTree = "<group>"; };
+		EA51A9BF2632FD3200C857A8 /* CitationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CitationsManager.swift; path = "Bulls'N'Bears/Controllers/CitationsManager.swift"; sourceTree = SOURCE_ROOT; };
 		EA52EDC725D18D760000155F /* WebpageScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpageScraper.swift; sourceTree = "<group>"; };
 		EA5639E0262C47F700010964 /* ChartTimeLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTimeLineView.swift; sourceTree = SOURCE_ROOT; };
 		EA5639E7262C481600010964 /* ChartPricesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPricesView.swift; sourceTree = "<group>"; };
@@ -303,9 +299,7 @@
 		EAC19070257641180030B331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EAC1908E257642F20030B331 /* CSVImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImporter.swift; sourceTree = "<group>"; };
 		EAC190B2257661F60030B331 /* MasterSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterSplitView.swift; sourceTree = "<group>"; };
-		EAC190B9257662930030B331 /* StocksListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksListViewController.swift; sourceTree = "<group>"; };
 		EAC190C0257663200030B331 /* PublicVars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicVars.swift; sourceTree = "<group>"; };
-		EAC190CA257663730030B331 /* Stock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stock.swift; sourceTree = "<group>"; };
 		EAC190D42576731B0030B331 /* StockChartVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockChartVC.swift; sourceTree = "<group>"; };
 		EAC190E92577E2E20030B331 /* ChartContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartContainerView.swift; sourceTree = "<group>"; };
 		EAC190F32577E3B60030B331 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
@@ -385,7 +379,6 @@
 			children = (
 				EAC1908E257642F20030B331 /* CSVImporter.swift */,
 				EAC190C0257663200030B331 /* PublicVars.swift */,
-				EAC190CA257663730030B331 /* Stock.swift */,
 				EAC1904F257641160030B331 /* Main.storyboard */,
 				EA163F76258BA85E000974AB /* StockTrend.swift */,
 				EA7B613825C412860018BA02 /* StockTickerDictionary.csv */,
@@ -434,6 +427,7 @@
 		EAC2FCA025A256B80060F387 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				EA51A9BF2632FD3200C857A8 /* CitationsManager.swift */,
 				EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */,
 				EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */,
 				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
@@ -539,7 +533,6 @@
 				EA3DF0C8260B8C5A001A0098 /* BuySellView.swift */,
 				EA805DC425D54D4E00720E68 /* StockSearchTVC.swift */,
 				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
-				EAC190B9257662930030B331 /* StocksListViewController.swift */,
 				EA0E2F212625CBD500602BEE /* StocksListTVC.swift */,
 				EA50DEF125D427B10005B23A /* StocksController.swift */,
 				EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */,
@@ -743,7 +736,6 @@
 			files = (
 				EAC19054257641160030B331 /* TrendMyStocks.xcdatamodeld in Sources */,
 				EA4B5F0625DD53900070CC70 /* WebDataDownloader.swift in Sources */,
-				EAC190BA257662930030B331 /* StocksListViewController.swift in Sources */,
 				EA6AACDF26053294002DE9DF /* MACD_View.swift in Sources */,
 				EAFCB97D25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
 				EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */,
@@ -768,6 +760,7 @@
 				EAC1904A257641160030B331 /* AppDelegate.swift in Sources */,
 				EA3DF0C9260B8C5A001A0098 /* BuySellView.swift in Sources */,
 				EAA099C42588020B00DBB93C /* CheckButton.swift in Sources */,
+				EA51A9C02632FD3200C857A8 /* CitationsManager.swift in Sources */,
 				EA736CDE25D7E72C007FC981 /* ValuationErrorsTVC.swift in Sources */,
 				EAC2FC4225A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EA50DEF225D427B10005B23A /* StocksController.swift in Sources */,
@@ -812,7 +805,6 @@
 				EA3E1D6C26317F8A0021B973 /* SharePlaceHolder.swift in Sources */,
 				EAC190B3257661F60030B331 /* MasterSplitView.swift in Sources */,
 				EAA69FB22612221B0067EE1A /* ResearchTVC.swift in Sources */,
-				EAC190CB257663730030B331 /* Stock.swift in Sources */,
 				EAD835BC25DA9BA40015C93A /* WBValuationTVC.swift in Sources */,
 				EA805DC525D54D4E00720E68 /* StockSearchTVC.swift in Sources */,
 				EA0E2F292625D50A00602BEE /* SortView.swift in Sources */,
@@ -832,7 +824,6 @@
 				EAC2FC4325A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EAC190C2257663200030B331 /* PublicVars.swift in Sources */,
 				EAFCB98925C9A4DE0029AA4F /* ValuationSummaryCell.swift in Sources */,
-				EAC190BB257662930030B331 /* StocksListViewController.swift in Sources */,
 				EAC190F52577E3B60030B331 /* ChartView.swift in Sources */,
 				EA06251B25D07A230015FA6E /* DownloadProgressView.swift in Sources */,
 				EA0E2F312625E32500602BEE /* RimmedLabel.swift in Sources */,
@@ -843,7 +834,6 @@
 				EAD835E125DC06EC0015C93A /* Calculator.swift in Sources */,
 				EA5639E2262C47F700010964 /* ChartTimeLineView.swift in Sources */,
 				EA0E2F232625CBD500602BEE /* StocksListTVC.swift in Sources */,
-				EAC190CC257663730030B331 /* Stock.swift in Sources */,
 				EAA69F7F26121A940067EE1A /* CompanyNews+CoreDataClass.swift in Sources */,
 				EAD835BD25DA9BA40015C93A /* WBValuationTVC.swift in Sources */,
 				EAA69F8226121A940067EE1A /* CompanyNews+CoreDataProperties.swift in Sources */,
@@ -885,14 +875,12 @@
 				EAC2FC4425A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EAC190C3257663200030B331 /* PublicVars.swift in Sources */,
 				EAFCB98A25C9A4DE0029AA4F /* ValuationSummaryCell.swift in Sources */,
-				EAC190BC257662930030B331 /* StocksListViewController.swift in Sources */,
 				EAC190F62577E3B60030B331 /* ChartView.swift in Sources */,
 				EA06251C25D07A230015FA6E /* DownloadProgressView.swift in Sources */,
 				EA0E2F322625E32500602BEE /* RimmedLabel.swift in Sources */,
 				EA5639EA262C481600010964 /* ChartPricesView.swift in Sources */,
 				EAC190EC2577E2E20030B331 /* ChartContainerView.swift in Sources */,
 				EAC0F16025FA819E00AD9E29 /* Share+CoreDataProperties.swift in Sources */,
-				EAC190CD257663730030B331 /* Stock.swift in Sources */,
 				EAD835E225DC06EC0015C93A /* Calculator.swift in Sources */,
 				EA5639E3262C47F700010964 /* ChartTimeLineView.swift in Sources */,
 				EA0E2F242625CBD500602BEE /* StocksListTVC.swift in Sources */,
