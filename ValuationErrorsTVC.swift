@@ -10,7 +10,10 @@ import UIKit
 class ValuationErrorsTVC: UITableViewController {
 
     var errors = [String]()
-    
+    var firstCellHeight: CGFloat?
+    var otherCellHeight: CGFloat?
+    var otherCellsFontSize: CGFloat = 15
+
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -30,13 +33,57 @@ class ValuationErrorsTVC: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "valuationErrorListCell", for: indexPath)
 
-        if let label = cell.viewWithTag(10) as? UILabel {
-            label.text = errors[indexPath.row]
+        if (firstCellHeight != nil) && indexPath.row == 0 {
+            if let label = cell.viewWithTag(10) as? UILabel {
+                label.numberOfLines = 0
+                label.font = UIFont.systemFont(ofSize: 12)
+                label.text = errors[indexPath.row]
+                
+                if let label = cell.viewWithTag(20) as? UILabel {
+                    label.numberOfLines = 0
+                    label.text = ""
+                }
+
+                return cell
+            }
+        }
+        else {
+        
+            let details = errors[indexPath.row].split(separator: ":")
+            
+            if let label = cell.viewWithTag(10) as? UILabel {
+                label.numberOfLines = 0
+                label.font = UIFont.systemFont(ofSize: otherCellsFontSize)
+                label.text = String(details.first ?? "")
+            }
+            if details.count > 1 {
+                if let label = cell.viewWithTag(20) as? UILabel {
+                    label.numberOfLines = 0
+                    label.font = UIFont.systemFont(ofSize: otherCellsFontSize)
+                    label.text = String(details.last ?? "")
+                }
+            }
+            else {
+                if let label = cell.viewWithTag(20) as? UILabel {
+                    label.numberOfLines = 0
+                    label.font = UIFont.systemFont(ofSize: otherCellsFontSize)
+                    label.text = ""
+                }
+            }
         }
 
         return cell
     }
 
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if let height = firstCellHeight {
+            if indexPath.row == 0 {
+                return height
+            }
+            else { return otherCellHeight ?? 50 }
+        }
+        else { return otherCellHeight ?? 50 }
+    }
 //    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 //        return "There were problems with the calculation"
 //    }

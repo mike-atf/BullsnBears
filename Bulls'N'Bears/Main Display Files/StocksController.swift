@@ -133,7 +133,7 @@ class StocksController: NSFetchedResultsController<Share> {
 
     }
     
-    class func createShare(from file: URL?, deleteFile: Bool?=false) -> Share? {
+    class func createShare(from file: URL?, companyName: String?=nil, deleteFile: Bool?=false) -> Share? {
         
         guard let fileURL = file else {
             return nil
@@ -152,9 +152,9 @@ class StocksController: NSFetchedResultsController<Share> {
         newShare.dailyPrices = newShare.convertDailyPricesToData(dailyPrices: pricePoints)
         let macds = newShare.calculateMACDs(shortPeriod: 8, longPeriod: 17)
         newShare.macd = newShare.convertMACDToData(macds: macds)
-        
+                
         if let dictionary = stockTickerDictionary {
-            newShare.name_long = dictionary[stockName]
+            newShare.name_long = companyName ?? dictionary[stockName]
             
             if let longNameComponents = newShare.name_long?.split(separator: " ") {
                 let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co."] // "Group",

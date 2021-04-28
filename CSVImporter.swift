@@ -228,10 +228,12 @@ class CSVImporter: NSObject {
         if let headerArray = rows.first?.components(separatedBy: ",") {
             var count = 0
             headerArray.forEach { (header) in
-                if header != expectedOrder[count] {
-                    headerError = true
+                if count < expectedOrder.count {
+                    if header != expectedOrder[count] {
+                        headerError = true
+                    }
+                    count += 1
                 }
-                count += 1
             }
         }
         

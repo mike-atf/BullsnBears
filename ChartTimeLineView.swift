@@ -14,7 +14,7 @@ class ChartTimeLineView: UIView {
     var macdLabel: UILabel?
     var oscLabel: UILabel?
     
-    var dateRange = [Date]()
+    var dateRange = [Date(), Date()]
     var stdLabelWidth: CGFloat!
     var timeIntervalBetweenLabels: TimeInterval!
     
@@ -182,7 +182,6 @@ class ChartTimeLineView: UIView {
     override func draw(_ rect: CGRect) {
         
         let daysWidth = rect.width / CGFloat(dateRange.last!.timeIntervalSince(dateRange.first!) / (24*3600))
-
     
         let xAxis = UIBezierPath()
         xAxis.move(to: CGPoint(x: 0, y: rect.maxY-1))

@@ -311,7 +311,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 else if selectedPath.row == 1 {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, errors) = validController.valuation!.rAndDProportion()
+                    let (margins, _) = validController.valuation!.rAndDProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                 }

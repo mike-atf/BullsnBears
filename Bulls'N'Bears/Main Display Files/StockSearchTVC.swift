@@ -25,6 +25,9 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         navigationItem.searchController = searchController
         definesPresentationContext = true
                 
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addManual))
+        self.navigationItem.rightBarButtonItem = addButton
+
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -95,6 +98,18 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         tableView.deselectRow(at: indexPath, animated: false)
         yahooStockDownload(stocksDictionary[indexPath.row].key)
         self.navigationController?.popToRootViewController(animated: true)
+
+    }
+    
+    @objc
+    func addManual() {
+        
+        guard let manualSearchVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ManualSearchVC") as? ManualSearchVC else {
+            return
+        }
+        manualSearchVC.loadViewIfNeeded()
+        
+        self.navigationController?.pushViewController(manualSearchVC, animated: true)
 
     }
 
@@ -180,9 +195,6 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
                     guard CSVImporter.matchesExpectedFormat(url: tempURL) else {
                         removeFile(tempURL)
-//                        DispatchQueue.main.async {
-//                            alertController.showDialog(title: "Download error", alertMessage: "downloaded file for \(stockName) is not in the expected format", viewController: self, delegate: nil)
-//                        }
                         return
                     }
                 

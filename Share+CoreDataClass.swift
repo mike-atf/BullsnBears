@@ -1361,7 +1361,6 @@ public class Share: NSManagedObject {
             else { return true }
         }).first else { return }
         
-        var buySellPriceDifferencePct = [Double]()
         
         //find first signal > 0 with date, then find subsequent crossing.signal > 0 of the other two types
         //take last of the three as buy signal -> price
@@ -1377,15 +1376,16 @@ public class Share: NSManagedObject {
 //        var macDSell: LineCrossing
 //        var oscSell: LineCrossing
         
-        var upwardCrossing = firstUpwardCrossing
-        var secondCrossing = allCrossings.filter { (crossing) -> Bool in
+        let upwardCrossing = firstUpwardCrossing
+        let secondCrossing = allCrossings.filter { (crossing) -> Bool in
             if crossing.date <= upwardCrossing.date { return false }
             else if crossing.signal < 0 { return false }
             else if crossing.type != upwardCrossing.type { return true }
             else { return false }
         }.first
+        
         if secondCrossing == nil { return }
-        var thirdCrossing = allCrossings.filter { (crossing) -> Bool in
+        let thirdCrossing = allCrossings.filter { (crossing) -> Bool in
             if crossing.date <= secondCrossing!.date { return false }
             else if crossing.signal < 0 { return false }
             else if ![upwardCrossing.type, secondCrossing!.type ?? ""].contains(crossing.type) { return true }
@@ -1393,33 +1393,6 @@ public class Share: NSManagedObject {
         }.first
         if thirdCrossing == nil { return }
         
-        print(upwardCrossing)
-        print(secondCrossing!)
-        print(thirdCrossing!)
-        
-//        let firstDownwardCrossing = allCrossings.filter { (crossing) -> Bool in
-//            if crossing.date <= firstDownwardCrossing.date { return false }
-//            else if crossing.signal > 0 { return false }
-//            else if crossing.type != upwardCrossing.type { return true }
-//            else { return false }
-//        }.first
-
-//        var count = 0
-//        for crossing in allCrossings {
-//
-//            if crossing.signal > 0 {
-//                let type = crossing.type ?? ""
-//
-//                if type == "sma10" {
-//                    smaBuy = crossing
-//                } else if type == "macd" {
-//                    macDBuy = crossing
-//                } else if type == "osc" {
-//                    oscBuy = crossing
-//                }
-//
-//            }
-//            count += 1
         }
         
     func buyTriggersThreeLowOnly() {

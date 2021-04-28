@@ -456,7 +456,7 @@ public class WBValuation: NSManagedObject {
         if let valid = inverseValueFactor(values1: adjustedEquity(), values2: debtLT, maxCutOff: 1, emaPeriod: emaPeriods, removeZeroElements: false) {
             allFactors.append(valid * ltDebtDivadjEq)
             allWeights.append(ltDebtDivadjEq)
-            allFactorNames.append("Growth trend long-term debt / adjusted share-holder equity")
+            allFactorNames.append("Growth trend long-term debt / adj. share-holder equity")
         }
         if let valid = valueFactor(values1: revenue, values2: sgaExpense, maxCutOff: 0.4, emaPeriod: emaPeriods) {
             allFactors.append(valid * sgaDivRevenue)
@@ -541,7 +541,7 @@ public class WBValuation: NSManagedObject {
         }
         if let valid = inverseValueFactor(values1: adjustedEquity(), values2: debtLT, maxCutOff: 1, emaPeriod: emaPeriods, removeZeroElements: false) {
 
-            allFactorTexts.append("Long-term debt / adjusted share-holder equity: " + (numberFormatterWith1Digit.string(from: (valid * ltDebtDivadjEq) as NSNumber) ?? "-"))
+            allFactorTexts.append("Long-term debt / adj. share-holder equity: " + (numberFormatterWith1Digit.string(from: (valid * ltDebtDivadjEq) as NSNumber) ?? "-"))
         }
         if let valid = valueFactor(values1: revenue, values2: sgaExpense, maxCutOff: 0.4, emaPeriod: emaPeriods) {
             allFactorTexts.append("SGA expense / sales: " + (numberFormatterWith1Digit.string(from: (valid * sgaDivRevenue) as NSNumber) ?? "-"))

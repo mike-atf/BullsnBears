@@ -72,7 +72,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         return sL
     }()
-    var  wbValuationView: WBValuationTVC?
+    var wbValuationView: WBValuationTVC?
+    var selectedSharesToCompare = Set<Share>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -87,9 +88,9 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         controller.pricesUpdateDelegate = self
                 
         if controller.fetchedObjects?.count ?? 0 > 0 {
-//            showCitation()
+            showCitation()
             tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
-            performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+            performSegue(withIdentifier: "showChartSegue", sender: nil)
         }
         else {
             showWelcomeView()
@@ -99,6 +100,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         sortView.label?.text = "Sorted by " + ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore")
         
         updateShares()
+//        tableView.allowsMultipleSelection = true
 
 // temp
 //        self.controller.research()
@@ -172,19 +174,35 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func showCitation() {
         
         let citationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WelcomeViewController")
-        
-        citationView.loadViewIfNeeded()
-        citationView.preferredContentSize = CGSize(width: view.bounds.width / 2, height: view.bounds.height / 2)
-        
-        self.navigationController?.present(citationView, animated: true) {
-            if let textView = citationView.view.viewWithTag(10) as? UITextView {
-                textView.font = UIFont.preferredFont(forTextStyle: .largeTitle)
-                let citation = CitationsManager.cite()
+                    
+        citationView.view.backgroundColor = UIColor.systemGray4
+        citationView.modalPresentationStyle = .popover
+        citationView.preferredContentSize = CGSize(width: self.view.frame.width / 2.5, height: self.view.frame.height / 3)
 
-                textView.text = citation
-            }
+        citationView.loadViewIfNeeded()
+        if let textView = citationView.view.viewWithTag(10) as? UITextView {
+            textView.backgroundColor = UIColor.systemGray4
+            textView.attributedText = CitationsManager.cite()
         }
+
+        let popUpController = citationView.popoverPresentationController
+        popUpController!.permittedArrowDirections = [.up, .left]
+        popUpController?.sourceView = view
+        popUpController?.sourceRect = CGRect(x: view.frame.width * 0.6, y: view.frame.height * 0.7, width: 5, height: 5)
+            
+        present(citationView, animated: true, completion: nil)
+        
+
     }
+
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return UIModalPresentationStyle.none
+    }
+
+    func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
+       
+    }
+
 
         
     public func openDocumentBrowser(with remoteURL: URL, importIfNeeded: Bool) {
@@ -209,15 +227,15 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     @objc
     func fileDownloaded(_ notification: Notification) {
-        
+                
         if let url = notification.object as? URL {
-            addShare(fileURL: url)
+            addShare(fileURL: url, companyName: notification.userInfo?["companyName"] as? String)
         }
     }
     
-    public func addShare(fileURL: URL) {
+    public func addShare(fileURL: URL, companyName: String?=nil) {
         
-        if let share = StocksController.createShare(from: fileURL, deleteFile: true) {
+        if let share = StocksController.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
             
             do {
                 try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
@@ -227,7 +245,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
             if let indexPath = controller.indexPath(forObject: share) {
                 tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+                performSegue(withIdentifier: "showChartSegue", sender: nil)
             }
             
             let placeHolder = SharePlaceHolder(share: share)
@@ -289,6 +307,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }).count ?? 0
         
         cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData, scoreDelegate: self, userCommentCount: evaluationsCount)
+        
+//        cell.accessoryType = .disclosureIndicator
         
         return cell
     }
@@ -357,6 +377,25 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        if !tableView.isEditing {
+            performSegue(withIdentifier: "showChartSegue", sender: nil)
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+        else {
+            let selectedShare = controller.object(at: indexPath)
+            if !selectedSharesToCompare.compactMap({ $0.symbol }).contains(selectedShare.symbol) {
+                selectedSharesToCompare.insert(selectedShare)
+            }
+            else {
+                selectedSharesToCompare.remove(selectedShare)
+            }
+        }
+
+    }
+    
+    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        
+            
         DispatchQueue.main.async {
             self.wbValuationView?.share = self.controller.object(at: indexPath)
             self.wbValuationView?.fromIndexPath = indexPath
@@ -366,32 +405,68 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             }
         }
         
-        performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+
+        performSegue(withIdentifier: "showChartSegue", sender: nil)
         tableView.deselectRow(at: indexPath, animated: true)
 
     }
+    
+    func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return UITableViewCell.EditingStyle(rawValue: 3)!
+    }
+    
+    @IBAction func selectToCompare(_ sender: UIBarButtonItem) {
+        
+        tableView.allowsSelectionDuringEditing = false
+        
+        var editingStatus = tableView.isEditing
+        editingStatus.toggle()
 
+        tableView.allowsMultipleSelection = editingStatus ? true : false
+
+        tableView.setEditing(editingStatus, animated: true)
+        
+        if !editingStatus {
+            // editing ended
+            if selectedSharesToCompare.count > 0 {
+                
+                guard let comparisonVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ComparisonVC") as? ComparisonVC else {
+                    return
+                }
+                comparisonVC.loadViewIfNeeded()
+                comparisonVC.shares = Array(selectedSharesToCompare)
+                
+                self.navigationController?.pushViewController(comparisonVC, animated: true)
+            }
+        }
+        
+    }
     // MARK: - Navigation
 
  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
      
-     guard let indexPath = tableView.indexPathForSelectedRow else { return }
+        guard let indexPath = tableView.indexPathForSelectedRow else { return }
      
-     let share = controller.object(at: indexPath)
-     
-     if let chartView = segue.destination as? StockChartVC {
-             
-         chartView.share = controller.object(at: indexPath)
-         chartView.configure(share: share)
+         let share = controller.object(at: indexPath)
          
-     }
-     else if let navView = segue.destination as? UINavigationController {
-         if let chartView = navView.topViewController as? StockChartVC {
+         if let chartView = segue.destination as? StockChartVC {
                  
              chartView.share = controller.object(at: indexPath)
              chartView.configure(share: share)
+             
          }
-     }
+         else if let navView = segue.destination as? UINavigationController {
+             if let chartView = navView.topViewController as? StockChartVC {
+                     
+                 chartView.share = controller.object(at: indexPath)
+                 chartView.configure(share: share)
+             }
+         }
  }
 
     @IBAction func downloadAction(_ sender: Any) {
@@ -485,18 +560,22 @@ extension StocksListTVC: StocksControllerDelegate, ScoreCircleDelegate {
             popUpController!.permittedArrowDirections = .any
             popUpController!.sourceView = sender
             evaluationsView.loadViewIfNeeded()
+            evaluationsView.firstCellHeight = 200
             
             let share = controller.object(at: indexPath)
-            
-            var texts:[String]?
+        
+            var texts = ["Why to buy: " + (share.research?.theBuyStory ?? "")]
             if isUserScoreType {
-                texts = share.wbValuation?.returnUserCommentsTexts()
+                evaluationsView.otherCellHeight = 75
+                evaluationsView.otherCellsFontSize = 14
+                texts.append(contentsOf: share.wbValuation?.returnUserCommentsTexts() ?? [])
             }
             else {
-                texts = share.wbValuation?.valuesSummaryTexts()
+                evaluationsView.otherCellHeight = 50
+                texts.append(contentsOf:share.wbValuation?.valuesSummaryTexts() ?? [])
             }
             
-            evaluationsView.errors = texts ?? []
+            evaluationsView.errors = texts
             
             present(evaluationsView, animated: true, completion:  nil)
         }
