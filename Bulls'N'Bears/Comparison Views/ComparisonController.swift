@@ -13,10 +13,6 @@ class ComparisonController {
     var controlledView: ComparisonVC
     
     
-//    override init() {
-//        super.init
-//    }
-    
     init(shares: [Share]?, viewController: ComparisonVC) {
         
         self.shares = shares
@@ -25,10 +21,10 @@ class ComparisonController {
     
     func rowTitles() -> [[String]]{
         
-        let titleStructure = [  ["Shares","Why to buy"],
+        let titleStructure = [["Shares","Why to buy"],
                                 ["Personal rating score", "Fundamentals score", "Compet. strength" ,"GB Valuation" ,"DCF Valuation", "Intrinsic value"],
                                 ["PE ratio", "Lynch score", "Book value / share price"],
-                                ["ret. eranings", "Revenue", "Net income", "Op. Cash flow", "Profit margin", "EPS"],
+                                ["Ret. earnings", "Revenue", "Net income", "Op. Cash flow", "Profit margin", "EPS"],
                                 ["ROI", "ROE", "ROA"],
                                 ["LT Debt / net income", "LT Debt / adj equity", "cap. exp.", "SGA / revenue", "R&D / profit"]]
         

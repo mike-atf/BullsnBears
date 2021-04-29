@@ -186,11 +186,11 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
 
         let popUpController = citationView.popoverPresentationController
-        popUpController!.permittedArrowDirections = [.up, .left]
+        popUpController!.permittedArrowDirections = UIPopoverArrowDirection.init(rawValue: 0)
         popUpController?.sourceView = view
-        popUpController?.sourceRect = CGRect(x: view.frame.width * 0.6, y: view.frame.height * 0.7, width: 5, height: 5)
+        popUpController?.sourceRect = CGRect(x: view.frame.width * 0.8, y: view.frame.height * 0.75, width: 5, height: 5)
             
-        present(citationView, animated: true, completion: nil)
+        self.parent?.present(citationView, animated: true, completion: nil)
         
 
     }
@@ -439,9 +439,12 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     return
                 }
                 comparisonVC.loadViewIfNeeded()
+                comparisonVC.modalPresentationStyle = .fullScreen
                 comparisonVC.shares = Array(selectedSharesToCompare)
                 
-                self.navigationController?.pushViewController(comparisonVC, animated: true)
+                self.present(comparisonVC, animated: true, completion: nil)
+//                self.navigationController?.pushViewController(comparisonVC, animated: true)
+                
             }
         }
         

@@ -19,14 +19,14 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
         searchController = UISearchController(searchResultsController: nil)
         searchController?.searchResultsUpdater = self
-        searchController?.searchBar.placeholder = "Stock symbol or company name"
+        searchController?.searchBar.placeholder = "Enter Symbol - if not listed tap Search"
         searchController?.delegate = self
         searchController?.searchBar.delegate = self
         navigationItem.searchController = searchController
         definesPresentationContext = true
                 
-        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addManual))
-        self.navigationItem.rightBarButtonItem = addButton
+//        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addManual))
+//        self.navigationItem.rightBarButtonItem = addButton
 
     }
 
@@ -76,6 +76,18 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         
         tableView.reloadData()
     }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        
+        if stocksDictionary.count == 0 {
+            // no stock found in dictionary
+            if let requestedSymbol = searchBar.text?.uppercased() {
+                findNameOnYahoo(symbol: requestedSymbol)
+            }
+        }
+        
+        searchBar.resignFirstResponder()
+    }
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -96,29 +108,33 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         tableView.deselectRow(at: indexPath, animated: false)
-        yahooStockDownload(stocksDictionary[indexPath.row].key)
+        yahooStockDownload(stocksDictionary[indexPath.row].key, companyName: stocksDictionary[indexPath.row].value)
         self.navigationController?.popToRootViewController(animated: true)
 
     }
     
-    @objc
-    func addManual() {
+//    @objc
+//    func addManual() {
+//
+//        guard let manualSearchVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ManualSearchVC") as? ManualSearchVC else {
+//            return
+//        }
+//        manualSearchVC.loadViewIfNeeded()
+//
+//        self.navigationController?.pushViewController(manualSearchVC, animated: true)
+//
+//    }
+
+    func yahooStockDownload(_ ticker: String?, companyName: String?) {
         
-        guard let manualSearchVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ManualSearchVC") as? ManualSearchVC else {
+        guard let symbol = ticker else {
             return
         }
-        manualSearchVC.loadViewIfNeeded()
-        
-        self.navigationController?.pushViewController(manualSearchVC, animated: true)
 
-    }
-
-    func yahooStockDownload(_ ticker: String?) {
-        
-        guard let name = ticker else {
+        guard companyName != nil else {
             return
         }
-
+        
         let calendar = Calendar.current
         let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
         var dateComponents = calendar.dateComponents(components, from: Date())
@@ -135,21 +151,16 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
         let start$ = numberFormatter.string(from: start as NSNumber) ?? ""
         
-        var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(name)")
+        var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(symbol)")
         urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
         
-        var webPath = "https://query1.finance.yahoo.com/v7/finance/download/"
-        webPath += name+"?"
-        webPath += "period1=" + start$
-        webPath += "&period2=" + end$
-        webPath += "&interval=1d&events=history&includeAdjustedClose=true"
         
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-            downLoadWebFile(sourceURL, stockName: name)
+            downLoadWebFile(sourceURL, symbol: symbol, companyName: companyName!)
         }
     }
         
-    func downLoadWebFile(_ url: URL, stockName: String) {
+    func downLoadWebFile(_ url: URL, symbol: String, companyName: String) {
         
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieAcceptPolicy = .always
@@ -162,14 +173,14 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             
             guard errorOrNil == nil else {
                 DispatchQueue.main.async {
-                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(stockName) due to error \(errorOrNil!.localizedDescription)", viewController: self, delegate: nil)
+                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(symbol) due to error \(errorOrNil!.localizedDescription)", viewController: self, delegate: nil)
                 }
                 return
             }
             
             guard responseOrNil != nil else {
                 DispatchQueue.main.async {
-                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(stockName) due to error \(String(describing: responseOrNil!.textEncodingName))", viewController: self, delegate: nil)
+                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(symbol) due to error \(String(describing: responseOrNil!.textEncodingName))", viewController: self, delegate: nil)
                 }
                 return
             }
@@ -183,8 +194,8 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                                             appropriateFor: nil,
                                             create: true)
                 
-                let tempURL = documentsURL.appendingPathComponent(stockName + "-temp.csv")
-                let targetURL = documentsURL.appendingPathComponent(stockName + ".csv")
+                let tempURL = documentsURL.appendingPathComponent(symbol + "-temp.csv")
+                let targetURL = documentsURL.appendingPathComponent(symbol + ".csv")
                 
                 if FileManager.default.fileExists(atPath: tempURL.path) {
                     removeFile(tempURL)
@@ -206,7 +217,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
                     DispatchQueue.main.async {
 
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object:   targetURL, userInfo: nil) // send to StocksListVC
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object:   targetURL, userInfo: ["companyName": companyName]) // send to StocksListVC
                     
                     // the Company profile (industry, sector and employees) is downloaded after this in StocksController called from StocksListVC as delegate of this here download
                     }
@@ -231,5 +242,99 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             }
         }
     }
+    
+    //MARK: - find new symbol on Yahoo
+    
+    func findNameOnYahoo(symbol: String?) {
+        
+        guard let name = symbol else {
+            return
+        }
+        
+        var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(name)/profile")
+        urlComponents?.queryItems = [URLQueryItem(name: "p", value: name)]
+        
+        if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
+            downloadWebData(sourceURL, stockName: name)
+        }
+
+
+    }
+
+    func downloadWebData(_ url: URL, stockName: String) {
+        
+        let configuration = URLSessionConfiguration.default
+        configuration.httpCookieAcceptPolicy = .always
+        configuration.httpShouldSetCookies = true
+        let session = URLSession(configuration: configuration)
+        var downloadTask: URLSessionDataTask? // URLSessionDataTask stores downloaded data in memory, DownloadTask as File
+
+        downloadTask = session.dataTask(with: url) { [self]
+            data, urlResponse, error in
+            
+            guard error == nil else {
+                DispatchQueue.main.async {
+                    stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
+                    self.tableView.reloadData()
+                }
+                return
+            }
+            
+            guard urlResponse != nil else {
+                DispatchQueue.main.async {
+                    stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
+                    self.tableView.reloadData()
+                }
+                return
+            }
+            
+            guard let validData = data else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
+                stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+                return
+            }
+
+            let html$ = String(decoding: validData, as: UTF8.self)
+            self.nameInWebData(html$: html$, symbol: stockName)
+            
+            
+        }
+        downloadTask?.resume()
+    }
+    
+    func nameInWebData(html$: String, symbol: String) {
+        
+        let nameStarter = ">"
+        let symbol$ = "(" + symbol + ")"
+        
+        guard let symbolIndex = html$.range(of: symbol$) else {
+            DispatchQueue.main.async {
+                self.stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
+                self.tableView.reloadData()
+            }
+            return
+        }
+        
+        guard let nameStartIndex = html$.range(of: nameStarter, options: .backwards, range: html$.startIndex..<symbolIndex.upperBound, locale: nil) else {
+            DispatchQueue.main.async {
+                self.stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
+                self.tableView.reloadData()
+            }
+            return
+        }
+        
+        let name$ = html$[nameStartIndex.lowerBound..<symbolIndex.lowerBound].dropFirst()
+
+        DispatchQueue.main.async {
+            self.stocksDictionary.insert((key: symbol, value: String(name$.dropLast())), at: 0)
+            self.tableView.reloadData()
+        }
+
+//        yahooStockDownload(symbol)
+    }
+
 
 }
