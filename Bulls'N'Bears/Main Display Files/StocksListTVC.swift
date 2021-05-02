@@ -308,6 +308,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData, scoreDelegate: self, userCommentCount: evaluationsCount)
         
+//        cell.accessoryView = UIImageView(image: UIImage(systemName: "magnifyingglass.circle"))
 //        cell.accessoryType = .disclosureIndicator
         
         return cell
@@ -438,13 +439,22 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 guard let comparisonVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ComparisonVC") as? ComparisonVC else {
                     return
                 }
-                comparisonVC.loadViewIfNeeded()
-                comparisonVC.modalPresentationStyle = .fullScreen
+
+                comparisonVC.modalPresentationStyle = .popover
+                if let rootView = splitViewController {
+                    comparisonVC.preferredContentSize = CGSize(width: rootView.view.frame.width * 0.9, height: rootView.view.frame.height * 0.9)
+                }
+
                 comparisonVC.shares = Array(selectedSharesToCompare)
-                
-                self.present(comparisonVC, animated: true, completion: nil)
-//                self.navigationController?.pushViewController(comparisonVC, animated: true)
-                
+                selectedSharesToCompare.removeAll()
+
+                let popUpController = comparisonVC.popoverPresentationController
+                popUpController!.permittedArrowDirections = UIPopoverArrowDirection.init(rawValue: 0)
+                popUpController?.sourceView = splitViewController?.view ?? view
+                popUpController?.sourceRect = splitViewController?.view.frame ?? view.frame
+                    
+                self.splitViewController?.present(comparisonVC, animated: true, completion: nil)
+
             }
         }
         
@@ -614,7 +624,7 @@ extension StocksListTVC: NSFetchedResultsControllerDelegate {
         
         switch type {
         case .update:
-            let share = controller.object(at: indexPath!) as! Share
+            let _ = controller.object(at: indexPath!) as! Share
             tableView.reloadRows(at: [indexPath!], with: .none)
         case .insert:
             tableView.insertRows(at: [newIndexPath!], with: .automatic)

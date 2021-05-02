@@ -94,7 +94,7 @@
                                     <action selector="downloadAction:" destination="cqX-eK-jk9" id="daY-2l-AqO"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem title="Item" image="pencil" catalog="system" id="Qru-Ys-VWJ">
+                            <barButtonItem title="Compare" id="Qru-Ys-VWJ">
                                 <connections>
                                     <action selector="selectToCompare:" destination="cqX-eK-jk9" id="LWb-yu-dAC"/>
                                 </connections>
@@ -116,7 +116,7 @@
             <objects>
                 <viewController id="GS7-IZ-4uD" customClass="StockChartVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DMz-IK-SGN" customClass="ChartContainerView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="859" height="820"/>
+                        <rect key="frame" x="0.0" y="0.0" width="859.5" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MVz-dh-kgA" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
@@ -414,7 +414,7 @@
                                     <action selector="errorButtonAction:" destination="GS7-IZ-4uD" id="d2h-RN-d78"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="binoculars.fill" catalog="system" id="ift-0I-bW6">
+                            <barButtonItem image="doc.text.magnifyingglass" catalog="system" id="ift-0I-bW6">
                                 <color key="tintColor" systemColor="linkColor"/>
                                 <connections>
                                     <action selector="researchAction:" destination="GS7-IZ-4uD" id="FZ1-kz-8id"/>
@@ -521,21 +521,31 @@
             <objects>
                 <viewController storyboardIdentifier="ComparisonVC" id="eky-w9-FwK" customClass="ComparisonVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="T0f-nS-9Hb">
-                        <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VCh-Ud-hMe">
-                                <rect key="frame" x="0.0" y="20" width="540" height="33.5"/>
-                                <color key="backgroundColor" systemColor="systemGray3Color"/>
+                                <rect key="frame" x="0.0" y="20" width="1180" height="73"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Compare shares" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e21-RP-5wh">
+                                        <rect key="frame" x="481" y="18" width="218" height="37"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="VCh-Ud-hMe" secondAttribute="height" multiplier="1180:73" id="FKe-ul-rZg"/>
+                                    <constraint firstItem="e21-RP-5wh" firstAttribute="centerX" secondItem="VCh-Ud-hMe" secondAttribute="centerX" id="VtD-Zk-r7j"/>
+                                    <constraint firstItem="e21-RP-5wh" firstAttribute="centerY" secondItem="VCh-Ud-hMe" secondAttribute="centerY" id="fUm-cI-r8Y"/>
                                 </constraints>
                             </view>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pXA-jR-ADe">
-                                <rect key="frame" x="0.0" y="61.5" width="540" height="578.5"/>
+                                <rect key="frame" x="0.0" y="101" width="1180" height="719"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="iO9-hW-Vne">
-                                        <rect key="frame" x="0.0" y="0.0" width="1414" height="578.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="1414" height="719"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="1414" id="2eU-1a-fEz"/>
@@ -594,7 +604,6 @@
                             <constraint firstItem="VCh-Ud-hMe" firstAttribute="top" secondItem="3w2-Yl-Zc8" secondAttribute="top" constant="20" id="xGI-1Y-0Eo"/>
                         </constraints>
                     </view>
-                    <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="horizontalScrollView" destination="pXA-jR-ADe" id="DOm-yB-OJ8"/>
                         <outlet property="tableView" destination="iO9-hW-Vne" id="BZA-yT-87K"/>
@@ -1167,12 +1176,11 @@
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.up.arrow.down" catalog="system" width="128" height="98"/>
-        <image name="binoculars.fill" catalog="system" width="128" height="90"/>
+        <image name="doc.text.magnifyingglass" catalog="system" width="113" height="128"/>
         <image name="dollarsign.square.fill" catalog="system" width="128" height="114"/>
         <image name="exclamationmark.triangle" catalog="system" width="128" height="112"/>
         <image name="exclamationmark.triangle.fill" catalog="system" width="128" height="112"/>
         <image name="info.circle" catalog="system" width="128" height="121"/>
-        <image name="pencil" catalog="system" width="128" height="113"/>
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="xmark.circle" catalog="system" width="128" height="121"/>
         <systemColor name="labelColor">
@@ -1186,9 +1194,6 @@
         </systemColor>
         <systemColor name="systemGray2Color">
             <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemGray3Color">
-            <color red="0.7803921568627451" green="0.7803921568627451" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
             <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

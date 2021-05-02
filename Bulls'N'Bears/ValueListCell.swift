@@ -28,6 +28,7 @@ class ValueListCell: UITableViewCell, UITextFieldDelegate {
         self.chartView.configure(array1: nil, array2: nil, trendLabel: title)
     }
     
+    /// values1 contains valuation figures, values2 (optional) has the proportions either comnpared to another set of figures, or element-on-element growth
     public func configure(values1: [Double]?, values2: [Double]?, rightTitle: String?, leftTitle: String?) {
                 
         rightLowerLabel.text = rightTitle

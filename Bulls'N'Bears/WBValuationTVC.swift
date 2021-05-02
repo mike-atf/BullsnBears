@@ -64,13 +64,20 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
         let (value$, color, errors) = controller!.value$(path: indexPath)
         let evaluation = controller!.userEvaluation(for: indexPath)
+        
         var correlation: Correlation?
-        if let arrays = arraysForValueListTVC(indexPath: indexPath) {
-            let proportions = controller!.valueListTVCProportions(values: arrays)
-            let sendArrays = [arrays[0], proportions]
+        let arrays = arraysForValueListTVC(indexPath: indexPath)
+        if arrays != nil {
+            let proportions = controller!.valueListTVCProportions(values: arrays!)
+            let sendArrays = [arrays![0], proportions]
             correlation = Calculator.valueChartCorrelation(arrays:sendArrays)
+//            if share.symbol == "NVDA" && indexPath == IndexPath(row: 2, section: 1) {
+//            }
+
         }
-        cell.configure(title: controller!.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self, userEvaluation: evaluation, correlation: correlation)
+        
+        
+        cell.configure(title: controller!.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self, userEvaluation: evaluation, correlation: correlation,correlationValues: arrays?[0])
         
         if indexPath.section == 0 {
             cell.accessoryType = .detailButton
@@ -89,7 +96,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 60
+        return 50
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -100,13 +107,12 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
         let header = UIView()
-        let height: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 60 : 50
+        let height: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 50 : 50
         header.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: height)
         
-        let (title, subtitle) = controller?.sectionHeaderText(section: section) ?? ("","")
+        let title = controller?.sectionHeaderText(section: section) ?? ""
         
         let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 22 : 20
-        let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 16 : 12
         
         let titleLabel: UILabel = {
             let label = UILabel()
@@ -120,32 +126,12 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
                 
         header.addSubview(titleLabel)
-        
-        let subTitle: UILabel = {
-            let label = UILabel()
-            label.font = UIFont.systemFont(ofSize: smallFontSize, weight: .regular)
-            label.textColor = UIColor.label
-            label.adjustsFontSizeToFitWidth = true
-            label.minimumScaleFactor = 0.8
-            label.text = subtitle
-            return label
-        }()
-        
-        subTitle.translatesAutoresizingMaskIntoConstraints = false
-        
-        header.addSubview(subTitle)
-        
-        
+                
         let margins = header.layoutMarginsGuide
         
         titleLabel.setContentHuggingPriority(.required, for: .vertical)
         titleLabel.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 10).isActive = true
-        titleLabel.trailingAnchor.constraint(greaterThanOrEqualTo: subTitle.leadingAnchor, constant: 10).isActive = true
-        
-        subTitle.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor, constant: 5).isActive = true
-        subTitle.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
-        subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
         
         return header
         
@@ -250,65 +236,98 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             destination.sectionTitles.append(contentsOf: titles)
             destination.cellLegendTitles = validController.valueListChartLegendTitles[selectedPath.section-1][selectedPath.row]
             
-            let arrays = arraysForValueListTVC(indexPath: selectedPath)
+            let arrays = arraysForValueListTVC(indexPath: selectedPath) // time-ASCENDING
             
             if selectedPath.section == 1 {
                 if selectedPath.row == 0 {
+                // Revenue
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                 }
                 else if selectedPath.row == 1 {
+                // Net income
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapWithPence
                 }
                 else if selectedPath.row == 2 {
+                // Net income / Revenue
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, _) = validController.valuation!.netIncomeProportion()
                     destination.proportions = margins
                 }
                 else if selectedPath.row == 3 {
+                // Ret earnings
+                    destination.values = arrays
+                    destination.formatter = currencyFormatterGapNoPence
+                }
+                else if selectedPath.row == 4 {
+                // EPS
+                    destination.values = arrays
+                    destination.formatter = currencyFormatterGapNoPence
+                }
+               else if selectedPath.row == 5 {
+                // Profit margin
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, _) = validController.valuation!.grossProfitMargins()
                     destination.proportions = margins
+                
                 }
-                else if selectedPath.row == 4 {
-                    destination.values = arrays
-                    destination.formatter = percentFormatter0Digits
-                    let (prop, _) = validController.valuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
-                    destination.proportions = prop
-                    destination.higherGrowthIsBetter = false
-                }
-               else if selectedPath.row == 5 {
+               else if selectedPath.row == 6 {
+                // Op. cash flow
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, _) = validController.valuation!.longtermDebtProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                 }
+
             }
             else if selectedPath.section == 2 {
-                if selectedPath.row < 3 {
+                if selectedPath.row == 0 {
+                // ROE
                     destination.values = arrays
                     destination.formatter = percentFormatter0Digits
                 }
-                else if selectedPath.row == 3 {
+                else if selectedPath.row == 1 {
+                // ROA
                     destination.values = arrays
-                    destination.formatter = currencyFormatterGapNoPence
+                    destination.formatter = percentFormatter0Digits
+                }
+                else if selectedPath.row == 2 {
+                // Lt debt / adj shareholder equity
+                    destination.values = arrays
+                    destination.formatter = percentFormatter0Digits
                     destination.higherGrowthIsBetter = false
                 }
             }
             else if selectedPath.section == 3 {
                 if selectedPath.row == 0 {
+                // CapEx / earnings
+                    destination.values = arrays
+                    destination.formatter = percentFormatter0Digits
+                    let (prop, _) = validController.valuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
+                    destination.proportions = prop
+                    destination.higherGrowthIsBetter = false
+                }
+                else if selectedPath.row == 1 {
+                // Lt debt / net income
+                    destination.values = arrays
+                    let (margins, _) = validController.valuation!.longtermDebtProportion()
+                    destination.proportions = margins
+                    destination.higherGrowthIsBetter = false
+                }
+                else if selectedPath.row == 2 {
+                // SGA / profit
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, _) = validController.valuation!.sgaProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
-                    
                 }
-                else if selectedPath.row == 1 {
+                else if selectedPath.row == 3 {
+                // R&D / profit
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, _) = validController.valuation!.rAndDProportion()
@@ -326,35 +345,45 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         if indexPath.section == 1 {
             if indexPath.row == 0 {
-                arrays = [controller?.valuation?.equityRepurchased ?? []]
+            // Revenue
+                arrays = [controller?.valuation?.revenue ?? []]
             }
             else if indexPath.row == 1 {
-                arrays = [controller?.valuation?.eps ?? []]
+            // net income
+                arrays = [controller?.valuation?.netEarnings ?? []]
             }
             else if indexPath.row == 2 {
+            // net income / revenue
                 arrays = [controller?.valuation?.netEarnings ?? [], controller?.valuation?.revenue ?? []]
             }
             else if indexPath.row == 3 {
-                arrays = [controller?.valuation?.grossProfit ?? [], controller?.valuation?.revenue ?? []]
+            // Ret. earnings
+                arrays = [controller?.valuation?.equityRepurchased ?? []]
             }
             else if indexPath.row == 4 {
-                arrays = [controller?.valuation?.capExpend ?? [], controller?.valuation?.netEarnings ?? []]
+            // EPS
+                arrays = [controller?.valuation?.eps ?? []]
             }
             else if indexPath.row == 5 {
-                arrays = [controller?.valuation?.debtLT ?? [], controller?.valuation?.netEarnings ?? []]
+            // Profit margin
+                arrays = [controller?.valuation?.grossProfit ?? [], controller?.valuation?.revenue ?? []]
+            }
+            else if indexPath.row == 6 {
+            // op. cash flow
+                arrays = [controller?.valuation?.opCashFlow ?? []]
             }
         }
         else if indexPath.section == 2 {
             if indexPath.row == 0 {
-                arrays = [controller?.valuation?.opCashFlow ?? []]
-            }
-            else if indexPath.row == 1 {
+            // ROE
                 arrays = [controller?.valuation?.roe ?? []]
             }
-            else if indexPath.row == 2 {
+            else if indexPath.row == 1 {
+            // ROA
                 arrays = [controller?.valuation?.roa ?? []]
             }
-            else if indexPath.row == 3 {
+            else if indexPath.row == 2 {
+            // Lt debt / adj. shareholder equity
                 if let validController = controller {
                     let (shEquityWithRetEarnings, _) = validController.valuation!.addElements(array1: validController.valuation?.shareholdersEquity ?? [], array2: validController.valuation!.equityRepurchased ?? [])
                     arrays = [validController.valuation?.debtLT ?? [], shEquityWithRetEarnings]
@@ -363,9 +392,19 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         }
         else if indexPath.section == 3 {
             if indexPath.row == 0 {
-                arrays = [controller?.valuation?.sgaExpense ?? [], controller?.valuation?.grossProfit ?? []]
+            // capEx / net income
+                arrays = [controller?.valuation?.capExpend ?? [], controller?.valuation?.netEarnings ?? []]
             }
             else if indexPath.row == 1 {
+            // Lt debt / net income
+                arrays = [controller?.valuation?.debtLT ?? [], controller?.valuation?.netEarnings ?? []]
+            }
+            else if indexPath.row == 2 {
+            // SAG / profit
+                arrays = [controller?.valuation?.sgaExpense ?? [], controller?.valuation?.grossProfit ?? []]
+            }
+            else if indexPath.row == 3 {
+            // R&D / profit
                 arrays = [controller?.valuation?.rAndDexpense ?? [], controller?.valuation?.grossProfit ?? []]
             }
         }

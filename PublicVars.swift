@@ -119,20 +119,22 @@ enum TrendTimeOption {
 struct WBVParameters {
     // when adding new parameter check impact in WBVValuationController and WBVValuationTVC and ValueListTVC
     // also adapt 'higherIsBetter' parameter in UserEvaluation
-    let earnigsGrowth = "Growth of earnings"
-    let retEarningsGrowth = "Growth of retained earnings"
+    // careful - the '/' characters are used in ValueListVC to determine the charts to show
+    let revenueGrowth = "Revenue growth"
+    let earnigsGrowth = "Earnings growth"
+    let retEarningsGrowth = "Ret. earnings growth"
     let epsGrowth = "EPS"
-    let incomeOfRevenueGrowth = "Growth of net income % of revenue"
-    let profitOfRevenueGrowth = "Growth of profit % of revenue"
-    let capExpendOfEarningsGrowth = "Growth of cap. expend % of net income"
-    let earningsToPERratio = "Growth of earnings % of pe ratio"
-    let debtOfIncomeGrowth = "Growth of LT debt % of net income"
+    let incomeOfRevenueGrowth = "Net income / revenue growth"
+    let profitOfRevenueGrowth = "Profit / revenue growth"
+    let capExpendOfEarningsGrowth = "Cap. expend / net income growth"
+    let earningsToPERratio = "Growth of earnings / pe ratio"
+    let debtOfIncomeGrowth = "Growth of LT debt / net income"
     let opCashFlowGrowth = "Growth of op. cash flow"
     let roeGrowth = "Growth of return on equity"
     let roaGrowth = "Growth of return on assets"
-    let debtOfEqAndRtEarningsGrowth = "Growth of LT debt % of equity + ret. earnings"
-    let sgaOfProfitGrowth = "Growth of SGA % of profit"
-    let rAdOfProfitGrowth = "Growth of R&D % of profit"
+    let debtOfEqAndRtEarningsGrowth = "Growth of LT debt / equity + ret. earnings"
+    let sgaOfProfitGrowth = "Growth of SGA / profit"
+    let rAdOfProfitGrowth = "Growth of R&D / profit"
     
     func allParameters() -> [String] {
         return [earnigsGrowth,retEarningsGrowth, epsGrowth, incomeOfRevenueGrowth, profitOfRevenueGrowth, capExpendOfEarningsGrowth, debtOfIncomeGrowth, roeGrowth, roaGrowth ,debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth ,rAdOfProfitGrowth]
@@ -143,24 +145,26 @@ struct WBVParameters {
     }
         
     func firstSection() -> [[String]] {
-        return [[retEarningsGrowth],
+        return [[revenueGrowth],
+                [earnigsGrowth],
+                [incomeOfRevenueGrowth], //, "Revenue"
+                [retEarningsGrowth],
                 [epsGrowth],
-                [incomeOfRevenueGrowth, "Revenue"],
-                [profitOfRevenueGrowth, "Revenue"],
-                [capExpendOfEarningsGrowth, "Net income"],
-                [debtOfIncomeGrowth, "Net income"]]
+                [profitOfRevenueGrowth], //, "Revenue"
+                [opCashFlowGrowth]]
     }
     
     func secondSection() -> [[String]] {
-        return [[opCashFlowGrowth],
-                [roeGrowth],
+        return [[roeGrowth],
                 [roaGrowth],
-                [debtOfEqAndRtEarningsGrowth, "equity + ret. earnings"]]
+                [debtOfEqAndRtEarningsGrowth]] // , "equity + ret. earnings"
     }
     
     func thirdSection() -> [[String]] {
-        return [[sgaOfProfitGrowth, "Profit"],
-                [rAdOfProfitGrowth, "Profit"]]
+        return [[capExpendOfEarningsGrowth], //, "Net income"
+                [debtOfIncomeGrowth], //, "Net income"
+                [sgaOfProfitGrowth], // , "Profit"
+                [rAdOfProfitGrowth]] // , "Profit"]
     }
 
     /// all other WBVParameters have highIsBetter
@@ -334,7 +338,7 @@ let percentFormatter0DigitsPositive: NumberFormatter = {
 let numberFormatterWith1Digit: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
-    formatter.maximumFractionDigits = 2
+    formatter.maximumFractionDigits = 1
     formatter.minimumIntegerDigits = 1
     formatter.usesGroupingSeparator = true
     return formatter

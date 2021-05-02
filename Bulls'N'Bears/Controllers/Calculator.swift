@@ -125,7 +125,7 @@ class Calculator {
         return Correlation(m: m, b: b, r: r, xElements: cleanedArrayX.count)
     }
     
-    /// returns the proportions of array1 / array0
+    /// returns the proportions of first array / second array
     class func proportions(array1: [Double]?, array0: [Double]?) -> [Double]? {
         
         guard let values1 = array1 else {
@@ -158,6 +158,7 @@ class Calculator {
         return proportions
     }
     
+    
     class func valueChartCorrelation(arrays: [[Double]?]?) -> Correlation? {
         
         guard let array1 = arrays?.first else {
@@ -173,6 +174,7 @@ class Calculator {
         
         if array2?.count ?? 0 > 1 {
             // proportions - calculate trend of proportions
+            // ignore array 1
             
             var years = [Double]()
             var count = 1.0 // important to start with 1.0 to avoid dropping 0 element in correlation

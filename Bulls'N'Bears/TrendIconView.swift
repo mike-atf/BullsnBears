@@ -10,6 +10,7 @@ import UIKit
 class TrendIconView: UIView {
     
     var correlation: Correlation?
+    var chartValues: [Double]?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -21,9 +22,10 @@ class TrendIconView: UIView {
         self.backgroundColor = UIColor.clear
     }
     
-    func configure(correlation: Correlation) {
+    func configure(correlation: Correlation, values: [Double]?) {
 
         self.correlation = correlation
+        self.chartValues = values
         setNeedsDisplay()
     }
 
@@ -34,9 +36,24 @@ class TrendIconView: UIView {
             return
         }
         
+        var baselineY = rect.height * 0.9
+        
+//        if (chartValues ?? []).count > 0 {
+//
+//            let max = chartValues!.max()!
+//            let min = chartValues!.min()!
+//            if max * min < 0 {
+//                // part of the values are < 0, others >0
+//                baselineY = rect.height * 0.5
+//            }
+//            else if max < 0 && min < 0 {
+//                baselineY  = rect.height * 0.1
+//            }
+//        }
+        
         let baseLine = UIBezierPath()
-        baseLine.move(to: CGPoint(x: rect.width * 0.1, y: rect.height * 0.9))
-        baseLine.addLine(to: CGPoint(x: rect.width * 0.9, y: rect.height * 0.9))
+        baseLine.move(to: CGPoint(x: rect.width * 0.1, y: baselineY))
+        baseLine.addLine(to: CGPoint(x: rect.width * 0.9, y: baselineY))
         baseLine.lineWidth = 1.0
         UIColor.systemGray.setStroke()
         UIColor.systemGray.setFill()
@@ -73,12 +90,14 @@ class TrendIconView: UIView {
         }
         
         if r2 >= 0.64 {
-            let height = (max(barHeights.last!,barHeights.first!) + min(barHeights.last!,barHeights.first!)) / 2
-            barHeights.insert(height, at: 1)
+            let heightDifference = (barHeights[1] - barHeights[0]) / 3
+            barHeights.insert(barHeights[0] + heightDifference, at: 1)
+            barHeights.insert(barHeights[1] + heightDifference, at: 2)
         }
         else {
-            let height: CGFloat = 0
-            barHeights.insert(height, at: 1)
+            let heightDifference = (barHeights[1] - barHeights[0])
+            barHeights.insert(barHeights[0] + heightDifference * 0.7, at: 1)
+            barHeights.insert(barHeights[0] - heightDifference * 0.15, at: 2)
         }
         
         let bottom = rect.height * 0.85

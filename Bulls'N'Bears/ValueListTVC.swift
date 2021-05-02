@@ -38,7 +38,7 @@ class ValueListTVC: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         
-       proportions = controller.valueListTVCProportions(values: values)
+       proportions = controller.valueListTVCProportions(values: values) // values = time-DESCENDING, proportions come back in same order
    }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -57,7 +57,7 @@ class ValueListTVC: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return (values?.count ?? 0) + 2
+        return sectionTitles.count // + 1 //+ 2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -90,14 +90,19 @@ class ValueListTVC: UITableViewController {
         }
         else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
-            if indexPath.section == 2 {
+//            if sectionTitles[indexPath.section].contains("/") {
+//                if indexPath.section == 2 {
 
-                cell.configure(values1: values?[indexPath.section-2], values2: proportions, rightTitle: cellLegendTitles[1], leftTitle: cellLegendTitles.first)
-            }
-            else {
-                cell.configure(values1: values?[indexPath.section-2], values2: nil, rightTitle: sectionTitles.last, leftTitle: nil)
-            }
-            
+                    cell.configure(values1: values?[indexPath.section-2], values2: proportions, rightTitle: cellLegendTitles[1], leftTitle: cellLegendTitles.first)
+//                }
+//                else {
+//                    cell.configure(values1: values?[indexPath.section-2], values2: nil, rightTitle: sectionTitles.last, leftTitle: nil)
+//                }
+//            }
+//            else {
+//                cell.configure(values1: values?[indexPath.section-2], values2: nil, rightTitle: sectionTitles.last, leftTitle: nil)
+//            }
+
             return cell
         }
         
@@ -110,7 +115,8 @@ class ValueListTVC: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 { return 100 }
         else if indexPath.section == 1 { return 120 }
-        else { return 300 }
+        else { return 450 }
     }
 
 }
+

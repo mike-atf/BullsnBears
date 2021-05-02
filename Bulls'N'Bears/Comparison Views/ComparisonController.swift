@@ -23,7 +23,7 @@ class ComparisonController {
         
         let titleStructure = [["Shares","Why to buy"],
                                 ["Personal rating score", "Fundamentals score", "Compet. strength" ,"GB Valuation" ,"DCF Valuation", "Intrinsic value"],
-                                ["PE ratio", "Lynch score", "Book value / share price"],
+                                ["PE ratio", "Lynch ratio", "Book value / share price"],
                                 ["Ret. earnings", "Revenue", "Net income", "Op. Cash flow", "Profit margin", "EPS"],
                                 ["ROI", "ROE", "ROA"],
                                 ["LT Debt / net income", "LT Debt / adj equity", "cap. exp.", "SGA / revenue", "R&D / profit"]]
@@ -32,13 +32,176 @@ class ComparisonController {
         
     }
     
+    func sectionTitle() -> [String] {
+        
+        return ["", "Scores & valuations", "Ratios", "Fundamentals" ,"Returns", "Debt, outgoings & costs"]
+    }
+    
+    func titleForSection(section: Int) -> String {
+        
+        guard section < sectionTitle().count else {
+            return ""
+        }
+        
+        return sectionTitle()[section]
+    }
+    
     func titleForRow(for path: IndexPath) -> String {
         
         let titles = rowTitles()
         return titles[path.section][path.row]
     }
     
-    
+    func rowTexts(forPath: IndexPath) -> [String] {
+        
+        var texts = [String]()
+        
+        switch forPath.section {
+        case 0:
+            if forPath.row == 0 {
+                texts = shares?.compactMap{ $0.symbol } ?? [String]()
+            }
+            else if forPath.row == 1 {
+                for share in shares ?? [] {
+                    texts.append(share.research?.theBuyStory ?? "")
+                }
+            }
+        case 1:
+            if forPath.row == 0 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if share.userEvaluationScore > 0 {
+                        text = percentFormatter0Digits.string(from: share.userEvaluationScore as NSNumber) ?? "-"
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 1 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if share.valueScore > 0 {
+                        text = percentFormatter0Digits.string(from: share.valueScore as NSNumber) ?? "-"
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 2 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if let moat = share.rule1Valuation?.moatScore() {
+                        text = percentFormatter0Digits.string(from: moat as NSNumber) ?? "-"
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 3 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if share.rule1Valuation != nil {
+                        let (price,_) = share.rule1Valuation!.stickerPrice()
+                        if let validPrice = price {
+                            text = currencyFormatterNoGapNoPence.string(from: validPrice as NSNumber) ?? "-"
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 4 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if share.dcfValuation != nil {
+                        let (price,_) = share.dcfValuation!.returnIValue()
+                        if let validPrice = price {
+                            text = currencyFormatterNoGapNoPence.string(from: validPrice as NSNumber) ?? "-"
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 5 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if share.wbValuation != nil {
+                        let (price,_) = share.wbValuation!.ivalue()
+                        if let validPrice = price {
+                            text = currencyFormatterNoGapNoPence.string(from: validPrice as NSNumber) ?? "-"
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+        case 2:
+            if forPath.row == 0 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if share.peRatio != 0 {
+                        text = numberFormatterWith1Digit.string(from: share.peRatio as NSNumber) ?? "-"
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 1 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if share.wbValuation != nil {
+                        if let ratio = share.wbValuation!.lynchRatio() {
+                            text = numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "-"
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 2 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if share.wbValuation != nil {
+                        if let values = share.wbValuation!.bookValuePerPrice() {
+                            var t1$:String?
+                            var t2$:String?
+                            if let value1 = values[0] {
+                                t1$ = percentFormatter0Digits.string(from: value1 as NSNumber) ?? ""
+                            }
+                            if let value2 = values[1] {
+                                t2$ = currencyFormatterNoGapWithPence.string(from: value2 as NSNumber) ?? ""
+                            }
+
+                            
+                            if t1$ != nil && t2$ != nil {
+                                text = t1$! + " (" + t2$! + ")"
+                            }
+                            else {
+                                text = (t1$ ?? t2$) ?? "-"
+                            }
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+        case 3:
+            if forPath.row == 0 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if let retE = share.wbValuation?.equityRepurchased {
+                        if let lastRetEarnings = retE.last {
+                            if lastRetEarnings < 0 {
+                                text = "last neg."
+                            }
+                            else {
+                                
+                            }
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+
+
+        default:
+            texts = [String]()
+        }
+        
+        return texts
+    }
     
     /*
      tableStructure:

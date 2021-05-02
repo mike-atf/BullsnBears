@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -13,39 +13,39 @@
             <rect key="frame" x="0.0" y="0.0" width="350" height="61"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="306" height="61"/>
+                <rect key="frame" x="0.0" y="0.0" width="309.5" height="61"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wei-cZ-Jf6">
-                        <rect key="frame" x="16" y="12.5" width="48" height="24"/>
+                        <rect key="frame" x="16" y="14" width="41.5" height="20.5"/>
                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ovB-7I-mf5" customClass="ScoreCircle" customModule="Bulls_N_Bears" customModuleProvider="target">
-                        <rect key="frame" x="219.5" y="12" width="36.5" height="37"/>
+                        <rect key="frame" x="223" y="12" width="36.5" height="37"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="ovB-7I-mf5" secondAttribute="height" multiplier="1:1" id="b6h-Hx-f3Y"/>
                         </constraints>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kHJ-Tc-GPs" customClass="ScoreCircle" customModule="Bulls_N_Bears" customModuleProvider="target">
-                        <rect key="frame" x="158" y="12" width="36.5" height="37"/>
+                        <rect key="frame" x="161.5" y="12" width="36.5" height="37"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="kHJ-Tc-GPs" secondAttribute="height" multiplier="1:1" id="Xxh-tg-0ur"/>
                         </constraints>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JcG-ab-0AL" customClass="BuySellView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                        <rect key="frame" x="71" y="6" width="57" height="49"/>
+                        <rect key="frame" x="74.5" y="6" width="57" height="49"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="JcG-ab-0AL" secondAttribute="height" multiplier="35:30" id="agO-r1-j2F"/>
                         </constraints>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sIC-VG-f5n">
-                        <rect key="frame" x="16" y="39" width="33" height="16"/>
-                        <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                        <rect key="frame" x="16" y="36.5" width="26.5" height="12"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -60,7 +60,7 @@
                     <constraint firstItem="JcG-ab-0AL" firstAttribute="centerY" secondItem="kHJ-Tc-GPs" secondAttribute="centerY" id="ONS-vF-Ohp"/>
                     <constraint firstItem="Wei-cZ-Jf6" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="SFQ-sc-QWq"/>
                     <constraint firstItem="JcG-ab-0AL" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wei-cZ-Jf6" secondAttribute="trailing" constant="5" id="Ti8-TQ-gHN"/>
-                    <constraint firstItem="sIC-VG-f5n" firstAttribute="firstBaseline" secondItem="Wei-cZ-Jf6" secondAttribute="baseline" constant="20" symbolType="layoutAnchor" id="Tx0-27-yUd"/>
+                    <constraint firstItem="sIC-VG-f5n" firstAttribute="firstBaseline" secondItem="Wei-cZ-Jf6" secondAttribute="baseline" constant="16" symbolType="layoutAnchor" id="Tx0-27-yUd"/>
                     <constraint firstItem="ovB-7I-mf5" firstAttribute="top" secondItem="kHJ-Tc-GPs" secondAttribute="top" id="Vle-lB-yjZ"/>
                     <constraint firstAttribute="trailing" secondItem="ovB-7I-mf5" secondAttribute="trailing" constant="50" id="nLX-Nx-nsL"/>
                     <constraint firstItem="kHJ-Tc-GPs" firstAttribute="leading" secondItem="JcG-ab-0AL" secondAttribute="trailing" constant="30" id="vbc-NA-Jt5"/>

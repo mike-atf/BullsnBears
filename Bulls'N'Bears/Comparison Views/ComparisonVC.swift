@@ -38,11 +38,19 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "comparisonCell", for: indexPath) as! ComparisonCell
         
-        cell.configure(rowTitle: controller.titleForRow(for: indexPath), values: [1.2, nil, 2.0])
+        cell.configure(controller: controller, cellPath: indexPath)
         
         return cell
     }
 
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        controller.titleForSection(section: section)
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath == IndexPath(row: 1, section: 0) { return 200 }
+        else { return 44 }
+    }
     
     /*
     // MARK: - Navigation

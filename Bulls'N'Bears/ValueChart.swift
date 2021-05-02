@@ -39,16 +39,16 @@ class ValueChart: UIView {
     var trendlabel: UILabel!
     
     /// 1st array will be bar chart
-    /// 2nd array (optional) will line chart
-    /// both should have some number of elements, otherwise, the second array will be brought to same size
+    /// 2nd array (optional) will line chart,. values2 (optional) has  proportions either comnpared to another set of figures, or element-on-element growth
+    /// both should have same number of elements, otherwise, the second array will be brought to same count
     func configure(array1: [Double]?, array2: [Double]?, trendLabel: UILabel) {
         
         guard array1?.count ?? 0 > 0 || array2?.count ?? 0 > 0 else {
             return
         }
 
-        self.valueArray1 = array1?.reversed()
-        self.valueArray2 = array2?.reversed()
+        self.valueArray1 = Array(array1!.reversed())
+        self.valueArray2 = Array(array2!.reversed())
         self.trendlabel = trendLabel
         
         if let secondArray = array2 {
@@ -129,32 +129,6 @@ class ValueChart: UIView {
         
         trend = Calculator.valueChartCorrelation(arrays: [array1 ?? [], array2 ?? []])
         
-        /*
-        if array2?.count ?? 0 > 1 {
-            // proportions - calculate trend of proportions
-            
-            var years = [Double]()
-            var count = 1.0 // important to start with 1.0 to avoid dropping 0 element in correlation
-            for _ in array2! {
-                years.append(count)
-                count += 1.0
-            }
-
-            trend = Calculator.correlation(xArray: years, yArray: array2?.reversed())
-        }
-        else if array1?.count ?? 0 > 1 {
-            // values only, no proportions - calculate values trend
-            
-            var years = [Double]()
-            var count = 1.0 // important to avoid dropping 0 element in correlation
-            for _ in array1! {
-                years.append(count)
-                count += 1.0
-            }
-
-            trend = Calculator.correlation(xArray: years, yArray: array1?.reversed())
-        }
-        */
     }
     
     override func draw(_ rect: CGRect) {
@@ -318,27 +292,37 @@ class ValueChart: UIView {
             
             UIColor.lightGray.setStroke()
             horizontalNullLine?.stroke()
-            
+
+// r2 and labels
             var r2$ = String()
-            var growth$ = String()
+            var growthEMA$ = String() // correlation incline based
+            var meanChangeOfGrowth$ = String() // correlation incline based
             let r2 = trend.r2()
-            if let growth = trend.meanGrowth(for: Double(xAxisLabels.count)) {
+            // array2 = proportions, array1 = values
+
+            if let growth = valueArray2?.reversed().ema(periods: 7) {
+                //calculates changes of growth rates yoy then ema
                 if r2 != nil{
                     r2$ = percentFormatter0Digits.string(from: r2! as NSNumber) ?? ""
-                    if r2! > 0.64 {
-                        growth$ = percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? ""
-                    }
-                    else {
-                        growth$ = "high volatility (" + (percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? "") + ")"
-                    }
                 }
+                growthEMA$ = percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? ""
+                meanChangeOfGrowth$ = percentFormatter0Digits.string(from: trend.incline as NSNumber) ?? ""
+            }
+            else if let growthRates = valueArray1?.reversed().growthRates() {
+                
+                if let ema = growthRates.ema(periods: 7) {
+                    growthEMA$ = percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? ""
+                }
+                if r2 != nil{
+                    r2$ = percentFormatter0Digits.string(from: r2! as NSNumber) ?? ""
+                }
+                    meanChangeOfGrowth$ = percentFormatter0Digits.string(from: trend.incline as NSNumber) ?? ""
             }
             trendlabel.font = UIFont.preferredFont(forTextStyle: .footnote)
             trendlabel.numberOfLines = 0
 
-            trendlabel.setAttributedTextWithSuperscripts(text: "R2: \(r2$)  -  Avg. growth pa.: \(growth$)", indicesOfSuperscripts: [1])
+            trendlabel.setAttributedTextWithSuperscripts(text: "R2: \(r2$)  -  YoY growth changing by average \(meanChangeOfGrowth$) to EMA \(growthEMA$)", indicesOfSuperscripts: [1])
             trendlabel.sizeToFit()
-            
         }
     }
     

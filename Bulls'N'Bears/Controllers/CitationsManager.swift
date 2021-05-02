@@ -13,9 +13,9 @@ class CitationsManager {
         
         let pL0 = "You don't have to 'kiss all the girls.' I've missed my share of tenbaggers and it hasn't kept me from beating the market"
         let pL1 = "You won't improve results by pulling out the flowers and watering the weeds"
-        let pL2 = "By careful pruning and rotation based on fundamentals, you can improve your results. When stocks are out of line qwith reality and better alternatives exist, seel them and switch inot somehting else"
-        let pL3 = "You dont lose anything by not owning a successful stock, even if it's a tenbagger"
-        let pL4 = "Don't become so attached to a winner that complacency sets in ans you stop monitoring the story"
+        let pL2 = "By careful pruning and rotation based on fundamentals, you can improve your results. When stocks are out of line with reality and better alternatives exist, sell them and switch into something else"
+        let pL3 = "You don't lose anything by not owning a successful stock, even if it's a tenbagger"
+        let pL4 = "Don't become so attached to a winner that complacency sets in and you stop monitoring the story"
         let pL5 = "Buying a company with mediocre prospects just because the stock is cheap is a losing technique"
         let pL6 = "Selling an outstanding fast grower because its stock seems slightly overpriced is a losing technique"
         let pL7 = "Just because the price goes up doesn't mean you're right"
@@ -33,13 +33,16 @@ class CitationsManager {
         let pL19 = "It turns out that England had a big trade deficit, and England was thriving around it. But there's no point bringing this up. By the time I thought of it, people had forgotten about the trade deficit and started to worry about the next trade surplus"
         let pL20 = "It's that last 20% [of a typical stock move] that Wall Street studies for, clamors for and then lines up for - all the while with a sharp eye on the exits. The idea is to make a quick gain and then stampede out the door.\nSmall investors don't have to fight this mob. They can calmly walk in the entrance when there's a crowd at the exit, and walk out the exit when there's a crowd at the entrance."
         let pL21 = "Investing without research is like playing stud poker and never looking at the cards."
-        let pL22 = "Specific products aside, big companies don't have big stock moves. In certain markets thy perform well, but you'll get your biggest moves in smaller companies"
+        let pL22 = "Specific products aside, big companies don't have big stock moves. In certain markets they perform well, but you'll get your biggest moves in smaller companies"
         let pL23 = "If you can summon the courage and presence of mind to buy during [the collapses, drops, burps, hiccups and freefalls] when your stomach says 'sell', you'll find opportunities that you wouldn't have thought you'd ever see again"
         let pL24 = "... when you've found the right stock and bought it, all the evidence tells you it's going higher, and everything is working in your direction, then it's a shame if you sell"
         let pL25 = "These days if I feel there's a danger of being faked out, I try to review the reasons why I bought in the first place."
+        let pL26 = "How many people know what the Fed does?...23 % of the US population thought the Federal Reserve was an Indian reservation, 25% thought it was a wildlife preserve, and 51% thought it was a brand of whiskey"
+        let pL27 = "ultimately the earnings will decide the fate of a stock."
+        let pL28 = "There are three phases to a growth company's life: the start-up phase..., the rapid expansion phase..., and the saturation phase...\nThe second phase is the safest phase, and also where the most money is made"
 
         
-        var allCitations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25]
+        var allCitations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
         
         if let lastCitation = UserDefaults.standard.value(forKey: userDefaultTerms.lastCitation) as? String {
             var count = 0

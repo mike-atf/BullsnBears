@@ -676,6 +676,54 @@ public class WBValuation: NSManagedObject {
         return (sumArray,nil)
     }
     
+    /// [precent, price] as [Double?, Double?]
+    public func bookValuePerPrice() -> [Double?]? {
+        
+        guard let validShare = share else {
+            return nil
+        }
+
+        
+        let lastStockPrice =  validShare.getDailyPrices()?.last?.close //stock.dailyPrices.last?.close
+        if let valid = bvps?.first {
+            if lastStockPrice != nil {
+                let percent = valid / lastStockPrice!
+                let price = valid
+                return [percent, price]
+//                if let t$ = percentFormatter0Digits.string(from: (valid / lastStockPrice!) as NSNumber) {
+//                    if let t2$ = currencyFormatterGapWithPence.string(from: valid as NSNumber) {
+//                        value$ = t$ + " (" + t2$ + ")"
+//                    }
+//                    else {
+//                        value$ = currencyFormatterGapWithPence.string(from: valid as NSNumber)
+//                    }
+//                }
+            }
+        }
+        
+        return nil
+
+    }
+    
+    public func lynchRatio() -> Double? {
+        
+        guard let validShare = share else {
+            return nil
+        }
+        
+//        let emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
+        if let earningsGrowth = netEarnings?.growthRates()?.mean() { // ema(periods: emaPeriod)
+            // use 10 y sums / averages, not ema according to Book Ch 51
+            let denominator = earningsGrowth * 100 + validShare.divYieldCurrent * 100
+            if validShare.peRatio > 0 {
+                return (denominator / validShare.peRatio)
+            }
+        }
+        
+        return nil
+
+    }
+    
     public func ivalue() -> (Double?, [String] ){
         
 //         guard let stock = stocks.filter({ (stock) -> Bool in

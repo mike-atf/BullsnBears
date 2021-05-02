@@ -28,6 +28,7 @@ class StockListCellTableViewCell: UITableViewCell {
         
     override func awakeFromNib() {
         super.awakeFromNib()
+        
     }
     
     override func prepareForReuse() {

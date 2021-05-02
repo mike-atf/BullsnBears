@@ -38,7 +38,8 @@ class WBValuationCell: UITableViewCell {
         self.detailLEadingConstraint.isActive = true
     }
     
-    public func configure(title: String, detail: String, detailColor: UIColor?=nil, errors: [String]?, delegate: WBValuationCellDelegate, userEvaluation: UserEvaluation?, correlation: Correlation?) {
+    public func configure(title: String, detail: String, detailColor: UIColor?=nil, errors: [String]?, delegate: WBValuationCellDelegate, userEvaluation: UserEvaluation?, correlation: Correlation?, correlationValues: [Double]?) {
+        
         self.title.text = title
         self.detail.text = detail
         self.detail.sizeToFit()
@@ -81,7 +82,7 @@ class WBValuationCell: UITableViewCell {
         if let valid = correlation {
             detailLEadingConstraint.isActive = true
             trendIcon.isHidden = false
-            trendIcon.configure(correlation: valid)
+            trendIcon.configure(correlation: valid,values: correlationValues)
         }
         else {
             trendIcon.isHidden = true

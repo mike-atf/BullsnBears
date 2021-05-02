@@ -11,6 +11,7 @@ class ComparisonCell: UITableViewCell {
 
     @IBOutlet var rowTitleLabel: UILabel!
     var valueLabels: [UILabel]?
+    var controller: ComparisonController!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -19,7 +20,9 @@ class ComparisonCell: UITableViewCell {
     
     override func prepareForReuse() {
         rowTitleLabel.text = "Row title"
-        valueLabels?.removeAll()
+        for label in valueLabels ?? [] {
+            label.removeFromSuperview()
+        }
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -28,14 +31,34 @@ class ComparisonCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func configure(rowTitle: String, values: [Double?]) {
+    func configure(controller: ComparisonController, cellPath: IndexPath) {
         
-        rowTitleLabel.text = rowTitle
+        rowTitleLabel.text = controller.titleForRow(for: cellPath)
         
-        
-        for value in values {
+        let strings = controller.rowTexts(forPath: cellPath)
+        valueLabels = [UILabel]()
+
+        var count: CGFloat = 0
+        for string in strings {
             
+            let label: UILabel = {
+                let label = UILabel()
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.font = UIFont.preferredFont(forTextStyle: .body)
+                label.text = string
+                label.sizeToFit()
+                return label
+            }()
+            self.contentView.addSubview(label)
+            valueLabels?.append(label)
+            
+            let margins = contentView.layoutMarginsGuide
+            
+            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 300 + 150*count).isActive = true
+            label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+            count += 1
         }
+        
     }
 
 }

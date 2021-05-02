@@ -12,7 +12,7 @@ import WebKit
 
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
-    var sectionTitles = ["Key ratios","Main parameters", "Secondary parameters","Expenses"]
+    var sectionTitles = ["Key financials","Earnings & incomings", "Returns", "Outgoings & debt"]
     var sectionSubTitles = ["from Yahoo finance","Growth trend EMA","Growth trend EMA","Growth trend EMA"]
     var rowTitles: [[String]]!
     var share: Share!
@@ -22,21 +22,24 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var downloadTasksCompleted = 0
     var downloadErrors = [String]()
     var downloader: WebDataDownloader?
-    var valueListChartLegendTitles = [
-        [["YoY Growth","Retained earnings"],
+    var valueListChartLegendTitles = [ 
+        [["YoY Growth","Revenue"],
+         ["YoY Growth","Net income"],
+         ["Growth net income / revenue","net income","revenue"],
+         ["YoY Growth","Ret. earnings"],
          ["YoY Growth","EPS"],
-         ["Growth net income % of revenue","net income","revenue"],
-         ["Growth profit % of revenue","profit","revenue"],
-         ["Growth cap.expend % of earnings","cap. expend","earnings"],
-         ["Growth LT debt % of net income","LT debt","revenue"]
+         ["Growth profit / revenue","profit","revenue"],
+         ["YoY Growth","Op. cash flow"]
         ],
-        [["YoY Growth","Op. cash flow"],
-         ["YoY Growth","Return of equity"],
+        [
+         ["YoY Growth","Return on equity"],
          ["YoY Growth","Return on assets"],
-         ["Growth lt debt % of [equity+ret. earnings]","lt debt","equity + ret. earnings"]
+         ["Growth lt debt / [equity+ret. earnings]","lt debt","equity + ret. earnings"]
         ],
-        [["Growth SGA % of profit","SGA","profit"],
-         ["Growth R&D % of profit","R&D","profit"]
+        [["Growth cap.expend / earnings","cap. expend","earnings"],
+         ["Growth LT debt / net income","LT debt","revenue"],
+         ["SGA % / profit","SGA","profit"],
+         ["R&D % / profit","R&D","profit"]
         ]]
     var wbvParameters = WBVParameters()
     
@@ -71,7 +74,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
         }
                 
-        rowTitles = buildRowTitles()
+        rowTitles = returnRowTitles()
     }
     
     func deallocate() {
@@ -160,7 +163,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         return rowTitles[path.section][path.row]
     }
     
-    public func sectionHeaderText(section: Int) -> (String, String) {
+    public func sectionHeaderText(section: Int) -> String {
         
         var date$ = String()
         if let date = valuation?.date {
@@ -171,7 +174,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         for i in 1..<sectionTitles.count {
             datedTitles.append(sectionTitles[i] + " (" + date$ + ")")
         }
-        return (datedTitles[section], sectionSubTitles[section])
+        return datedTitles[section]
     }
 
     public func value$(path: IndexPath) -> (String, UIColor?, [String]?) {
@@ -189,6 +192,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
             switch path.row {
             case 0:
+            // PE ratio
                 if share.peRatio != Double() {
                     value$ = numberFormatterDecimals.string(from: share.peRatio as NSNumber)
                     color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: share.peRatio, greenCutoff: 10.0, redCutOff: 40.0)
@@ -201,38 +205,46 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
                 
             case 1:
+            // EPS
                 if share.eps != Double() {
                     value$ = currencyFormatterGapWithPence.string(from: share.eps as NSNumber)
                     color = share.eps > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
                 }
             case 2:
-                let lastStockPrice =  share.getDailyPrices()?.last?.close //stock.dailyPrices.last?.close
-                if let valid = valuation?.bvps?.first {
-                    if lastStockPrice != nil {
-                        if let t$ = percentFormatter0Digits.string(from: (valid / lastStockPrice!) as NSNumber) {
-                            if let t2$ = currencyFormatterGapWithPence.string(from: valid as NSNumber) {
-                                value$ = t$ + " (" + t2$ + ")"
-                            }
-                            else {
-                                value$ = currencyFormatterGapWithPence.string(from: valid as NSNumber)
-                            }
-                        }
+            // BVPSP
+                if let values = valuation!.bookValuePerPrice() {
+                    value$ = "-"
+                    var t1$:String?
+                    var t2$:String?
+                    if let value1 = values[0] {
+                        t1$ = percentFormatter0Digits.string(from: value1 as NSNumber) ?? ""
                     }
+                    if let value2 = values[1] {
+                        t2$ = currencyFormatterNoGapWithPence.string(from: value2 as NSNumber) ?? ""
+                    }
+
+                    
+                    if t1$ != nil && t2$ != nil {
+                        value$ = t1$! + " (" + t2$! + ")"
+                    }
+                    else {
+                        value$ = (t1$ ?? t2$) ?? "-"
+                    }
+                    
                 }
             case 3:
-                if let earningsGrowth = valuation!.netEarnings?.growthRates()?.ema(periods: emaPeriod) {
-                    // use 10 y sums / averages, not ema according to Book Ch 51
-                    let denominator = earningsGrowth * 100 + share.divYieldCurrent * 100
-                    if share.peRatio > 0 {
-                        value$ = numberFormatterWith1Digit.string(from: (denominator / share.peRatio) as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: (denominator / share.peRatio), greenCutoff: 2.0, redCutOff: 1.0)
-                    }
+            // Lynch ratio
+                if let ratio = valuation!.lynchRatio() {
+                    value$ = numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "-"
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: ratio, greenCutoff: 2.0, redCutOff: 1.0)
                 }
             case 4:
+            // beta
                 if share.beta != Double() {
                     value$ = numberFormatterDecimals.string(from: share.beta as NSNumber)
                 }
             case 5:
+            // WB intrinsic value
                 if share.peRatio != Double() {
 
                     let (valid, es$) = valuation!.ivalue()
@@ -252,29 +264,47 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             var value$ = "-"
             switch path.row {
             case 0:
-                let retEarningsGrowths = valuation?.equityRepurchased?.growthRates()
-                
-                if let meanGrowth = retEarningsGrowths?.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.05, redCutOff: 0.05)
-                }
+            // Revenue
+            
+                let sales = valuation?.revenue
+                if let growth = sales?.growthRates() {
+                    if let growthEMA = growth.ema(periods: emaPeriod) {
+                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0, redCutOff: 0)
 
+                    }
+                }
                 return (value$, color, errors)
-            case 1:
-                var years = [Double]()
-                var count = 0.0
-                for _ in valuation?.eps ?? [] {
-                    years.append(count)
-                    count += 1.0
-                }
                 
-                if let growthRatesMean = valuation?.eps?.growthRates()?.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
-                    color = growthRatesMean > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
-                }
+            case 1:
+            // net income
+                
+                let netIncome = valuation?.netEarnings
+                if let growth = netIncome?.growthRates() {
+                    if let growthEMA = growth.ema(periods: emaPeriod) {
+                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0, redCutOff: 0)
 
-                return (value$,color,errors)
+                    }
+                }
+                return (value$, color, errors)
+
+                
+//                var years = [Double]()
+//                var count = 0.0
+//                for _ in valuation?.eps ?? [] {
+//                    years.append(count)
+//                    count += 1.0
+//                }
+                
+//                if let growthRatesMean = valuation?.eps?.growthRates()?.ema(periods: emaPeriod) {
+//                    value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
+//                    color = growthRatesMean > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
+//                }
+//
+//                return (value$,color,errors)
             case 2:
+            // net income / revenue
                 let (proportions, es$) = valuation!.netIncomeProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
@@ -283,6 +313,35 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
                 return (value$, color, errors)
             case 3:
+            // Ret. earnings
+                let retEarningsGrowths = valuation?.equityRepurchased?.growthRates()
+                
+                if let meanGrowth = retEarningsGrowths?.ema(periods: emaPeriod) {
+                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.05, redCutOff: 0.05)
+                }
+
+                return (value$, color, errors)
+
+            case 4:
+            // EPS
+            
+                //                var years = [Double]()
+                //                var count = 0.0
+                //                for _ in valuation?.eps ?? [] {
+                //                    years.append(count)
+                //                    count += 1.0
+                //                }
+
+                if let growthRatesMean = valuation?.eps?.growthRates()?.ema(periods: emaPeriod) {
+                    value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
+                    color = growthRatesMean > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
+                }
+
+                return (value$,color,errors)
+
+           case 5:
+            // profit margin
                 let (margins, es$) = valuation!.grossProfitMargins()
                 errors = es$
                 if let averageMargin = margins.ema(periods: emaPeriod) { //weightedMean()
@@ -290,26 +349,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: averageMargin, greenCutoff: 0.4, redCutOff: 0.2)
                 }
                 return (value$,color,errors)
-            case 4:
-                if let sumDiv = valuation!.netEarnings?.reduce(0, +) {
-                    // use 10 y sums / averages, not ema according to Book Ch 51
-                    if let sumDenom = valuation!.capExpend?.reduce(0, +) {
-                        let tenYAverages = abs(sumDenom / sumDiv)
-                        value$ = percentFormatter0Digits.string(from: tenYAverages as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 1, value: tenYAverages, greenCutoff: 0.25, redCutOff: 0.5)
-                    }
-                }
+            case 6:
+            // op. cash flow
+                let fcfGrowth = valuation?.opCashFlow?.filter({ (element) -> Bool in
+                    if element != 0.0 { return true }
+                    else { return false }
+                }).growthRates()
                 
-                return (value$,color,errors)
-
-           case 5:
-                let (proportions, es$) = valuation!.longtermDebtProportion()
-                errors = es$
-                if let average = proportions.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 3.0, redCutOff: 4.0)
+                if let meanGrowth = fcfGrowth?.ema(periods: emaPeriod) {
+                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: meanGrowth, greenCutoff: 0.15, redCutOff: 0.0)
                 }
-
                 return (value$, color, errors)
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
@@ -320,18 +370,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             var value$ = "-"
             switch path.row {
             case 0:
-                let fcfGrowth = valuation?.opCashFlow?.filter({ (element) -> Bool in
-                    if element != 0.0 { return true }
-                    else { return false }
-                }).growthRates()
-                
-                if let meanGrowth = fcfGrowth?.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: meanGrowth, greenCutoff: 0.15, redCutOff: 0.0)
-                }
-
-                return (value$, color, errors)
-            case 1:
+            // ROE
                 let roeGrowths = valuation?.roe?.filter({ (element) -> Bool in
                     if element != 0.0 { return true }
                     else { return false }
@@ -339,11 +378,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 
                 if let meanGrowth = roeGrowths?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.3, redCutOff: 0.1)
                 }
 
                 return (value$, color, errors)
 
-            case 2:
+
+            case 1:
+            // ROA
                 let roaGrowths = valuation?.roa?.filter({ (element) -> Bool in
                     if element != 0.0 { return true }
                     else { return false }
@@ -355,8 +397,8 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
                 return (value$, color, errors)
 
-            case 3:
-                
+            case 2:
+            // LT debt / adj shareholder equity
                 let (shEquityWithRetEarnings, error) = valuation!.addElements(array1: valuation!.shareholdersEquity ?? [], array2: valuation!.equityRepurchased ?? [])
                 if error != nil {
                     errors = [error!]
@@ -392,6 +434,32 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             var value$ = "-"
             switch path.row {
             case 0:
+            // cap expend / earnigs
+            
+                if let sumDiv = valuation!.netEarnings?.reduce(0, +) {
+                    // use 10 y sums / averages, not ema according to Book Ch 51
+                    if let sumDenom = valuation!.capExpend?.reduce(0, +) {
+                        let tenYAverages = abs(sumDenom / sumDiv)
+                        value$ = percentFormatter0Digits.string(from: tenYAverages as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 1, value: tenYAverages, greenCutoff: 0.25, redCutOff: 0.5)
+                    }
+                }
+                
+                return (value$,color,errors)
+
+            case 1:
+            // Lt debt / net income
+                let (proportions, es$) = valuation!.longtermDebtProportion()
+                errors = es$
+                if let average = proportions.ema(periods: emaPeriod) {
+                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average, greenCutoff: 3.0, redCutOff: 4.0)
+                }
+
+                return (value$, color, errors)
+ 
+            case 2:
+            // SGA / revenue
                 let (proportions, es$) = valuation!.sgaProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) { //proportions.mean()
@@ -399,13 +467,16 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: average, greenCutoff: 0.3, redCutOff: 1.0)
                 }
                 return (value$, color, errors)
-            case 1:
+
+            case 3:
+            // R&D / profit
                 let (proportions, es$) = valuation!.rAndDProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
                 }
                 return (value$, nil, errors)
+
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
             }
@@ -415,12 +486,15 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         
     }
     
+    /// if sending 2 arrays returns array with proportion array 0 / array 1
+    /// if sending 1 array returns the rate of growth from array element to element
+    /// the rates returned are in time-ASCENDING order
     public func valueListTVCProportions(values: [[Double]?]?) -> [Double]? {
         
         var proportions: [Double]?
         
         if values?.count ?? 0 > 1 {
-            proportions = Calculator.proportions(array1: values?.first!, array0: values?.last!)
+            proportions = Calculator.proportions(array1: values?.first!, array0: values?.last!) // returns in same order as sent
         }
         else {
             if let array1 = values?.first {
@@ -432,10 +506,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     // MARK: - internal functions
     
-    private func buildRowTitles() -> [[String]] {
+    private func returnRowTitles() -> [[String]] {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
-        return [["P/E ratio", "EPS", "Book value /share price","Earnings growth/ PE ratio","beta", "intr. value (10y)"], ["Ret. earnings", "EPS", "Net inc./ Revenue","profit margin", "Cap. expend. / earnings (av.)", "LT Debt / net income"],["Op. cash flow","Return on equity growth", "Return on assets growth","LT debt / adj.sh.equity"],["SGA / Revenue growth", "R&D / profit growth"]]
+        return [["P/E ratio", "EPS", "Book value/share price","Lynch ratio","beta", "intr. value (10y)"],
+                ["Revenue growth EMA", "Net income growth EMA", "Net inc./ Revenue", "Ret. earnings  growth EMA", "EPS  growth EMA", "Profit margin growth EMA", "Op. cash flow growth EMA"],
+                ["Return on equity growth EMA", "Return on assets growth EMA","LT debt / adj.sh.equity"],
+                ["Cap. expend. / earnings (av.)", "LT Debt / net income", "SGA / profit", "R&D / profit"]
+        ]
     }
         
     // MARK: - Data download functions
