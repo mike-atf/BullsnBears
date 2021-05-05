@@ -12,11 +12,11 @@ import CoreData
 /// then update the stockChartVC - > chartView candleStick chart
 protocol StocksControllerDelegate {
     func allSharesHaveUpdatedTheirPrices() // all shares prices have been updated
+    func treasuryBondRatesDownloaded()
 }
 
 /// Share calls this when it wants to inform StocksController that the price update is complete
 protocol StockDelegate {
-//    func priceUpdateComplete(symbol: String)
     func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String])
 }
 
@@ -31,6 +31,8 @@ class StocksController: NSFetchedResultsController<Share> {
     var sortParameter = UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as! String
     
     var backgroundContext: NSManagedObjectContext?
+    /// in time-DESCENDING order
+    var treasuryBondYields: [PriceDate]?
             
     //Mark:- shares price update functions
     
@@ -52,6 +54,72 @@ class StocksController: NSFetchedResultsController<Share> {
                 // returns to 'keyRatioDownloadComplete()' just below via the delegate
             }
         }
+        
+        if treasuryBondYields == nil {
+            updateTreasuryBondYields()
+        }
+        else {
+            if let lastDate =  treasuryBondYields!.compactMap({ $0.date }).sorted().last {
+                if Date().timeIntervalSince(lastDate) > 14*3600 {
+                    updateTreasuryBondYields()
+                }
+            }
+        }
+
+    }
+    
+    func updateTreasuryBondYields() {
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = NSLocale.current
+            formatter.timeZone = NSTimeZone.local
+            formatter.dateFormat = "YYYY"
+            return formatter
+        }()
+        let year$ = dateFormatter.string(from: Date())
+        
+        var urlComponents = URLComponents(string: "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx")
+        urlComponents?.queryItems = [URLQueryItem(name: "data", value: "yieldYear"),URLQueryItem(name: "year", value: year$)]
+        
+        guard let url = urlComponents?.url else {
+            return
+        }
+        
+        let configuration = URLSessionConfiguration.default
+        configuration.httpCookieAcceptPolicy = .always
+        configuration.httpShouldSetCookies = true
+        let session = URLSession(configuration: configuration)
+        var downloadTask: URLSessionDataTask? // URLSessionDataTask stores downloaded data in memory, DownloadTask as File
+
+        downloadTask = session.dataTask(with: url) { [self]
+            data, responseOrNil, errorOrNil in
+            
+            guard errorOrNil == nil else {
+                DispatchQueue.main.async {
+                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download Treasury Bond Yields due to error \(errorOrNil!.localizedDescription)", viewController: nil, delegate: nil)
+                }
+                return
+            }
+            
+            guard responseOrNil != nil else {
+                DispatchQueue.main.async {
+                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download Treasury Bond Yieldsdue to error \(String(describing: responseOrNil!.textEncodingName))", viewController: nil, delegate: nil)
+                }
+                return
+            }
+            
+            guard let validData = data else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
+                return
+            }
+
+            let html$ = String(decoding: validData, as: UTF8.self)
+            (self.treasuryBondYields, _) = WebpageScraper.scrapeTreasuryYields(html$: html$) // in time-DESCENDING order
+            self.pricesUpdateDelegate?.treasuryBondRatesDownloaded()
+
+        }
+        downloadTask?.resume()
     }
     
     func updateResearch(share: Share) {

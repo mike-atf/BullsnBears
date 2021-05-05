@@ -24,9 +24,6 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         searchController?.searchBar.delegate = self
         navigationItem.searchController = searchController
         definesPresentationContext = true
-                
-//        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addManual))
-//        self.navigationItem.rightBarButtonItem = addButton
 
     }
 

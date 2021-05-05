@@ -60,6 +60,9 @@
 		EA5639E9262C481600010964 /* ChartPricesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E7262C481600010964 /* ChartPricesView.swift */; };
 		EA5639EA262C481600010964 /* ChartPricesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5639E7262C481600010964 /* ChartPricesView.swift */; };
 		EA5FDBE325B1EE34008918C8 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5FDBE225B1EE34008918C8 /* AlertController.swift */; };
+		EA641C292642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA641C282642BCD4002FE8C1 /* TBYChartViewController.swift */; };
+		EA641C2A2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA641C282642BCD4002FE8C1 /* TBYChartViewController.swift */; };
+		EA641C2B2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA641C282642BCD4002FE8C1 /* TBYChartViewController.swift */; };
 		EA6AACD826050457002DE9DF /* MAC_D.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACD726050457002DE9DF /* MAC_D.swift */; };
 		EA6AACD926050457002DE9DF /* MAC_D.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACD726050457002DE9DF /* MAC_D.swift */; };
 		EA6AACDA26050457002DE9DF /* MAC_D.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACD726050457002DE9DF /* MAC_D.swift */; };
@@ -270,6 +273,7 @@
 		EA5639E0262C47F700010964 /* ChartTimeLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTimeLineView.swift; sourceTree = SOURCE_ROOT; };
 		EA5639E7262C481600010964 /* ChartPricesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPricesView.swift; sourceTree = "<group>"; };
 		EA5FDBE225B1EE34008918C8 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AlertController.swift; path = "Bulls'N'Bears/DCFValuation FIles/AlertController.swift"; sourceTree = SOURCE_ROOT; };
+		EA641C282642BCD4002FE8C1 /* TBYChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TBYChartViewController.swift; sourceTree = SOURCE_ROOT; };
 		EA6AACD726050457002DE9DF /* MAC_D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MAC_D.swift; sourceTree = SOURCE_ROOT; };
 		EA6AACDE26053294002DE9DF /* MACD_View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MACD_View.swift; path = "Bulls'N'Bears/Model Files/MACD_View.swift"; sourceTree = SOURCE_ROOT; };
 		EA6EEF9126165665000FA141 /* ResearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ResearchController.swift; path = "Bulls'N'Bears/ResearchController.swift"; sourceTree = SOURCE_ROOT; };
@@ -546,6 +550,7 @@
 		EAFD825025A4D2D800D27566 /* Main Display Files */ = {
 			isa = PBXGroup;
 			children = (
+				EA641C282642BCD4002FE8C1 /* TBYChartViewController.swift */,
 				EA0E2F282625D50A00602BEE /* SortView.swift */,
 				EA0E2F2F2625E32500602BEE /* RimmedLabel.swift */,
 				EA0E2F1A2624E4AA00602BEE /* SortSelectorTVC.swift */,
@@ -778,6 +783,7 @@
 				EA163F77258BA85E000974AB /* StockTrend.swift in Sources */,
 				EA79790225E6F24200663644 /* GradientColorFinder.swift in Sources */,
 				EAC2FC4525A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
+				EA641C292642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
 				EA225B1D25F3DE9700871D7D /* ScoreCircle.swift in Sources */,
 				EAC1904A257641160030B331 /* AppDelegate.swift in Sources */,
 				EA3DF0C9260B8C5A001A0098 /* BuySellView.swift in Sources */,
@@ -889,6 +895,7 @@
 				EAA69F9626121CA30067EE1A /* StockResearch+CoreDataProperties.swift in Sources */,
 				EA6AACE026053294002DE9DF /* MACD_View.swift in Sources */,
 				EAC0F15C25FA819E00AD9E29 /* Share+CoreDataClass.swift in Sources */,
+				EA641C2A2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -940,6 +947,7 @@
 				EAA69F9726121CA30067EE1A /* StockResearch+CoreDataProperties.swift in Sources */,
 				EA6AACE126053294002DE9DF /* MACD_View.swift in Sources */,
 				EAC0F15D25FA819E00AD9E29 /* Share+CoreDataClass.swift in Sources */,
+				EA641C2B2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

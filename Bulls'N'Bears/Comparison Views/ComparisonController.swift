@@ -22,7 +22,7 @@ class ComparisonController {
     func rowTitles() -> [[String]]{
         
         let titleStructure = [["Shares","Why to buy"],
-                                ["Personal rating score", "Fundamentals score", "Compet. strength" ,"GB Valuation" ,"DCF Valuation", "Intrinsic value"],
+                                ["Personal rating score", "Fundamentals score", "Compet. strength" ,"Share price / GB Value" ,"Share price / DCF Value", "Share price / Intrinsic value"],
                                 ["PE ratio", "Lynch ratio", "Book value / share price"],
                                 ["Ret. earnings", "Revenue", "Net income", "Op. Cash flow", "Profit margin", "EPS"],
                                 ["ROI", "ROE", "ROA"],
@@ -100,7 +100,8 @@ class ComparisonController {
                     if share.rule1Valuation != nil {
                         let (price,_) = share.rule1Valuation!.stickerPrice()
                         if let validPrice = price {
-                            text = currencyFormatterNoGapNoPence.string(from: validPrice as NSNumber) ?? "-"
+                            let ratio = share.latestPrice(option: .close)! / validPrice
+                            text = percentFormatter0Digits.string(from: ratio as NSNumber) ?? "-"
                         }
                     }
                     texts.append(text)
@@ -112,7 +113,8 @@ class ComparisonController {
                     if share.dcfValuation != nil {
                         let (price,_) = share.dcfValuation!.returnIValue()
                         if let validPrice = price {
-                            text = currencyFormatterNoGapNoPence.string(from: validPrice as NSNumber) ?? "-"
+                            let ratio = share.latestPrice(option: .close)! / validPrice
+                            text = percentFormatter0Digits.string(from: ratio as NSNumber) ?? "-"
                         }
                     }
                     texts.append(text)
@@ -124,7 +126,8 @@ class ComparisonController {
                     if share.wbValuation != nil {
                         let (price,_) = share.wbValuation!.ivalue()
                         if let validPrice = price {
-                            text = currencyFormatterNoGapNoPence.string(from: validPrice as NSNumber) ?? "-"
+                            let ratio = share.latestPrice(option: .close)! / validPrice
+                            text = percentFormatter0Digits.string(from: ratio as NSNumber) ?? "-"
                         }
                     }
                     texts.append(text)

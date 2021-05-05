@@ -115,7 +115,7 @@ class ValueListTVC: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 { return 100 }
         else if indexPath.section == 1 { return 120 }
-        else { return 450 }
+        else { return 440 }
     }
 
 }

@@ -559,5 +559,95 @@ class WebpageScraper {
         return (valueArray.reversed(), errors)
 
     }
+    
+    /// returns (priceDate, errors) in time-DESCENDING order
+    class func scrapeTreasuryYields(html$: String?) -> ([PriceDate]?, [String]) {
+        
+        var errors = [String]()
+        
+        guard var pageText = html$ else {
+            errors = ["Empty html$ received trying to find TreasuryBond Yields"]
+            return (nil, errors)
+        }
+        
+        var priceDates = [PriceDate]()
+        
+//        let tableStart = "<tbody><tr>"
+        let tableEnd = "</td></tr></table>\r\n<div class=\"updated\"" //"</td></tr></tbody></table>"
+        let columnStart = "</td><td class=\"text_view_data\">" //"</td><td class=\"text_view_data\">"
+        let rowStart = "<td scope=\"row\" class=\"text_view_data\">"  //"<td scope=\"row "
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = NSLocale.current
+            formatter.timeZone = NSTimeZone.local
+            formatter.dateFormat = "MM/dd/yy"
+            return formatter
+        }()
+
+        guard let tableStartIndex = pageText.range(of: rowStart) else {
+            let error = "Did not find table end on TreasuryBond Yields webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
+            return (nil,errors)
+        }
+        
+        pageText = String(pageText.suffix(from: tableStartIndex.lowerBound))
+        
+        guard let tableEndIndex = pageText.range(of: tableEnd) else {
+            let error = "Did not find table end on TreasuryBond Yields webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
+            return (nil,errors)
+        }
+        
+        pageText = String(pageText.prefix(through: tableEndIndex.upperBound))
+        
+        var rows = [String]()
+        var rowStartIndex = pageText.range(of: rowStart, options: .backwards)
+        guard rowStartIndex != nil else {
+            let error = "Did not start of last table row on TreasuryBond Yields webpage"
+            if !errors.contains(error) {
+                errors.append(error)
+            }
+            return (nil,errors)
+        }
+        
+        repeat {
+            let row$ = String(pageText[rowStartIndex!.upperBound...])
+            rows.append(row$)
+            pageText.removeSubrange(rowStartIndex!.lowerBound...)
+            rowStartIndex = pageText.range(of: rowStart, options: .backwards)
+        } while rowStartIndex != nil
+        
+        for i in 0..<rows.count {
+            var row = rows[i]
+
+            for _ in 0..<2 {
+                if let columStartIndex = row.range(of: columnStart, options: .backwards) {
+                    row.removeSubrange(columStartIndex.lowerBound...)
+                }
+            }
+            
+            var value: Double?
+            var date: Date?
+            if let columStartIndex = row.range(of: columnStart, options: .backwards) {
+                let value$ = row[columStartIndex.upperBound...]
+                value = Double(value$.filter("-0123456789.".contains))
+            }
+            if let endOfDateIndex = row.range(of: "</td><td ") {
+                let date$ = String(String(row[...endOfDateIndex.lowerBound]).dropLast())
+                date = dateFormatter.date(from: date$)
+            }
+            
+            if value != nil && date != nil {
+                priceDates.append((date:date!, price: value!))
+            }
+        }
+        
+        return (priceDates,errors)
+        
+    }
 
 }

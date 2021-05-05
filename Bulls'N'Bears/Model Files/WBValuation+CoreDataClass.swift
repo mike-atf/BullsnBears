@@ -391,45 +391,44 @@ public class WBValuation: NSManagedObject {
     
     func valuesSummaryScores() -> RatingCircleData? {
         
-        let peRatioWeight = 1.5
-        let retEarningsGrowthWeight = 1.3
-        let earningsByPERWeight = 1.3
-        let epsGrowthWeight = 1.0
-        let netIncomeDivProfitWeight = 1.0
-        let capExpendDivEarningsWeight = 1.1
-        let profitMarginWeight = 1.0
-        let ltDebtDivIncomeWeight = 0.8
-        let opCashFlowGrowthWeight = 1.1
-        let ltDebtDivadjEq = 0.4
-        let sgaDivRevenue = 0.75
-        let radDivRevenue = 0.75
+        let weights = ShareFinancialsValueWeights()
         
         var allFactors = [Double]()
         var allFactorNames = [String]()
         var allWeights = [Double]()
         let emaPeriods = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
         
-        allFactors.append(perValueFactor() * peRatioWeight)
-        allWeights.append(peRatioWeight)
+        allFactors.append(perValueFactor() * weights.retEarningsGrowth) // 0-1 with cutOff at 40.0
+        allWeights.append(weights.retEarningsGrowth)
         
+        if let valid = valueFactor(values1: revenue, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * weights.revenueGrowth)
+            allWeights.append(weights.revenueGrowth)
+            allFactorNames.append("Revenue growth trend")
+        }
+        if let valid = valueFactor(values1: netEarnings, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * weights.netIncomeGrowth)
+            allWeights.append(weights.netIncomeGrowth)
+            allFactorNames.append("Net income growth trend")
+        }
         if let valid = valueFactor(values1: equityRepurchased, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactors.append(valid * retEarningsGrowthWeight)
-            allWeights.append(retEarningsGrowthWeight)
-            allFactorNames.append("Growth trend ret. earnings")
+            allFactors.append(valid * weights.retEarningsGrowth)
+            allWeights.append(weights.retEarningsGrowth)
+            allFactorNames.append("Ret. earnings growth trend")
         }
         if let valid = valueFactor(values1: eps, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactors.append(valid * epsGrowthWeight)
-            allWeights.append(epsGrowthWeight)
-            allFactorNames.append("Growth trend EPS")
+            allFactors.append(valid * weights.retEarningsGrowth)
+            allWeights.append(weights.retEarningsGrowth)
+            allFactorNames.append("EPS growth trend")
         }
         if let valid = valueFactor(values1: revenue, values2: netEarnings, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactors.append(valid * netIncomeDivProfitWeight)
-            allWeights.append(netIncomeDivProfitWeight)
+            allFactors.append(valid * weights.netIncomeDivRevenue)
+            allWeights.append(weights.netIncomeDivRevenue)
             allFactorNames.append("Growth trend net earnings / sales")
         }
         if let valid = valueFactor(values1: revenue, values2: grossProfit, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactors.append(valid * profitMarginWeight)
-            allWeights.append(profitMarginWeight)
+            allFactors.append(valid * weights.profitMargin)
+            allWeights.append(weights.profitMargin)
             allFactorNames.append("Growth trend gross profit / sales")
         }
         if let sumDiv = netEarnings?.reduce(0, +) {
@@ -438,35 +437,35 @@ public class WBValuation: NSManagedObject {
                 let tenYAverages = abs(sumDenom / sumDiv)
                 let maxCutOff = 0.5
                 let factor = (tenYAverages < maxCutOff) ? ((maxCutOff - tenYAverages) / maxCutOff) : 0
-                allFactors.append(factor * capExpendDivEarningsWeight)
-                allWeights.append(capExpendDivEarningsWeight)
+                allFactors.append(factor * weights.capExpendDivEarnings)
+                allWeights.append(weights.capExpendDivEarnings)
                 allFactorNames.append("Growth trend cap. expenditure / net earnings")
             }
         }
         if let valid = valueFactor(values1: opCashFlow, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactors.append(valid * opCashFlowGrowthWeight)
-            allWeights.append(opCashFlowGrowthWeight)
-            allFactorNames.append("Growth trend op. cash flow")
+            allFactors.append(valid * weights.opCashFlowGrowth)
+            allWeights.append(weights.opCashFlowGrowth)
+            allFactorNames.append("Op. cash flow growth trend")
         }
         if let valid = inverseValueFactor(values1: netEarnings, values2: debtLT, maxCutOff: 3, emaPeriod: emaPeriods, removeZeroElements: false) {
-            allFactors.append(valid * ltDebtDivIncomeWeight)
-            allWeights.append(ltDebtDivIncomeWeight)
+            allFactors.append(valid * weights.ltDebtDivIncome)
+            allWeights.append(weights.ltDebtDivIncome)
             allFactorNames.append("Growth trend long-term debt / net earnings")
         }
         if let valid = inverseValueFactor(values1: adjustedEquity(), values2: debtLT, maxCutOff: 1, emaPeriod: emaPeriods, removeZeroElements: false) {
-            allFactors.append(valid * ltDebtDivadjEq)
-            allWeights.append(ltDebtDivadjEq)
+            allFactors.append(valid * weights.ltDebtDivadjEq)
+            allWeights.append( weights.ltDebtDivadjEq)
             allFactorNames.append("Growth trend long-term debt / adj. share-holder equity")
         }
-        if let valid = valueFactor(values1: revenue, values2: sgaExpense, maxCutOff: 0.4, emaPeriod: emaPeriods) {
-            allFactors.append(valid * sgaDivRevenue)
-            allWeights.append(sgaDivRevenue)
-            allFactorNames.append("Growth trend SGA expense / sales")
+        if let valid = valueFactor(values1: grossProfit, values2: sgaExpense, maxCutOff: 0.4, emaPeriod: emaPeriods) {
+            allFactors.append(valid * weights.sgaDivRevenue)
+            allWeights.append(weights.sgaDivRevenue)
+            allFactorNames.append("Growth trend SGA expense / profit")
         }
-        if let valid = valueFactor(values1: revenue, values2: rAndDexpense, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactors.append(valid * radDivRevenue)
-            allWeights.append(radDivRevenue)
-            allFactorNames.append("Growth trend R&D expense / sales")
+        if let valid = valueFactor(values1: grossProfit, values2: rAndDexpense, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactors.append(valid * weights.radDivRevenue)
+            allWeights.append(weights.radDivRevenue)
+            allFactorNames.append("Growth trend R&D expense / profit")
         }
         let emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
         if let yield = share?.divYieldCurrent {
@@ -476,53 +475,51 @@ public class WBValuation: NSManagedObject {
                     var value = (denominator / share!.peRatio) - 1
                     if value > 1 { value = 1 }
                     else if value < 0 { value = 0 }
-                    allFactors.append(value * earningsByPERWeight)
-                    allWeights.append(earningsByPERWeight)
+                    allFactors.append(value * weights.earningsByPER)
+                    allWeights.append(weights.earningsByPER)
                     allFactorNames.append("P Lynch sore")
                 }
             }
         }
         
-        
-        let scoreSum = allFactors.reduce(0, +) * (share?.rule1Valuation?.moatScore() ?? 1.0)
+        var moatWeight: Double?
+        if let score = share?.rule1Valuation?.moatScore() {
+            moatWeight = sqrt(score)
+        }
+        let scoreSum = allFactors.reduce(0, +) * (moatWeight ?? 1.0)
         let maximum = allWeights.reduce(0, +)
-        allFactors.append(share?.rule1Valuation?.moatScore() ?? -1)
+        allFactors.append(moatWeight ?? -1)
         allFactorNames.append("Competitive strength score")
         
         return RatingCircleData(rating: scoreSum, maximum: maximum, minimum: 0, symbol: .dollar)
     }
     
     func valuesSummaryTexts() -> [String] {
-        
-        let peRatioWeight = 1.5
-        let retEarningsGrowthWeight = 1.3
-        let earningsByPERWeight = 1.3
-        let epsGrowthWeight = 1.0
-        let netIncomeDivProfitWeight = 1.0
-        let capExpendDivEarningsWeight = 1.1
-        let profitMarginWeight = 1.0
-        let ltDebtDivIncomeWeight = 0.8
-        let opCashFlowGrowthWeight = 1.1
-        let ltDebtDivadjEq = 0.4
-        let sgaDivRevenue = 0.75
-        let radDivRevenue = 0.75
+                
+        let weights = ShareFinancialsValueWeights()
         
         var allFactorTexts = [String]()
         let emaPeriods = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
         
-        allFactorTexts.append("PE ratio: " + (numberFormatterWith1Digit.string(from: (perValueFactor() * peRatioWeight) as NSNumber) ?? "-"))
+        allFactorTexts.append("PE ratio: " + (numberFormatterWith1Digit.string(from: (perValueFactor() * weights.peRatio) as NSNumber) ?? "-"))
 
+        if let valid = valueFactor(values1: revenue, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactorTexts.append("Revenue: " + (numberFormatterWith1Digit.string(from: (valid * weights.revenueGrowth) as NSNumber) ?? "-"))
+        }
+        if let valid = valueFactor(values1: netEarnings, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactorTexts.append("Net income: " + (numberFormatterWith1Digit.string(from: (valid * weights.netIncomeGrowth) as NSNumber) ?? "-"))
+        }
         if let valid = valueFactor(values1: equityRepurchased, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactorTexts.append("Ret. earnings: " + (numberFormatterWith1Digit.string(from: (valid * retEarningsGrowthWeight) as NSNumber) ?? "-"))
+            allFactorTexts.append("Ret. earnings: " + (numberFormatterWith1Digit.string(from: (valid * weights.retEarningsGrowth) as NSNumber) ?? "-"))
         }
         if let valid = valueFactor(values1: eps, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactorTexts.append("EPS: " + (numberFormatterWith1Digit.string(from: (valid * epsGrowthWeight) as NSNumber) ?? "-"))
+            allFactorTexts.append("EPS: " + (numberFormatterWith1Digit.string(from: (valid * weights.epsGrowth) as NSNumber) ?? "-"))
         }
         if let valid = valueFactor(values1: revenue, values2: netEarnings, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactorTexts.append("Net earnings / sales: " + (numberFormatterWith1Digit.string(from: (valid * netIncomeDivProfitWeight) as NSNumber) ?? "-"))
+            allFactorTexts.append("Net earnings / sales: " + (numberFormatterWith1Digit.string(from: (valid * weights.netIncomeDivRevenue) as NSNumber) ?? "-"))
         }
         if let valid = valueFactor(values1: revenue, values2: grossProfit, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactorTexts.append("Gross profit / sales: " + (numberFormatterWith1Digit.string(from: (valid * profitMarginWeight) as NSNumber) ?? "-"))
+            allFactorTexts.append("Gross profit / sales: " + (numberFormatterWith1Digit.string(from: (valid * weights.profitMargin) as NSNumber) ?? "-"))
         }
         if let sumDiv = netEarnings?.reduce(0, +) {
             // use 10 y sums / averages, not ema according to Book Ch 51
@@ -530,24 +527,24 @@ public class WBValuation: NSManagedObject {
                 let tenYAverages = abs(sumDenom / sumDiv)
                 let maxCutOff = 0.5
                 let factor = (tenYAverages < maxCutOff) ? ((maxCutOff - tenYAverages) / maxCutOff) : 0
-                allFactorTexts.append("Cap. expenditure / net earnings: " + (numberFormatterWith1Digit.string(from: (factor * capExpendDivEarningsWeight) as NSNumber) ?? "-"))
+                allFactorTexts.append("Cap. expenditure / net earnings: " + (numberFormatterWith1Digit.string(from: (factor * weights.capExpendDivEarnings) as NSNumber) ?? "-"))
             }
         }
         if let valid = valueFactor(values1: opCashFlow, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactorTexts.append("Op. cash flow: " + (numberFormatterWith1Digit.string(from: (valid * opCashFlowGrowthWeight) as NSNumber) ?? "-"))
+            allFactorTexts.append("Op. cash flow: " + (numberFormatterWith1Digit.string(from: (valid * weights.opCashFlowGrowth) as NSNumber) ?? "-"))
         }
         if let valid = inverseValueFactor(values1: netEarnings, values2: debtLT, maxCutOff: 3, emaPeriod: emaPeriods, removeZeroElements: false) {
-            allFactorTexts.append("Long-term debt / net earnings: " + (numberFormatterWith1Digit.string(from: (valid * ltDebtDivIncomeWeight) as NSNumber) ?? "-"))
+            allFactorTexts.append("Long-term debt / net earnings: " + (numberFormatterWith1Digit.string(from: (valid * weights.ltDebtDivIncome) as NSNumber) ?? "-"))
         }
         if let valid = inverseValueFactor(values1: adjustedEquity(), values2: debtLT, maxCutOff: 1, emaPeriod: emaPeriods, removeZeroElements: false) {
 
-            allFactorTexts.append("Long-term debt / adj. share-holder equity: " + (numberFormatterWith1Digit.string(from: (valid * ltDebtDivadjEq) as NSNumber) ?? "-"))
+            allFactorTexts.append("Long-term debt / adj. share-holder equity: " + (numberFormatterWith1Digit.string(from: (valid * weights.ltDebtDivadjEq) as NSNumber) ?? "-"))
         }
-        if let valid = valueFactor(values1: revenue, values2: sgaExpense, maxCutOff: 0.4, emaPeriod: emaPeriods) {
-            allFactorTexts.append("SGA expense / sales: " + (numberFormatterWith1Digit.string(from: (valid * sgaDivRevenue) as NSNumber) ?? "-"))
+        if let valid = valueFactor(values1: grossProfit, values2: sgaExpense, maxCutOff: 0.4, emaPeriod: emaPeriods) {
+            allFactorTexts.append("SGA expense / profit: " + (numberFormatterWith1Digit.string(from: (valid * weights.sgaDivRevenue) as NSNumber) ?? "-"))
         }
-        if let valid = valueFactor(values1: revenue, values2: rAndDexpense, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactorTexts.append("R&D expense / sales: " + (numberFormatterWith1Digit.string(from: (valid * radDivRevenue) as NSNumber) ?? "-"))
+        if let valid = valueFactor(values1: grossProfit, values2: rAndDexpense, maxCutOff: 1, emaPeriod: emaPeriods) {
+            allFactorTexts.append("R&D expense / profit: " + (numberFormatterWith1Digit.string(from: (valid * weights.radDivRevenue) as NSNumber) ?? "-"))
         }
         let emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
         if let yield = share?.divYieldCurrent {
@@ -557,12 +554,13 @@ public class WBValuation: NSManagedObject {
                     var value = (denominator / share!.peRatio) - 1
                     if value > 1 { value = 1 }
                     else if value < 0 { value = 0 }
-                    allFactorTexts.append("P Lynch score: " + (numberFormatterWith1Digit.string(from: (value * earningsByPERWeight) as NSNumber) ?? "-"))
+                    allFactorTexts.append("P Lynch score: " + (numberFormatterWith1Digit.string(from: (value * weights.earningsByPER) as NSNumber) ?? "-"))
                 }
             }
         }
         
-        if let score = share?.rule1Valuation?.moatScore() {
+        if let moatScore  = share?.rule1Valuation?.moatScore() {
+            let score = sqrt(moatScore)
             allFactorTexts.append("Competitive strength score: " + (numberFormatterWith1Digit.string(from: score as NSNumber) ?? "-"))
         }
         return allFactorTexts
@@ -690,14 +688,6 @@ public class WBValuation: NSManagedObject {
                 let percent = valid / lastStockPrice!
                 let price = valid
                 return [percent, price]
-//                if let t$ = percentFormatter0Digits.string(from: (valid / lastStockPrice!) as NSNumber) {
-//                    if let t2$ = currencyFormatterGapWithPence.string(from: valid as NSNumber) {
-//                        value$ = t$ + " (" + t2$ + ")"
-//                    }
-//                    else {
-//                        value$ = currencyFormatterGapWithPence.string(from: valid as NSNumber)
-//                    }
-//                }
             }
         }
         
@@ -711,7 +701,6 @@ public class WBValuation: NSManagedObject {
             return nil
         }
         
-//        let emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
         if let earningsGrowth = netEarnings?.growthRates()?.mean() { // ema(periods: emaPeriod)
             // use 10 y sums / averages, not ema according to Book Ch 51
             let denominator = earningsGrowth * 100 + validShare.divYieldCurrent * 100

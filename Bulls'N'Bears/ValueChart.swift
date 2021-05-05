@@ -36,19 +36,31 @@ class ValueChart: UIView {
     var chartEnd = CGPoint()
     
     var trend:Correlation!
-    var trendlabel: UILabel!
+    var trendlabel: UILabel?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+                
+        self.backgroundColor = UIColor.systemBackground
+    }
+
     
     /// 1st array will be bar chart
     /// 2nd array (optional) will line chart,. values2 (optional) has  proportions either comnpared to another set of figures, or element-on-element growth
     /// both should have same number of elements, otherwise, the second array will be brought to same count
-    func configure(array1: [Double]?, array2: [Double]?, trendLabel: UILabel) {
+    func configure(array1: [Double]?, array2: [Double]?, trendLabel: UILabel?) {
         
         guard array1?.count ?? 0 > 0 || array2?.count ?? 0 > 0 else {
             return
         }
 
-        self.valueArray1 = Array(array1!.reversed())
-        self.valueArray2 = Array(array2!.reversed())
+        self.valueArray1 = array1?.reversed()
+        self.valueArray2 = array2?.reversed()
         self.trendlabel = trendLabel
         
         if let secondArray = array2 {
@@ -105,18 +117,40 @@ class ValueChart: UIView {
         let dateComponents = Calendar.current.dateComponents(components, from: Date())
         let mostRecentYear = dateComponents.year! - 2000
         
-        var count = valueArray1?.count ?? 0
-        for _ in valueArray1 ?? [] {
-                let aLabel: UILabel = {
-                    let label = UILabel()
-                    label.font = UIFont.systemFont(ofSize: 12)
-                    label.text = "\(mostRecentYear-count)"
-                    label.sizeToFit()
-                    self.addSubview(label)
-                    return label
-                }()
-                xAxisLabels.append(aLabel)
-            count -= 1
+        if trendlabel != nil {
+            var count = valueArray1?.count ?? 0
+            for _ in valueArray1 ?? [] {
+                    let aLabel: UILabel = {
+                        let label = UILabel()
+                        label.font = UIFont.systemFont(ofSize: 12)
+                        label.text = "\(mostRecentYear-count)"
+                        label.sizeToFit()
+                        self.addSubview(label)
+                        return label
+                    }()
+                    xAxisLabels.append(aLabel)
+                count -= 1
+            }
+        }
+        else {
+            let dateFormatter: DateFormatter = {
+                let formatter = DateFormatter()
+                formatter.locale = NSLocale.current
+                formatter.timeZone = NSTimeZone.local
+                formatter.dateFormat = "YYYY"
+                return formatter
+            }()
+            let year$ = dateFormatter.string(from: Date())
+            
+            let aLabel: UILabel = {
+                let label = UILabel()
+                label.font = UIFont.systemFont(ofSize: 12)
+                label.text = year$
+                label.sizeToFit()
+                self.addSubview(label)
+                return label
+            }()
+            xAxisLabels.append(aLabel)
         }
         
         if array1?.count ?? 0 > 0 {
@@ -150,10 +184,10 @@ class ValueChart: UIView {
         
         
 //xAxisLabels
-        let labelSlotWidth = chartAreaSize.width / CGFloat(xAxisLabels.count)
+        let labelSlotWidth = (xAxisLabels.count > 1) ? chartAreaSize.width / CGFloat(xAxisLabels.count) : chartAreaSize.width / CGFloat(valueArray1?.count ?? 1)
         var step: CGFloat = 1
         xAxisLabels.forEach { (label) in
-            let labelLeft = chartOrigin.x + labelSlotWidth * step - label.frame.width / 2 //+ (step / CGFloat(validValues.count)) * chartAreaSize.width
+            let labelLeft = chartOrigin.x + labelSlotWidth * step - label.frame.width / 2
             label.frame.origin = CGPoint(x: labelLeft - label.frame.width / 2, y: rect.maxY - label.frame.height)
            step += 1
         }
@@ -274,7 +308,7 @@ class ValueChart: UIView {
         }
         
 //Trend
-        if trend != nil {
+        if trend != nil && trendlabel != nil {
             let trendLine = UIBezierPath()
             
             let pixPerValue = (valueArray2?.count ?? 0 > 0) ? pixPerValue2 : pixPerValue1
@@ -318,11 +352,11 @@ class ValueChart: UIView {
                 }
                     meanChangeOfGrowth$ = percentFormatter0Digits.string(from: trend.incline as NSNumber) ?? ""
             }
-            trendlabel.font = UIFont.preferredFont(forTextStyle: .footnote)
-            trendlabel.numberOfLines = 0
+            trendlabel?.font = UIFont.systemFont(ofSize: 13)
+            trendlabel?.numberOfLines = 0
 
-            trendlabel.setAttributedTextWithSuperscripts(text: "R2: \(r2$)  -  YoY growth changing by average \(meanChangeOfGrowth$) to EMA \(growthEMA$)", indicesOfSuperscripts: [1])
-            trendlabel.sizeToFit()
+            trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$), YoY growth changing by average \(meanChangeOfGrowth$) to EMA \(growthEMA$)", indicesOfSuperscripts: [1])
+            trendlabel?.sizeToFit()
         }
     }
     
@@ -332,7 +366,7 @@ class ValueChart: UIView {
             return
         }
                 
-        let options:[CGFloat] = [2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0,1000.0, 5000.0,10000.0, 50000.0,100000.0]
+        let options:[CGFloat] = [0.1, 0.25, 0.5,1.0, 2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0,1000.0, 5000.0,10000.0, 50000.0,100000.0]
         let range = max - min
         
         var count: CGFloat = 100.0

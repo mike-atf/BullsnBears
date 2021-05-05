@@ -13,6 +13,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     @IBOutlet var tableView: UITableView!
     @IBOutlet var downloadButton: UIBarButtonItem!
+    @IBOutlet var treasuryBondYieldsButton: UIBarButtonItem!
     @IBOutlet var sortView: SortView!
     
     var controller: StocksController = {
@@ -459,6 +460,32 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         
     }
+    
+    
+    @IBAction func showTBYView(_ sender: Any) {
+        
+        guard let tbyVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TBYChartViewController") as? TBYChartViewController else {
+            return
+        }
+
+        tbyVC.modalPresentationStyle = .popover
+        tbyVC.preferredContentSize = CGSize(width: 400, height: 250)
+
+//        if let rootView = splitViewController {
+//            tbyVC.preferredContentSize = CGSize(width: rootView.view.frame.width * 0.9, height: rootView.view.frame.height * 0.9)
+//        }
+//        tbyVC.loadViewIfNeeded()
+        tbyVC.tbRates = controller.treasuryBondYields?.compactMap{ $0.price }
+
+        let popUpController = tbyVC.popoverPresentationController
+        popUpController!.permittedArrowDirections = .up
+        popUpController?.barButtonItem = treasuryBondYieldsButton
+            
+        self.splitViewController?.present(tbyVC, animated: true, completion: nil)
+
+        
+    }
+    
     // MARK: - Navigation
 
  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -602,6 +629,24 @@ extension StocksListTVC: StocksControllerDelegate, ScoreCircleDelegate {
             let currentlySelectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
             self.tableView.selectRow(at: currentlySelectedPath, animated: true, scrollPosition: .top)
             self.performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
+        }
+    }
+    
+    func treasuryBondRatesDownloaded() {
+        
+        if let yieldDates = controller.treasuryBondYields {
+            let yields = yieldDates.compactMap{ $0.price }
+            if let ema = yields.ema(periods: 10) {
+                treasuryBondYieldsButton.isEnabled = true
+                let latest = yields.first!
+                let change = (latest - ema) / ema
+                let change$ = percentFormatter2DigitsPositive.string(from: change as NSNumber) ?? "TBY"
+                treasuryBondYieldsButton.title = change$
+                treasuryBondYieldsButton.tintColor = change <= 0 ? UIColor.systemGreen : UIColor.systemRed
+            }
+        }
+        else {
+            treasuryBondYieldsButton.isEnabled = false
         }
     }
         

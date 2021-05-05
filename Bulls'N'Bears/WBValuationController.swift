@@ -22,7 +22,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var downloadTasksCompleted = 0
     var downloadErrors = [String]()
     var downloader: WebDataDownloader?
-    var valueListChartLegendTitles = [ 
+    var valueListChartLegendTitles = [
         [["YoY Growth","Revenue"],
          ["YoY Growth","Net income"],
          ["Growth net income / revenue","net income","revenue"],
@@ -288,21 +288,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     }
                 }
                 return (value$, color, errors)
-
                 
-//                var years = [Double]()
-//                var count = 0.0
-//                for _ in valuation?.eps ?? [] {
-//                    years.append(count)
-//                    count += 1.0
-//                }
-                
-//                if let growthRatesMean = valuation?.eps?.growthRates()?.ema(periods: emaPeriod) {
-//                    value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
-//                    color = growthRatesMean > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
-//                }
-//
-//                return (value$,color,errors)
             case 2:
             // net income / revenue
                 let (proportions, es$) = valuation!.netIncomeProportion()
@@ -324,14 +310,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 return (value$, color, errors)
 
             case 4:
-            // EPS
-            
-                //                var years = [Double]()
-                //                var count = 0.0
-                //                for _ in valuation?.eps ?? [] {
-                //                    years.append(count)
-                //                    count += 1.0
-                //                }
 
                 if let growthRatesMean = valuation?.eps?.growthRates()?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
@@ -459,7 +437,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 return (value$, color, errors)
  
             case 2:
-            // SGA / revenue
+            // SGA / profit
                 let (proportions, es$) = valuation!.sgaProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) { //proportions.mean()

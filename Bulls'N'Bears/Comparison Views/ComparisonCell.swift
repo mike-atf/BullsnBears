@@ -39,6 +39,7 @@ class ComparisonCell: UITableViewCell {
         valueLabels = [UILabel]()
 
         var count: CGFloat = 0
+        var previousLabel: UILabel?
         for string in strings {
             
             let label: UILabel = {
@@ -56,8 +57,13 @@ class ComparisonCell: UITableViewCell {
             
             label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 300 + 150*count).isActive = true
             label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+            if previousLabel != nil {
+                previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
+            }
+            previousLabel = label
             count += 1
         }
+        
         
     }
 

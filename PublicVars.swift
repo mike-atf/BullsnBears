@@ -517,3 +517,36 @@ struct PricePoint: Codable {
     
 }
 
+struct ShareFinancialsValueWeights {
+    
+    let peRatio = 1.5
+    let retEarningsGrowth = 1.3
+    let earningsByPER = 1.3
+    let epsGrowth = 1.0
+    let netIncomeDivRevenue = 1.0
+    let capExpendDivEarnings = 1.1
+    let profitMargin = 1.0
+    let ltDebtDivIncome = 0.8
+    let opCashFlowGrowth = 1.3
+    let ltDebtDivadjEq = 0.4
+    let sgaDivRevenue = 0.75
+    let radDivRevenue = 0.75
+    let revenueGrowth = 1.3
+    let netIncomeGrowth = 1.3
+    let roeGrowth = 1.0
+
+    
+    public func weightsSum() -> Double? {
+        
+        let mirror = Mirror(reflecting: self)
+        
+        var sum: Double?
+        for child in mirror.children {
+            if sum == nil { sum = Double() }
+            if let value = child.value as? Double {
+                sum! += value
+            }
+        }
+        return sum
+    }
+}
