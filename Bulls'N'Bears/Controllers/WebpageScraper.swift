@@ -69,13 +69,9 @@ class WebpageScraper {
             return (nil, errors)
         }
         
-//        print()
-//        print("website text:")
-//        print(html$ ?? "none")
-        
         if website == .macrotrends {
             let (valueArray, errors) = macrotrendsRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, exponent: webpageExponent)
-            return (valueArray, errors)
+            return (valueArray, errors) // MT.com rows are time_DESCENDING from left to right, so the valueArray is in time-ASCENDING order deu to backwards row scraping.
         }
         else {
             let (valueArray, errors) = yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal, exponent: webpageExponent)
@@ -248,7 +244,8 @@ class WebpageScraper {
         return macrotrendsRowExtraction(table$: pageText ?? "", rowTitle: rowTitle, exponent: nil)
     }
 
-    
+    /// macrotrend data are time-DESCENDING from left to right,
+    /// so the value arrays - scraped right-to-left  from eadh row - are returned in time_ASCENDING order
     class func macrotrendsRowExtraction(table$: String, rowTitle: String, exponent: Double?=nil, numberTerminal:String?=nil) -> ([Double], [String]) {
         
         var valueArray = [Double]()
@@ -279,7 +276,7 @@ class WebpageScraper {
             numberEndIndex = tableText.range(of: numberTerminal)
         }
         
-        return (valueArray, errors)
+        return (valueArray, errors)  // in time_DESCENDING order
     }
     
     class func yahooRowNumbersExtraction(table$: String, rowTitle: String, numberTerminal: String?=nil, exponent: Double?=nil) -> ([Double], [String]) {

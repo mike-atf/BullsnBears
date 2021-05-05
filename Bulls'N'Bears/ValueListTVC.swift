@@ -90,19 +90,8 @@ class ValueListTVC: UITableViewController {
         }
         else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
-//            if sectionTitles[indexPath.section].contains("/") {
-//                if indexPath.section == 2 {
 
                     cell.configure(values1: values?[indexPath.section-2], values2: proportions, rightTitle: cellLegendTitles[1], leftTitle: cellLegendTitles.first)
-//                }
-//                else {
-//                    cell.configure(values1: values?[indexPath.section-2], values2: nil, rightTitle: sectionTitles.last, leftTitle: nil)
-//                }
-//            }
-//            else {
-//                cell.configure(values1: values?[indexPath.section-2], values2: nil, rightTitle: sectionTitles.last, leftTitle: nil)
-//            }
-
             return cell
         }
         

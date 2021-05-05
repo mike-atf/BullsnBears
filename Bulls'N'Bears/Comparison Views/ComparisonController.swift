@@ -184,8 +184,8 @@ class ComparisonController {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if let retE = share.wbValuation?.equityRepurchased {
-                        if let lastRetEarnings = retE.last {
+                    if let retE = share.wbValuation?.equityRepurchased { // MT.com row-based data are stored in time-DESCENDING order
+                        if let lastRetEarnings = retE.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
                             }

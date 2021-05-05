@@ -471,11 +471,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tbyVC.modalPresentationStyle = .popover
         tbyVC.preferredContentSize = CGSize(width: 400, height: 250)
 
-//        if let rootView = splitViewController {
-//            tbyVC.preferredContentSize = CGSize(width: rootView.view.frame.width * 0.9, height: rootView.view.frame.height * 0.9)
-//        }
-//        tbyVC.loadViewIfNeeded()
-        tbyVC.tbRates = controller.treasuryBondYields?.compactMap{ $0.price }
+        tbyVC.tbrPriceDates = controller.treasuryBondYields
 
         let popUpController = tbyVC.popoverPresentationController
         popUpController!.permittedArrowDirections = .up

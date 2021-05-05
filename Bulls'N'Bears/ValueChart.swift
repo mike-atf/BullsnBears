@@ -59,7 +59,7 @@ class ValueChart: UIView {
             return
         }
 
-        self.valueArray1 = array1?.reversed()
+        self.valueArray1 = array1?.reversed() // MT.com row based data are stored in time-DESCENDING order
         self.valueArray2 = array2?.reversed()
         self.trendlabel = trendLabel
         
@@ -124,6 +124,7 @@ class ValueChart: UIView {
                         let label = UILabel()
                         label.font = UIFont.systemFont(ofSize: 12)
                         label.text = "\(mostRecentYear-count)"
+                        label.textAlignment = .center
                         label.sizeToFit()
                         self.addSubview(label)
                         return label
@@ -146,6 +147,7 @@ class ValueChart: UIView {
                 let label = UILabel()
                 label.font = UIFont.systemFont(ofSize: 12)
                 label.text = year$
+                label.textAlignment = .center
                 label.sizeToFit()
                 self.addSubview(label)
                 return label
@@ -185,14 +187,15 @@ class ValueChart: UIView {
         
 //xAxisLabels
         let labelSlotWidth = (xAxisLabels.count > 1) ? chartAreaSize.width / CGFloat(xAxisLabels.count) : chartAreaSize.width / CGFloat(valueArray1?.count ?? 1)
-        var step: CGFloat = 1
+        var step: CGFloat = 0
         xAxisLabels.forEach { (label) in
-            let labelLeft = chartOrigin.x + labelSlotWidth * step - label.frame.width / 2
-            label.frame.origin = CGPoint(x: labelLeft - label.frame.width / 2, y: rect.maxY - label.frame.height)
+            let labelCentreX = chartOrigin.x + labelSlotWidth * step + labelSlotWidth / 2
+            label.frame.origin = CGPoint(x: labelCentreX - label.frame.width / 2, y: rect.maxY - label.frame.height)
+//            label.center.x = labelCentreX
            step += 1
         }
         
-        chartEnd.y = xAxisLabels.first!.frame.minY - 5
+        chartEnd.y = xAxisLabels.first!.frame.minY // - 5
         chartAreaSize.height = chartEnd.y - chartOrigin.y
         let pixPerValue1 = chartAreaSize.height / CGFloat(value1Range)
 

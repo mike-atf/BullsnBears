@@ -110,8 +110,6 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             return nil
         }()
 
-//        NotificationCenter.default.addObserver(self, selector: #selector(mtDownloadCompleted(_:)), name: Notification.Name(rawValue: "MTDataDownloadComplete"), object: nil)
-
         loadWebView(url: nil, stockSymbol: stock.symbol, stockShortname: hyphenatedShortName!.lowercased(), section: mtDownloadTasks.first! )
     }
     
@@ -192,7 +190,6 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
                 self.mt_html$ = html as? String
                 let section = (webView as! HiddenWebView).section
                 self.mtDownloadCompleted(section: section)
-//                NotificationCenter.default.post(name: Notification.Name(rawValue: "MTDataDownloadComplete"), object: section , userInfo: nil)
 
             }
             else {
@@ -279,11 +276,8 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
 
     // MARK: - completed download functions
     
-//    @objc
     func mtDownloadCompleted(section: String) {
         // is called from a background thread!
-        
-//        let section = notification.object as? String
         
         var remove = Int()
         for i in 0..<mtDownloadTasks.count {
@@ -305,12 +299,9 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
 
     }
     
-//    @objc
     func yahooDownloadCompleted(section: String) {
         // is called from a background thread!
 
-//        let section = notification.object as? String
-        
         var remove = Int()
         for i in 0..<yahooDownloadTasks.count {
             if yahooDownloadTasks[i] == section {

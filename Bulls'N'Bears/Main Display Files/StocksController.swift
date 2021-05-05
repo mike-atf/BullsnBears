@@ -116,7 +116,9 @@ class StocksController: NSFetchedResultsController<Share> {
 
             let html$ = String(decoding: validData, as: UTF8.self)
             (self.treasuryBondYields, _) = WebpageScraper.scrapeTreasuryYields(html$: html$) // in time-DESCENDING order
-            self.pricesUpdateDelegate?.treasuryBondRatesDownloaded()
+            DispatchQueue.main.async {
+                self.pricesUpdateDelegate?.treasuryBondRatesDownloaded()
+            }
 
         }
         downloadTask?.resume()

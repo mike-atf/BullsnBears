@@ -16,6 +16,8 @@ extension WBValuation {
         return NSFetchRequest<WBValuation>(entityName: "WBValuation")
     }
 
+    // careful: MT.com row-based webdata are in time-DESCENDING order
+
     @NSManaged public var capExpend: [Double]? // converted from NEGATIVE in MacroTrends to positive!
     @NSManaged public var opCashFlow: [Double]?
     @NSManaged public var company: String?

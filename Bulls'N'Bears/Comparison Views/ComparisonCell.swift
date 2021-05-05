@@ -46,6 +46,9 @@ class ComparisonCell: UITableViewCell {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = UIFont.preferredFont(forTextStyle: .body)
+                if cellPath == IndexPath(row: 1, section: 0) {
+                    label.numberOfLines = 0
+                }
                 label.text = string
                 label.sizeToFit()
                 return label
