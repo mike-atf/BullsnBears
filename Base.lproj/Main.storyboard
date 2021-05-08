@@ -581,10 +581,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VCh-Ud-hMe">
-                                <rect key="frame" x="0.0" y="20" width="1180" height="73"/>
+                                <rect key="frame" x="0.0" y="20" width="1180" height="100"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Compare shares" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e21-RP-5wh">
-                                        <rect key="frame" x="481" y="18" width="218" height="37"/>
+                                        <rect key="frame" x="481" y="5" width="218" height="37"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -592,16 +592,16 @@
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="VCh-Ud-hMe" secondAttribute="height" multiplier="1180:73" id="FKe-ul-rZg"/>
+                                    <constraint firstAttribute="width" secondItem="VCh-Ud-hMe" secondAttribute="height" multiplier="1180:100" id="FKe-ul-rZg"/>
                                     <constraint firstItem="e21-RP-5wh" firstAttribute="centerX" secondItem="VCh-Ud-hMe" secondAttribute="centerX" id="VtD-Zk-r7j"/>
-                                    <constraint firstItem="e21-RP-5wh" firstAttribute="centerY" secondItem="VCh-Ud-hMe" secondAttribute="centerY" id="fUm-cI-r8Y"/>
+                                    <constraint firstItem="e21-RP-5wh" firstAttribute="top" secondItem="VCh-Ud-hMe" secondAttribute="top" constant="5" id="fgY-5O-rHV"/>
                                 </constraints>
                             </view>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pXA-jR-ADe">
-                                <rect key="frame" x="0.0" y="101" width="1180" height="719"/>
+                                <rect key="frame" x="0.0" y="128" width="1180" height="692"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="iO9-hW-Vne">
-                                        <rect key="frame" x="0.0" y="0.0" width="1414" height="719"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="1414" height="692"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="1414" id="2eU-1a-fEz"/>
@@ -663,6 +663,7 @@
                     <connections>
                         <outlet property="horizontalScrollView" destination="pXA-jR-ADe" id="DOm-yB-OJ8"/>
                         <outlet property="tableView" destination="iO9-hW-Vne" id="BZA-yT-87K"/>
+                        <outlet property="titleLabel" destination="e21-RP-5wh" id="0OZ-mR-HyO"/>
                         <outlet property="toolBarView" destination="VCh-Ud-hMe" id="eRh-CX-oVc"/>
                     </connections>
                 </viewController>

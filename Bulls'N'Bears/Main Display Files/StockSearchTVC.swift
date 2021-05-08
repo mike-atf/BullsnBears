@@ -7,10 +7,15 @@
 
 import UIKit
 
+protocol StockSearchDataDownloadDelegate {
+    func newShare(symbol: String, prices: [PricePoint]?)
+}
+
 class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResultsUpdating, UISearchControllerDelegate {
     
     var searchController: UISearchController?
     weak var callingVC: StocksListTVC!
+    var downloadDelegate: StockSearchDataDownloadDelegate?
     
     var stocksDictionary = Array<(key:String, value:String)>() // [String:String]()
     
@@ -110,18 +115,6 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
     }
     
-//    @objc
-//    func addManual() {
-//
-//        guard let manualSearchVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ManualSearchVC") as? ManualSearchVC else {
-//            return
-//        }
-//        manualSearchVC.loadViewIfNeeded()
-//
-//        self.navigationController?.pushViewController(manualSearchVC, animated: true)
-//
-//    }
-
     func yahooStockDownload(_ ticker: String?, companyName: String?) {
         
         guard let symbol = ticker else {
@@ -159,14 +152,11 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         
     func downLoadWebFile(_ url: URL, symbol: String, companyName: String) {
         
-        let configuration = URLSessionConfiguration.default
-        configuration.httpCookieAcceptPolicy = .always
-        configuration.httpShouldSetCookies = true
-        let session = URLSession(configuration: configuration)
-        var downloadTask: URLSessionDownloadTask? // URLSessionDataTask stores downloaded data in memory, DownloadTask as File
+        let session = URLSession.shared
+        var downloadTask: URLSessionDownloadTask?// URLSessionDataTask stores downloaded data in memory, DownloadTask as File
 
         downloadTask = session.downloadTask(with: url) { [self]
-            urlOrNil, responseOrNil, errorOrNil in
+            urlOrNil, response, errorOrNil in
             
             guard errorOrNil == nil else {
                 DispatchQueue.main.async {
@@ -175,13 +165,13 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                 return
             }
             
-            guard responseOrNil != nil else {
+            guard response != nil else {
                 DispatchQueue.main.async {
-                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(symbol) due to error \(String(describing: responseOrNil!.textEncodingName))", viewController: self, delegate: nil)
+                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(symbol) due to error \(String(describing: response!.textEncodingName))", viewController: self, delegate: nil)
                 }
                 return
             }
-            
+                        
             guard let fileURL = urlOrNil else { return }
             
             do {
@@ -198,26 +188,55 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                     removeFile(tempURL)
                 }
 
-                    try FileManager.default.moveItem(at: fileURL, to: tempURL)
-                
+                try FileManager.default.moveItem(at: fileURL, to: tempURL)
+            
 
-                    guard CSVImporter.matchesExpectedFormat(url: tempURL) else {
-                        removeFile(tempURL)
+                if !CSVImporter.matchesExpectedFormat(url: tempURL) {
+                    // this may be due to 'invalid cookie' error
+                    // if so download webpage content with table
+                    removeFile(tempURL)
+                                        
+                    let calendar = Calendar.current
+                    let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+                    var dateComponents = calendar.dateComponents(components, from: Date())
+                    dateComponents.second = 0
+                    dateComponents.minute = 0
+                    dateComponents.hour = 0
+                    dateComponents.year = 1970
+                    dateComponents.day = 1
+                    dateComponents.month = 1
+                    let yahooRefDate = calendar.date(from: dateComponents) ?? Date()
+                    let nowSinceRefDate = Date().timeIntervalSince(yahooRefDate)
+                    let start = nowSinceRefDate - TimeInterval(3600 * 24 * 365)
+                    
+                    let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
+                    let start$ = numberFormatter.string(from: start as NSNumber) ?? ""
+                    
+                    var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
+                    urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "filter", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
+                    
+                    
+                    if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
+                        downloadWebData(sourceURL, stockName: symbol, task: "priceHistory")
+                    }
+                    else {
                         return
                     }
+                }
+            
                 
-                    if FileManager.default.fileExists(atPath: targetURL.path) {
-                        removeFile(targetURL)
-                    }
+                if FileManager.default.fileExists(atPath: targetURL.path) {
+                    removeFile(targetURL)
+                }
 
-                    try FileManager.default.moveItem(at: tempURL, to: targetURL)
+                try FileManager.default.moveItem(at: tempURL, to: targetURL)
 
-                    DispatchQueue.main.async {
+                DispatchQueue.main.async {
 
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object:   targetURL, userInfo: ["companyName": companyName]) // send to StocksListVC
-                    
-                    // the Company profile (industry, sector and employees) is downloaded after this in StocksController called from StocksListVC as delegate of this here download
-                    }
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object:   targetURL, userInfo: ["companyName": companyName]) // send to StocksListVC
+                
+                // the Company profile (industry, sector and employees) is downloaded after this in StocksController called from StocksListVC as delegate of this here download
+                }
 
             } catch {
                 DispatchQueue.main.async {
@@ -252,13 +271,13 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         urlComponents?.queryItems = [URLQueryItem(name: "p", value: name)]
         
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-            downloadWebData(sourceURL, stockName: name)
+            downloadWebData(sourceURL, stockName: name, task: "name")
         }
 
 
     }
 
-    func downloadWebData(_ url: URL, stockName: String) {
+    func downloadWebData(_ url: URL, stockName: String, task: String) {
         
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieAcceptPolicy = .always
@@ -295,9 +314,16 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             }
 
             let html$ = String(decoding: validData, as: UTF8.self)
-            self.nameInWebData(html$: html$, symbol: stockName)
-            
-            
+            if task == "name" {
+                self.nameInWebData(html$: html$, symbol: stockName)
+            }
+            else if task == "priceHistory" {
+                let pricePoints = WebpageScraper.yahooPriceTable(html$: html$)
+                
+                DispatchQueue.main.async {
+                    self.downloadDelegate?.newShare(symbol: stockName, prices: pricePoints)
+                }
+            }
         }
         downloadTask?.resume()
     }
@@ -330,7 +356,6 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             self.tableView.reloadData()
         }
 
-//        yahooStockDownload(symbol)
     }
 
 

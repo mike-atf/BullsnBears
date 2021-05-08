@@ -47,9 +47,6 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(pageTitles.first!)")
         components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
         
-//        NotificationCenter.default.addObserver(self, selector: #selector(yahooDownloadCompleted(notification:)), name: Notification.Name(rawValue: "YahooDataDownloadComplete"), object: nil)
-
-        
         yahooDownloadPage(url: components?.url, for: yahooDownloadTasks.first!)
     }
     
@@ -268,7 +265,6 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             self.yahoo_html$ = String(decoding: validData, as: UTF8.self)
             self.yahooDownloadCompleted(section: section)
             
-//           NotificationCenter.default.post(name: Notification.Name(rawValue: "YahooDataDownloadComplete"), object: section , userInfo: nil)
         }
         yahooSession?.resume()
     }

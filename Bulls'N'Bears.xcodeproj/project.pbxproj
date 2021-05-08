@@ -77,6 +77,7 @@
 		EA7B613A25C412860018BA02 /* StockTickerDictionary.csv in Resources */ = {isa = PBXBuildFile; fileRef = EA7B613825C412860018BA02 /* StockTickerDictionary.csv */; };
 		EA7B613B25C412860018BA02 /* StockTickerDictionary.csv in Resources */ = {isa = PBXBuildFile; fileRef = EA7B613825C412860018BA02 /* StockTickerDictionary.csv */; };
 		EA805DC525D54D4E00720E68 /* StockSearchTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA805DC425D54D4E00720E68 /* StockSearchTVC.swift */; };
+		EA9D7399264432C300672762 /* TrendIconView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9D7398264432C300672762 /* TrendIconView2.swift */; };
 		EAA099C42588020B00DBB93C /* CheckButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA099C32588020B00DBB93C /* CheckButton.swift */; };
 		EAA69F73260E52550067EE1A /* GrowthCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA69F72260E52550067EE1A /* GrowthCategory.swift */; };
 		EAA69F74260E52550067EE1A /* GrowthCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA69F72260E52550067EE1A /* GrowthCategory.swift */; };
@@ -282,6 +283,7 @@
 		EA79790125E6F24200663644 /* GradientColorFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientColorFinder.swift; sourceTree = "<group>"; };
 		EA7B613825C412860018BA02 /* StockTickerDictionary.csv */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = StockTickerDictionary.csv; sourceTree = "<group>"; };
 		EA805DC425D54D4E00720E68 /* StockSearchTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockSearchTVC.swift; sourceTree = "<group>"; };
+		EA9D7398264432C300672762 /* TrendIconView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TrendIconView2.swift; path = "Bulls'N'Bears/TrendIconView2.swift"; sourceTree = SOURCE_ROOT; };
 		EAA099C32588020B00DBB93C /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
 		EAA69F63260E44940067EE1A /* TrendMyStocks 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 5.xcdatamodel"; sourceTree = "<group>"; };
 		EAA69F72260E52550067EE1A /* GrowthCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthCategory.swift; sourceTree = "<group>"; };
@@ -378,6 +380,7 @@
 		EA0F8898263956FE009C980F /* Comparison Views */ = {
 			isa = PBXGroup;
 			children = (
+				EA9D7398264432C300672762 /* TrendIconView2.swift */,
 				EA0F889926395745009C980F /* ComparisonVC.swift */,
 				EA0F889D263959D6009C980F /* ComparisonController.swift */,
 				EA0F889B2639575B009C980F /* ComparisonCell.swift */,
@@ -821,6 +824,7 @@
 				EA0F889C2639575B009C980F /* ComparisonCell.swift in Sources */,
 				EAA69FBD261222AF0067EE1A /* ResearchCell.swift in Sources */,
 				EA3207F125EEA13200A6A6AB /* ValueListRatingCell.swift in Sources */,
+				EA9D7399264432C300672762 /* TrendIconView2.swift in Sources */,
 				EAD835EF25DC12000015C93A /* ValueListCell.swift in Sources */,
 				EAA69F8126121A940067EE1A /* CompanyNews+CoreDataProperties.swift in Sources */,
 				EAA69F7E26121A940067EE1A /* CompanyNews+CoreDataClass.swift in Sources */,

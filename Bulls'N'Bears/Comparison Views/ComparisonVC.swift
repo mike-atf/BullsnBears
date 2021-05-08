@@ -13,15 +13,43 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     @IBOutlet var horizontalScrollView: UIScrollView!
     @IBOutlet var tableView: UITableView!
     @IBOutlet var toolBarView: UIView!
+    @IBOutlet var titleLabel: UILabel!
     
     
     var controller: ComparisonController!
     var shares: [Share]?
+    var shareNameLabels: [UILabel]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         controller = ComparisonController(shares: shares, viewController: self)
+        
+        let margins = self.view.safeAreaLayoutGuide
+        var previousLabel: UILabel?
+        var count: CGFloat = 0.0
+        for share in shares ?? [] {
+            let label: UILabel = {
+                let label = UILabel()
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.font = UIFont.preferredFont(forTextStyle: .title3)
+                label.text = share.symbol
+                label.sizeToFit()
+                return label
+            }()
+            self.view.addSubview(label)
+            shareNameLabels?.append(label)
+            
+            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 330 + 150*count).isActive = true
+            label.topAnchor.constraint(equalTo: titleLabel.bottomAnchor,constant: 10).isActive = true
+            if previousLabel != nil {
+                previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
+            }
+            previousLabel = label
+            count += 1.0
+        }
+        
+        
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -48,8 +76,8 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath == IndexPath(row: 1, section: 0) { return 200 }
-        else { return 44 }
+        if indexPath == IndexPath(row: 0, section: 0) { return 200 }
+        else { return 50 }
     }
     
     /*

@@ -41,8 +41,23 @@ class CitationsManager {
         let pL27 = "ultimately the earnings will decide the fate of a stock."
         let pL28 = "There are three phases to a growth company's life: the start-up phase..., the rapid expansion phase..., and the saturation phase...\nThe second phase is the safest phase, and also where the most money is made"
 
+        let wb0 = "Warren [Buffett] realized ... that if a company's competitive advantage could be maintained for a long period of time - if it was 'durable' - then the underlying vaue of the business would continue to increase year after year"
+        let wb1 = "Because these businesses [with durable competitive advantage] had such incredible business economics working in their favor, there was zero chance of them ever going into bankruptcy."
+        let wb2 = "the longer [Warren Buffett] held on to these positions, the more time he had to profit ferom these businesses' great underlying economics."
+        let wb3 = "[Warren Buffett] realized that he no longer had to wait for Wall Street to serve up a bargain price. He could pay a fair price for one of these super businesses and still come out ahead, provided he held the investmemnt long enough"
+        let wb4 = "Warren has figured out that these super companies come in three basic business models: They sell either a unique product or a unique service, or they are the low-cost buyer and seller of a product or service that the public consistently needs"
+        let wb5 = "Warren [Buffett] has learned that it is the 'durability' of the competitive advantage that creates all the wealth"
+        let wb6 = "when Warren [Buffett] is looking at a company's financial statement, he is looking for consistency"
+        let wb7 = "All publicly traded companies must fiel quarterly financial statements with the SEC; thewe are known as 8Qs.\nAlso filed iwth the SEC is a document called the 10K, which is the company's annual report"
+        let wb8 = "Warren [Buffett] has read thousands of 10K's over the years, as they do the best job of reporting the numbers without all the fluff that can get stuffed into a shareholder's annual report"
+        let wb9 = "To Warren [Buffett], the source of the earnings is always more important than the earnings themselves"
+        let wb10 = "Warren [Buffett] knows that one of the great secrets to making more money is spending less money"
+
+        let plCitatations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
+        let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10]
         
-        var allCitations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
+        var allCitations = plCitatations
+        allCitations.append(contentsOf: wbCitations)
         
         if let lastCitation = UserDefaults.standard.value(forKey: userDefaultTerms.lastCitation) as? String {
             var count = 0
@@ -58,8 +73,10 @@ class CitationsManager {
         let citationCount = allCitations.count
         let randomCitationNo = Int.random(in: 0..<citationCount)
         let randomCitation = "\"" + allCitations[randomCitationNo] + "\""
-        let tribute = "\n\nPeter Lynch\n'One up on Wall Street'\nSimon & Schuster, 1989"
-        
+        let tributePL = "\n\nPeter Lynch\n'One up on Wall Street'\nSimon & Schuster, 1989"
+        let tributeWB = "\n\nMary Buffett and David Clark\n'Warren Buffett and the Interpretation of Financial Statements'\nSimon & Schuster, 2008"
+
+        let tribute = randomCitationNo < plCitatations.count ? tributePL : tributeWB
         let font = UIFont.italicSystemFont(ofSize: 18)
         let fontColor = UIColor.label
         let paragraphStyle1 = NSMutableParagraphStyle()

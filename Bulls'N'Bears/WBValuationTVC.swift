@@ -71,9 +71,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             let proportions = controller!.valueListTVCProportions(values: arrays!)
             let sendArrays = [arrays![0], proportions]
             correlation = Calculator.valueChartCorrelation(arrays:sendArrays)
-//            if share.symbol == "NVDA" && indexPath == IndexPath(row: 2, section: 1) {
-//            }
-
         }
         
         

@@ -335,8 +335,6 @@ class WebpageScraper {
             tableText.removeSubrange(index.lowerBound...)
         }
 
-//        print("row text:")
-//        print(tableText)
         repeat {
             guard let labelStartIndex = tableText.range(of: numberStarter, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil) else {
                 let error = "Did not find number start in \(rowTitle) on webpage"
@@ -347,7 +345,6 @@ class WebpageScraper {
             }
             
             let value$ = tableText[labelStartIndex.upperBound...]
-//            print("value$ extracted: \(value$)")
             let value = numberFromText(value$: String(value$), rowTitle: rowTitle, exponent: exponent)
             valueArray.append(value)
             
@@ -379,8 +376,6 @@ class WebpageScraper {
             tableText.removeSubrange(index.lowerBound...)
         }
 
-//        print("row text:")
-//        print(tableText)
         repeat {
             guard let labelStartIndex = tableText.range(of: textStarter, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil) else {
                 let error = "Did not find text start in \(rowTitle) on webpage"
@@ -391,7 +386,6 @@ class WebpageScraper {
             }
             
             let value$ = String(tableText[labelStartIndex.upperBound...])
-//            print("value$ extracted: \(value$)")
             textArray.append(value$)
             
             labelEndIndex = tableText.range(of: textTerminal, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil)
@@ -406,7 +400,6 @@ class WebpageScraper {
 //        )
         return (textArray, errors)
     }
-
     
     class func numberFromText(value$: String, rowTitle: String, exponent: Double?=nil) -> Double {
         
@@ -645,6 +638,89 @@ class WebpageScraper {
         
         return (priceDates,errors)
         
+    }
+    
+    class func yahooPriceTable(html$: String) -> [PricePoint]? {
+        
+        let tableEnd$ = "</tbody><tfoot "
+        let tableStart$ = "<thead "
+        
+        let rowStart$ = "Ta(start)"
+//        let rowEnd = "</span></td></tr>"
+//        let columnStart = "<span data-reactid="
+        let columnEnd = "</span></td>"
+        
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd MMM yyyy"
+            return formatter
+        }()
+
+        var pageText = html$
+        
+        // eliminate above table start
+        if let tableStartIndex = pageText.range(of: tableStart$) {
+            pageText.removeSubrange(...tableStartIndex.upperBound)
+        } else {
+            print("Extracting from Yahoo prices table - can't find start of table")
+            return nil
+        }
+
+        // eliminate below table end
+        if let tableEndIndex = pageText.range(of: tableEnd$) {
+            pageText.removeSubrange(tableEndIndex.upperBound...)
+        } else {
+            print("Extracting from Yahoo prices table - can't find end of table")
+            return nil
+        }
+
+        // table should have 7 columns: Date, Open, High, Low, Close, Ajd. close , Volume
+        
+        var pricePoints = [PricePoint]()
+        
+        var rowStartIndex = pageText.range(of: rowStart$, options: .backwards)
+        var count = 0
+        while rowStartIndex != nil {
+            
+            var tradingDate: Date?
+            
+            var values = [Double]()
+            
+            var rowText = pageText[rowStartIndex!.upperBound...]
+            
+            count = 0
+            var columnEndIndex = rowText.range(of: columnEnd, options: .backwards)
+            while columnEndIndex != nil {
+                rowText.removeSubrange(columnEndIndex!.lowerBound...)
+                if let dataIndex = rowText.range(of: ">", options: .backwards) {
+                    let data$ = rowText[dataIndex.upperBound...]
+                    if count == 6 {
+                        if let date = dateFormatter.date(from: String(data$)) {
+                            tradingDate = date
+                        }
+                    }
+                    else if let value = Double(data$.filter("-0123456789.".contains)) {
+                            values.append(value)
+                    }
+                }
+                else {
+                    values.append(Double())
+                }
+                columnEndIndex = rowText.range(of: columnEnd, options: .backwards)
+                count += 1
+            }
+            
+            if values.count == 6 && tradingDate != nil {
+                let newPricePoint = PricePoint(open: values[5], close: values[2], low: values[3], high: values[4], volume: values[0], date: tradingDate ?? Date())
+                pricePoints.append(newPricePoint)
+            }
+            
+            pageText.removeSubrange(rowStartIndex!.lowerBound...)
+            rowStartIndex = pageText.range(of: rowStart$, options: .backwards)
+        }
+        
+        return pricePoints
     }
 
 }

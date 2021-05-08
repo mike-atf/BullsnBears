@@ -21,12 +21,12 @@ class ComparisonController {
     
     func rowTitles() -> [[String]]{
         
-        let titleStructure = [["Shares","Why to buy"],
+        let titleStructure = [["Why to buy"],
                                 ["Personal rating score", "Fundamentals score", "Compet. strength" ,"Share price / GB Value" ,"Share price / DCF Value", "Share price / Intrinsic value"],
                                 ["PE ratio", "Lynch ratio", "Book value / share price"],
-                                ["Ret. earnings", "Revenue", "Net income", "Op. Cash flow", "Profit margin", "EPS"],
-                                ["ROI", "ROE", "ROA"],
-                                ["LT Debt / net income", "LT Debt / adj equity", "cap. exp.", "SGA / revenue", "R&D / profit"]]
+                                ["Ret. earnings growth", "Revenue growth", "Net income growth", "Op. Cash flow growth", "Gross profit growth", "EPS growth"],
+                                ["ROI growth", "ROE growth", "ROA growth"],
+                                ["LT Debt / net income", "LT Debt / adj equity", "cap. exp.", "SGA / profit", "R&D / profit"]]
         
         return titleStructure
         
@@ -59,9 +59,6 @@ class ComparisonController {
         switch forPath.section {
         case 0:
             if forPath.row == 0 {
-                texts = shares?.compactMap{ $0.symbol } ?? [String]()
-            }
-            else if forPath.row == 1 {
                 for share in shares ?? [] {
                     texts.append(share.research?.theBuyStory ?? "")
                 }
@@ -190,15 +187,105 @@ class ComparisonController {
                                 text = "last neg."
                             }
                             else {
-                                
+                                if let ema = retE.growthRates()?.ema(periods: 7) {
+                                    text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                }
                             }
                         }
                     }
                     texts.append(text)
                 }
             }
-
-
+            else if forPath.row == 1 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if let values = share.wbValuation?.revenue { // MT.com row-based data are stored in time-DESCENDING order
+                        if let lastRetEarnings = values.first {
+                            if lastRetEarnings < 0 {
+                                text = "last neg."
+                            }
+                            else {
+                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                    text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                }
+                            }
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 2 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if let values = share.wbValuation?.netEarnings { // MT.com row-based data are stored in time-DESCENDING order
+                        if let lastRetEarnings = values.first {
+                            if lastRetEarnings < 0 {
+                                text = "last neg."
+                            }
+                            else {
+                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                    text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                }
+                            }
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 3 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if let values = share.wbValuation?.opCashFlow { // MT.com row-based data are stored in time-DESCENDING order
+                        if let lastRetEarnings = values.first {
+                            if lastRetEarnings < 0 {
+                                text = "last neg."
+                            }
+                            else {
+                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                    text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                }
+                            }
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 4 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if let values = share.wbValuation?.grossProfit { // MT.com row-based data are stored in time-DESCENDING order
+                        if let lastRetEarnings = values.first {
+                            if lastRetEarnings < 0 {
+                                text = "last neg."
+                            }
+                            else {
+                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                    text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                }
+                            }
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
+            else if forPath.row == 5 {
+                for share in  shares ?? [] {
+                    var text = "-"
+                    if let values = share.wbValuation?.eps { // MT.com row-based data are stored in time-DESCENDING order
+                        if let lastRetEarnings = values.first {
+                            if lastRetEarnings < 0 {
+                                text = "last neg."
+                            }
+                            else {
+                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                    text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                }
+                            }
+                        }
+                    }
+                    texts.append(text)
+                }
+            }
         default:
             texts = [String]()
         }
@@ -206,11 +293,117 @@ class ComparisonController {
         return texts
     }
     
+    func fundamentals(forPath: IndexPath) -> ([Correlation?]?, [[Double]?]?) {
+        
+        guard forPath.section > 2 else {
+            return (nil, nil)
+        }
+        
+        var valueArray = [[Double]?]()
+        var correlations = [Correlation?]()
+        
+        if forPath.section == 3 {
+            if forPath.row == 0 {
+                for share in shares ?? [] {
+                    valueArray.append(share.wbValuation?.equityRepurchased)
+                    let proportions = proportions(values: [share.wbValuation?.equityRepurchased])
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.equityRepurchased, proportions]))
+                }
+            }
+            else if forPath.row == 1 {
+                for share in shares ?? [] {
+                    valueArray.append(share.wbValuation?.revenue)
+                    let proportions = proportions(values: [share.wbValuation?.revenue])
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.revenue, proportions]))
+                }
+
+            }
+            else if forPath.row == 2 {
+                for share in shares ?? [] {
+                    valueArray.append(share.wbValuation?.netEarnings)
+                    let proportions = proportions(values: [share.wbValuation?.netEarnings])
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.netEarnings, proportions]))
+                }
+
+            }
+            else if forPath.row == 3 {
+                for share in shares ?? [] {
+                    valueArray.append(share.wbValuation?.opCashFlow)
+                    let proportions = proportions(values: [share.wbValuation?.opCashFlow])
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.opCashFlow, proportions]))
+                }
+
+            }
+            else if forPath.row == 4 {
+                for share in shares ?? [] {
+                    valueArray.append(share.wbValuation?.grossProfit)
+                    let proportions = proportions(values: [share.wbValuation?.grossProfit])
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.grossProfit, proportions]))
+                }
+
+            }
+            else if forPath.row == 5 {
+                for share in shares ?? [] {
+                    valueArray.append(share.wbValuation?.eps)
+                    let proportions = proportions(values: [share.wbValuation?.eps])
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.eps, proportions]))
+                }
+
+            }
+        }
+        else if forPath.section == 4 {
+            if forPath.row == 0 {
+                for share in shares ?? [] {
+                    valueArray.append(share.rule1Valuation?.roic)
+                    let proportions = proportions(values: [share.rule1Valuation?.roic])
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[share.rule1Valuation?.roic, proportions]))
+                }
+            }
+            else if forPath.row == 1 {
+                for share in shares ?? [] {
+                    valueArray.append(share.wbValuation?.roe)
+                    let proportions = proportions(values: [share.wbValuation?.roe])
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.roe, proportions]))
+                }
+            }
+            else if forPath.row == 2 {
+                for share in shares ?? [] {
+                    valueArray.append(share.wbValuation?.roa)
+                    let proportions = proportions(values: [share.wbValuation?.roa])
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.roa, proportions]))
+                }
+            }
+        }
+
+        return (correlations, valueArray)
+        
+    }
+    
+    /// if sending 2 arrays returns array with proportion array 0 / array 1
+    /// if sending 1 array returns the rate of growth from array element to element
+    /// the rates returned are in time-ASCENDING order
+    public func proportions(values: [[Double]?]?) -> [Double]? {
+        
+        var proportions: [Double]?
+        
+        if values?.count ?? 0 > 1 {
+            proportions = Calculator.proportions(array1: values?.first!, array0: values?.last!) // returns in same order as sent
+        }
+        else {
+            if let array1 = values?.first {
+                proportions = array1?.growthRates()
+            }
+        }
+        return proportions
+    }
+
+    
     /*
      tableStructure:
+     
      == section 0
-     0 titles / symbols
-     1 research.buy story
+     0 research.buy story
+     
      == section 1
      0 user rating score
      1 fundamentals score
@@ -218,10 +411,12 @@ class ComparisonController {
      3 GB valuation
      4 DCF Valuation
      5 intrinsic WB value
+     
      == section 2
      0 PE ratios
      1 Lynch score
      2 Book value/share price
+     
      == section 3
      0 ret. earnings
      1 sales
@@ -229,10 +424,12 @@ class ComparisonController {
      3 OCF
      4 profit margin
      5 EPS
+     
      == section 4
      0 ROI
      1 ROE
      2 ROA
+     
      == section 5
      0 debt / net income
      1 debt / adj equity

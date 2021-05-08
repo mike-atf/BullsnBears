@@ -253,6 +253,49 @@ class StocksController: NSFetchedResultsController<Share> {
         return newShare
     }
     
+    class func createShare(with pricePoints: [PricePoint]?, symbol: String, companyName: String?=nil) -> Share? {
+        
+        guard let validPrices = pricePoints else {
+            return nil
+        }
+        
+        let stockName = symbol
+        
+        let newShare = Share.init(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+        
+        newShare.symbol = stockName
+        newShare.creationDate = Date()
+        newShare.dailyPrices = newShare.convertDailyPricesToData(dailyPrices: validPrices)
+        let macds = newShare.calculateMACDs(shortPeriod: 8, longPeriod: 17)
+        newShare.macd = newShare.convertMACDToData(macds: macds)
+                
+        if let dictionary = stockTickerDictionary {
+            newShare.name_long = companyName ?? dictionary[stockName]
+            
+            if let longNameComponents = newShare.name_long?.split(separator: " ") {
+                let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co."] // "Group",
+                let replaceTerms = ["S.A.": "sa "]
+                var cleanedName = String()
+                for component in longNameComponents {
+                    if replaceTerms.keys.contains(String(component)) {
+                        cleanedName += replaceTerms[String(component)] ?? ""
+                    } else if !removeTerms.contains(String(component)) {
+                        cleanedName += String(component) + " "
+                    }
+                }
+                newShare.name_short = String(cleanedName.dropLast())
+            }
+        }
+        
+        // check for any exisisting valuations
+        newShare.wbValuation = WBValuationController.returnWBValuations(share: newShare)
+        newShare.dcfValuation = CombinedValuationController.returnDCFValuations(company: newShare.symbol!)
+        newShare.rule1Valuation = CombinedValuationController.returnR1Valuations(company: newShare.symbol)
+        
+        return newShare
+    }
+
+    
     class func fetchSpecificShare(symbol: String, context: NSManagedObjectContext?=nil) -> Share? {
         
         let request = NSFetchRequest<Share>(entityName:"Share")

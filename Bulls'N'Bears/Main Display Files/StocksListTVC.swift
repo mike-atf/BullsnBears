@@ -203,8 +203,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
        
     }
-
-
         
     public func openDocumentBrowser(with remoteURL: URL, importIfNeeded: Bool) {
         
@@ -258,7 +256,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from file \(fileURL)")
        }
     }
-
+    
     
     // MARK: - TableView functions
     
@@ -510,13 +508,39 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSearchTVC") as? StockSearchTVC else { return }
 
         entryView.callingVC = self
+        entryView.downloadDelegate = self
         
         navigationController?.pushViewController(entryView, animated: true)
     }
 
 }
 
-extension StocksListTVC: SortDelegate {
+extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
+    
+    func newShare(symbol: String, prices: [PricePoint]?) {
+                
+        if let share = StocksController.createShare(with: prices, symbol: symbol) {
+            do {
+                try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol) \(error)")
+            }
+
+            if let indexPath = controller.indexPath(forObject: share) {
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+                performSegue(withIdentifier: "showChartSegue", sender: nil)
+            }
+            
+            let placeHolder = SharePlaceHolder(share: share)
+            placeHolder.downloadKeyRatios(delegate: controller)
+            placeHolder.downloadProfile(delegate: controller)
+
+        }
+        else {
+            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol)")
+       }
+    }
+
     
     func sortParameterChanged() {
         

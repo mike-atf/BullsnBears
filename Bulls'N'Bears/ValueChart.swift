@@ -317,8 +317,7 @@ class ValueChart: UIView {
             let pixPerValue = (valueArray2?.count ?? 0 > 0) ? pixPerValue2 : pixPerValue1
 
             let trendLineStartY = nullAxisY - CGFloat(trend.yIntercept) * pixPerValue
-            let trendLineEndY = nullAxisY - CGFloat(trend.endValue(for: Double(xAxisLabels.count))) * pixPerValue
-            
+            let trendLineEndY = nullAxisY - CGFloat(trend.endValue(for: Double(xAxisLabels.count))) * pixPerValue // -             
             trendLine.move(to: CGPoint(x: chartOrigin.x, y: trendLineStartY))
             trendLine.addLine(to: CGPoint(x: chartEnd.x, y: trendLineEndY))
             trendLine.lineWidth = 1.5
