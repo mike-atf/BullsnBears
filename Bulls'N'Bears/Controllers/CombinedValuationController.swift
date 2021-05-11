@@ -1173,10 +1173,8 @@ class CombinedValuationController: ValuationHelper {
         return nil
     }
     
+    /// returns detail value for the SAME row based on any existing later elements
     internal func calculateGrowthDCF(_ array: [Double]?, element: Int) -> Double? {
-        
-        // returns detail value for the SAME row based on any existing later elements
-        
         guard let numbers = array else {
             return nil
         }
@@ -1192,6 +1190,8 @@ class CombinedValuationController: ValuationHelper {
                 
     }
  
+    /// 'element' is the order number in the DESCENDING valueArray to calculate compound growth in relation to first element in valueArray
+    /// the element number is interpreted as 'years' backwards since date of first element
     internal func calculateGrowthR1(valueArray: [Double]?, element: Int) -> Double? {
         
         guard element > 0 && element < (valueArray?.count ?? 0) else {

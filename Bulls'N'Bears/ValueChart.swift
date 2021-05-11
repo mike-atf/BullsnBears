@@ -35,7 +35,8 @@ class ValueChart: UIView {
     var chartOrigin = CGPoint()
     var chartEnd = CGPoint()
     
-    var trend:Correlation!
+    var valuesTrend: Correlation?
+    var growthTrend:Correlation!
     var trendlabel: UILabel?
     
     override init(frame: CGRect) {
@@ -63,24 +64,25 @@ class ValueChart: UIView {
         self.valueArray2 = array2?.reversed()
         self.trendlabel = trendLabel
         
-        if let secondArray = array2 {
-            if secondArray.count > valueArray1?.count ?? 0 {
-                valueArray2 = Array(secondArray[...(valueArray1?.count ?? 0)])
-            }
-            else if secondArray.count < valueArray1?.count ?? 0 {
-                for _ in secondArray.count..<(valueArray1?.count ?? 0) {
-                    valueArray2?.insert(Double(), at: 0)
-                }
-            }
-        }
+        // compoundGrowth can return NaN values
+        let v1noNaN = valueArray1?.filter({ value in
+            if value.isNaN { return false }
+            else { return true }
+        }) ?? []
+        
+        let v2noNaN = valueArray2?.filter({ value in
+            if value.isNaN { return false }
+            else { return true }
+        }) ?? []
 
-        minValue1 = CGFloat(valueArray1?.min() ?? Double())
+        
+        minValue1 = CGFloat(v1noNaN.min() ?? Double())
         if minValue1 > 0 { minValue1 = 0 }
-        maxValue1 = CGFloat(valueArray1?.max() ?? Double())
+        maxValue1 = CGFloat(v1noNaN.max() ?? Double())
 
-        minValue2 = CGFloat(valueArray2?.min() ?? Double())
+        minValue2 = CGFloat(v2noNaN.min() ?? Double())
         if minValue2 > 0 { minValue2 = 0 }
-        maxValue2 = CGFloat(valueArray2?.max() ?? Double())
+        maxValue2 = CGFloat(v2noNaN.max() ?? Double())
         
         var proportion1: CGFloat?
         var proportion2: CGFloat?
@@ -162,9 +164,9 @@ class ValueChart: UIView {
             findYAxisValuesLeft(min: minValue2, max: maxValue2)
         }
         
-        
-        trend = Calculator.valueChartCorrelation(arrays: [array1 ?? [], array2 ?? []])
-        
+        growthTrend = Calculator.valueChartCorrelation(arrays: [array1 ?? [], array2 ?? []])
+        valuesTrend = Calculator.valueChartCorrelation(arrays: [array1 ?? []])
+
     }
     
     override func draw(_ rect: CGRect) {
@@ -288,42 +290,77 @@ class ValueChart: UIView {
                 index += 1
             }
 
+            //MARK: - growth line graph
+            valueCount = 0
+            for value in secondValues.reversed() {
+                if !value.isNaN { break }
+                valueCount += 1
+            }
+            
+            
             let linePath = UIBezierPath()
-            let lineStartX = chartOrigin.x + labelSlotWidth / 2
-            let lineStartY = nullAxisY - CGFloat(secondValues.first!) * pixPerValue2
+            let lineStartX = chartEnd.x - labelSlotWidth / 2
+            let lineStartY = nullAxisY - CGFloat(secondValues.reversed()[Int(valueCount)]) * pixPerValue2
             linePath.move(to: CGPoint(x: lineStartX, y: lineStartY))
 
-// growth line graph
-            valueCount = 0
-            secondValues.forEach({ (value) in
-                if value != Double() {
-                    let lineX = chartOrigin.x + labelSlotWidth / 2 + labelSlotWidth * valueCount
+            valueCount = +1
+            var previousIsNaN = false
+            for i in Int(valueCount)..<secondValues.reversed().count {
+                let value = secondValues.reversed()[i]
+                if !value.isNaN {
+                    let lineX = chartEnd.x - labelSlotWidth / 2 - labelSlotWidth * CGFloat(i)
                     let lineY = nullAxisY - CGFloat(value) * pixPerValue2
-                    linePath.addLine(to: CGPoint(x: lineX, y: lineY))
+                    if previousIsNaN {
+                        linePath.move(to: CGPoint(x: lineX, y: lineY))
+                    }
+                    else {
+                        linePath.addLine(to: CGPoint(x: lineX, y: lineY))
+                    }
+                    previousIsNaN = false
                 }
-                valueCount += 1
-            })
-
+                else {
+                    previousIsNaN = true
+                }
+            }
+            
             UIColor.label.setStroke()
             UIColor.systemOrange.setStroke()
-            linePath.lineWidth = 2.5
+            linePath.lineWidth = 2.1
             linePath.stroke()
         }
         
-//Trend
-        if trend != nil && trendlabel != nil {
+        //MARK: - Values trend
+        if valuesTrend != nil {
             let trendLine = UIBezierPath()
             
-            let pixPerValue = (valueArray2?.count ?? 0 > 0) ? pixPerValue2 : pixPerValue1
+            let pixPerValue = pixPerValue1 //(valueArray2?.count ?? 0 > 0) ? pixPerValue2 :
 
-            let trendLineStartY = nullAxisY - CGFloat(trend.yIntercept) * pixPerValue
-            let trendLineEndY = nullAxisY - CGFloat(trend.endValue(for: Double(xAxisLabels.count))) * pixPerValue // -             
+            let trendLineStartY = nullAxisY - CGFloat(valuesTrend!.yIntercept) * pixPerValue
+            let trendLineEndY = nullAxisY - CGFloat(valuesTrend!.endValue(for: Double(xAxisLabels.count))) * pixPerValue // -
             trendLine.move(to: CGPoint(x: chartOrigin.x, y: trendLineStartY))
             trendLine.addLine(to: CGPoint(x: chartEnd.x, y: trendLineEndY))
             trendLine.lineWidth = 1.5
             let dashPattern:[CGFloat] = [3,7]
             trendLine.setLineDash(dashPattern, count: dashPattern.count, phase: 0)
             UIColor.label.setStroke()
+            trendLine.stroke()
+        }
+
+        
+        //MARK: - GrowthTrend
+        if growthTrend != nil && trendlabel != nil {
+            let trendLine = UIBezierPath()
+            
+            let pixPerValue = (valueArray2?.count ?? 0 > 0) ? pixPerValue2 : pixPerValue1
+
+            let trendLineStartY = nullAxisY - CGFloat(growthTrend.yIntercept) * pixPerValue
+            let trendLineEndY = nullAxisY - CGFloat(growthTrend.endValue(for: Double(xAxisLabels.count))) * pixPerValue // -             
+            trendLine.move(to: CGPoint(x: chartOrigin.x, y: trendLineStartY))
+            trendLine.addLine(to: CGPoint(x: chartEnd.x, y: trendLineEndY))
+            trendLine.lineWidth = 2.1
+            let dashPattern:[CGFloat] = [3,7]
+            trendLine.setLineDash(dashPattern, count: dashPattern.count, phase: 0)
+            UIColor.systemOrange.setStroke()
             trendLine.stroke()
             
             UIColor.lightGray.setStroke()
@@ -333,16 +370,19 @@ class ValueChart: UIView {
             var r2$ = String()
             var growthEMA$ = String() // correlation incline based
             var meanChangeOfGrowth$ = String() // correlation incline based
-            let r2 = trend.r2()
+            let r2 = growthTrend.r2()
             // array2 = proportions, array1 = values
 
-            if let growth = valueArray2?.reversed().ema(periods: 7) {
+            if let growth = valueArray2?.reversed().filter({ (element) -> Bool in
+                if element != 0.0 { return true }
+                else { return false }
+            }).ema(periods: 7) {
                 //calculates changes of growth rates yoy then ema
                 if r2 != nil{
                     r2$ = percentFormatter0Digits.string(from: r2! as NSNumber) ?? ""
                 }
                 growthEMA$ = percentFormatter0DigitsPositive.string(from: growth as NSNumber) ?? ""
-                meanChangeOfGrowth$ = percentFormatter0Digits.string(from: trend.incline as NSNumber) ?? ""
+                meanChangeOfGrowth$ = percentFormatter0Digits.string(from: growthTrend.incline as NSNumber) ?? ""
             }
             else if let growthRates = valueArray1?.reversed().growthRates() {
                 
@@ -352,12 +392,12 @@ class ValueChart: UIView {
                 if r2 != nil{
                     r2$ = percentFormatter0Digits.string(from: r2! as NSNumber) ?? ""
                 }
-                    meanChangeOfGrowth$ = percentFormatter0Digits.string(from: trend.incline as NSNumber) ?? ""
+                    meanChangeOfGrowth$ = percentFormatter0Digits.string(from: growthTrend.incline as NSNumber) ?? ""
             }
             trendlabel?.font = UIFont.systemFont(ofSize: 13)
             trendlabel?.numberOfLines = 0
 
-            trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$), YoY growth changing by average \(meanChangeOfGrowth$) to EMA \(growthEMA$)", indicesOfSuperscripts: [1])
+            trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$), Compound growth change trend \(meanChangeOfGrowth$) to EMA \(growthEMA$)", indicesOfSuperscripts: [1])
             trendlabel?.sizeToFit()
         }
     }

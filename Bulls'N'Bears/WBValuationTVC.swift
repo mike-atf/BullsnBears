@@ -73,7 +73,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             correlation = Calculator.valueChartCorrelation(arrays:sendArrays)
         }
         
-        
         cell.configure(title: controller!.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self, userEvaluation: evaluation, correlation: correlation,correlationValues: arrays?[0])
         
         if indexPath.section == 0 {
@@ -233,7 +232,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             destination.sectionTitles.append(contentsOf: titles)
             destination.cellLegendTitles = validController.valueListChartLegendTitles[selectedPath.section-1][selectedPath.row]
             
-            let arrays = arraysForValueListTVC(indexPath: selectedPath) // time-ASCENDING
+            let arrays = arraysForValueListTVC(indexPath: selectedPath)
             
             if selectedPath.section == 1 {
                 if selectedPath.row == 0 {

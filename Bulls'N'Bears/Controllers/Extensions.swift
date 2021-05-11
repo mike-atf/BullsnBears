@@ -132,16 +132,22 @@ extension Array where Element == Double {
         
         guard periods > 2 else { return nil }
         
+        let noNaN = self.filter { element in
+            if !element.isNaN { return true }
+            else { return false }
+        }
+        
         var appliedPeriods = periods
-        if self.count < periods+2 {
-            appliedPeriods = Int(Double(self.count * 7/12))
+        if noNaN.count < periods+2 {
+            appliedPeriods = Int(Double(noNaN.count * 7/12))
             
         }
+        
         guard appliedPeriods > 2 else {
             return nil
         }
         
-        let ascending = Array(self.reversed())
+        let ascending = Array(noNaN.reversed())
         
         var sum = Double()
         for i in 0..<appliedPeriods {
@@ -151,7 +157,7 @@ extension Array where Element == Double {
         
         var ema = sma
         
-        for i in appliedPeriods..<self.count {
+        for i in appliedPeriods..<noNaN.count {
             if ascending[i] != Double() {
                 ema = ascending[i] * (2/(Double(appliedPeriods+1))) + ema * (1 - 2/(Double(appliedPeriods+1)))
             }

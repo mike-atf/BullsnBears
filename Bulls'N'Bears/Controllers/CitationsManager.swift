@@ -48,7 +48,7 @@ class CitationsManager {
         let wb4 = "Warren has figured out that these super companies come in three basic business models: They sell either a unique product or a unique service, or they are the low-cost buyer and seller of a product or service that the public consistently needs"
         let wb5 = "Warren [Buffett] has learned that it is the 'durability' of the competitive advantage that creates all the wealth"
         let wb6 = "when Warren [Buffett] is looking at a company's financial statement, he is looking for consistency"
-        let wb7 = "All publicly traded companies must fiel quarterly financial statements with the SEC; thewe are known as 8Qs.\nAlso filed iwth the SEC is a document called the 10K, which is the company's annual report"
+        let wb7 = "All publicly traded companies must file quarterly financial statements with the SEC; these are known as 8Qs.\nAlso filed with the SEC is a document called the 10K, which is the company's annual report"
         let wb8 = "Warren [Buffett] has read thousands of 10K's over the years, as they do the best job of reporting the numbers without all the fluff that can get stuffed into a shareholder's annual report"
         let wb9 = "To Warren [Buffett], the source of the earnings is always more important than the earnings themselves"
         let wb10 = "Warren [Buffett] knows that one of the great secrets to making more money is spending less money"

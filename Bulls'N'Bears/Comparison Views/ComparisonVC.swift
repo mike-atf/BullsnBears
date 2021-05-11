@@ -40,7 +40,7 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
             self.view.addSubview(label)
             shareNameLabels?.append(label)
             
-            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 330 + 150*count).isActive = true
+            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 455 + 150*count).isActive = true
             label.topAnchor.constraint(equalTo: titleLabel.bottomAnchor,constant: 10).isActive = true
             if previousLabel != nil {
                 previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
@@ -77,7 +77,7 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath == IndexPath(row: 0, section: 0) { return 200 }
-        else { return 50 }
+        else { return 75 }
     }
     
     /*

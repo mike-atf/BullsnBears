@@ -87,6 +87,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 
         controller.delegate = self
         controller.pricesUpdateDelegate = self
+        controller.viewController = self
                 
         if controller.fetchedObjects?.count ?? 0 > 0 {
             showCitation()

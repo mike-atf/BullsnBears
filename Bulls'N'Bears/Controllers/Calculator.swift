@@ -10,9 +10,43 @@ import Foundation
 
 class Calculator {
     
+    ///calculates the compound growth rate from startValue to endValue, assuming years' time between the two
+    /// end- and startValue must be either both positive or both negative, otherwise 0 as rate is returned
+    /// if both are negative and 'inverse' negative rate is returned
     class func compoundGrowthRate(endValue: Double, startValue: Double, years: Double) -> Double {
         
-        return (pow((endValue / startValue) , (1/(years-1))) - 1)
+//        guard endValue * startValue >= 0 else {
+//            return 0
+//        }
+        
+        let rate = pow((endValue / startValue) , (1/years)) - 1// (years-1)
+        if endValue < 0 { return rate * -1 }
+        else { return rate }
+    }
+
+    /// returns a time-DESCENDING array (n-1 elements) of the compound growth rates from all values to the first value in the array ('end value')
+    /// the array should be in time DESCENDING order and the time between each element is assumed to one year
+    /// any placeholder (Double()) element will return a growthRate placeholder element (Double())
+    class func compoundGrowthRates(values: [Double]?) -> [Double]? {
+        
+        guard let array = values else {
+            return nil
+        }
+        
+        guard let endValue = array.first else {
+            return nil
+        }
+        
+        var rates = [Double]()
+        
+        for i in 1..<array.count {
+            if array[i] != 0 && array[i] != Double() {
+                let rate = compoundGrowthRate(endValue: endValue, startValue: array[i], years: Double(i))
+                rates.append(rate)
+            } else { rates.append(Double()) }
+        }
+        
+        return rates
     }
 
     class func futureValue(present: Double, growth: Double, years: Double) -> Double {
@@ -59,11 +93,14 @@ class Calculator {
             return nil
         }
         
-        // Removing any empty Double() elements
+        // Removing any empty Double() or NaN elements
         
         var elementsToRemove = [Int]()
         for i in 0..<xArray!.count {
             if xArray![i] == Double() || yArray![i] == Double() {
+                elementsToRemove.append(i)
+            }
+            else if xArray![i].isNaN || yArray![i].isNaN {
                 elementsToRemove.append(i)
             }
         }
@@ -125,7 +162,7 @@ class Calculator {
         return Correlation(m: m, b: b, r: r, xElements: cleanedArrayX.count)
     }
     
-    /// returns the proportions of first array / second array
+    /// returns the proportions of array1 /  array0
     class func proportions(array1: [Double]?, array0: [Double]?) -> [Double]? {
         
         guard let values1 = array1 else {
@@ -159,14 +196,17 @@ class Calculator {
     }
     
     
+    /// if two arrays are received ignores array 1 and assumes array 2 contains proportions - returns the Correlation of the proportions and years/ time of the two
+    /// if one array is received returns the correlation between array values and time/ years
     class func valueChartCorrelation(arrays: [[Double]?]?) -> Correlation? {
         
+        // NaN is frequently passed in compound Growth rates
         guard let array1 = arrays?.first else {
             return nil
         }
         
         var array2: [Double]?
-        if arrays?.count ?? 0 > 0 {
+        if arrays?.count ?? 0 > 1 {
             array2 = arrays![1]
         }
         

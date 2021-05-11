@@ -389,6 +389,37 @@ public class WBValuation: NSManagedObject {
 
     }
     
+    public func ltDebtPerAdjEquityProportion() -> (Double?, Double?, [String]?) {
+        
+        var errors: [String]?
+        let (shEquityWithRetEarnings, error) = addElements(array1: shareholdersEquity ?? [], array2: equityRepurchased ?? [])
+        
+        if error != nil {
+            errors = [error!]
+        }
+        let first3Average = shEquityWithRetEarnings?.average(of: 3)
+        let (proportions, es$) = proportions(array1: shEquityWithRetEarnings, array2: debtLT)
+        if es$ != nil {
+            if errors != nil { errors?.append(contentsOf: es$!) }
+            else { errors = es$! }
+        }
+        let average = proportions.ema(periods: 7)
+
+        return (first3Average, average, errors)
+    }
+    
+    public func ltDebtPerAdjEquityProportions() -> [Double]? {
+        
+        let (shEquityWithRetEarnings, _) = addElements(array1: shareholdersEquity ?? [], array2: equityRepurchased ?? [])
+        let first3Average = shEquityWithRetEarnings?.average(of: 3)
+        if first3Average ?? 0 > 0 {
+            let (proportions, _) = proportions(array1: shEquityWithRetEarnings, array2: debtLT)
+            return proportions
+        }
+        
+        return nil
+    }
+    
     func valuesSummaryScores() -> RatingCircleData? {
         
         let weights = ShareFinancialsValueWeights()

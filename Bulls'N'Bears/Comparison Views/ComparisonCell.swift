@@ -12,20 +12,31 @@ class ComparisonCell: UITableViewCell {
     @IBOutlet var rowTitleLabel: UILabel!
     
     var valueLabels: [UILabel]?
+    var legendLabel: UILabel?
     var textViews: [UITextView]?
     var trendIcons: [TrendIconView2]?
     var controller: ComparisonController!
     
-    let columnWidth: CGFloat = 200
-    let firstColumnInset: CGFloat = 300
+    let columnWidth: CGFloat = 150
+    let firstColumnInset: CGFloat = 350
+    var margins: UILayoutGuide!
+    let financialsFontSize: CGFloat = 16
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        
+        rowTitleLabel.numberOfLines = 0
+        rowTitleLabel.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
 
     }
     
     override func prepareForReuse() {
         rowTitleLabel.text = "Row title"
+        for constraint in legendLabel?.constraints ?? [] {
+            legendLabel?.removeConstraint(constraint)
+        }
+        legendLabel?.removeFromSuperview()
+        
         for label in valueLabels ?? [] {
             label.removeFromSuperview()
         }
@@ -43,7 +54,9 @@ class ComparisonCell: UITableViewCell {
     }
     
     func configure(controller: ComparisonController, cellPath: IndexPath) {
+        
         self.controller = controller
+        margins = contentView.layoutMarginsGuide
         rowTitleLabel.text = controller.titleForRow(for: cellPath)
 
         if cellPath == IndexPath(row: 0, section: 0) {
@@ -53,7 +66,23 @@ class ComparisonCell: UITableViewCell {
             createLabels(cellPath: cellPath)
         }
         else {
-            createIconCellContent(cellPath: cellPath)
+            legendLabel = {
+                let label = UILabel()
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.font = UIFont.systemFont(ofSize: financialsFontSize)
+                label.text = cellPath.section < 6 ? "EMA:\n>10%:\nTrend:" : "EMA:\n<0%:\nTrend:"
+                label.textAlignment = .right
+                label.numberOfLines = 0
+                label.sizeToFit()
+                return label
+            }()
+            self.contentView.addSubview(legendLabel!)
+            legendLabel!.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset-10).isActive = true
+            legendLabel!.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+            legendLabel!.leadingAnchor.constraint(greaterThanOrEqualTo: rowTitleLabel.trailingAnchor, constant: 10).isActive = true
+            
+//            createIconCellContent(cellPath: cellPath)
+            createFinancialsTexts(cellPath: cellPath)
         }
     }
     
@@ -63,7 +92,6 @@ class ComparisonCell: UITableViewCell {
         valueLabels = [UILabel]()
 
         var count: CGFloat = 0
-        let margins = contentView.layoutMarginsGuide
         
         var previousLabel: UILabel?
         for string in strings {
@@ -71,19 +99,26 @@ class ComparisonCell: UITableViewCell {
             let label: UILabel = {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
-                label.font = UIFont.preferredFont(forTextStyle: .body)
+                label.font = UIFont.systemFont(ofSize: financialsFontSize)
                 label.text = string
+                label.numberOfLines = 0
                 label.sizeToFit()
                 return label
             }()
             self.contentView.addSubview(label)
             valueLabels?.append(label)
             
-            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
+            label.leadingAnchor.constraint(greaterThanOrEqualTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
             label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-            if previousLabel != nil {
-                previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
-            }
+            label.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1)).isActive = true
+//            if previousLabel != nil {
+//                previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
+//            }
+//            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
+//            label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+//            if previousLabel != nil {
+//                previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
+//            }
             previousLabel = label
             count += 1
         }
@@ -96,7 +131,6 @@ class ComparisonCell: UITableViewCell {
         textViews = [UITextView]()
 
         var count: CGFloat = 0
-        let margins = contentView.layoutMarginsGuide
         
         for string in strings {
             
@@ -107,6 +141,7 @@ class ComparisonCell: UITableViewCell {
                 view.text = string
                 view.sizeToFit()
                 view.showsHorizontalScrollIndicator = false
+                view.backgroundColor = contentView.backgroundColor
                 return view
             }()
             self.contentView.addSubview(textView)
@@ -115,7 +150,7 @@ class ComparisonCell: UITableViewCell {
             textView.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth * count).isActive = true
             textView.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
             textView.bottomAnchor.constraint(equalTo: margins.bottomAnchor).isActive = true
-            textView.widthAnchor.constraint(equalToConstant: 140).isActive = true
+            textView.widthAnchor.constraint(equalToConstant: columnWidth-10).isActive = true
             count += 1
         }
 
@@ -124,13 +159,12 @@ class ComparisonCell: UITableViewCell {
     private func createIconCellContent(cellPath: IndexPath) {
         
         let strings = controller.rowTexts(forPath: cellPath)
+        
         let (correlations, values) = controller.fundamentals(forPath: cellPath)
         trendIcons = [TrendIconView2]()
         valueLabels = [UILabel]()
 
         var count: CGFloat = 0
-        let margins = contentView.layoutMarginsGuide
-        
         for string in strings {
             
             let iconView = TrendIconView2(frame: CGRect.zero)
@@ -169,7 +203,45 @@ class ComparisonCell: UITableViewCell {
             label.widthAnchor.constraint(equalToConstant: 75).isActive = true
             count += 1
         }
+    }
+    
+    private func createFinancialsTexts(cellPath: IndexPath) {
+        
+        let texts = controller.financialsTexts(forPath: cellPath)
+        valueLabels = [UILabel]()
 
+        var count: CGFloat = 0
+        
+        var previousLabel: UILabel?
+
+        for triplet in texts ?? [] {
+            
+            guard triplet.count > 2 else {
+                return
+            }
+            
+            let label: UILabel = {
+                let label = UILabel()
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.numberOfLines = 0
+                label.font = UIFont.systemFont(ofSize: financialsFontSize)
+                label.text = triplet[0] + "\n" + triplet[1] + "\n" + triplet[2]
+                label.textAlignment = .right
+                label.sizeToFit()
+                return label
+            }()
+            self.contentView.addSubview(label)
+            valueLabels?.append(label)
+            
+            label.leadingAnchor.constraint(greaterThanOrEqualTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
+            label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+            label.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1)).isActive = true
+//            if previousLabel != nil {
+//                previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
+//            }
+            previousLabel = label
+            count += 1
+        }
     }
 
 }

@@ -33,6 +33,7 @@ class StocksController: NSFetchedResultsController<Share> {
     var backgroundContext: NSManagedObjectContext?
     /// in time-DESCENDING order
     var treasuryBondYields: [PriceDate]?
+    var viewController: StocksListTVC?
             
     //Mark:- shares price update functions
     
@@ -97,14 +98,14 @@ class StocksController: NSFetchedResultsController<Share> {
             
             guard errorOrNil == nil else {
                 DispatchQueue.main.async {
-                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download Treasury Bond Yields due to error \(errorOrNil!.localizedDescription)", viewController: nil, delegate: nil)
+                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download Treasury Bond Yields due to error \(errorOrNil!.localizedDescription)", viewController: viewController?.splitViewController, delegate: nil)
                 }
                 return
             }
             
             guard responseOrNil != nil else {
                 DispatchQueue.main.async {
-                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download Treasury Bond Yieldsdue to error \(String(describing: responseOrNil!.textEncodingName))", viewController: nil, delegate: nil)
+                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download Treasury Bond Yieldsdue to error \(String(describing: responseOrNil!.textEncodingName))", viewController: viewController?.splitViewController, delegate: nil)
                 }
                 return
             }

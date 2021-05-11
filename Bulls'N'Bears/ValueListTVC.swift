@@ -91,7 +91,10 @@ class ValueListTVC: UITableViewController {
         else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
 
-                    cell.configure(values1: values?[indexPath.section-2], values2: proportions, rightTitle: cellLegendTitles[1], leftTitle: cellLegendTitles.first)
+            let barChartValues = (values?.count ?? 0 > 1) ? proportions : values?[indexPath.section-2]
+            let trendLineChartValues = (values?.count ?? 0 > 1) ? Calculator.compoundGrowthRates(values: proportions) : proportions
+
+            cell.configure(values1: barChartValues, values2: trendLineChartValues, rightTitle: cellLegendTitles[1], leftTitle: cellLegendTitles.first)
             return cell
         }
         
