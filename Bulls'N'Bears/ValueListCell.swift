@@ -11,7 +11,6 @@ class ValueListCell: UITableViewCell, UITextFieldDelegate {
 
     @IBOutlet var title: UILabel!
     @IBOutlet var chartView: ValueChart!
-    @IBOutlet var leftLowerLabel: UILabel!
     @IBOutlet var rightLowerLabel: UILabel!
     
     override func awakeFromNib() {
@@ -22,26 +21,18 @@ class ValueListCell: UITableViewCell, UITextFieldDelegate {
 
     
     override func prepareForReuse() {
-        self.title.text = "T-G"
+        self.title.text = " "
         rightLowerLabel.text = " "
-        leftLowerLabel.text = " "
-        self.chartView.configure(array1: nil, array2: nil, trendLabel: title)
+        self.chartView.configure(array: nil, trendLabel: title, valuesAreGrowth: false)
     }
     
     /// values1 contains valuation figures, values2 (optional) has the proportions either comnpared to another set of figures, or element-on-element growth
-    public func configure(values1: [Double]?, values2: [Double]?, rightTitle: String?, leftTitle: String?) {
+    public func configure(values: [Double]?, rightTitle: String?, valuesAreGrowth: Bool, valuesAreProportions:Bool? = false) {
                 
         rightLowerLabel.text = rightTitle
-        rightLowerLabel.textColor = UIColor.systemGray
-        if let title = leftTitle {
-            leftLowerLabel.text = title
-            leftLowerLabel.textColor = UIColor.systemYellow
-        } else {
-            leftLowerLabel.text = "correlation"
-            leftLowerLabel.textColor = UIColor.label
-        }
+        rightLowerLabel.textColor = UIColor.label
         
-        chartView.configure(array1: values1, array2: values2, trendLabel: title)
+        chartView.configure(array: values, trendLabel: title, valuesAreGrowth: valuesAreGrowth,valuesAreProportions:valuesAreProportions)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

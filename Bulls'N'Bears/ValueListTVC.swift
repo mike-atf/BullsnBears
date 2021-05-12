@@ -62,7 +62,8 @@ class ValueListTVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-            return 1
+        if section < 2 { return 1 }
+        else { return 2 }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -90,11 +91,23 @@ class ValueListTVC: UITableViewController {
         }
         else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
+            
+            if indexPath.row == 0 {
+                // chart of values
+                let barChartValues = (values?.count ?? 0 > 1) ? proportions : values?[indexPath.section-2]
+                let valuesAreProportions = (values?.count ?? 0 > 1)
+//                let barChartValues = values?[indexPath.section-2]
+                cell.configure(values: barChartValues, rightTitle: cellLegendTitles.first, valuesAreGrowth: false, valuesAreProportions: valuesAreProportions)
+// leftTile: cellLegendTitles.first
+            }
+            else if indexPath.row == 1 {
+                // chart of growth
+//                let trendLineChartValues = (values?.count ?? 0 > 1) ? Calculator.compoundGrowthRates(values: proportions) : proportions
+                let trendLineChartValues = (values?.count ?? 0 > 1) ? Calculator.compoundGrowthRates(values: proportions) : proportions
+                let rowtitle = "Compound growth rates of " + cellLegendTitles.first!
+                cell.configure(values: trendLineChartValues, rightTitle: rowtitle, valuesAreGrowth: true)
+            }
 
-            let barChartValues = (values?.count ?? 0 > 1) ? proportions : values?[indexPath.section-2]
-            let trendLineChartValues = (values?.count ?? 0 > 1) ? Calculator.compoundGrowthRates(values: proportions) : proportions
-
-            cell.configure(values1: barChartValues, values2: trendLineChartValues, rightTitle: cellLegendTitles[1], leftTitle: cellLegendTitles.first)
             return cell
         }
         
@@ -107,7 +120,7 @@ class ValueListTVC: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 { return 100 }
         else if indexPath.section == 1 { return 120 }
-        else { return 440 }
+        else { return 200 }
     }
 
 }

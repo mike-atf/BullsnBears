@@ -23,24 +23,43 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var downloadErrors = [String]()
     var downloader: WebDataDownloader?
     var valueListChartLegendTitles = [
-        [["Comp. Growth","Revenue"],
-         ["Comp. Growth","Net income"],
-         ["Comp. Growth","net income / revenue","revenue"],
-         ["Comp. Growth","Ret. earnings"],
-         ["Comp. Growth","EPS"],
-         ["Comp. Growth","profit / revenue","revenue"],
-         ["Comp. Growth","Op. cash flow"]
+        [["Revenue"],
+         ["Net income"],
+         ["net income / revenue"],
+         ["Ret. earnings"],
+         ["EPS"],
+         ["profit / revenue"],
+         ["Op. cash flow"]
         ],
         [
-         ["Comp. Growth","Return on equity"],
-         ["Comp. Growth","Return on assets"],
-         ["Comp. Growth","lt debt / adj. equity","equity + ret. earnings"]
+         ["Return on equity"],
+         ["Return on assets"],
+         ["lt debt / adj. equity"]
         ],
-        [["Comp. Growth","cap.expend / earnings","earnings"],
-         ["Comp. Growth"," LT debt / net income","revenue"],
-         ["Comp. Growth","SGA / profit","profit"],
-         ["Comp. Growth","R&D / profit","profit"]
+        [["cap.expend / earnings"],
+         [" LT debt / net income"],
+         ["SGA / profit"],
+         ["R&D / profit"]
         ]]
+
+//        [["Comp. Growth","Revenue"],
+//         ["Comp. Growth","Net income"],
+//         ["Comp. Growth","net income / revenue","revenue"],
+//         ["Comp. Growth","Ret. earnings"],
+//         ["Comp. Growth","EPS"],
+//         ["Comp. Growth","profit / revenue","revenue"],
+//         ["Comp. Growth","Op. cash flow"]
+//        ],
+//        [
+//         ["Comp. Growth","Return on equity"],
+//         ["Comp. Growth","Return on assets"],
+//         ["Comp. Growth","lt debt / adj. equity","equity + ret. earnings"]
+//        ],
+//        [["Comp. Growth","cap.expend / earnings","earnings"],
+//         ["Comp. Growth"," LT debt / net income","revenue"],
+//         ["Comp. Growth","SGA / profit","profit"],
+//         ["Comp. Growth","R&D / profit","profit"]
+//        ]]
     var wbvParameters = WBVParameters()
     
     //MARK: - init

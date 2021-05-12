@@ -120,21 +120,21 @@ struct WBVParameters {
     // when adding new parameter check impact in WBVValuationController and WBVValuationTVC and ValueListTVC
     // also adapt 'higherIsBetter' parameter in UserEvaluation
     // careful - the '/' characters are used in ValueListVC to determine the charts to show
-    let revenueGrowth = "Revenue growth"
-    let earnigsGrowth = "Earnings growth"
-    let retEarningsGrowth = "Ret. earnings growth"
-    let epsGrowth = "EPS"
-    let incomeOfRevenueGrowth = "Net income / revenue growth"
-    let profitOfRevenueGrowth = "Profit / revenue growth"
-    let capExpendOfEarningsGrowth = "Cap. expend / net income growth"
-    let earningsToPERratio = "Growth of earnings / pe ratio"
-    let debtOfIncomeGrowth = "Growth of LT debt / net income"
-    let opCashFlowGrowth = "Growth of op. cash flow"
-    let roeGrowth = "Growth of return on equity"
-    let roaGrowth = "Growth of return on assets"
-    let debtOfEqAndRtEarningsGrowth = "Growth of LT debt / equity + ret. earnings"
-    let sgaOfProfitGrowth = "Growth of SGA / profit"
-    let rAdOfProfitGrowth = "Growth of R&D / profit"
+    let revenueGrowth = "Revenue and its compound growth"
+    let earnigsGrowth = "Net earnings and their compound growth"
+    let retEarningsGrowth = "Ret. earnings and their compound growth"
+    let epsGrowth = "EPS and its compound growth"
+    let incomeOfRevenueGrowth = "[Net income / revenue] and its compound growth"
+    let profitOfRevenueGrowth = "[Profit / revenue] and its compound growth"
+    let capExpendOfEarningsGrowth = "[Cap. expend / net income] and its compound growth"
+    let earningsToPERratio = "[Earnings / pe ratio] and its compound growth"
+    let debtOfIncomeGrowth = "[LT debt / net income] and its compound growth"
+    let opCashFlowGrowth = "Op. cash flow and its compound growth"
+    let roeGrowth = "Return on equity and its compound growth"
+    let roaGrowth = "Rturn on assets and its compound growth"
+    let debtOfEqAndRtEarningsGrowth = "[LT debt / adj. equity] and its compound growth"
+    let sgaOfProfitGrowth = "[SGA / profit] and its compound growth"
+    let rAdOfProfitGrowth = "[R&D / profit]  and its compound growth"
     
     func allParameters() -> [String] {
         return [earnigsGrowth,retEarningsGrowth, epsGrowth, incomeOfRevenueGrowth, profitOfRevenueGrowth, capExpendOfEarningsGrowth, debtOfIncomeGrowth, roeGrowth, roaGrowth ,debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth ,rAdOfProfitGrowth]
