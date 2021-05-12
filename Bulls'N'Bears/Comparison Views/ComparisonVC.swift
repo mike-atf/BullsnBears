@@ -14,6 +14,7 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     @IBOutlet var tableView: UITableView!
     @IBOutlet var toolBarView: UIView!
     @IBOutlet var titleLabel: UILabel!
+    @IBOutlet var shareNamesView: UIView!
     
     
     var controller: ComparisonController!
@@ -25,7 +26,7 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
 
         controller = ComparisonController(shares: shares, viewController: self)
         
-        let margins = self.view.safeAreaLayoutGuide
+        let margins = shareNamesView.safeAreaLayoutGuide
         var previousLabel: UILabel?
         var count: CGFloat = 0.0
         for share in shares ?? [] {
@@ -37,11 +38,12 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
                 label.sizeToFit()
                 return label
             }()
-            self.view.addSubview(label)
+            shareNamesView.addSubview(label)
             shareNameLabels?.append(label)
             
             label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 455 + 150*count).isActive = true
-            label.topAnchor.constraint(equalTo: titleLabel.bottomAnchor,constant: 10).isActive = true
+            label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+//            label.topAnchor.constraint(equalTo: titleLabel.bottomAnchor,constant: 10).isActive = true
             if previousLabel != nil {
                 previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
             }

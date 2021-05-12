@@ -600,8 +600,15 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pXA-jR-ADe">
                                 <rect key="frame" x="0.0" y="128" width="1180" height="692"/>
                                 <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xaJ-pa-yMQ">
+                                        <rect key="frame" x="0.0" y="0.0" width="1414" height="60"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="60" id="Nwk-Fg-cm0"/>
+                                        </constraints>
+                                    </view>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="iO9-hW-Vne">
-                                        <rect key="frame" x="0.0" y="0.0" width="1414" height="692"/>
+                                        <rect key="frame" x="0.0" y="60" width="1414" height="632"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="1414" id="2eU-1a-fEz"/>
@@ -638,11 +645,14 @@
                                     </tableView>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="xaJ-pa-yMQ" firstAttribute="leading" secondItem="iO9-hW-Vne" secondAttribute="leading" id="37D-C8-upR"/>
+                                    <constraint firstItem="5WE-Sp-LtO" firstAttribute="top" secondItem="xaJ-pa-yMQ" secondAttribute="top" id="AVZ-iF-aZb"/>
                                     <constraint firstItem="iO9-hW-Vne" firstAttribute="bottom" secondItem="9NN-bh-5i9" secondAttribute="bottom" id="OwN-bo-1iA"/>
                                     <constraint firstItem="iO9-hW-Vne" firstAttribute="leading" secondItem="pXA-jR-ADe" secondAttribute="leading" id="P3u-AQ-VPZ"/>
                                     <constraint firstAttribute="trailing" secondItem="iO9-hW-Vne" secondAttribute="trailing" id="TWi-LE-fn6"/>
                                     <constraint firstItem="iO9-hW-Vne" firstAttribute="bottom" secondItem="5WE-Sp-LtO" secondAttribute="bottom" id="Y5S-NZ-gFX"/>
-                                    <constraint firstItem="iO9-hW-Vne" firstAttribute="top" secondItem="5WE-Sp-LtO" secondAttribute="top" id="feH-Zh-ppQ"/>
+                                    <constraint firstItem="xaJ-pa-yMQ" firstAttribute="trailing" secondItem="iO9-hW-Vne" secondAttribute="trailing" id="dvx-rv-i7B"/>
+                                    <constraint firstItem="iO9-hW-Vne" firstAttribute="top" secondItem="xaJ-pa-yMQ" secondAttribute="bottom" id="iYA-bi-wba"/>
                                 </constraints>
                                 <viewLayoutGuide key="contentLayoutGuide" id="5WE-Sp-LtO"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="9NN-bh-5i9"/>
@@ -662,6 +672,7 @@
                     </view>
                     <connections>
                         <outlet property="horizontalScrollView" destination="pXA-jR-ADe" id="DOm-yB-OJ8"/>
+                        <outlet property="shareNamesView" destination="xaJ-pa-yMQ" id="EFF-TG-E3I"/>
                         <outlet property="tableView" destination="iO9-hW-Vne" id="BZA-yT-87K"/>
                         <outlet property="titleLabel" destination="e21-RP-5wh" id="0OZ-mR-HyO"/>
                         <outlet property="toolBarView" destination="VCh-Ud-hMe" id="eRh-CX-oVc"/>
