@@ -144,7 +144,7 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
         }
         else if section == webpages[4] {
            
-            result = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: "Revenue estimate</span>", rowTitle: "Sales growth (year/est)")
+            result = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: "Revenue estimate</span>", rowTitle: "Sales growth (year/est)</span>")
             downloadErrors.append(contentsOf: result.errors)
             if let validResult = result.array?.reversed() {
                 var growth = [validResult.last!]
@@ -159,7 +159,7 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
             }
         } else if section == webpages[5] {
 
-            result = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: "Cash flow</span>", rowTitle: "Operating cash flow")
+            result = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: "Cash flow</span>", rowTitle: "Operating cash flow</span>")
             downloadErrors.append(contentsOf: result.errors)
             share.rule1Valuation?.opCashFlow = result.array?.first ?? Double()
 
@@ -170,7 +170,7 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
             let rowTitles = ["Purchases","Sales","Total insider shares held"]
             
             for rtitle in rowTitles {
-                result = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: "Insider purchases - Last 6 months</span>", rowTitle: rtitle, rowTerminal: "</td></tr>", numberTerminal: "</td>")
+                result = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, sectionHeader: "Insider purchases - Last 6 months</span>", rowTitle: rtitle+"</span>", rowTerminal: "</td></tr>", numberTerminal: "</td>")
                 downloadErrors.append(contentsOf: result.errors)
                 if rtitle.contains("Purchases") {
                     share.rule1Valuation?.insiderStockBuys = result.array?.last ?? Double()

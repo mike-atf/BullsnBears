@@ -43,6 +43,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
             
             // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
+            
+            appActivatedFromBackground = true // leads to price update tasks in StocksController
 
             let inboxFolder = documentFolder + "/Inbox"
             

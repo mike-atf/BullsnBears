@@ -16,6 +16,8 @@ extension Share {
         return NSFetchRequest<Share>(entityName: "Share")
     }
 
+    @NSManaged public var lastLivePrice: Double
+    @NSManaged public var lastLivePriceDate: Date?
     @NSManaged public var macd: Data?
     @NSManaged public var divYieldCurrent: Double
     @NSManaged public var watchStatus: Int16 // // 0 watchList, 1 owned, 2 archived

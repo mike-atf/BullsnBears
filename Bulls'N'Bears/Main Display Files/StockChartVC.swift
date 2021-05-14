@@ -47,6 +47,10 @@ class StockChartVC: UIViewController {
         r1ErrorsButton.isHidden = true
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        chart.chartPricesView.currentLabelRefreshTimer?.invalidate()
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -61,10 +65,8 @@ class StockChartVC: UIViewController {
         
         loadViewIfNeeded() // leave! essential
         
-//        updateCharts {
-//            self.setValuationTexts()
-//        }
         if let validChart = chart {
+            chart.chartPricesView.currentLabelRefreshTimer?.invalidate() // when changing a stock invalidate current price update timer of any previously displayed share
             if let validShare = share {
                 validChart.configure(with: validShare)
             }
@@ -72,18 +74,7 @@ class StockChartVC: UIViewController {
 
         setValuationTexts()
     }
-    
-//    private func updateCharts(completion: (@escaping () -> Void)) {
-//
-//        if let validChart = chart {
-//            if let validShare = share {
-//                validChart.configure(with: validShare)
-//            }
-//        }
-//
-//        completion()
-//    }
-    
+        
     func setValuationTexts() {
         refreshDCFLabel()
         refreshR1Label()

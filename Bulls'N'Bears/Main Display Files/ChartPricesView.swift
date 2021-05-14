@@ -11,6 +11,7 @@ class ChartPricesView: UIView {
     
     var lowestPriceInRange: Double?
     var highestPriceInRange: Double?
+    var share: Share!
     
     var minPrice: Double!
     var maxPrice: Double!
@@ -28,7 +29,23 @@ class ChartPricesView: UIView {
     var labelVerticalConstraints = [NSLayoutConstraint]()
     var topMargin: CGFloat = 0
     var verticalHeightFactor: CGFloat = 1.0
+    var currentLabelRefreshTimer: Timer?
     
+    let timeFormatter: RelativeDateTimeFormatter = {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.dateTimeStyle = .numeric
+        formatter.unitsStyle = .abbreviated
+        return formatter
+    }()
+    
+    let dateTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+//        formatter.dateFormat = "dd.MM"
+        formatter.timeStyle = .short
+        return formatter
+    }()
+
+
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -46,7 +63,8 @@ class ChartPricesView: UIView {
     func configure(share: Share?, topMargin: CGFloat? = 0, verticalHeightFactor: CGFloat? = 1.0) {
         
         guard let validShare = share else { return }
-
+        self.share = validShare
+        
         lowestPriceInRange = validShare.lowestPrice()
         highestPriceInRange = validShare.highestPrice()
         
@@ -60,22 +78,33 @@ class ChartPricesView: UIView {
         minPrice = (lowestPriceInRange! * 0.9).rounded()
         maxPrice = (highestPriceInRange! * 1.1).rounded() + 1
         
-        if let validPrice = share?.latestPrice(option: .close) {
+        let nonNullLivePrice = (share?.lastLivePrice != 0.0) ? share?.lastLivePrice : nil
+        if let validPrice = nonNullLivePrice ?? share?.latestPrice(option: .close) {
             currentPrice = validPrice
+            
+            let priceDate = share?.lastLivePriceDate ?? share?.getDailyPrices()?.last?.tradingDate
             
             currentPriceLabel = {
                 let label = UILabel()
-                label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                label.font = UIFont.systemFont(ofSize: 13)
                 label.textColor = UIColor(named: "antiLabel")!
                 label.textAlignment = .right
+                label.numberOfLines = 0
                 label.text = " " + currencyFormatterNoGapWithPence.string(from: NSNumber(value: validPrice))! + " "
+                if let date = priceDate { label.text! += "\n " + timeFormatter.localizedString(for: date, relativeTo: Date()) + " " }
+//                if let date = priceDate { label.text! += "\n " + dateTimeFormatter.string(from: date) + " " }
                 label.sizeToFit()
                 label.backgroundColor = UIColor.label
                 label.isHidden = true
                 self.addSubview(label)
                 return label
             }()
-
+            
+            if share?.lastLivePriceDate != nil {
+               currentLabelRefreshTimer = Timer(timeInterval: 120, target: self, selector: #selector(refreshCurrentLabel), userInfo: nil, repeats: true)
+                currentLabelRefreshTimer?.tolerance = 1.0
+                RunLoop.current.add(currentLabelRefreshTimer!, forMode: .common) // makes refresh independent of user interacting with App while time fires, which would block the timer execution.
+            }
         }
 
         let step = findYAxisValues(min: minPrice, max: maxPrice)
@@ -85,7 +114,7 @@ class ChartPricesView: UIView {
             let newLabel: UILabel = {
                 let label = UILabel()
 
-                label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                label.font = UIFont.systemFont(ofSize: 13)
                 label.textAlignment = .right
                 label.text = currencyFormatterNoGapWithPence.string(from: NSNumber(value: labelPrice))
                 label.sizeToFit()
@@ -158,7 +187,8 @@ class ChartPricesView: UIView {
                         
                         buySellPriceLabel = {
                             let label = UILabel()
-                            label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                            label.font = UIFont.systemFont(ofSize: 13)
+                            label.textColor = UIColor.white
                             label.textAlignment = .right
                             label.text = " " + price$ + " "
                             label.sizeToFit()
@@ -263,6 +293,18 @@ class ChartPricesView: UIView {
         }
 
         
+    }
+    
+    @objc
+    func refreshCurrentLabel() {
+        
+        let nonNullLivePrice = (share.lastLivePrice != 0.0) ? share.lastLivePrice : nil
+        if let validPrice = nonNullLivePrice ?? share.latestPrice(option: .close) {
+            currentPriceLabel?.text = " " + currencyFormatterNoGapWithPence.string(from: NSNumber(value: validPrice))! + " "
+            if let date = share.lastLivePriceDate { currentPriceLabel?.text! += "\n " + timeFormatter.localizedString(for: date, relativeTo: Date()) + " " }
+//            if let date = priceDate { currentPriceLabel.text! += "\n " + dateTimeFormatter.string(from: date) + " " }
+            currentPriceLabel?.sizeToFit()
+        }
     }
 
 }

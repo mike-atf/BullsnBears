@@ -71,10 +71,10 @@ class ChartTimeLineView: UIView {
                 
                 label.font = UIFont.systemFont(ofSize: 12)
                 label.textAlignment = .right
-                let text = sma10Crossing_v.signal < 0 ? " :Sell" : " :Buy"
-//                let signal$ = numberFormatter.string(from: sma10Crossing_v.signal as NSNumber) ?? "-"
-                label.text = dateFormatter.string(from: sma10Crossing_v.date) + text
+                let text = sma10Crossing_v.signal < 0 ? " :Sell " : " :Buy "
+                label.text = " " + dateFormatter.string(from: sma10Crossing_v.date) + text
                 label.backgroundColor = sma10Crossing_v.signal < 0 ? UIColor(named: "Red") : UIColor(named: "DarkGreen")
+                label.textColor = UIColor.white
                 label.sizeToFit()
                 self.addSubview(label)
                 label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
@@ -82,7 +82,6 @@ class ChartTimeLineView: UIView {
             }()
         }
         
-//        macdCrossing = share?.latestMCDCrossing()
         if let macdc_v = macdCrossing {
             macdLabel?.removeFromSuperview()
             macdLabel = {
@@ -91,10 +90,10 @@ class ChartTimeLineView: UIView {
                 
                 label.font = UIFont.systemFont(ofSize: 12)
                 label.textAlignment = .right
-                let text = macdc_v.signal < 0 ? " :Sell" : " :Buy"
-//                let signal$ = numberFormatter.string(from: macdc_v.signal as NSNumber) ?? "-"
-                label.text = dateFormatter.string(from: macdc_v.date) + text
+                let text = macdc_v.signal < 0 ? " :Sell " : " :Buy "
+                label.text = " " + dateFormatter.string(from: macdc_v.date) + text
                 label.backgroundColor = macdc_v.signal < 0 ? UIColor(named: "Red") : UIColor(named: "DarkGreen")
+                label.textColor = UIColor.white
                 label.sizeToFit()
                 self.addSubview(label)
                 label.topAnchor.constraint(equalTo: topAnchor, constant: 5).isActive = true
@@ -102,7 +101,6 @@ class ChartTimeLineView: UIView {
             }()
         }
         
-//        oscCrossing = share?.latestStochastikCrossing()
         if let osc_v = oscCrossing {
             oscLabel?.removeFromSuperview()
             oscLabel = {
@@ -111,10 +109,10 @@ class ChartTimeLineView: UIView {
                 
                 label.font = UIFont.systemFont(ofSize: 12)
                 label.textAlignment = .right
-                let text = osc_v.signal < 0 ? " :Sell" : " :Buy"
-//                let signal$ = numberFormatter.string(from: osc_v.signal as NSNumber) ?? "-"
-                label.text = dateFormatter.string(from: osc_v.date) + text
+                let text = osc_v.signal < 0 ? " :Sell " : " :Buy "
+                label.text = " " + dateFormatter.string(from: osc_v.date) + text
                 label.backgroundColor = osc_v.signal < 0 ? UIColor(named: "Red") : UIColor(named: "DarkGreen")
+                label.textColor = UIColor.white
                 label.sizeToFit()
                 self.addSubview(label)
                 label.topAnchor.constraint(equalTo: topAnchor, constant: 5).isActive = true
@@ -122,8 +120,6 @@ class ChartTimeLineView: UIView {
             }()
 
         }
-
-
     }
 
     private func getDateLabels() -> [UILabel] {

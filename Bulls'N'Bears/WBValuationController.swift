@@ -13,7 +13,7 @@ import WebKit
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     var sectionTitles = ["Key financials","Earnings & incomings", "Returns", "Outgoings & debt"]
-    var sectionSubTitles = ["from Yahoo finance","Growth trend EMA","Growth trend EMA","Growth trend EMA"]
+    var sectionSubTitles = ["from Yahoo finance","Trend & growth EMA","Trend & growth EMA","Trend & Ratio"]
     var rowTitles: [[String]]!
     var share: Share!
     var valuation: WBValuation?
@@ -195,6 +195,12 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         return datedTitles[section]
     }
+    
+    public func sectionSubHeaderText(section: Int) -> String {
+        
+        return sectionSubTitles[section]
+    }
+
 
     public func value$(path: IndexPath) -> (String, UIColor?, [String]?) {
         
@@ -356,11 +362,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 return (value$,color,errors)
             case 6:
             // op. cash flow
-//                let fcfGrowth = valuation?.opCashFlow?.filter({ (element) -> Bool in
-//                    if element != 0.0 { return true }
-//                    else { return false }
-//                }).growthRates()
-                
                 let fcfGrowth = Calculator.compoundGrowthRates(values: valuation!.opCashFlow)
                 if let meanGrowth = fcfGrowth?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
@@ -377,10 +378,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             switch path.row {
             case 0:
             // ROE
-//                let roeGrowths = valuation?.roe?.filter({ (element) -> Bool in
-//                    if element != 0.0 { return true }
-//                    else { return false }
-//                }).growthRates()
                 let roeGrowths = Calculator.compoundGrowthRates(values: valuation!.roe)
                 if let meanGrowth = roeGrowths?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
@@ -521,9 +518,9 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
         return [["P/E ratio", "EPS", "Book value/share price","Lynch ratio","beta", "intr. value (10y)"],
-                ["Revenue growth EMA", "Net income growth EMA", "Net inc./ Revenue", "Ret. earnings  growth EMA", "EPS  growth EMA", "Profit margin growth EMA", "Op. cash flow growth EMA"],
-                ["Return on equity growth EMA", "Return on assets growth EMA","LT debt / adj.sh.equity"],
-                ["Cap. expend. / earnings (av.)", "LT Debt / net income", "SGA / profit", "R&D / profit"]
+                ["Revenue", "Net income", "Net inc./ Revenue (Trend & ratio)", "Ret. earnings", "EPS", "Profit margin (Trend & ratio)", "Op. cash flow"],
+                ["Return on equity", "Return on assets","LT debt / adj.sh.equity (Trend & ratio)"],
+                ["Cap. expend. / earnings", "LT Debt / net income", "SGA / profit", "R&D / profit"]
         ]
     }
         

@@ -176,9 +176,9 @@ class ChartView: UIView {
 
         
         //MARK: - current price line
-        
-        if let dailyPrices = share?.getDailyPrices(){
-            if let currentPrice = dailyPrices.last?.close {
+        let nonNullLivePrice = (share?.lastLivePrice != 0.0) ? share?.lastLivePrice : nil
+        if let dailyPrices = share?.getDailyPrices() {
+            if let currentPrice = nonNullLivePrice ?? dailyPrices.last?.close {
                 let currentPriceLine = UIBezierPath()
                 let pp1 = PriceDate(dailyPrices.first!.tradingDate, currentPrice)
                 let pp2 = PriceDate(dailyPrices.last!.tradingDate, currentPrice)
@@ -194,63 +194,63 @@ class ChartView: UIView {
       
                 //MARK: - DCF Label
                 
-                for label in valuationLabels {
-                    label.removeFromSuperview()
-                }
-                valuationLabels.removeAll()
-
-                if let existingValuation = CombinedValuationController.returnDCFValuations(company: share!.symbol) {
-                    let (fairValue, errors) = existingValuation.returnIValue()
-                    if (fairValue ?? 0.0) > 0 {
-                        let ratio = currentPrice / fairValue!
-                        let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
-
-                        let newLabel: UILabel = {
-                            let label = UILabel()
-                            label.numberOfLines = 1
-                            label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                            label.textColor = UIColor(named: "antiLabel")
-                            label.backgroundColor = (errors.count == 0) ? UIColor.label : UIColor.systemYellow
-                            label.text = ratio$
-                            label.sizeToFit()
-                            
-                            let labelTop = endPoint.y - label.frame.height - 2
-                            
-                            label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
-                            return label
-                        }()
-                        valuationLabels.append(newLabel)
-                        addSubview(newLabel)
-                    }
-                }
+//                for label in valuationLabels {
+//                    label.removeFromSuperview()
+//                }
+//                valuationLabels.removeAll()
+//
+//                if let existingValuation = CombinedValuationController.returnDCFValuations(company: share!.symbol) {
+//                    let (fairValue, errors) = existingValuation.returnIValue()
+//                    if (fairValue ?? 0.0) > 0 {
+//                        let ratio = currentPrice / fairValue!
+//                        let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
+//
+//                        let newLabel: UILabel = {
+//                            let label = UILabel()
+//                            label.numberOfLines = 1
+//                            label.font = UIFont.preferredFont(forTextStyle: .footnote)
+//                            label.textColor = UIColor(named: "antiLabel")
+//                            label.backgroundColor = (errors.count == 0) ? UIColor.label : UIColor.systemYellow
+//                            label.text = ratio$
+//                            label.sizeToFit()
+//
+//                            let labelTop = endPoint.y - label.frame.height - 2
+//
+//                            label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
+//                            return label
+//                        }()
+//                        valuationLabels.append(newLabel)
+//                        addSubview(newLabel)
+//                    }
+//                }
                 
     //MARK: - R1 Label
                 // R1 Label
-                if let existingValuation = CombinedValuationController.returnR1Valuations(company: share!.symbol) {
-                    let (fairValue,errors) = existingValuation.stickerPrice()
-                        if (fairValue ?? 0) > 0 {
-                            let ratio = currentPrice / fairValue!
-                            let ratio$ = " GBV " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
-
-                            let newLabel: UILabel = {
-                                let label = UILabel()
-                                label.numberOfLines = 1
-                                label.font = UIFont.preferredFont(forTextStyle: .footnote)
-                                label.textColor = UIColor(named: "antiLabel")
-                                label.backgroundColor = (errors == nil) ? UIColor.label : UIColor.systemYellow
-                                label.text = ratio$
-                                label.sizeToFit()
-                                
-                                let labelTop = endPoint.y + 2
-                                
-                                label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
-                                return label
-                            }()
-                            valuationLabels.append(newLabel)
-                            addSubview(newLabel)
-                        }
-
-            }
+//                if let existingValuation = CombinedValuationController.returnR1Valuations(company: share!.symbol) {
+//                    let (fairValue,errors) = existingValuation.stickerPrice()
+//                        if (fairValue ?? 0) > 0 {
+//                            let ratio = currentPrice / fairValue!
+//                            let ratio$ = " GBV " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
+//
+//                            let newLabel: UILabel = {
+//                                let label = UILabel()
+//                                label.numberOfLines = 1
+//                                label.font = UIFont.preferredFont(forTextStyle: .footnote)
+//                                label.textColor = UIColor(named: "antiLabel")
+//                                label.backgroundColor = (errors == nil) ? UIColor.label : UIColor.systemYellow
+//                                label.text = ratio$
+//                                label.sizeToFit()
+//
+//                                let labelTop = endPoint.y + 2
+//
+//                                label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
+//                                return label
+//                            }()
+//                            valuationLabels.append(newLabel)
+//                            addSubview(newLabel)
+//                        }
+//
+//            }
         }
         }
         trendLabels.forEach { (label) in

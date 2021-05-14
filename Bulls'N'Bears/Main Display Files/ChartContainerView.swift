@@ -43,17 +43,6 @@ class ChartContainerView: UIView {
     
     var buttonDelegate: ChartButtonDelegate?
     var zoomFactor: CGFloat!
-//    var contentOffsetFromRight : CGFloat {
-//        set {
-//            self.scrollView.isScrollEnabled = false
-//            self.scrollView.setContentOffset(CGPoint(x: self.scrollView.contentSize.width - self.scrollView.frame.width, y: 0), animated: false)
-//            self.scrollView.isScrollEnabled = true
-//        }
-//        get {
-//            return self.scrollView.contentSize.width - self.scrollView.frame.width - self.scrollView.contentOffset.x
-//        }
-//    }
- 
     
     override init(frame: CGRect) {
         super.init(frame: frame)

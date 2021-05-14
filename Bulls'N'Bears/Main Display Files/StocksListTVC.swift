@@ -75,6 +75,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }()
     var wbValuationView: WBValuationTVC?
     var selectedSharesToCompare = Set<Share>()
+    var refreshControl: UIRefreshControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,9 +102,9 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         sortView.delegate = self
         sortView.label?.text = "Sorted by " + ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore")
         
-        updateShares()
-//        tableView.allowsMultipleSelection = true
-
+        tableView.refreshControl = UIRefreshControl()
+        tableView.refreshControl?.addTarget(self, action: #selector(updateShares), for: .valueChanged)
+        
 // temp
 //        self.controller.research()
 // temp
@@ -127,18 +128,28 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         
         tableView.reloadData()
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
         wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC
 
+        if appActivatedFromBackground {
+            updateShares()
+            appActivatedFromBackground = false
+        }
     }
     
+    @objc
     func updateShares() {
         
-        let weekDay = Calendar.current.component(.weekday, from: Date())
-        guard (weekDay > 1 && weekDay < 7) else {
-            return
+        DispatchQueue.main.async {
+            self.controller.updateLivePrices()
+            // also triggers other keyRatioUpdates after livePrice have been udpated
+        }
+        
+        DispatchQueue.main.async {
+            self.controller.updateTreasuryBondYields()
         }
         
         // jobs to do:
@@ -151,7 +162,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         // the merge happens in the saveContext() function of the AppDelegate
         // saving an NSManagedObject in it's moc can be done via e.g. .save(self.context?)
         
-        controller.updatePrices()
+        // the actual call is made in livePriceUpdated() to avoid creating two placeHolders in parallel that prevent updated values being saved
+        
         // returns to 'updateStocksComplete()' once complete
     }
 
@@ -396,7 +408,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         
-            
         DispatchQueue.main.async {
             self.wbValuationView?.share = self.controller.object(at: indexPath)
             self.wbValuationView?.fromIndexPath = indexPath
@@ -490,7 +501,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
          let share = controller.object(at: indexPath)
          
          if let chartView = segue.destination as? StockChartVC {
-                 
+            
              chartView.share = controller.object(at: indexPath)
              chartView.configure(share: share)
              
@@ -609,6 +620,32 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
 }
 
 extension StocksListTVC: StocksControllerDelegate, ScoreCircleDelegate {
+    
+    func livePriceUpdated(indexPath: IndexPath) {
+
+        tableView.refreshControl?.endRefreshing()
+        
+        if let selectedPath = tableView.indexPathForSelectedRow {
+            if indexPath == selectedPath {
+                performSegue(withIdentifier: "showChartSegue", sender: nil)
+            }
+        }
+        else if let navView = splitViewController?.viewController(for: .secondary) as? UINavigationController {
+            for view in navView.viewControllers {
+                if let chartView = view as? StockChartVC {
+                    if let displayedShare = chartView.share {
+                        if let path = controller.indexPath(forObject: displayedShare) {
+//                            print(#function + " live price StocksListTVC found path m2")
+
+                            tableView.selectRow(at: path, animated: false, scrollPosition: .none)
+                            self.performSegue(withIdentifier: "showChartSegue", sender: nil)
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
     
     func tap(indexPath: IndexPath, isUserScoreType: Bool, sender: UIView) {
         

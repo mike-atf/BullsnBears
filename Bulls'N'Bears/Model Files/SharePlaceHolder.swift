@@ -12,7 +12,7 @@ class SharePlaceHolder: NSObject {
     // this would create concurrency problems if using the NSManagedObject Share from the AppDel viewContext which can only be accessed on the main thread
     
     var macd: Data?
-   var divYieldCurrent: Double = 0.0
+    var divYieldCurrent: Double = 0.0
     var watchStatus = Int16() // 0 watchList, 1 owned, 2 archived
     var valueScore = Double()
     var userEvaluationScore = Double()
@@ -30,6 +30,8 @@ class SharePlaceHolder: NSObject {
     var name_short: String?
     var name_long: String?
     var dailyPrices: Data?
+    var lastLivePrice: Double = 0.0
+    var lastLivePriceDate: Date?
     var priceUpdateComplete = false
 
     override init() {
@@ -59,6 +61,8 @@ class SharePlaceHolder: NSObject {
         self.name_short = share?.name_short
         self.name_long = share?.name_long
         self.dailyPrices = share?.dailyPrices
+        self.lastLivePrice = share?.lastLivePrice ?? Double()
+        self.lastLivePriceDate = share?.lastLivePriceDate
     }
     
     /// does NOT save the NSManagedObject Share to it's context
@@ -84,6 +88,8 @@ class SharePlaceHolder: NSObject {
         share?.name_short = self.name_short
         share?.name_long = self.name_long
         share?.dailyPrices = self.dailyPrices
+        share?.lastLivePrice = self.lastLivePrice
+        share?.lastLivePriceDate = self.lastLivePriceDate
 
     }
     
@@ -278,7 +284,52 @@ class SharePlaceHolder: NSObject {
 
     //MARK: - price update
     
-    func startPriceUpdate(yahooRefDate: Date, delegate: StockDelegate) {
+    func startLivePriceUpdate(delegate: StockDelegate) {
+        
+        var components: URLComponents?
+                
+        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)")
+        components?.queryItems = [URLQueryItem(name: "p", value: symbol), URLQueryItem(name: ".tsrc", value: "fin-srch")]
+        
+        guard let validURL = components?.url else {
+            return
+        }
+        
+        let yahooSession = URLSession(configuration: .default)
+        var dataTask: URLSessionDataTask?
+        
+        // this will start a background thread
+        // do not access the main viewContext or NSManagedObjects fetched from it!
+        // the StocksController sending this via startPriceUpdate uses a seperate backgroundMOC and shares fetched from this to execute this tasks
+        
+        print(#file + "." + #function + " live price download request started")
+
+        dataTask = yahooSession.dataTask(with: validURL) { (data, urlResponse, error) in
+            
+            guard error == nil else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock live price download error")
+                return
+            }
+            
+            guard urlResponse != nil else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock live price download error \(urlResponse.debugDescription)")
+                return
+            }
+            
+            guard let validData = data else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock live price download error - empty website data")
+                return
+            }
+
+            let html$ = String(decoding: validData, as: UTF8.self)
+            self.livePriceDownloadComplete(html$: html$, delegate: delegate)
+        }
+        dataTask?.resume()
+
+    }
+    
+    
+    func startDailyPriceUpdate(yahooRefDate: Date, delegate: StockDelegate) {
         
         let nowSinceRefDate = Date().timeIntervalSince(yahooRefDate)
         let start = nowSinceRefDate - TimeInterval(3600 * 24 * 366)
@@ -439,7 +490,7 @@ class SharePlaceHolder: NSObject {
             
             let pageText = html$
             
-            let (values, errors) = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: pageText, rowTitle: title , rowTerminal: "</tr>", numberTerminal: "</td>")
+            let (values, errors) = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: pageText, rowTitle: title+"</span>" , rowTerminal: "</tr>", numberTerminal: "</td>")
             loaderrors.append(contentsOf: errors)
             
             if title.starts(with: "Beta") {
@@ -474,6 +525,24 @@ class SharePlaceHolder: NSObject {
         DispatchQueue.main.async {
             delegate?.keyratioDownloadComplete(share: self, errors: loaderrors)
         }
+    }
+    
+    func livePriceDownloadComplete(html$: String, delegate: StockDelegate?) {
+        
+        print(#file + "." + #function + " live price download complete")
+
+        let (values, errors) = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, rowTitle: "<span class=\"Trsdu(0.3s) Trsdu(0.3s) " , rowTerminal: "</span>", numberTerminal: "</span>")
+        
+        if let livePrice = values?.first {
+            print(#file + "." + #function + " live price found")
+
+            self.lastLivePrice = livePrice
+            self.lastLivePriceDate = Date()
+            DispatchQueue.main.async {
+                delegate?.livePriceDownloadCompleted(share: self, errors: errors)
+            }
+        }
+        
     }
     
     //MARK: - profile download functions

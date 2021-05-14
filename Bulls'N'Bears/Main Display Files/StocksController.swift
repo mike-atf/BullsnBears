@@ -13,11 +13,13 @@ import CoreData
 protocol StocksControllerDelegate {
     func allSharesHaveUpdatedTheirPrices() // all shares prices have been updated
     func treasuryBondRatesDownloaded()
+    func livePriceUpdated(indexPath: IndexPath)
 }
 
 /// Share calls this when it wants to inform StocksController that the price update is complete
 protocol StockDelegate {
     func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String])
+    func livePriceDownloadCompleted(share: SharePlaceHolder, errors: [String])
 }
 
 
@@ -37,39 +39,58 @@ class StocksController: NSFetchedResultsController<Share> {
             
     //Mark:- shares price update functions
     
-    func updatePrices() {
-        
-        let yRD = getYahooRefDate()
+    func updateLivePrices() {
+        // runs on backGround queue!
         
         for share in fetchedObjects ?? [] {
             let placeholder = SharePlaceHolder(share: share)
-            
-            var sharePriceNeedsUpdate = true
-            if let lastPriceDate = placeholder.getDailyPrices()?.last?.tradingDate {
-                if (Date().timeIntervalSince(lastPriceDate) < 12 * 3600) {
-                    sharePriceNeedsUpdate = false
+
+            if share.watchStatus < 2 {
+                if placeholder.lastLivePriceDate == nil {
+                    placeholder.startLivePriceUpdate(delegate: self)
+                }
+                else if Date().timeIntervalSince(placeholder.lastLivePriceDate!) > 60 {
+                    placeholder.startLivePriceUpdate(delegate: self)
                 }
             }
-            if sharePriceNeedsUpdate {
-                placeholder.startPriceUpdate(yahooRefDate: yRD, delegate: self)
-                // returns to 'keyRatioDownloadComplete()' just below via the delegate
+            else {
+                updateDailyPrices(share: share)
             }
+        }
+    }
+    
+    func updateDailyPrices(share: Share) {
+        // called after livePriceDownloadCompleted()
+        // to avoid creating two parallel placeholder objects while separate downloads are in process that cancel the updated values out
+        
+        let weekDay = Calendar.current.component(.weekday, from: Date())
+        guard (weekDay > 1 && weekDay < 7) else {
+            return
         }
         
-        if treasuryBondYields == nil {
-            updateTreasuryBondYields()
-        }
-        else {
-            if let lastDate =  treasuryBondYields!.compactMap({ $0.date }).sorted().last {
-                if Date().timeIntervalSince(lastDate) > 14*3600 {
-                    updateTreasuryBondYields()
-                }
+        let placeholder = SharePlaceHolder(share: share)
+        
+        var sharePriceNeedsUpdate = true
+        if let lastPriceDate = placeholder.getDailyPrices()?.last?.tradingDate {
+            if (Date().timeIntervalSince(lastPriceDate) < 12 * 3600) {
+                sharePriceNeedsUpdate = false
             }
         }
+        if sharePriceNeedsUpdate {
+            placeholder.startDailyPriceUpdate(yahooRefDate: yahooRefDate, delegate: self)
+            // returns to 'keyRatioDownloadComplete()' just below via the delegate
+        }
+        
 
     }
     
     func updateTreasuryBondYields() {
+        
+        if let lastDate = treasuryBondYields?.compactMap({ $0.date }).sorted().last {
+            if Date().timeIntervalSince(lastDate) < 14*3600 {
+                return
+            }
+        }
         
         let dateFormatter: DateFormatter = {
             let formatter = DateFormatter()
@@ -125,7 +146,7 @@ class StocksController: NSFetchedResultsController<Share> {
         downloadTask?.resume()
     }
     
-    func updateResearch(share: Share) {
+    func updateCompanyResearchData(share: Share) {
         
         // this can safely be done using the main viewContext on the main thread as the function does not involve downloads and background tasks
         
@@ -189,6 +210,26 @@ class StocksController: NSFetchedResultsController<Share> {
         
         return shares
     }
+    
+    func fetchShare(symbol: String) -> Share? {
+
+        var share: Share?
+        
+        let fetchRequest = NSFetchRequest<Share>(entityName: "Share")
+        fetchRequest.sortDescriptors = [ NSSortDescriptor(key: "symbol", ascending: true)]
+        let predicate = NSPredicate(format: "symbol == %@", argumentArray: [symbol])
+        fetchRequest.returnsObjectsAsFaults = false
+        fetchRequest.predicate = predicate
+        
+        do {
+            share = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest).first
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+        }
+        
+        return share
+    }
+
                     
     private func getYahooRefDate() -> Date {
         let calendar = Calendar.current
@@ -295,7 +336,6 @@ class StocksController: NSFetchedResultsController<Share> {
         
         return newShare
     }
-
     
     class func fetchSpecificShare(symbol: String, context: NSManagedObjectContext?=nil) -> Share? {
         
@@ -334,11 +374,32 @@ class StocksController: NSFetchedResultsController<Share> {
 
     // MARK: - download functions
     
-    
 }
 
 extension StocksController: StockDelegate {
     
+    func livePriceDownloadCompleted(share: SharePlaceHolder, errors: [String]) {
+        
+        if let matchingShare = fetchedObjects?.filter({ (shareObject) -> Bool in
+            if share.symbol == shareObject.symbol { return true }
+            else { return false }
+        }).first {
+            share.shareFromPlaceholder(share: matchingShare)
+            
+            if let path = self.indexPath(forObject: matchingShare) {
+                pricesUpdateDelegate?.livePriceUpdated(indexPath: path)
+            }
+            
+            updateDailyPrices(share: matchingShare)
+        }
+        
+        if errors.count > 0 {
+            for error in errors {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
+            }
+        }
+
+    }
     
     /// caller must have dispatched this fucntion call on the main thread!!
     func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String]) {

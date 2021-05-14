@@ -10,12 +10,12 @@ import Foundation
 class WebpageScraper {
     
     /// webpageExponent = the exponent used by the webpage to listing financial figures, e.g. 'thousands' on yahoo = 3.0
-    class func scrapeRowForDoubles(website: Website, html$: String?, sectionHeader: String?=nil, rowTitle: String, rowTerminal: String? = nil, numberTerminal: String? = nil, webpageExponent: Double?=nil) -> ([Double]?, [String]) {
+    class func scrapeRowForDoubles(website: Website, html$: String?, sectionHeader: String?=nil, rowTitle: String, rowTerminal: String? = nil, numberStarter: String?=nil , numberTerminal: String? = nil, webpageExponent: Double?=nil) -> ([Double]?, [String]) {
         
         var pageText = html$
         let sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
         let rowDataStartDelimiter: String? = (website == .macrotrends) ? "class=\"fas fa-chart-bar\"></i></div></div></div><div role=" : nil
-        let rowStart = website == .macrotrends ? ">" + rowTitle + "</a></div></div>" : ">" + rowTitle + "</span>"
+        let rowStart = website == .macrotrends ? ">" + rowTitle + "</a></div></div>" : ">" + rowTitle // + "</span>"
         let rowTerminal = website == .macrotrends ? "</div></div></div>" : (rowTerminal ?? "</span></td></tr>")
         let tableTerminal = "</div></div></div></div>"
 
@@ -74,7 +74,7 @@ class WebpageScraper {
             return (valueArray, errors) // MT.com rows are time_DESCENDING from left to right, so the valueArray is in time-ASCENDING order deu to backwards row scraping.
         }
         else {
-            let (valueArray, errors) = yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal, exponent: webpageExponent)
+            let (valueArray, errors) = yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle,numberTerminal: numberTerminal, exponent: webpageExponent)
             return (valueArray, errors)
         }
     }
@@ -322,12 +322,12 @@ class WebpageScraper {
         return (valueArray, errors)
     }
     
-    class func yahooNumbersExtraction(table$: String, rowTitle: String, numberTerminal: String?=nil, exponent: Double?=nil) -> ([Double], [String]) {
+    class func yahooNumbersExtraction(table$: String, rowTitle: String, numberStarter:String?=nil, numberTerminal: String?=nil, exponent: Double?=nil) -> ([Double], [String]) {
         
         var valueArray = [Double]()
         var errors = [String]()
         let numberTerminal = numberTerminal ?? ","
-        let numberStarter = ":"
+        let numberStarter = numberStarter ?? ":"
         var tableText = table$
         
         var labelEndIndex = tableText.range(of: numberTerminal, options: .backwards, range: nil, locale: nil)
@@ -563,9 +563,9 @@ class WebpageScraper {
         var priceDates = [PriceDate]()
         
 //        let tableStart = "<tbody><tr>"
-        let tableEnd = "</td></tr></table>\r\n<div class=\"updated\"" //"</td></tr></tbody></table>"
-        let columnStart = "</td><td class=\"text_view_data\">" //"</td><td class=\"text_view_data\">"
-        let rowStart = "<td scope=\"row\" class=\"text_view_data\">"  //"<td scope=\"row "
+        let tableEnd = "</td></tr></table>\r\n<div class=\"updated\""
+        let columnStart = "</td><td class=\"text_view_data\">"
+        let rowStart = "<td scope=\"row\" class=\"text_view_data\">"
         let dateFormatter: DateFormatter = {
             let formatter = DateFormatter()
             formatter.locale = NSLocale.current

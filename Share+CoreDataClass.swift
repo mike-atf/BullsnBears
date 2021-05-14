@@ -28,8 +28,6 @@ public class Share: NSManagedObject {
     public override func awakeFromFetch() {
         priceUpdateComplete = false
         
-//        let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
-        
         if industry == nil {
             industry = "Unknown"
         }

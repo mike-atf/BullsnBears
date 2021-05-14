@@ -107,8 +107,10 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         header.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: height)
         
         let title = controller?.sectionHeaderText(section: section) ?? ""
-        
-        let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 22 : 20
+        let subtitle = controller?.sectionSubHeaderText(section: section) ?? ""
+
+        let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 20 : 20
+        let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 16 : 12
         
         let titleLabel: UILabel = {
             let label = UILabel()
@@ -122,12 +124,32 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
                 
         header.addSubview(titleLabel)
-                
+        
+        let subTitle: UILabel = {
+            let label = UILabel()
+            label.font = UIFont.systemFont(ofSize: smallFontSize, weight: .regular)
+            label.textColor = UIColor.label
+            label.adjustsFontSizeToFitWidth = true
+            label.minimumScaleFactor = 0.8
+            label.text = subtitle
+            return label
+        }()
+        
+        subTitle.translatesAutoresizingMaskIntoConstraints = false
+        
+        header.addSubview(subTitle)
+        
+        
         let margins = header.layoutMarginsGuide
         
         titleLabel.setContentHuggingPriority(.required, for: .vertical)
-        titleLabel.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
-        titleLabel.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 10).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: margins.topAnchor, constant: -10).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 5).isActive = true
+        titleLabel.trailingAnchor.constraint(greaterThanOrEqualTo: subTitle.leadingAnchor, constant: 10).isActive = true
+        
+        subTitle.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
+        subTitle.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
+        subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
         
         return header
         
@@ -462,6 +484,10 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 }
 
 extension WBValuationTVC: StockDelegate, WBValuationCellDelegate {
+    
+    func livePriceDownloadCompleted(share: SharePlaceHolder, errors: [String]) {
+        
+    }
     
     func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String]) {
         
