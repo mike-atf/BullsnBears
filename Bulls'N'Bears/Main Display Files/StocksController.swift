@@ -13,13 +13,13 @@ import CoreData
 protocol StocksControllerDelegate {
     func allSharesHaveUpdatedTheirPrices() // all shares prices have been updated
     func treasuryBondRatesDownloaded()
-    func livePriceUpdated(indexPath: IndexPath)
+    func livePriceUpdated(indexPath: IndexPath?)
 }
 
 /// Share calls this when it wants to inform StocksController that the price update is complete
 protocol StockDelegate {
     func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String])
-    func livePriceDownloadCompleted(share: SharePlaceHolder, errors: [String])
+    func livePriceDownloadCompleted(share: SharePlaceHolder?, errors: [String])
 }
 
 
@@ -39,18 +39,28 @@ class StocksController: NSFetchedResultsController<Share> {
             
     //Mark:- shares price update functions
     
-    func updateLivePrices() {
+    func updateLivePrices(selectedShare: Share) {
         // runs on backGround queue!
         
+//
+//        print()
+//        print(#function)
         for share in fetchedObjects ?? [] {
             let placeholder = SharePlaceHolder(share: share)
 
-            if share.watchStatus < 2 {
+            if share.watchStatus < 2 || share.isEqual(selectedShare) {
                 if placeholder.lastLivePriceDate == nil {
+//                    print("\(share.symbol!) start live price update process...")
                     placeholder.startLivePriceUpdate(delegate: self)
                 }
-                else if Date().timeIntervalSince(placeholder.lastLivePriceDate!) > 60 {
+                else if Date().timeIntervalSince(placeholder.lastLivePriceDate!) > 10 {
+//                    print("\(share.symbol!) start live price update process...")
                     placeholder.startLivePriceUpdate(delegate: self)
+                }
+                else if share.isEqual(selectedShare) {
+//                    print("\(share.symbol!) is currently selected . Live price update <300 secs. Ending refresh...")
+                    livePriceDownloadCompleted(share: nil, errors: [])
+                    // ends tableView refresh process if last update <300sec ago
                 }
             }
             else {
@@ -378,15 +388,25 @@ class StocksController: NSFetchedResultsController<Share> {
 
 extension StocksController: StockDelegate {
     
-    func livePriceDownloadCompleted(share: SharePlaceHolder, errors: [String]) {
+    func livePriceDownloadCompleted(share: SharePlaceHolder?, errors: [String]) {
+        
+        if share == nil {
+            print(#function + "no share placeHolder returned from live price download. Sending request to end refresh process to StocksListTVC")
+
+            pricesUpdateDelegate?.livePriceUpdated(indexPath: nil)
+            // ends tableView refresh process if last update <300sec ago
+            
+            return
+        }
         
         if let matchingShare = fetchedObjects?.filter({ (shareObject) -> Bool in
-            if share.symbol == shareObject.symbol { return true }
+            if share!.symbol == shareObject.symbol { return true }
             else { return false }
         }).first {
-            share.shareFromPlaceholder(share: matchingShare)
+            share!.shareFromPlaceholder(share: matchingShare)
             
             if let path = self.indexPath(forObject: matchingShare) {
+                print(#function + "\(matchingShare.symbol!) live price download complete. Sending info to StocksListTVC")
                 pricesUpdateDelegate?.livePriceUpdated(indexPath: path)
             }
             

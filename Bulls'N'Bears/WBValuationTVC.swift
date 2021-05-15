@@ -485,7 +485,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
 extension WBValuationTVC: StockDelegate, WBValuationCellDelegate {
     
-    func livePriceDownloadCompleted(share: SharePlaceHolder, errors: [String]) {
+    func livePriceDownloadCompleted(share: SharePlaceHolder?, errors: [String]) {
         
     }
     

@@ -143,8 +143,14 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @objc
     func updateShares() {
         
+        guard controller.fetchedObjects != nil else {
+            return
+        }
+        
         DispatchQueue.main.async {
-            self.controller.updateLivePrices()
+            let selectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
+            let selectedShare = self.controller.object(at: selectedPath)
+            self.controller.updateLivePrices(selectedShare: selectedShare) // uses selectedShare to end refresh process
             // also triggers other keyRatioUpdates after livePrice have been udpated
         }
         
@@ -621,12 +627,18 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
 
 extension StocksListTVC: StocksControllerDelegate, ScoreCircleDelegate {
     
-    func livePriceUpdated(indexPath: IndexPath) {
+    func livePriceUpdated(indexPath: IndexPath?) {
 
-        tableView.refreshControl?.endRefreshing()
+//        print()
+        guard indexPath != nil else { // nil is sent if e.g. last refresh of selected share was <300sec ago.
+//            print(#function + " live price update notice without an indexPath. Ending refresh...")
+            tableView.refreshControl?.endRefreshing()
+            return
+        }
         
         if let selectedPath = tableView.indexPathForSelectedRow {
             if indexPath == selectedPath {
+                tableView.refreshControl?.endRefreshing()
                 performSegue(withIdentifier: "showChartSegue", sender: nil)
             }
         }
@@ -635,8 +647,8 @@ extension StocksListTVC: StocksControllerDelegate, ScoreCircleDelegate {
                 if let chartView = view as? StockChartVC {
                     if let displayedShare = chartView.share {
                         if let path = controller.indexPath(forObject: displayedShare) {
-//                            print(#function + " live price StocksListTVC found path m2")
-
+//                            print(#function + " live price update complete for selected share \(displayedShare.symbol!)")
+                            tableView.refreshControl?.endRefreshing()
                             tableView.selectRow(at: path, animated: false, scrollPosition: .none)
                             self.performSegue(withIdentifier: "showChartSegue", sender: nil)
                         }

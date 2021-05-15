@@ -27,7 +27,6 @@ class ComparisonCell: UITableViewCell {
         
         rowTitleLabel.numberOfLines = 0
         rowTitleLabel.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
-
     }
     
     override func prepareForReuse() {
@@ -70,7 +69,7 @@ class ComparisonCell: UITableViewCell {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = UIFont.systemFont(ofSize: financialsFontSize)
-                label.text = cellPath.section < 6 ? "EMA:\n>10%:\nTrend:" : "EMA:\n<0%:\nTrend:"
+                label.text = cellPath.section < 6 ? "EMA:\n>10%:" : "EMA:\n<0%:"
                 label.textAlignment = .right
                 label.numberOfLines = 0
                 label.sizeToFit()
@@ -81,7 +80,6 @@ class ComparisonCell: UITableViewCell {
             legendLabel!.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
             legendLabel!.leadingAnchor.constraint(greaterThanOrEqualTo: rowTitleLabel.trailingAnchor, constant: 10).isActive = true
             
-//            createIconCellContent(cellPath: cellPath)
             createFinancialsTexts(cellPath: cellPath)
         }
     }
@@ -93,7 +91,6 @@ class ComparisonCell: UITableViewCell {
 
         var count: CGFloat = 0
         
-        var previousLabel: UILabel?
         for string in strings {
             
             let label: UILabel = {
@@ -111,18 +108,8 @@ class ComparisonCell: UITableViewCell {
             label.leadingAnchor.constraint(greaterThanOrEqualTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
             label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
             label.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1)).isActive = true
-//            if previousLabel != nil {
-//                previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
-//            }
-//            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
-//            label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-//            if previousLabel != nil {
-//                previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
-//            }
-            previousLabel = label
             count += 1
         }
-
     }
     
     private func createTextView(cellPath: IndexPath) {
@@ -212,8 +199,6 @@ class ComparisonCell: UITableViewCell {
 
         var count: CGFloat = 0
         
-        var previousLabel: UILabel?
-
         for triplet in texts ?? [] {
             
             guard triplet.count > 2 else {
@@ -236,10 +221,6 @@ class ComparisonCell: UITableViewCell {
             label.leadingAnchor.constraint(greaterThanOrEqualTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
             label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
             label.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1)).isActive = true
-//            if previousLabel != nil {
-//                previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
-//            }
-            previousLabel = label
             count += 1
         }
     }

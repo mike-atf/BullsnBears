@@ -287,31 +287,6 @@ class ComparisonController {
                     texts.append(text)
                 }
             }
-//        case 4:
-//            if forPath.row == 0 {
-//                for share in  shares ?? [] {
-//                    var text = "-"
-//                    if let proportions = Calculator.proportions(array1: share.wbValuation?.grossProfit, array0: share.wbValuation?.revenue) {
-//                        if let ema = proportions.ema(periods: 7) {
-//                            text = (percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
-//                        }
-//                        var years = [Double]()
-//                        for i in 0..<proportions.count {
-//                            years.append(Double(proportions.count-i))
-//                        }
-//                        if let correlation = Calculator.correlation(xArray: years, yArray: proportions) {
-//                            let r2 = correlation.r2() ?? 0
-//                            var correlation$ = "very low"
-//                            if r2 > 0.64 { correlation$ = "high"}
-//                            else if r2 > 0.5 { correlation$ = "low" }
-//                            text += correlation$
-//                            text += percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-"
-//                        }
-//                    }
-//                    texts.append(text)
-//                }
-//
-//            }
         default:
             texts = [String]()
         }
@@ -325,44 +300,43 @@ class ComparisonController {
             return nil
         }
         
-        var textTriplets = [[String]]()
+        var finStrings = [[String]]()
         
         if forPath.section == 3 {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let triplet = singleFinancialText(values: share.wbValuation?.equityRepurchased)
-                    textTriplets.append(triplet)
+                    let texts = singleFinancialText(values: share.wbValuation?.equityRepurchased)
+                    finStrings.append(texts)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
-                    
-                    let triplet = singleFinancialText(values: share.wbValuation?.revenue)
-                    textTriplets.append(triplet)
+                    let texts = singleFinancialText(values: share.wbValuation?.revenue)
+                    finStrings.append(texts)
                 }
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
-                    let triplet = singleFinancialText(values: share.wbValuation?.netEarnings)
-                    textTriplets.append(triplet)
+                    let texts = singleFinancialText(values: share.wbValuation?.netEarnings)
+                    finStrings.append(texts)
                 }
             }
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
-                    let triplet = singleFinancialText(values: share.wbValuation?.opCashFlow)
-                    textTriplets.append(triplet)
+                    let texts = singleFinancialText(values: share.wbValuation?.opCashFlow)
+                    finStrings.append(texts)
                 }
             }
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
-                    let triplet = singleFinancialText(values: share.wbValuation?.grossProfit, growthCutOffRate: 0.0)
-                    textTriplets.append(triplet)
+                    let texts = singleFinancialText(values: share.wbValuation?.grossProfit, growthCutOffRate: 0.0)
+                    finStrings.append(texts)
                 }
             }
             else if forPath.row == 5 {
                 for share in  shares ?? [] {
-                    let triplet = singleFinancialText(values: share.wbValuation?.eps)
-                    textTriplets.append(triplet)
+                    let texts = singleFinancialText(values: share.wbValuation?.eps)
+                    finStrings.append(texts)
                 }
             }
         }
@@ -370,13 +344,13 @@ class ComparisonController {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     let texts = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.grossProfit)
-                    textTriplets.append(texts)
+                    finStrings.append(texts)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     let texts = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.netEarnings)
-                    textTriplets.append(texts)
+                    finStrings.append(texts)
                 }
             }
         }
@@ -384,19 +358,19 @@ class ComparisonController {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     let texts = singleFinancialText(values: share.rule1Valuation?.roic)
-                    textTriplets.append(texts)
+                    finStrings.append(texts)
                 }
             }
             if forPath.row == 1 {
                 for share in  shares ?? [] {
                     let texts = singleFinancialText(values: share.wbValuation?.roe)
-                    textTriplets.append(texts)
+                    finStrings.append(texts)
                 }
             }
             if forPath.row == 2 {
                 for share in  shares ?? [] {
                     let texts = singleFinancialText(values: share.wbValuation?.roa)
-                    textTriplets.append(texts)
+                    finStrings.append(texts)
                 }
             }
         }
@@ -404,39 +378,39 @@ class ComparisonController {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     let texts = twoFinancialsText(values0: share.wbValuation?.netEarnings, values1: share.wbValuation?.debtLT, growthCutOffRate: 0.0, biggerIsBetter: false)
-                    textTriplets.append(texts)
+                    finStrings.append(texts)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     if let proportions = share.wbValuation?.ltDebtPerAdjEquityProportions() {
                         let texts = singleFinancialText(values: proportions, growthCutOffRate: 0.0, biggerIsBetter: false)
-                        textTriplets.append(texts)
+                        finStrings.append(texts)
                     }
                 }
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
                     let texts = singleFinancialText(values: share.wbValuation?.capExpend, growthCutOffRate: 0.0, biggerIsBetter: false)
-                    textTriplets.append(texts)
+                    finStrings.append(texts)
                 }
             }
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
                     let texts = twoFinancialsText(values0: share.wbValuation?.grossProfit, values1: share.wbValuation?.sgaExpense, growthCutOffRate: 0.0, biggerIsBetter: false)
-                    textTriplets.append(texts)
+                    finStrings.append(texts)
                 }
             }
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
                     let texts = twoFinancialsText(values0: share.wbValuation?.grossProfit, values1: share.wbValuation?.rAndDexpense, growthCutOffRate: 0.0, biggerIsBetter: false)
-                    textTriplets.append(texts)
+                    finStrings.append(texts)
                 }
             }
 
         }
 
-        return textTriplets
+        return finStrings
     }
     
     private func singleFinancialText(values: [Double]?, growthCutOffRate:Double?=nil, biggerIsBetter: Bool?=nil) -> [String] {
@@ -460,9 +434,6 @@ class ComparisonController {
             }
             
             let nonNilGrowthRates = compoundGrowthRates //.filter { rate in
-//                if rate != Double() { return true }
-//                else { return false }
-//            }
             
             let consistency = Double(countExceedingThreshold.count) / Double(nonNilGrowthRates.count)
             text.append(percentFormatter0Digits.string(from: consistency as NSNumber) ?? "-")
@@ -472,43 +443,13 @@ class ComparisonController {
                 years.append(Double(compoundGrowthRates.count-i))
             }
 
-            if let correlation = Calculator.correlation(xArray: years, yArray: compoundGrowthRates) {
-                text.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")
-            }
-            else { text.append("-") }
+//            if let correlation = Calculator.correlation(xArray: years, yArray: compoundGrowthRates) {
+//                text.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")
+//            }
+//            else { text.append("-") }
         }
-        else { text = ["-","-","-"] }
-        
-        
-// so far
-        /*
-        if let rates = values?.filter({ (element) -> Bool in
-            if element != 0.0 { return true }
-            else { return false }
-        }).growthRates() {
-            if let ema = rates.ema(periods: 7) {
-                text.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
-            }
-            var years = [Double]()
-            for i in 0..<rates.count {
-                years.append(Double(rates.count-i))
-            }
-            if let correlation = Calculator.correlation(xArray: years, yArray: rates) {
-                let r2 = correlation.r2() ?? 0
-                var correlation$ = "very low"
-                if r2 > 0.64 { correlation$ = "high"}
-                else if r2 > 0.5 { correlation$ = "low" }
-                text.append(correlation$)
-                text.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")
-            }
-            else {
-                text.append("-")
-                text.append("-")
-            }
-        }
-        else { text = ["-","-","-"] }
-        */
-        
+        else { text = ["-","-"] } //,"-"
+                
         return text
     }
     
@@ -534,9 +475,6 @@ class ComparisonController {
                 }
                 
                 let nonNilGrowthRates = compoundGrowthRates //.filter { rate in
-//                    if rate != Double() { return true }
-//                    else { return false }
-//                }
                 
                 let consistency = Double(ratesOverTenPct.count) / Double(nonNilGrowthRates.count)
                 texts.append(percentFormatter0Digits.string(from: consistency as NSNumber) ?? "-")
@@ -546,39 +484,14 @@ class ComparisonController {
                     years.append(Double(compoundGrowthRates.count-i))
                 }
 
-                if let correlation = Calculator.correlation(xArray: years, yArray: compoundGrowthRates) {
-                    texts.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")
-                }
-                else { texts.append("-") }
+//                if let correlation = Calculator.correlation(xArray: years, yArray: compoundGrowthRates) {
+//                    texts.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")
+//                }
+//                else { texts.append("-") }
 
             }
         }
-        else { texts = ["-","-","-"] }
-
-// oLd
-//        if let proportions = Calculator.proportions(array1: values1, array0: values0) {
-//            if let ema = proportions.ema(periods: 7) {
-//                triplet.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
-//            }
-//            var years = [Double]()
-//            for i in 0..<proportions.count {
-//                years.append(Double(proportions.count-i))
-//            }
-//            if let correlation = Calculator.correlation(xArray: years, yArray: proportions) {
-//                let r2 = correlation.r2() ?? 0
-//                var correlation$ = "very low"
-//                if r2 > 0.64 { correlation$ = "high"}
-//                else if r2 > 0.5 { correlation$ = "low" }
-//                triplet.append(correlation$)
-//                triplet.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")
-//            }
-//            else {
-//                triplet.append("-")
-//                triplet.append("-")
-//            }
-//        }
-//        else { triplet = ["-","-","-"] }
-        
+        else { texts = ["-","-"] } //,"-"
         return texts
     }
     

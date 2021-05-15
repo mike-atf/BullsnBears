@@ -529,17 +529,18 @@ class SharePlaceHolder: NSObject {
     
     func livePriceDownloadComplete(html$: String, delegate: StockDelegate?) {
         
-        print(#file + "." + #function + " live price download complete")
-
         let (values, errors) = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, rowTitle: "<span class=\"Trsdu(0.3s) Trsdu(0.3s) " , rowTerminal: "</span>", numberTerminal: "</span>")
         
         if let livePrice = values?.first {
-            print(#file + "." + #function + " live price found")
-
             self.lastLivePrice = livePrice
             self.lastLivePriceDate = Date()
             DispatchQueue.main.async {
                 delegate?.livePriceDownloadCompleted(share: self, errors: errors)
+            }
+        }
+        else {
+            DispatchQueue.main.async {
+                delegate?.livePriceDownloadCompleted(share: nil, errors: errors)
             }
         }
         
