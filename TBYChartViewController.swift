@@ -25,18 +25,7 @@ class TBYChartViewController: UIViewController {
                 datesLabel.text = fdate$ + " - " + ldate$
             }
         }
-        chartView.configure(array: rates, trendLabel: nil, valuesAreGrowth: true)
+        chartView.configure(array: rates, trendLabel: nil, valuesAreGrowth: false, showXLabels: false, showsXYearLabel: true)
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

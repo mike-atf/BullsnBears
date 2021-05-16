@@ -494,7 +494,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     }
     
     /// if sending 2 arrays returns array with proportion array 0 / array 1
-    /// if sending 1 array returns the rate of growth from array element to element
+    /// if sending 1 array returns the compund rate of growth from array element to element
     /// the rates returned are in time-ASCENDING order
     public func valueListTVCProportions(values: [[Double]?]?) -> [Double]? {
         

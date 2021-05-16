@@ -391,11 +391,9 @@ extension StocksController: StockDelegate {
     func livePriceDownloadCompleted(share: SharePlaceHolder?, errors: [String]) {
         
         if share == nil {
-            print(#function + "no share placeHolder returned from live price download. Sending request to end refresh process to StocksListTVC")
 
             pricesUpdateDelegate?.livePriceUpdated(indexPath: nil)
             // ends tableView refresh process if last update <300sec ago
-            
             return
         }
         
@@ -406,7 +404,6 @@ extension StocksController: StockDelegate {
             share!.shareFromPlaceholder(share: matchingShare)
             
             if let path = self.indexPath(forObject: matchingShare) {
-                print(#function + "\(matchingShare.symbol!) live price download complete. Sending info to StocksListTVC")
                 pricesUpdateDelegate?.livePriceUpdated(indexPath: path)
             }
             

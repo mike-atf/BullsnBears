@@ -27,7 +27,7 @@ class ComparisonController {
                                 ["Ret. earnings growth", "Revenue growth", "Net income growth", "Op. Cash flow growth", "Gross profit growth", "EPS growth"],
                                 ["Profit margin growth", "Net earnings margin growth"],
                                 ["ROI growth", "ROE growth", "ROA growth"],
-                                ["LT Debt / net income", "LT Debt / adj equity", "cap. exp.", "SGA / profit", "R&D / profit"]]
+                                ["LT Debt / net income", "LT Debt / adj equity", "cap. exp./net income", "SGA / profit", "R&D / profit"]]
         
         return titleStructure
         
@@ -507,75 +507,161 @@ class ComparisonController {
         if forPath.section == 3 {
             if forPath.row == 0 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.equityRepurchased)
+//                    valueArray.append(share.wbValuation?.equityRepurchased)
                     let proportions = proportions(values: [share.wbValuation?.equityRepurchased])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.equityRepurchased)
+                    valueArray.append(cpGrowth)
                     correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.equityRepurchased, proportions]))
                 }
             }
             else if forPath.row == 1 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.revenue)
+//                    valueArray.append(share.wbValuation?.revenue)
                     let proportions = proportions(values: [share.wbValuation?.revenue])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.revenue)
+                    valueArray.append(cpGrowth)
                     correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.revenue, proportions]))
                 }
 
             }
             else if forPath.row == 2 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.netEarnings)
+//                    valueArray.append(share.wbValuation?.netEarnings)
                     let proportions = proportions(values: [share.wbValuation?.netEarnings])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.netEarnings)
+                    valueArray.append(cpGrowth)
                     correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.netEarnings, proportions]))
                 }
 
             }
             else if forPath.row == 3 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.opCashFlow)
+//                    valueArray.append(share.wbValuation?.opCashFlow)
                     let proportions = proportions(values: [share.wbValuation?.opCashFlow])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.opCashFlow)
+                    valueArray.append(cpGrowth)
                     correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.opCashFlow, proportions]))
                 }
 
             }
             else if forPath.row == 4 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.grossProfit)
+//                    valueArray.append(share.wbValuation?.grossProfit)
                     let proportions = proportions(values: [share.wbValuation?.grossProfit])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.grossProfit)
+                    valueArray.append(cpGrowth)
                     correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.grossProfit, proportions]))
                 }
 
             }
             else if forPath.row == 5 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.eps)
+//                    valueArray.append(share.wbValuation?.eps)
                     let proportions = proportions(values: [share.wbValuation?.eps])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.eps)
+                    valueArray.append(cpGrowth)
                     correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.eps, proportions]))
                 }
 
             }
         }
+        else if forPath.section == 4 {
+            if forPath.row == 0 {
+                for share in shares ?? [] {
+//                    valueArray.append(share.wbValuation?.grossProfit)
+                    let proportions = proportions(values: [share.wbValuation?.grossProfit, share.wbValuation?.revenue])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
+                    valueArray.append(cpGrowth)
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[proportions, proportions]))
+                }
+            }
+            else if forPath.row == 1 {
+                for share in shares ?? [] {
+//                    valueArray.append(share.wbValuation?.netEarnings)
+                    let proportions = proportions(values: [share.wbValuation?.netEarnings, share.wbValuation?.revenue])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
+                    valueArray.append(cpGrowth)
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[proportions, proportions]))
+                }
+            }
+        }
         else if forPath.section == 5 {
             if forPath.row == 0 {
                 for share in shares ?? [] {
-                    valueArray.append(share.rule1Valuation?.roic)
+//                    valueArray.append(share.rule1Valuation?.roic)
                     let proportions = proportions(values: [share.rule1Valuation?.roic])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: share.rule1Valuation?.roic)
+                    valueArray.append(cpGrowth)
                     correlations.append(Calculator.valueChartCorrelation(arrays:[share.rule1Valuation?.roic, proportions]))
                 }
             }
             else if forPath.row == 1 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.roe)
+//                    valueArray.append(share.wbValuation?.roe)
                     let proportions = proportions(values: [share.wbValuation?.roe])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.roe)
+                    valueArray.append(cpGrowth)
                     correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.roe, proportions]))
                 }
             }
             else if forPath.row == 2 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.roa)
+//                    valueArray.append(share.wbValuation?.roa)
                     let proportions = proportions(values: [share.wbValuation?.roa])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.roa)
+                    valueArray.append(cpGrowth)
                     correlations.append(Calculator.valueChartCorrelation(arrays:[share.wbValuation?.roa, proportions]))
                 }
             }
         }
+        else if forPath.section == 6 {
+            if forPath.row == 0 {
+                for share in shares ?? [] {
+                    let (values, _) = share.wbValuation!.longtermDebtProportion()
+//                    valueArray.append(values)
+                    let proportions = proportions(values: [values])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: values)
+                    valueArray.append(cpGrowth)
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[values, proportions]))
+                }
+            }
+            else if forPath.row == 1 {
+                for share in shares ?? [] {
+                    let values = share.wbValuation!.ltDebtPerAdjEquityProportions()
+//                    valueArray.append(values)
+                    let proportions = proportions(values: [values])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: values)
+                    valueArray.append(cpGrowth)
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[values, proportions]))
+                }
+            }
+            else if forPath.row == 2 {
+                for share in shares ?? [] {
+//                    valueArray.append(share.wbValuation?.capExpend)
+                    let proportions = proportions(values: [share.wbValuation?.capExpend, share.wbValuation?.netEarnings])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
+                    valueArray.append(cpGrowth)
+                     correlations.append(Calculator.valueChartCorrelation(arrays:[proportions, proportions]))
+                }
+            }
+            else if forPath.row == 3 {
+                for share in shares ?? [] {
+//                    valueArray.append(share.wbValuation?.sgaExpense)
+                    let proportions = proportions(values: [share.wbValuation?.sgaExpense, share.wbValuation?.grossProfit])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
+                    valueArray.append(cpGrowth)
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[cpGrowth, proportions]))
+                }
+            }
+            else if forPath.row == 3 {
+                for share in shares ?? [] {
+                    let proportions = proportions(values: [share.wbValuation?.rAndDexpense, share.wbValuation?.grossProfit])
+                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
+                    valueArray.append(cpGrowth)
+                    correlations.append(Calculator.valueChartCorrelation(arrays:[proportions, proportions]))
+                }
+            }
+       }
 
         return (correlations, valueArray)
         

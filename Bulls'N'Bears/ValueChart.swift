@@ -13,6 +13,7 @@ class ValueChart: UIView {
 
     var yAxisLabelsRight = [UILabel]()
     var yAxisNumbersRight = [CGFloat]()
+    var yAxisLabelMaxWidth: CGFloat = 0.0
     
     var xAxisLabels = [UILabel]()
     var trendLabels = [UILabel]()
@@ -33,31 +34,33 @@ class ValueChart: UIView {
     var trendlabel: UILabel?
     var yAxisNumberFormatter: NumberFormatter!
     var valuesAreGrowth: Bool!
+    var titleIsLong = true
+    var biggerIsBetter = true
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        self.backgroundColor = UIColor.systemBackground
+
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
                 
         self.backgroundColor = UIColor.systemBackground
-//        trendlabel?.font = UIFont.systemFont(ofSize: 15)
-        trendlabel?.numberOfLines = 0
-//        trendlabel?.textColor = UIColor.label
-
     }
 
     
-    func configure(array: [Double]?, trendLabel: UILabel?, valuesAreGrowth: Bool, valuesAreProportions:Bool? = false) {
+    func configure(array: [Double]?, biggerIsBetter:Bool?=true,trendLabel: UILabel?, longTitle: Bool?=true ,valuesAreGrowth: Bool, valuesAreProportions:Bool? = false, showXLabels: Bool=true, showYLabels: Bool=true, showsXYearLabel: Bool=false) {
         
         guard array?.count ?? 0 > 0  else {
             return
         }
 
+        self.titleIsLong = longTitle ?? true
+        self.biggerIsBetter = biggerIsBetter ?? true
         self.valueArray = array?.reversed() // MT.net row based data are stored in time-DESCENDING order
         self.trendlabel = trendLabel
+        trendlabel?.numberOfLines = 0
         self.valuesAreGrowth = valuesAreGrowth
         self.yAxisNumberFormatter = valuesAreGrowth ? percentFormatter0DigitsPositive : numberFormatterDecimals
         if valuesAreProportions ?? false {
@@ -78,7 +81,7 @@ class ValueChart: UIView {
         let dateComponents = Calendar.current.dateComponents(components, from: Date())
         let mostRecentYear = dateComponents.year! - 2000
         
-        if trendlabel != nil {
+        if showXLabels{
             var count = valueArray?.count ?? 0
             for _ in valueArray ?? [] {
                     let aLabel: UILabel = {
@@ -94,7 +97,8 @@ class ValueChart: UIView {
                 count -= 1
             }
         }
-        else {
+                
+        if showsXYearLabel {
             let dateFormatter: DateFormatter = {
                 let formatter = DateFormatter()
                 formatter.locale = NSLocale.current
@@ -116,13 +120,11 @@ class ValueChart: UIView {
             xAxisLabels.append(aLabel)
         }
         
-        if array?.count ?? 0 > 0 {
+        if array?.count ?? 0 > 0 && showYLabels {
             findYAxisValuesRight(min: minValue1, max: maxValue1)
         }
 
-//        growthTrend = Calculator.valueChartCorrelation(arrays: [array ?? []])
         valuesTrend = Calculator.valueChartCorrelation(arrays: [array ?? []])
-
     }
     
     override func draw(_ rect: CGRect) {
@@ -131,9 +133,9 @@ class ValueChart: UIView {
             return
         }
         
-        chartOrigin.x = rect.width * 0.15
-        chartOrigin.y = 10.0
-        chartEnd.x = rect.width * 0.87
+        chartOrigin.x = 0
+        chartOrigin.y = 0
+        chartEnd.x = rect.width - yAxisLabelMaxWidth - 5
         chartAreaSize.width = chartEnd.x - chartOrigin.x
         
         var value1Range = maxValue1 - minValue1
@@ -153,7 +155,7 @@ class ValueChart: UIView {
            step += 1
         }
         
-        chartEnd.y = xAxisLabels.first!.frame.minY // - 5
+        chartEnd.y = xAxisLabels.first?.frame.minY ?? rect.height - 5
         chartAreaSize.height = chartEnd.y - chartOrigin.y
         let pixPerValue1 = chartAreaSize.height / CGFloat(value1Range)
 
@@ -175,7 +177,6 @@ class ValueChart: UIView {
         yAxis.move(to: CGPoint(x: chartOrigin.x, y:chartOrigin.y))
         yAxis.addLine(to: CGPoint(x: chartOrigin.x, y: chartEnd.y))
         yAxis.lineWidth = 2
-//        UIColor.systemGray.setStroke()
         yAxis.stroke()
 
 // x axis
@@ -202,21 +203,30 @@ class ValueChart: UIView {
                 
 // colums
         var valueCount: CGFloat = 0
-        let fillColor = UIColor.systemGray4
+        var fillColor = UIColor.systemGray4
                 
         fillColor.setFill()
         fillColor.setStroke()
 
+        var previousValue = validValues.first!
         validValues.forEach({ (value) in
             let boxLeft = chartOrigin.x + (labelSlotWidth / 2) + labelSlotWidth * valueCount - (labelSlotWidth * 0.8 / 2)
-            let boxTop = nullAxisY - CGFloat(value) * pixPerValue1 //chartEnd.y - chartAreaSize.height * CGFloat(value) / maxValue1
+            let boxTop = nullAxisY - CGFloat(value) * pixPerValue1
             let boxBottom = nullAxisY
             let boxHeight = boxBottom - boxTop
 
             let boxRect = CGRect(x: boxLeft, y: boxTop, width: labelSlotWidth * 0.8, height: boxHeight)
             let newBox = UIBezierPath(rect: boxRect)
+            if biggerIsBetter {
+                fillColor = (previousValue < value) ? UIColor(named: "Green")! : UIColor(named: "Red")!
+            }
+            else {
+                fillColor = (previousValue > value) ? UIColor(named: "Green")! : UIColor(named: "Red")!
+            }
+            fillColor.setFill()
             newBox.fill()
-
+            
+            previousValue = value
             valueCount += 1
         })
         
@@ -226,7 +236,7 @@ class ValueChart: UIView {
         if valuesTrend != nil {
             let trendLine = UIBezierPath()
             
-            let pixPerValue = pixPerValue1 //(valueArray2?.count ?? 0 > 0) ? pixPerValue2 :
+            let pixPerValue = pixPerValue1
 
             let trendLineStartY = nullAxisY - CGFloat(valuesTrend!.yIntercept) * pixPerValue
             let trendLineEndY = nullAxisY - CGFloat(valuesTrend!.endValue(for: Double(xAxisLabels.count))) * pixPerValue // -
@@ -257,7 +267,12 @@ class ValueChart: UIView {
                 meanChangeOfGrowth$ = valuesAreGrowth ? "Compound growth trend " + (percentFormatter0Digits.string(from: valuesTrend!.incline as NSNumber) ?? "-") + " to " : ""
             }
             
-            trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$) \(meanChangeOfGrowth$) \(growthEMA$)", indicesOfSuperscripts: [1])
+            if titleIsLong {
+                trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$) \(meanChangeOfGrowth$) \(growthEMA$)", indicesOfSuperscripts: [1])
+            }
+            else {
+                trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$), \(growthEMA$)", indicesOfSuperscripts: [1])
+            }
             trendlabel?.sizeToFit()
         }
 
@@ -307,6 +322,9 @@ class ValueChart: UIView {
                 label.textAlignment = .right
                 label.text = (yAxisNumberFormatter.string(from: (labelValue / factor) as NSNumber) ?? "") + (lastLetter ?? "")
                 label.sizeToFit()
+                if label.frame.width > yAxisLabelMaxWidth {
+                    yAxisLabelMaxWidth = label.frame.width
+                }
                 self.addSubview(label)
                 return label
             }()

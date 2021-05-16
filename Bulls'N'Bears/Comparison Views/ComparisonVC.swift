@@ -20,6 +20,7 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     var controller: ComparisonController!
     var shares: [Share]?
     var shareNameLabels: [UILabel]?
+    var popOverControllers:[TBYChartViewController]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,17 +42,14 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
             shareNamesView.addSubview(label)
             shareNameLabels?.append(label)
             
-            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 455 + 150*count).isActive = true
+            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: 480 + 150*count).isActive = true
             label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-//            label.topAnchor.constraint(equalTo: titleLabel.bottomAnchor,constant: 10).isActive = true
             if previousLabel != nil {
                 previousLabel?.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: 10).isActive = true
             }
             previousLabel = label
             count += 1.0
         }
-        
-        
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -79,9 +77,23 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath == IndexPath(row: 0, section: 0) { return 200 }
-        else { return 75 }
+        else { return 90 }
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        tableView.deselectRow(at: indexPath, animated: false)
+        
+        if indexPath.section > 2 {
+            let cell = tableView.cellForRow(at: indexPath) as! ComparisonCell
+            
+            cell.cellShowsCharts.toggle()
+            cell.configure(controller: controller, cellPath: indexPath)
+//            tableView.reloadRows(at: [indexPath], with: .automatic)
+
+        }
+    }
+        
     /*
     // MARK: - Navigation
 

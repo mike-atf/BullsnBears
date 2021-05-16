@@ -91,21 +91,20 @@ class ValueListTVC: UITableViewController {
         }
         else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListCell2", for: indexPath) as! ValueListCell
-            
+                        
             if indexPath.row == 0 {
                 // chart of values
                 let barChartValues = (values?.count ?? 0 > 1) ? proportions : values?[indexPath.section-2]
                 let valuesAreProportions = (values?.count ?? 0 > 1)
-//                let barChartValues = values?[indexPath.section-2]
-                cell.configure(values: barChartValues, rightTitle: cellLegendTitles.first, valuesAreGrowth: false, valuesAreProportions: valuesAreProportions)
-// leftTile: cellLegendTitles.first
+                
+                cell.configure(values: barChartValues, biggerIsBetter: higherGrowthIsBetter ,rightTitle: cellLegendTitles.first, valuesAreGrowth: false, valuesAreProportions: valuesAreProportions)
             }
             else if indexPath.row == 1 {
                 // chart of growth
-//                let trendLineChartValues = (values?.count ?? 0 > 1) ? Calculator.compoundGrowthRates(values: proportions) : proportions
                 let trendLineChartValues = (values?.count ?? 0 > 1) ? Calculator.compoundGrowthRates(values: proportions) : proportions
                 let rowtitle = "Compound growth rates of " + cellLegendTitles.first!
-                cell.configure(values: trendLineChartValues, rightTitle: rowtitle, valuesAreGrowth: true)
+                
+                cell.configure(values: trendLineChartValues, biggerIsBetter: higherGrowthIsBetter ,rightTitle: rowtitle, valuesAreGrowth: true)
             }
 
             return cell

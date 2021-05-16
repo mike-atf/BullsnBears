@@ -302,8 +302,6 @@ class SharePlaceHolder: NSObject {
         // do not access the main viewContext or NSManagedObjects fetched from it!
         // the StocksController sending this via startPriceUpdate uses a seperate backgroundMOC and shares fetched from this to execute this tasks
         
-        print(#file + "." + #function + " live price download request started")
-
         dataTask = yahooSession.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {

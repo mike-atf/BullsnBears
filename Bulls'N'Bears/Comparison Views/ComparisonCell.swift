@@ -14,7 +14,9 @@ class ComparisonCell: UITableViewCell {
     var valueLabels: [UILabel]?
     var legendLabel: UILabel?
     var textViews: [UITextView]?
-    var trendIcons: [TrendIconView2]?
+    var charts: [ValueChart]?
+    var cellShowsCharts = false
+//    var trendIcons: [TrendIconView2]?
     var controller: ComparisonController!
     
     let columnWidth: CGFloat = 150
@@ -42,14 +44,11 @@ class ComparisonCell: UITableViewCell {
         for view in textViews ?? [] {
             view.removeFromSuperview()
         }
-        for view in trendIcons ?? [] {
-            view.removeFromSuperview()
-        }
+        cellShowsCharts = false
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
     }
     
     func configure(controller: ComparisonController, cellPath: IndexPath) {
@@ -58,13 +57,31 @@ class ComparisonCell: UITableViewCell {
         margins = contentView.layoutMarginsGuide
         rowTitleLabel.text = controller.titleForRow(for: cellPath)
 
+        layoutCell(cellPath: cellPath)
+    }
+    
+    func layoutCell(cellPath: IndexPath) {
+        
+        for constraint in legendLabel?.constraints ?? [] {
+            legendLabel?.removeConstraint(constraint)
+        }
+        legendLabel?.removeFromSuperview()
+
+        for label in valueLabels ?? [] {
+            label.removeFromSuperview()
+        }
+
+        for chart in charts ?? [] {
+            chart.removeFromSuperview()
+        }
+        
         if cellPath == IndexPath(row: 0, section: 0) {
             createTextView(cellPath: cellPath)
         }
         else if cellPath.section < 3 {
             createLabels(cellPath: cellPath)
         }
-        else {
+        else if !cellShowsCharts {
             legendLabel = {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
@@ -81,6 +98,9 @@ class ComparisonCell: UITableViewCell {
             legendLabel!.leadingAnchor.constraint(greaterThanOrEqualTo: rowTitleLabel.trailingAnchor, constant: 10).isActive = true
             
             createFinancialsTexts(cellPath: cellPath)
+        }
+        else {
+            chartsView(cellPath: cellPath)
         }
     }
     
@@ -143,55 +163,50 @@ class ComparisonCell: UITableViewCell {
 
     }
     
-    private func createIconCellContent(cellPath: IndexPath) {
+    private func chartsView(cellPath: IndexPath) {
         
-        let strings = controller.rowTexts(forPath: cellPath)
+        let (correlation, values) = controller.fundamentals(forPath: cellPath)
         
-        let (correlations, values) = controller.fundamentals(forPath: cellPath)
-        trendIcons = [TrendIconView2]()
-        valueLabels = [UILabel]()
-
         var count: CGFloat = 0
-        for string in strings {
+        
+        charts = [ValueChart]()
+        valueLabels = [UILabel]()
+        for array in values ?? [] {
             
-            let iconView = TrendIconView2(frame: CGRect.zero)
-            iconView.translatesAutoresizingMaskIntoConstraints = false
-            self.contentView.addSubview(iconView)
-            trendIcons?.append(iconView)
-            
-            iconView.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth * count).isActive = true
-            iconView.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-            iconView.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 1.0).isActive = true
-            iconView.widthAnchor.constraint(equalTo: iconView.heightAnchor).isActive = true
-            
-            var correlation: Correlation?
-            var iconValues: [Double]?
-            if correlations?.count ?? 0 > Int(count) {
-                correlation = correlations?[Int(count)]
-            }
-            if values?.count ?? 0 > Int(count) {
-                iconValues = values?[Int(count)]
-            }
-            iconView.configure(correlation: correlation, wbParameters: iconValues)
-
             let label: UILabel = {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
-                label.font = UIFont.preferredFont(forTextStyle: .body)
-                label.text = string
+                label.font = UIFont.systemFont(ofSize: financialsFontSize-2)
+                label.text = " "
+                label.numberOfLines = 0
                 label.sizeToFit()
                 return label
             }()
-            self.contentView.addSubview(label)
+            contentView.addSubview(label)
             valueLabels?.append(label)
             
-            label.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 5).isActive = true
-            label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-            label.widthAnchor.constraint(equalToConstant: 75).isActive = true
+            let newChart = ValueChart()
+            newChart.translatesAutoresizingMaskIntoConstraints = false
+            contentView.addSubview(newChart)
+            
+            label.topAnchor.constraint(equalTo: topAnchor).isActive = true
+            label.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth * count + 10).isActive = true
+            label.widthAnchor.constraint(equalToConstant: columnWidth-10).isActive = true
+            
+            newChart.leadingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth * count + 10).isActive = true
+            newChart.topAnchor.constraint(equalTo: label.bottomAnchor,constant: 3).isActive = true
+            newChart.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+            newChart.widthAnchor.constraint(equalToConstant: columnWidth-10).isActive = true
+            
+            newChart.backgroundColor = UIColor.systemBackground
+            let biggerIsBetter = (cellPath.section == 6) ? false : true
+            newChart.configure(array: array, biggerIsBetter: biggerIsBetter ,trendLabel: label, longTitle: false ,valuesAreGrowth: true, showXLabels: false, showYLabels: true)
+            charts?.append(newChart)
             count += 1
         }
+
     }
-    
+     
     private func createFinancialsTexts(cellPath: IndexPath) {
         
         let texts = controller.financialsTexts(forPath: cellPath)
@@ -199,9 +214,9 @@ class ComparisonCell: UITableViewCell {
 
         var count: CGFloat = 0
         
-        for triplet in texts ?? [] {
+        for duplet in texts ?? [] {
             
-            guard triplet.count > 2 else {
+            guard duplet.count > 1 else {
                 return
             }
             
@@ -210,7 +225,7 @@ class ComparisonCell: UITableViewCell {
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.numberOfLines = 0
                 label.font = UIFont.systemFont(ofSize: financialsFontSize)
-                label.text = triplet[0] + "\n" + triplet[1] + "\n" + triplet[2]
+                label.text = duplet[0] + "\n" + duplet[1]
                 label.textAlignment = .right
                 label.sizeToFit()
                 return label

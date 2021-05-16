@@ -402,14 +402,19 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         else {
             let selectedShare = controller.object(at: indexPath)
-            if !selectedSharesToCompare.compactMap({ $0.symbol }).contains(selectedShare.symbol) {
-                selectedSharesToCompare.insert(selectedShare)
-            }
-            else {
+            selectedSharesToCompare.insert(selectedShare)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        
+        if tableView.isEditing {
+            let selectedShare = controller.object(at: indexPath)
+            if selectedSharesToCompare.compactMap({ $0.symbol }).contains(selectedShare.symbol) {
                 selectedSharesToCompare.remove(selectedShare)
             }
         }
-
+ 
     }
     
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
@@ -494,8 +499,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         popUpController?.barButtonItem = treasuryBondYieldsButton
             
         self.splitViewController?.present(tbyVC, animated: true, completion: nil)
-
-        
     }
     
     // MARK: - Navigation
@@ -612,7 +615,7 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
             do {
                 try sL.performFetch()
             } catch let error as NSError {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
+                ErrorController.addErrorLog(errorLocation: #function, systemError: error, errorInfo: "can't fetch files")
             }
 
             return sL

@@ -27,12 +27,12 @@ class ValueListCell: UITableViewCell, UITextFieldDelegate {
     }
     
     /// values1 contains valuation figures, values2 (optional) has the proportions either comnpared to another set of figures, or element-on-element growth
-    public func configure(values: [Double]?, rightTitle: String?, valuesAreGrowth: Bool, valuesAreProportions:Bool? = false) {
+    public func configure(values: [Double]?, biggerIsBetter: Bool?=true ,rightTitle: String?, valuesAreGrowth: Bool, valuesAreProportions:Bool? = false) {
                 
         rightLowerLabel.text = rightTitle
         rightLowerLabel.textColor = UIColor.label
         
-        chartView.configure(array: values, trendLabel: title, valuesAreGrowth: valuesAreGrowth,valuesAreProportions:valuesAreProportions)
+        chartView.configure(array: values, biggerIsBetter: biggerIsBetter ,trendLabel: title, valuesAreGrowth: valuesAreGrowth,valuesAreProportions:valuesAreProportions)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
