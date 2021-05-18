@@ -29,11 +29,12 @@ class ErrorListVC: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "errorLogListCell", for: indexPath) as! ErrorLogListCell
 
-        let log = errorLog![indexPath.row]
-        cell.locationLabel.text = log.location
-        cell.infoLabel.text = log.errorInfo
-        cell.sysErrLabel.text = log.systemMessage?.localizedDescription
-
+        if errorLog?.count ?? 0 > indexPath.row {
+            let log = errorLog![indexPath.row]
+            cell.locationLabel.text = log.location
+            cell.infoLabel.text = log.errorInfo
+            cell.sysErrLabel.text = log.systemMessage?.localizedDescription
+        }
         return cell
     }
     

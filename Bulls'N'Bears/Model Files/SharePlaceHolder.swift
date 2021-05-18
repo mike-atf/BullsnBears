@@ -329,11 +329,11 @@ class SharePlaceHolder: NSObject {
     
     func startDailyPriceUpdate(yahooRefDate: Date, delegate: StockDelegate) {
         
-        let nowSinceRefDate = Date().timeIntervalSince(yahooRefDate)
-        let start = nowSinceRefDate - TimeInterval(3600 * 24 * 366)
-        
+        let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
+        let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
+
         let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
-        let start$ = numberFormatter.string(from: start as NSNumber) ?? ""
+        let start$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
         
         var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(symbol)")
         urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
@@ -397,10 +397,27 @@ class SharePlaceHolder: NSObject {
                 try FileManager.default.moveItem(at: fURL, to: tempURL)
                 
                 guard CSVImporter.matchesExpectedFormat(url: tempURL) else {
-//                    DispatchQueue.main.async {
-//                        ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "no matching stock symbol, or file error")
-//                    }
-                    return
+                    removeFile(tempURL)
+                         
+                    // invalid cookie error - try alternative method
+                    let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
+                    let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
+
+                    let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
+                    let start$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
+                    
+                    // 18/5/21 - period1=1589760000 // period2=1621296000 https://uk.finance.yahoo.com/quote/AAPL/history?period1=1589760000&period2=1621296000&interval=1d&filter=history&frequency=1d&includeAdjustedClose=true
+                    var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
+                    urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "filter", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
+                    
+                    
+                    if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
+                        downloadWebData(sourceURL, stockName: symbol, task: "priceHistory", delegate: delegate)
+                        return
+                    }
+                    else {
+                        return
+                    }
                 }
 
                 if FileManager.default.fileExists(atPath: targetURL.path) {
@@ -435,6 +452,45 @@ class SharePlaceHolder: NSObject {
             }
         }
     }
+    
+    func downloadWebData(_ url: URL, stockName: String, task: String, delegate: StockDelegate?) {
+        
+        let configuration = URLSessionConfiguration.default
+        configuration.httpCookieAcceptPolicy = .always
+        configuration.httpShouldSetCookies = true
+        let session = URLSession(configuration: configuration)
+        var downloadTask: URLSessionDataTask? // URLSessionDataTask stores downloaded data in memory, DownloadTask as File
+
+        downloadTask = session.dataTask(with: url) { [self]
+            data, urlResponse, error in
+            
+            guard error == nil else {
+                return
+            }
+            
+            guard urlResponse != nil else {
+                return
+            }
+            
+            guard let validData = data else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
+                return
+            }
+
+            let html$ = String(decoding: validData, as: UTF8.self)
+            if task == "priceHistory" {
+                let pricePoints = WebpageScraper.yahooPriceTable(html$: html$)
+                
+                DispatchQueue.main.async {
+                    priceUpdateComplete = true
+                    updateDailyPrices(newPrices: pricePoints) // this saves the downloaded data to the backgroundMOC used
+                    downloadKeyRatios(delegate: delegate)
+                }
+            }
+        }
+        downloadTask?.resume()
+    }
+
 
     // MARK: - keyRatios update
     

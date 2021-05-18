@@ -27,7 +27,7 @@ class StocksController: NSFetchedResultsController<Share> {
     
     var pricesUpdateDelegate: StocksControllerDelegate?
     var stockDelegate: StockDelegate?
-    lazy var yahooRefDate: Date = getYahooRefDate()
+//    lazy var yahooRefDate: Date = getYahooRefDate()
     var downloadErrors = [String]()
     var webDownLoader: WebDataDownloader?
     var sortParameter = UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as! String
@@ -241,19 +241,19 @@ class StocksController: NSFetchedResultsController<Share> {
     }
 
                     
-    private func getYahooRefDate() -> Date {
-        let calendar = Calendar.current
-        let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
-        var dateComponents = calendar.dateComponents(components, from: Date())
-        dateComponents.second = 0
-        dateComponents.minute = 0
-        dateComponents.hour = 0
-        dateComponents.year = 1970
-        dateComponents.day = 1
-        dateComponents.month = 1
-        return calendar.date(from: dateComponents) ?? Date()
-
-    }
+//    private func getYahooRefDate() -> Date {
+//        let calendar = Calendar.current
+//        let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+//        var dateComponents = calendar.dateComponents(components, from: Date())
+//        dateComponents.second = 0
+//        dateComponents.minute = 0
+//        dateComponents.hour = 0
+//        dateComponents.year = 1970
+//        dateComponents.day = 1
+//        dateComponents.month = 1
+//        return calendar.date(from: dateComponents) ?? Date()
+//
+//    }
     
     class func createShare(from file: URL?, companyName: String?=nil, deleteFile: Bool?=false) -> Share? {
         

@@ -298,7 +298,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.formatter = currencyFormatterGapNoPence
                     let (margins, _) = validController.valuation!.longtermDebtProportion()
                     destination.proportions = margins
-                    destination.higherGrowthIsBetter = false
                 }
 
             }

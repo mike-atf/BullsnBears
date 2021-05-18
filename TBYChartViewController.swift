@@ -25,7 +25,7 @@ class TBYChartViewController: UIViewController {
                 datesLabel.text = fdate$ + " - " + ldate$
             }
         }
-        chartView.configure(array: rates, trendLabel: nil, valuesAreGrowth: false, showXLabels: false, showsXYearLabel: true)
+        chartView.configure(array: rates, biggerIsBetter: false ,trendLabel: nil, valuesAreGrowth: false, showXLabels: false, showsXYearLabel: true)
     }
 
 }

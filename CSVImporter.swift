@@ -238,9 +238,9 @@ class CSVImporter: NSObject {
         }
         
         if headerError {
-            print()
-            print("Downloaded csv file header error \(String(describing: fileContent$))")
-            print()
+//            print()
+//            print("Downloaded csv file header error \(String(describing: fileContent$))")
+//            print()
             return false
             
         }

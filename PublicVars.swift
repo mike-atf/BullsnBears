@@ -20,6 +20,41 @@ let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
 var appActivatedFromBackground = true
 
+var yahooRefDate: Date = {
+    let calendar = Calendar.current
+    let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+    var dateComponents = calendar.dateComponents(components, from: Date())
+    dateComponents.second = 0
+    dateComponents.minute = 0
+    dateComponents.hour = 0
+    dateComponents.year = 1970
+    dateComponents.day = 1
+    dateComponents.month = 1
+    return calendar.date(from: dateComponents) ?? Date()
+}()
+
+var yahooPricesStartDate: Date {
+    let calendar = Calendar.current
+    let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+    var dateComponents = calendar.dateComponents(components, from: Date())
+    dateComponents.second = 0
+    dateComponents.minute = 0
+    dateComponents.hour = 0
+    dateComponents.year! -= 1
+    return calendar.date(from: dateComponents) ?? Date()
+}
+
+var yahooPricesEndDate: Date {
+    let calendar = Calendar.current
+    let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+    var dateComponents = calendar.dateComponents(components, from: Date())
+    dateComponents.second = 0
+    dateComponents.minute = 0
+    dateComponents.hour = 0
+    return calendar.date(from: dateComponents) ?? Date()
+}
+
+
 var stockTickerDictionary: [String:String]? = {
         
     guard let fileURL = Bundle.main.url(forResource: "StockTickerDictionary", withExtension: "csv") else {
