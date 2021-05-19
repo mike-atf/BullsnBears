@@ -40,7 +40,7 @@ class ChartTimeLineView: UIView {
             return
         }
 
-        dateRange = validShare.priceDateRangeWorkWeeksForCharts() ?? [Date(),Date()]
+        dateRange = validShare.priceDateRangeWorkWeeksForCharts()
         
         dateLabels = getDateLabels()
         

@@ -111,18 +111,31 @@ class ChartView: UIView {
 
         let dailyPrices = share?.getDailyPrices()
         var sma10:[Double]?
-        var smaLine: UIBezierPath?
+        var sma50: [Double]?
+        
+        var sma10Line: UIBezierPath?
+        var sma50Line: UIBezierPath?
         if dailyPrices?.count ?? 0 > 11 {
             sma10 = [Double]()
-            smaLine = UIBezierPath()
+            sma10Line = UIBezierPath()
             let firstSMA10 = dailyPrices![..<10].compactMap{ $0.close }.reduce(0, +) / 10
             let x = chartOrigin.x + CGFloat(dailyPrices![10].tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width + boxWidth / 2
             let y = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - firstSMA10) / (maxPrice - minPrice)))
-            smaLine?.move(to: CGPoint(x: x, y: y))
+            sma10Line?.move(to: CGPoint(x: x, y: y))
+        }
+        
+        if dailyPrices?.count ?? 0 > 51 {
+            sma50 = [Double]()
+            sma50Line = UIBezierPath()
+            let firstSMA50 = dailyPrices![..<50].compactMap{ $0.close }.reduce(0, +) / 50
+            let x = chartOrigin.x + CGFloat(dailyPrices![50].tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width + boxWidth / 2
+            let y = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - firstSMA50) / (maxPrice - minPrice)))
+            sma50Line?.move(to: CGPoint(x: x, y: y))
         }
 
+
         // MARK: - candles
-                
+
         for i in 0..<(dailyPrices ?? []).count {
             let pricePoint = dailyPrices![i]
             let boxLeft = chartOrigin.x + CGFloat(pricePoint.tradingDate.timeIntervalSince(dateRange!.first!) / chartTimeSpan) * chartAreaSize.width //- (boxWidth * 0.8 / 2)
@@ -144,21 +157,36 @@ class ChartView: UIView {
             tick.addLine(to: CGPoint(x:-1 + boxLeft + boxWidth / 2, y: lowPoint))
             tick.stroke()
                         
-            //MARK: - SMA Line
+            //MARK: - SMA10 Line
             sma10?.append(pricePoint.close)
             if sma10?.count ?? 0 > 10 {
                 let sma = (sma10?[..<10].reduce(0, +))! / 10.0 // exclude elements just added so it's sma until day before nbut not including current day
                 let x = boxLeft + boxWidth / 2
                 let y = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - sma) / (maxPrice - minPrice)))
-                smaLine?.addLine(to: CGPoint(x: x, y: y))
+                sma10Line?.addLine(to: CGPoint(x: x, y: y))
                 sma10?.removeFirst()
             }
+            
+            //MARK: - SMA10 Line
+            sma50?.append(pricePoint.close)
+            if sma50?.count ?? 0 > 50 {
+                let sma = (sma50?[..<50].reduce(0, +))! / 50.0 // exclude elements just added so it's sma until day before nbut not including current day
+                let x = boxLeft + boxWidth / 2
+                let y = chartEnd.y + chartAreaSize.height * (CGFloat((maxPrice - sma) / (maxPrice - minPrice)))
+                sma50Line?.addLine(to: CGPoint(x: x, y: y))
+                sma50?.removeFirst()
+            }
+
         }
         
         UIColor.systemBlue.setStroke()
-        smaLine!.lineWidth = 1.2
-        smaLine!.stroke()
+        sma10Line?.lineWidth = 1.2
+        sma10Line?.stroke()
         
+        UIColor.systemRed.setStroke()
+        sma50Line?.lineWidth = 1.2
+        sma50Line?.stroke()
+
         
         //MARK: -  latest SMA10 crossing
         if let crossingPoint = latestSMA10crossing {
@@ -178,80 +206,23 @@ class ChartView: UIView {
         //MARK: - current price line
         let nonNullLivePrice = (share?.lastLivePrice != 0.0) ? share?.lastLivePrice : nil
         if let dailyPrices = share?.getDailyPrices() {
-            if let currentPrice = nonNullLivePrice ?? dailyPrices.last?.close {
-                let currentPriceLine = UIBezierPath()
-                let pp1 = PriceDate(dailyPrices.first!.tradingDate, currentPrice)
-                let pp2 = PriceDate(dailyPrices.last!.tradingDate, currentPrice)
-                
-                let startPoint = plotPricePoint(pricePoint: pp1)
-                var endPoint = plotPricePoint(pricePoint: pp2)
-                endPoint.x = rect.maxX // yAxisLabels.first!.frame.maxX + 5
-                currentPriceLine.move(to: startPoint)
-                currentPriceLine.addLine(to: endPoint)
-                
-                UIColor.label.setStroke()
-                currentPriceLine.stroke()
+            if dailyPrices.count > 0 {
+                if let currentPrice = nonNullLivePrice ?? dailyPrices.last?.close {
+                    let currentPriceLine = UIBezierPath()
+                    let pp1 = PriceDate(dailyPrices.first!.tradingDate, currentPrice)
+                    let pp2 = PriceDate(dailyPrices.last!.tradingDate, currentPrice)
+                    
+                    let startPoint = plotPricePoint(pricePoint: pp1)
+                    var endPoint = plotPricePoint(pricePoint: pp2)
+                    endPoint.x = rect.maxX // yAxisLabels.first!.frame.maxX + 5
+                    currentPriceLine.move(to: startPoint)
+                    currentPriceLine.addLine(to: endPoint)
+                    
+                    UIColor.label.setStroke()
+                    currentPriceLine.stroke()
       
-                //MARK: - DCF Label
-                
-//                for label in valuationLabels {
-//                    label.removeFromSuperview()
-//                }
-//                valuationLabels.removeAll()
-//
-//                if let existingValuation = CombinedValuationController.returnDCFValuations(company: share!.symbol) {
-//                    let (fairValue, errors) = existingValuation.returnIValue()
-//                    if (fairValue ?? 0.0) > 0 {
-//                        let ratio = currentPrice / fairValue!
-//                        let ratio$ = " DCF " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
-//
-//                        let newLabel: UILabel = {
-//                            let label = UILabel()
-//                            label.numberOfLines = 1
-//                            label.font = UIFont.preferredFont(forTextStyle: .footnote)
-//                            label.textColor = UIColor(named: "antiLabel")
-//                            label.backgroundColor = (errors.count == 0) ? UIColor.label : UIColor.systemYellow
-//                            label.text = ratio$
-//                            label.sizeToFit()
-//
-//                            let labelTop = endPoint.y - label.frame.height - 2
-//
-//                            label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
-//                            return label
-//                        }()
-//                        valuationLabels.append(newLabel)
-//                        addSubview(newLabel)
-//                    }
-//                }
-                
-    //MARK: - R1 Label
-                // R1 Label
-//                if let existingValuation = CombinedValuationController.returnR1Valuations(company: share!.symbol) {
-//                    let (fairValue,errors) = existingValuation.stickerPrice()
-//                        if (fairValue ?? 0) > 0 {
-//                            let ratio = currentPrice / fairValue!
-//                            let ratio$ = " GBV " + (numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "") + "x "
-//
-//                            let newLabel: UILabel = {
-//                                let label = UILabel()
-//                                label.numberOfLines = 1
-//                                label.font = UIFont.preferredFont(forTextStyle: .footnote)
-//                                label.textColor = UIColor(named: "antiLabel")
-//                                label.backgroundColor = (errors == nil) ? UIColor.label : UIColor.systemYellow
-//                                label.text = ratio$
-//                                label.sizeToFit()
-//
-//                                let labelTop = endPoint.y + 2
-//
-//                                label.frame = label.frame.offsetBy(dx: endPoint.x, dy:labelTop)
-//                                return label
-//                            }()
-//                            valuationLabels.append(newLabel)
-//                            addSubview(newLabel)
-//                        }
-//
-//            }
-        }
+                }
+            }
         }
         trendLabels.forEach { (label) in
             label.removeFromSuperview()

@@ -20,22 +20,24 @@ class ResearchCell: UITableViewCell {
 //    var researchParameter: String!
     var originalText: String?
     var indexPath: IndexPath!
+    var textSaved = Bool()
     
     override func awakeFromNib() {
         super.awakeFromNib()
         
         textView.delegate = self
+        textView.backgroundColor = contentView.backgroundColor
     }
     
     override func prepareForReuse() {
         textView.text = " "
+        textSaved = false
     }
 
     func configure(delegate: ResearchCellDelegate?, path: IndexPath) {
         
         self.cellDelegate = delegate
         self.indexPath = path
-        
         
         textView.text = delegate?.value(indexPath: path)
         originalText = textView.text
@@ -48,14 +50,25 @@ extension ResearchCell: UITextViewDelegate {
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         
         addDoneButtonToKeyboard(sender: textView)
+        textSaved = false
         
         return true
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if !textSaved {
+            textSaved = true
+            if let validText = textView.text {
+                cellDelegate?.userEnteredNotes(notes: validText, cellPath: indexPath)
+            }
+        }
     }
 
     @objc
     func endedTextEntry() {
         
         textView.resignFirstResponder()
+        textSaved = true
         if let validText = textView.text {
             cellDelegate?.userEnteredNotes(notes: validText, cellPath: indexPath)
         }

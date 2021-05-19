@@ -746,12 +746,6 @@ public class WBValuation: NSManagedObject {
     
     public func ivalue() -> (Double?, [String] ){
         
-//         guard let stock = stocks.filter({ (stock) -> Bool in
-//            stock.symbol == company
-//         }).first else {
-//            return (nil, ["no stock data available for \(company!)"])
-//         }
-        
         guard let price = share?.getDailyPrices()?.last?.close else {
             return (nil, ["no current price available for \(company!)"])
         }
@@ -766,26 +760,44 @@ public class WBValuation: NSManagedObject {
         }
         
         var errors = [String]()
-        var epsGrowthRates = netEarnings?.growthRates()?.excludeQuartiles()
-        if epsGrowthRates == nil {
-            errors.append("can't calculate earnigs growth rates; trying EPS growth rates instead")
-            epsGrowthRates = eps?.growthRates()
-            if epsGrowthRates == nil {
-                errors.append("can't calculate EPS growth rates either")
-                return (nil, errors)
-            }
-        }
+//        var epsGrowthRates = netEarnings?.growthRates()?.excludeQuartiles()
+//        if epsGrowthRates == nil {
+//            errors.append("can't calculate earnigs growth rates; trying EPS growth rates instead")
+//            epsGrowthRates = eps?.growthRates()
+//            if epsGrowthRates == nil {
+//                errors.append("can't calculate EPS growth rates either")
+//                return (nil, errors)
+//            }
+//        }
+//
+//        guard let meanEPSGrowth = epsGrowthRates?.mean() else {
+//            errors.append("can't calculate mean EPS growth rate")
+//            return (nil, errors)
+//        }
         
-        guard let meanEPSGrowth = epsGrowthRates?.mean() else {
-            errors.append("can't calculate mean EPS growth rate")
+        let epsGrowthRates = Calculator.compoundGrowthRates(values: netEarnings) //netEarnings?.growthRates() // compoundGrowth??!
+        guard let meanEPSGrowth = epsGrowthRates?.median() else {
+            errors.append("can't calculate median EPS growth rate")
             return (nil, errors)
         }
-        
-        if let stdVariation = epsGrowthRates?.stdVariation() {
-            if (stdVariation / meanEPSGrowth) > 1.0 {
+
+        var years = [Double]()
+        for i in 0..<(epsGrowthRates?.count ?? 0) {
+            years.append(Double(epsGrowthRates!.count - i))
+        }
+        let correlation = Calculator.correlation(xArray: years, yArray: epsGrowthRates)
+        if let r2 = correlation?.r2() {
+            if r2 < 0.5 {
                 errors.append("highly variable past earnings growth rates. Resulting intrinsic value is unreliable")
+
             }
         }
+        
+//        if let stdVariation = epsGrowthRates?.stdVariation() {
+//            if (stdVariation / meanEPSGrowth) > 1.0 {
+//                errors.append("highly variable past earnings growth rates. Resulting intrinsic value is unreliable")
+//            }
+//        }
         
         let futureEPS = Calculator.futureValue(present: eps!.first!, growth: meanEPSGrowth, years: 10.0)
         

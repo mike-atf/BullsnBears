@@ -517,7 +517,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     private func returnRowTitles() -> [[String]] {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
-        return [["P/E ratio", "EPS", "Book value/share price","Lynch ratio","beta", "intr. value (10y)"],
+        return [["P/E ratio", "EPS", "Book value/share price","Lynch ratio","beta", "intr. share value (10y)"],
                 ["Revenue", "Net income", "Net inc./ Revenue (Trend & ratio)", "Ret. earnings", "EPS", "Profit margin (Trend & ratio)", "Op. cash flow"],
                 ["Return on equity", "Return on assets","LT debt / adj.sh.equity (Trend & ratio)"],
                 ["Cap. expend. / earnings", "LT Debt / net income", "SGA / profit", "R&D / profit"]

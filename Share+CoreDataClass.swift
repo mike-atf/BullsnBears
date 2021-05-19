@@ -266,10 +266,10 @@ public class Share: NSManagedObject {
     
     
     /// returns the dates of first Monday before first available tradingDate and the next Monday after today
-    public func priceDateRangeWorkWeeksForCharts() -> [Date]? {
+    public func priceDateRangeWorkWeeksForCharts() -> [Date] {
         
         guard let dailyPrices = getDailyPrices() else {
-            return nil
+            return [Date(), Date().addingTimeInterval(7*24*3600)]
         }
         
         let minDate = dailyPrices.compactMap { $0.tradingDate }.min()
@@ -298,7 +298,7 @@ public class Share: NSManagedObject {
                 return [firstMondayMidNight, lastMondayMidNight]
         }
         
-        return nil
+        return [Date(), Date().addingTimeInterval(7*24*3600)]
     }
 
     
@@ -785,6 +785,10 @@ public class Share: NSManagedObject {
         }
         
         guard let dailyPrices = getDailyPrices() else { return nil }
+        
+        guard dailyPrices.count > 14 else {
+            return nil
+        }
         
         var last14 = dailyPrices[..<14].compactMap{ $0.close }
         let after14 = dailyPrices[13...]

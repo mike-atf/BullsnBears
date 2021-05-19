@@ -646,8 +646,6 @@ class WebpageScraper {
         let tableStart$ = "<thead "
         
         let rowStart$ = "Ta(start)"
-//        let rowEnd = "</span></td></tr>"
-//        let columnStart = "<span data-reactid="
         let columnEnd = "</span></td>"
         
         
@@ -663,7 +661,6 @@ class WebpageScraper {
         if let tableStartIndex = pageText.range(of: tableStart$) {
             pageText.removeSubrange(...tableStartIndex.upperBound)
         } else {
-            print("Extracting from Yahoo prices table - can't find start of table")
             return nil
         }
 
@@ -671,7 +668,6 @@ class WebpageScraper {
         if let tableEndIndex = pageText.range(of: tableEnd$) {
             pageText.removeSubrange(tableEndIndex.upperBound...)
         } else {
-            print("Extracting from Yahoo prices table - can't find end of table")
             return nil
         }
 
@@ -719,7 +715,7 @@ class WebpageScraper {
             pageText.removeSubrange(rowStartIndex!.lowerBound...)
             rowStartIndex = pageText.range(of: rowStart$, options: .backwards)
         }
-        
+
         return pricePoints
     }
 

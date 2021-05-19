@@ -400,15 +400,16 @@ class SharePlaceHolder: NSObject {
                     removeFile(tempURL)
                          
                     // invalid cookie error - try alternative method
-                    let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
-                    let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
-
-                    let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
-                    let start$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
+//                    let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
+//                    let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
+//
+//                    let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
+//                    let start$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
                     
                     // 18/5/21 - period1=1589760000 // period2=1621296000 https://uk.finance.yahoo.com/quote/AAPL/history?period1=1589760000&period2=1621296000&interval=1d&filter=history&frequency=1d&includeAdjustedClose=true
                     var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
-                    urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "filter", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
+                    urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
+//                    urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "filter", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
                     
                     
                     if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)

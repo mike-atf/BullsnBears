@@ -407,6 +407,33 @@ extension Array where Element == Double? {
         
         return array
     }
+    
+    /// for odd-number array provides true median
+    /// for even number array provides average of two middle-elements
+    func median() -> Double? {
+        
+        guard self.count > 0 else {
+            return nil
+        }
+        
+        guard self.count > 1 else {
+            return self[0]
+        }
+        
+        var median: Double?
+        
+        let ranked = self.compactMap { $0 }.sorted()
+        let medianElement = Double(ranked.count) / 2.0
+        if medianElement != Double(Int(medianElement)) {
+            // odd number of elements
+            median = ranked[Int(medianElement)]
+        } else {
+            // even number - use average of two center elements
+            median = (ranked[Int(medianElement)] + ranked[Int(medianElement)+1]) / 2
+        }
+        
+        return median
+    }
 
     
 }

@@ -43,7 +43,7 @@ class CitationsManager {
 
         let wb0 = "Warren [Buffett] realized ... that if a company's competitive advantage could be maintained for a long period of time - if it was 'durable' - then the underlying vaue of the business would continue to increase year after year"
         let wb1 = "Because these businesses [with durable competitive advantage] had such incredible business economics working in their favor, there was zero chance of them ever going into bankruptcy."
-        let wb2 = "the longer [Warren Buffett] held on to these positions, the more time he had to profit ferom these businesses' great underlying economics."
+        let wb2 = "the longer [Warren Buffett] held on to these positions, the more time he had to profit from these businesses' great underlying economics."
         let wb3 = "[Warren Buffett] realized that he no longer had to wait for Wall Street to serve up a bargain price. He could pay a fair price for one of these super businesses and still come out ahead, provided he held the investment long enough"
         let wb4 = "Warren has figured out that these super companies come in three basic business models: They sell either a unique product or a unique service, or they are the low-cost buyer and seller of a product or service that the public consistently needs"
         let wb5 = "Warren [Buffett] has learned that it is the 'durability' of the competitive advantage that creates all the wealth"

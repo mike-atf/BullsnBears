@@ -89,7 +89,7 @@ class Calculator {
         }
         
         guard (xArray ?? []).count == (yArray ?? []).count else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Error in trend correlation: y.count != x.count")
+            ErrorController.addErrorLog(errorLocation: #function, systemError: nil, errorInfo: "Error in trend correlation: y.count != x.count")
             return nil
         }
         

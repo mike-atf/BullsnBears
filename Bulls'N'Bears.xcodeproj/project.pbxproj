@@ -170,6 +170,8 @@
 		EAC2FC7D25A240290060F387 /* ValuationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */; };
 		EAC9890225F146E1007AE6F6 /* TrendIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC9890125F146E1007AE6F6 /* TrendIconView.swift */; };
 		EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */; };
+		EAD34D5626545785004859A5 /* CategorySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD34D5426545785004859A5 /* CategorySelectionCell.swift */; };
+		EAD34D5726545785004859A5 /* CategorySelectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAD34D5526545785004859A5 /* CategorySelectionCell.xib */; };
 		EAD835BC25DA9BA40015C93A /* WBValuationTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD835BB25DA9BA40015C93A /* WBValuationTVC.swift */; };
 		EAD835BD25DA9BA40015C93A /* WBValuationTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD835BB25DA9BA40015C93A /* WBValuationTVC.swift */; };
 		EAD835BE25DA9BA40015C93A /* WBValuationTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD835BB25DA9BA40015C93A /* WBValuationTVC.swift */; };
@@ -330,6 +332,8 @@
 		EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationListViewController.swift; sourceTree = "<group>"; };
 		EAC9890125F146E1007AE6F6 /* TrendIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendIconView.swift; sourceTree = "<group>"; };
 		EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
+		EAD34D5426545785004859A5 /* CategorySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionCell.swift; sourceTree = "<group>"; };
+		EAD34D5526545785004859A5 /* CategorySelectionCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategorySelectionCell.xib; sourceTree = "<group>"; };
 		EAD835BB25DA9BA40015C93A /* WBValuationTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WBValuationTVC.swift; path = "Bulls'N'Bears/WBValuationTVC.swift"; sourceTree = SOURCE_ROOT; };
 		EAD835C225DB02030015C93A /* TrendMyStocks 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 2.xcdatamodel"; sourceTree = "<group>"; };
 		EAD835DF25DC06EC0015C93A /* Calculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Calculator.swift; path = "Bulls'N'Bears/Controllers/Calculator.swift"; sourceTree = SOURCE_ROOT; };
@@ -394,6 +398,8 @@
 			children = (
 				EA6EEF9126165665000FA141 /* ResearchController.swift */,
 				EAA69FB02612221B0067EE1A /* ResearchTVC.swift */,
+				EAD34D5426545785004859A5 /* CategorySelectionCell.swift */,
+				EAD34D5526545785004859A5 /* CategorySelectionCell.xib */,
 				EAA69FBB261222AF0067EE1A /* ResearchCell.swift */,
 				EAA69FBC261222AF0067EE1A /* ResearchCell.xib */,
 			);
@@ -698,6 +704,7 @@
 				EA7B613925C412860018BA02 /* StockTickerDictionary.csv in Resources */,
 				EAFCB95F25C5F0240029AA4F /* MTCookies in Resources */,
 				EAA69FC0261222AF0067EE1A /* ResearchCell.xib in Resources */,
+				EAD34D5726545785004859A5 /* CategorySelectionCell.xib in Resources */,
 				EA3207F925EEA15900A6A6AB /* ValueListTextEntryCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -845,6 +852,7 @@
 				EA0E2F292625D50A00602BEE /* SortView.swift in Sources */,
 				EAC2FC5025A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
 				EAC190F42577E3B60030B331 /* ChartView.swift in Sources */,
+				EAD34D5626545785004859A5 /* CategorySelectionCell.swift in Sources */,
 				EAC2FC6325A232780060F387 /* ValuationChooser.swift in Sources */,
 				EAC0F15B25FA819E00AD9E29 /* Share+CoreDataClass.swift in Sources */,
 				EAA69F73260E52550067EE1A /* GrowthCategory.swift in Sources */,
