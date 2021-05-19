@@ -24,9 +24,9 @@ class ComparisonController {
         let titleStructure = [["Why to buy"],
                                 ["Personal rating score", "Fundamentals score", "Compet. strength" ,"Share price / GB Value" ,"Share price / DCF Value", "Share price / Intrinsic value"],
                                 ["PE ratio", "Lynch ratio", "Book value / share price"],
-                                ["Ret. earnings growth", "Revenue growth", "Net income growth", "Op. Cash flow growth", "Gross profit growth", "EPS growth"],
-                                ["Profit margin growth", "Net earnings margin growth"],
-                                ["ROI growth", "ROE growth", "ROA growth"],
+                                ["Ret. earnings", "Revenue", "Net income", "Op. Cash flow", "Gross profit", "EPS"],
+                                ["Profit margin", "Net earnings margin"],
+                                ["ROI", "ROE", "ROA"],
                                 ["LT Debt / net income", "LT Debt / adj equity", "cap. exp./net income", "SGA / profit", "R&D / profit"]]
         
         return titleStructure
@@ -417,31 +417,32 @@ class ComparisonController {
         
         var text = [String]()
         
-        let lowestAcceptableGrowth = growthCutOffRate ?? 0.1
-        let higherIsBetter = biggerIsBetter ?? true
+//        let lowestAcceptableGrowth = growthCutOffRate ?? 0.1
+//        let higherIsBetter = biggerIsBetter ?? true
         
         if let compoundGrowthRates = Calculator.compoundGrowthRates(values: values) {
             if let ema = compoundGrowthRates.ema(periods: 7) {
                 text.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
             } else { text.append("-") }
             
-            let countExceedingThreshold = higherIsBetter ? compoundGrowthRates.filter { rate in
-                if rate < lowestAcceptableGrowth { return false }
-                else { return true }
-            } : compoundGrowthRates.filter { rate in
-                if rate > lowestAcceptableGrowth { return false }
-                else { return true }
-            }
+//            let countExceedingThreshold = higherIsBetter ? compoundGrowthRates.filter { rate in
+//                if rate < lowestAcceptableGrowth { return false }
+//                else { return true }
+//            } : compoundGrowthRates.filter { rate in
+//                if rate > lowestAcceptableGrowth { return false }
+//                else { return true }
+//            }
             
-            let nonNilGrowthRates = compoundGrowthRates //.filter { rate in
+//            let nonNilGrowthRates = compoundGrowthRates //.filter { rate in
+//            let consistency = Double(countExceedingThreshold.count) / Double(nonNilGrowthRates.count)
+            let consistency2 = values?.consistency(increaseIsBetter: biggerIsBetter ?? true) ?? Double()
             
-            let consistency = Double(countExceedingThreshold.count) / Double(nonNilGrowthRates.count)
-            text.append(percentFormatter0Digits.string(from: consistency as NSNumber) ?? "-")
+            text.append(percentFormatter0Digits.string(from: consistency2 as NSNumber) ?? "-")
                 
-            var years = [Double]()
-            for i in 0..<compoundGrowthRates.count {
-                years.append(Double(compoundGrowthRates.count-i))
-            }
+//            var years = [Double]()
+//            for i in 0..<compoundGrowthRates.count {
+//                years.append(Double(compoundGrowthRates.count-i))
+//            }
 
 //            if let correlation = Calculator.correlation(xArray: years, yArray: compoundGrowthRates) {
 //                text.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")
@@ -457,8 +458,8 @@ class ComparisonController {
     private func twoFinancialsText(values0: [Double]?, values1:[Double]?, growthCutOffRate:Double?=nil, biggerIsBetter: Bool?=nil) -> [String] {
         
         var texts = [String]()
-        let lowestAcceptableGrowth = growthCutOffRate ?? 0.1
-        let higherIsBetter = biggerIsBetter ?? true
+//        let lowestAcceptableGrowth = growthCutOffRate ?? 0.1
+//        let higherIsBetter = biggerIsBetter ?? true
 
         if let proportions = Calculator.proportions(array1: values1, array0: values0) {
             if let compoundGrowthRates = Calculator.compoundGrowthRates(values: proportions) {
@@ -466,23 +467,24 @@ class ComparisonController {
                     texts.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
                 } else { texts.append("-") }
                 
-                let ratesOverTenPct = higherIsBetter ? compoundGrowthRates.filter { rate in
-                    if rate < lowestAcceptableGrowth { return false }
-                    else { return true }
-                } : compoundGrowthRates.filter { rate in
-                    if rate > lowestAcceptableGrowth { return false }
-                    else { return true }
-                }
+//                let ratesOverTenPct = higherIsBetter ? compoundGrowthRates.filter { rate in
+//                    if rate < lowestAcceptableGrowth { return false }
+//                    else { return true }
+//                } : compoundGrowthRates.filter { rate in
+//                    if rate > lowestAcceptableGrowth { return false }
+//                    else { return true }
+//                }
+//
+//                let nonNilGrowthRates = compoundGrowthRates //.filter { rate in
                 
-                let nonNilGrowthRates = compoundGrowthRates //.filter { rate in
-                
-                let consistency = Double(ratesOverTenPct.count) / Double(nonNilGrowthRates.count)
-                texts.append(percentFormatter0Digits.string(from: consistency as NSNumber) ?? "-")
+//                let consistency = Double(ratesOverTenPct.count) / Double(nonNilGrowthRates.count)
+                let consistency2 = proportions.consistency(increaseIsBetter: biggerIsBetter ?? true)
+                texts.append(percentFormatter0Digits.string(from: consistency2 as NSNumber) ?? "-")
                     
-                var years = [Double]()
-                for i in 0..<compoundGrowthRates.count {
-                    years.append(Double(compoundGrowthRates.count-i))
-                }
+//                var years = [Double]()
+//                for i in 0..<compoundGrowthRates.count {
+//                    years.append(Double(compoundGrowthRates.count-i))
+//                }
 
 //                if let correlation = Calculator.correlation(xArray: years, yArray: compoundGrowthRates) {
 //                    texts.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")

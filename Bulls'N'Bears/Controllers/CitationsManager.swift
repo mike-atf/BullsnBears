@@ -52,9 +52,17 @@ class CitationsManager {
         let wb8 = "Warren [Buffett] has read thousands of 10K's over the years, as they do the best job of reporting the numbers without all the fluff that can get stuffed into a shareholder's annual report"
         let wb9 = "To Warren [Buffett], the source of the earnings is always more important than the earnings themselves"
         let wb10 = "Warren [Buffett] knows that one of the great secrets to making more money is spending less money"
+        let wb11 = "Companies with gross profit margins of 40% or better tend to be compnanies with some sort of durable competitive advantage...\nAny gross profit margin of 20% and below is usually a good indicator of a fiercely competitive industry."
+        let wb12 = "Warren [Buffett] knows that when we look for companies with a durable competitive advantage, 'consistency' is the name of the game"
+        let wb13 = "Companies that don't have a durable competitive advantage suffer from intense competition and show wild variation in SGA costs as a percentage of gross profit"
+        let wb14 = "...the lower the company's SGA expenses, the better. If they can stay consistently low, all the better. [...] anything under 30% is considered fantastic."
+        let wb15 = "...the lower the company's SGA expenses, the better. If they can stay consistently low, all the better. [...] anything under 30% is considered fantastic."
+        let wb16 = "...the economics of companies with low SGA expenses can be destroyed by expensive research and development costs, high capital expenditure and/ or lots of debt."
+        let wb17 = "Companies that have to spend heavily on R&D have an inherent flaw in their competitive advantage, that will always put their long-term economics at risk..."
+        let wb18 = "... if a company is showing a net earnings history of more than 20% on total revenues, there is a real good chance that it is benefiting from some kind of long-term competitive advantage."
 
         let plCitatations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
-        let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10]
+        let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10,wb11,wb12, wb13, wb14, wb15, wb16, wb17, wb18]
         
         var allCitations = plCitatations
         allCitations.append(contentsOf: wbCitations)

@@ -75,7 +75,6 @@ class ChartView: UIView {
         }
 
         self.setNeedsDisplay()
-        
     }
     
     override func draw(_ rect: CGRect) {
@@ -176,7 +175,6 @@ class ChartView: UIView {
                 sma50Line?.addLine(to: CGPoint(x: x, y: y))
                 sma50?.removeFirst()
             }
-
         }
         
         UIColor.systemBlue.setStroke()

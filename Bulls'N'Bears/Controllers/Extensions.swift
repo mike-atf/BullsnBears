@@ -234,6 +234,40 @@ extension Array where Element == Double {
         }
     }
 
+    /// returns the fraction of elements that are same or higher than the previous (if increaseIsBetter) or same or lower than previous (is iiB = false
+    /// assumes array is DESCENDING in order
+    /// return placeholder Double() if unable to calculate
+    func consistency(increaseIsBetter: Bool) -> Double {
+        
+        let nonNilElements = self.compactMap({$0})
+        let noPlaceHolderElements = nonNilElements.filter { element in
+            if element == Double() { return false }
+            else { return true }
+        }
+    
+        guard noPlaceHolderElements.count > 1 else {
+            return Double()
+        }
+        
+        var lastNonNilElement = noPlaceHolderElements[0]
+        
+        var consistentCount = 1
+        for i in 1..<noPlaceHolderElements.count {
+            if increaseIsBetter {
+                if noPlaceHolderElements[i] <= lastNonNilElement { // DESCENDING order!
+                    consistentCount += 1
+                }
+            }
+            else {
+                if noPlaceHolderElements[i] >= lastNonNilElement {
+                    consistentCount += 1
+                }
+            }
+            lastNonNilElement = noPlaceHolderElements[i]
+        }
+        
+        return Double(consistentCount) / Double(nonNilElements.count)
+    }
 
 }
 
@@ -434,8 +468,40 @@ extension Array where Element == Double? {
         
         return median
     }
-
     
+    /// returns the fraction of elements that are same or higher than the previous (if increaseIsBetter) or same or lower than previous (is iiB = false
+    /// assumes array is DESCENDING in order
+    func consistency(increaseIsBetter: Bool) -> Double? {
+        
+        let nonNilElements = self.compactMap({$0})
+        let noPlaceHolderElements = nonNilElements.filter { element in
+            if element == Double() { return false }
+            else { return true }
+        }
+    
+        guard noPlaceHolderElements.count > 1 else {
+            return nil
+        }
+        
+        var lastNonNilElement = noPlaceHolderElements[0]
+        
+        var consistentCount = 1
+        for i in 1..<noPlaceHolderElements.count {
+            if increaseIsBetter {
+                if noPlaceHolderElements[i] >= lastNonNilElement {
+                    consistentCount += 1
+                }
+            }
+            else {
+                if noPlaceHolderElements[i] <= lastNonNilElement {
+                    consistentCount += 1
+                }
+            }
+            lastNonNilElement = noPlaceHolderElements[i]
+        }
+        
+        return Double(consistentCount) / Double(nonNilElements.count)
+    }
 }
 
 extension UILabel {

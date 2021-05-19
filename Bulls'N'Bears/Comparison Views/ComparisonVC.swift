@@ -89,8 +89,6 @@ class ComparisonVC: UIViewController, UITableViewDelegate, UITableViewDataSource
             
             cell.cellShowsCharts.toggle()
             cell.configure(controller: controller, cellPath: indexPath)
-//            tableView.reloadRows(at: [indexPath], with: .automatic)
-
         }
     }
         

@@ -81,12 +81,31 @@ class ComparisonCell: UITableViewCell {
         else if cellPath.section < 3 {
             createLabels(cellPath: cellPath)
         }
-        else if !cellShowsCharts {
+        else if cellShowsCharts {
             legendLabel = {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = UIFont.systemFont(ofSize: financialsFontSize)
-                label.text = cellPath.section < 6 ? "EMA:\n>10%:" : "EMA:\n<0%:"
+                label.text = "Compound growth"
+                label.textAlignment = .right
+                label.numberOfLines = 0
+                label.sizeToFit()
+                return label
+            }()
+            self.contentView.addSubview(legendLabel!)
+            legendLabel!.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset-10).isActive = true
+            legendLabel!.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+            legendLabel!.leadingAnchor.constraint(greaterThanOrEqualTo: rowTitleLabel.trailingAnchor, constant: 10).isActive = true
+            
+            chartsView(cellPath: cellPath)
+        }
+        else {
+            legendLabel = {
+                let label = UILabel()
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.font = UIFont.systemFont(ofSize: financialsFontSize)
+//                label.text = cellPath.section < 6 ? "EMA:\n>10%:" : "EMA:\n<0%:"
+                label.text = "Growth EMA:\nConsistency:"
                 label.textAlignment = .right
                 label.numberOfLines = 0
                 label.sizeToFit()
@@ -98,9 +117,6 @@ class ComparisonCell: UITableViewCell {
             legendLabel!.leadingAnchor.constraint(greaterThanOrEqualTo: rowTitleLabel.trailingAnchor, constant: 10).isActive = true
             
             createFinancialsTexts(cellPath: cellPath)
-        }
-        else {
-            chartsView(cellPath: cellPath)
         }
     }
     
