@@ -426,6 +426,7 @@ extension StocksController: StockDelegate {
             else { return false }
         }).first {
             share.shareFromPlaceholder(share: matchingShare)
+            matchingShare.setUserAndValueScores()
             matchingShare.save() // will trigger update of StocksListTVC via FRC functionality
         }
         

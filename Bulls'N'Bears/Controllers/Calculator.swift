@@ -12,15 +12,16 @@ class Calculator {
     
     ///calculates the compound growth rate from startValue to endValue, assuming years' time between the two
     /// end- and startValue must be either both positive or both negative, otherwise 0 as rate is returned
-    /// if both are negative and 'inverse' negative rate is returned
-    class func compoundGrowthRate(endValue: Double, startValue: Double, years: Double) -> Double {
+    /// if end- AND startValue <= 0: if endValue < startvalue (dropping) -> rate inversed to be negative; if both < 0 and endValue > startValue (rising) -> rate inversed to be positive
+    /// if startValue < 0 AND endValue > 0:  -> -NaN=Double(), if startValue > 0 and endValue  < 0 -> -NaN=Double()
+    class func compoundGrowthRate(endValue: Double, startValue: Double, years: Double) -> Double? {
         
-//        guard endValue * startValue >= 0 else {
-//            return 0
-//        }
-        
+        guard endValue * startValue > 0 else {
+            return nil
+        }
+                
         let rate = pow((endValue / startValue) , (1/years)) - 1// (years-1)
-        if endValue < 0 { return rate * -1 }
+        if endValue <= 0 { return rate * -1 }
         else { return rate }
     }
 
@@ -41,7 +42,7 @@ class Calculator {
         
         for i in 1..<array.count {
             if array[i] != 0 && array[i] != Double() {
-                let rate = compoundGrowthRate(endValue: endValue, startValue: array[i], years: Double(i))
+                let rate = compoundGrowthRate(endValue: endValue, startValue: array[i], years: Double(i)) ?? Double()
                 rates.append(rate)
             } else { rates.append(Double()) }
         }

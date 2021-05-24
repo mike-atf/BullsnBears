@@ -51,59 +51,61 @@ class ResearchTVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-//        if (sectionTitles?[indexPath.section] ?? "").contains("Growth Category") {
-//
-//            let cell = tableView.dequeueReusableCell(withIdentifier: "categoryOptionsCell", for: indexPath) as! UITableViewCell
-//
-//        } else {
-        
             let cell = tableView.dequeueReusableCell(withIdentifier: "researchCell", for: indexPath) as! ResearchCell
 
             cell.configure(delegate: controller, path: indexPath)
 
             return cell
-//        }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        if indexPath.section == 0 {
+        let competitorsCount = research?.competitors?.count ?? 0
+        let newsCounts = research?.news?.count ?? 0
+        
+        if indexPath.section == 0 { // asste & values
             return 70
         }
-        else if indexPath.section == 1	 {
+        else if indexPath.section == 1	 { // size
             return 44
         }
-        else if indexPath.section == 2 {
+        else if indexPath.section == 2 { // compet. advantges
             return 44
         }
-        else if indexPath.section == 3 {
+        else if indexPath.section == 3 { // competitors (sub rows)
             return 44
         }
-        else if indexPath.section == 4 {
+        else if indexPath.section == 4 { // future growth plan
             return 70
         }
-        else if indexPath.section == 5 {
+        else if indexPath.section == 5 { // category
             return 44
         }
-        else if indexPath.section == 6 {
+        else if indexPath.section == 6 { // sub category
             return 44
         }
-        else if indexPath.section == 7 {
+        else if indexPath.section == 7 { // news (sub rows)
             return 44
         }
-        else if indexPath.section == 8 {
+        else if indexPath.section == 8 { // industry
             return 44
         }
-        else if indexPath.section == 9 {
-            return 70
+        else if indexPath.section == 9 { // insider buying selling
+            return 44
         }
-        else if indexPath.section == 10 {
+        else if indexPath.section == 10 { // crises performance
+            return 120
+        }
+        else if indexPath.section == 11 { // business description
             return 100
         }
-        else if indexPath.section == 11 {
+        else if indexPath.section == 12 { // ret. earnings
+            return 44
+        }
+        else if indexPath.section == 13 { // special products
             return 70
         }
-        else if indexPath.section == 12 {
+        else if indexPath.section == 14 { // buy story
             return 120
         }
         else {

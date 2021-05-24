@@ -315,19 +315,20 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
+        
         let share = controller.object(at: indexPath)
-        let valueRatingData = share.wbValuation?.valuesSummaryScores()
-        let userRatingData = share.wbValuation?.userEvaluationScore()
+
+//        let valueRatingData = share.wbValuation?.valuesSummaryScores()
+//        let userRatingData = share.wbValuation?.userEvaluationScore()
+//
+//        share.setUserAndValueScores()
         
         let evaluationsCount = share.wbValuation?.returnUserEvaluations()?.compactMap{ $0.comment }.filter({ (comment) -> Bool in
             if !comment.starts(with: "Enter your notes here...") { return true }
             else { return false }
         }).count ?? 0
         
-        cell.configureCell(indexPath: indexPath, stock: share, userRatingData: userRatingData, valueRatingData: valueRatingData, scoreDelegate: self, userCommentCount: evaluationsCount)
-        
-//        cell.accessoryView = UIImageView(image: UIImage(systemName: "magnifyingglass.circle"))
-//        cell.accessoryType = .disclosureIndicator
+        cell.configureCell(indexPath: indexPath, stock: share, userRatingScore: share.userEvaluationScore, valueRatingScore: share.valueScore, scoreDelegate: self, userCommentCount: evaluationsCount)
         
         return cell
     }

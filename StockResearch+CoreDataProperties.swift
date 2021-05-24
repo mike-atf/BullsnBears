@@ -30,6 +30,7 @@ extension StockResearch {
     @NSManaged public var theBuyStory: String?
     @NSManaged public var share: Share?
     @NSManaged public var news: NSSet?
+    @NSManaged public var businessDescription: String?
 
 }
 

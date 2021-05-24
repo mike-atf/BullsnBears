@@ -75,6 +75,7 @@
     </entity>
     <entity name="StockResearch" representedClassName="StockResearch" syncable="YES">
         <attribute name="assets" optional="YES" attributeType="String"/>
+        <attribute name="businessDescription" optional="YES" attributeType="String"/>
         <attribute name="companySize" optional="YES" attributeType="String"/>
         <attribute name="competitiveEdge" optional="YES" attributeType="String"/>
         <attribute name="competitors" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
@@ -128,7 +129,7 @@
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="313"/>
         <element name="Rule1Valuation" positionX="-194.4807128906249" positionY="573.2761535644531" width="128" height="314"/>
         <element name="Share" positionX="-233.677978515625" positionY="114.121826171875" width="128" height="404"/>
-        <element name="StockResearch" positionX="-200.3316650390625" positionY="-256.4151153564453" width="128" height="239"/>
+        <element name="StockResearch" positionX="-200.3316650390625" positionY="-256.4151153564453" width="128" height="254"/>
         <element name="UserEvaluation" positionX="187.350341796875" positionY="352.4636840820313" width="128" height="148"/>
         <element name="WBValuation" positionX="-37.604248046875" positionY="-7.48974609375" width="128" height="374"/>
     </elements>

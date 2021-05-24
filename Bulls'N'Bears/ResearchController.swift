@@ -135,6 +135,8 @@ class ResearchController {
                 sectionTitles[name] = "Growth Category" // enum GrowthCategoryNames
             case "growthSubType":
                 sectionTitles[name] = "Growth Sub Category" // enum GrowthCategoryNames
+            case "businessDescription":
+                sectionTitles[name] = "Products or Services" // enum GrowthCategoryNames
             default:
                 print("error: default")
             }
@@ -165,6 +167,9 @@ class ResearchController {
         }
         
         switch parameter {
+        case "businessDescription":
+            if let valid = share?.research?.businessDescription { return [valid] }
+            else { return nil }
         case "symbol":
             if let valid = share?.research?.symbol { return [valid] }
             else { return nil }
@@ -309,6 +314,8 @@ extension ResearchController: ResearchCellDelegate {
             share?.growthType = notes
         case "growthSubType":
             share?.growthSubType = notes
+        case "businessDescription":
+            share?.research?.businessDescription = notes
         default:
             print("error: default")
         }

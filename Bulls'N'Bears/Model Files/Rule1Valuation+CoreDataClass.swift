@@ -152,7 +152,7 @@ public class Rule1Valuation: NSManagedObject {
             if let endValue = moatArray?.first {
                 for yearBack in 1..<(moatArray?.count ?? 0) {
                     if let startValue = moatArray?[yearBack] {
-                        moatGrowthArray.append(Calculator.compoundGrowthRate(endValue: endValue, startValue: startValue, years: Double(yearBack)))
+                        moatGrowthArray.append(Calculator.compoundGrowthRate(endValue: endValue, startValue: startValue, years: Double(yearBack)) ?? Double())
                         sumValidRates += 1
                     }
                     else {
@@ -191,7 +191,7 @@ public class Rule1Valuation: NSManagedObject {
         
         var bvpsGrowthRates = [Double]()
         for yearsBack in 1..<(cleanedBVPS.count) {
-            bvpsGrowthRates.append(Calculator.compoundGrowthRate(endValue: endValue, startValue: cleanedBVPS[yearsBack], years: Double(yearsBack)))
+            bvpsGrowthRates.append(Calculator.compoundGrowthRate(endValue: endValue, startValue: cleanedBVPS[yearsBack], years: Double(yearsBack)) ?? Double())
         }
         let lowBVPSGrowth = bvpsGrowthRates.mean()
         

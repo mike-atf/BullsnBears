@@ -62,7 +62,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
                      
         let shortNameComponents = shortName.split(separator: " ")
-        hyphenatedShortName = String(shortNameComponents.first ?? "")
+        hyphenatedShortName = String(shortNameComponents.first ?? "").lowercased()
         guard hyphenatedShortName != nil && hyphenatedShortName != "" else {
             alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't construct a stock term for the macrotrends website.")
             return

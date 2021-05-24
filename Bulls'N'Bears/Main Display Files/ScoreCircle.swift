@@ -26,24 +26,29 @@ class ScoreCircle: UIView {
     var delegate: ScoreCircleDelegate?
     var isUserScoreType: Bool!
 
-    func configure(ratingStruct: RatingCircleData?, delegate: ScoreCircleDelegate, path: IndexPath, isUserScore: Bool, userCommentsCount: Int) {
+    func configure( score: Double?, delegate: ScoreCircleDelegate, path: IndexPath, isUserScore: Bool, userCommentsCount: Int) {
                
-        guard let validData = ratingStruct else {
+//        guard let validData = ratingStruct else {
+//            self.isHidden = true
+//            self.tapGestureRecognizer?.isEnabled = false
+//            return
+//        }
+        
+        guard let validScore = score else {
             self.isHidden = true
             self.tapGestureRecognizer?.isEnabled = false
             return
         }
+
         
-        guard let validRatio = validData.ratingScore() else { return }
-        
+        self.scoreRatio = CGFloat(validScore)
         self.isHidden = false
         
         self.isUserScoreType = isUserScore
         self.delegate = delegate
         self.cellPath = path
         
-        self.scoreRatio = CGFloat(validRatio)
-        self.symbol = validData.symbol
+        self.symbol = isUserScore ? .star : .dollar
 
         if scoreRatio > 1 { scoreRatio = 1.0 }
         else if scoreRatio < 0 { scoreRatio = 0 }

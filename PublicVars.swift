@@ -555,21 +555,22 @@ struct PricePoint: Codable {
 
 struct ShareFinancialsValueWeights {
     
-    let peRatio = 1.5
-    let retEarningsGrowth = 1.3
-    let earningsByPER = 1.3
-    let epsGrowth = 1.0
-    let netIncomeDivRevenue = 1.0
-    let capExpendDivEarnings = 1.1
+    let peRatio = 1.0
+    let retEarningsGrowth = 2.0
+    let lynchScore = 2.0
+    let moatScore = 2.0
+    let epsGrowth = 0.5
+    let netIncomeDivRevenue = 2.0
+    let capExpendDivEarnings = 1.0
     let profitMargin = 1.0
-    let ltDebtDivIncome = 0.8
-    let opCashFlowGrowth = 1.3
-    let ltDebtDivadjEq = 0.4
-    let sgaDivRevenue = 0.75
-    let radDivRevenue = 0.75
-    let revenueGrowth = 1.3
-    let netIncomeGrowth = 1.3
-    let roeGrowth = 1.0
+    let ltDebtDivIncome = 0.5
+    let opCashFlowGrowth = 1.0
+    let ltDebtDivadjEq = 2.0
+    let sgaDivRevenue = 1.0
+    let radDivRevenue = 0.5
+    let revenueGrowth = 1.0
+    let netIncomeGrowth = 1.0
+    let roeGrowth = 2.0
 
     
     public func weightsSum() -> Double? {

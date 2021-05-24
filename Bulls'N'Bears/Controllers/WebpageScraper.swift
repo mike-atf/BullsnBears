@@ -262,8 +262,11 @@ class WebpageScraper {
                 
                 let value$ = tableText[numberStartIndex.upperBound..<numberEndIndex!.lowerBound]
 
-                let value = numberFromText(value$: String(value$), rowTitle: rowTitle, exponent: exponent)
-                valueArray.append(value)
+                if value$ == "-" { valueArray.append( 0.0) } // MT.ent hads '-' indicating nil/ 0
+                else {
+                    let value = numberFromText(value$: String(value$), rowTitle: rowTitle, exponent: exponent)
+                    valueArray.append(value)
+                }
             }
             else {
                 let error = "Did not find start of number on MT webpage"

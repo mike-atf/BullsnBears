@@ -102,30 +102,30 @@ public class Share: NSManagedObject {
 
     
     /// takes new prices and adds any newer ones than already saved to the exsitng list (rather than replce the existing list)
-    func updateDailyPrices(newPrices: [PricePoint]?) {
-        
-        guard let validNewPoints = newPrices else { return }
-        
-        if let existingPricePoints = getDailyPrices() {
-            var newList = existingPricePoints
-            var existingMACDs = getMACDs()
-            if let lastExistingDate = existingPricePoints.last?.tradingDate {
-                let pointsToAdd = validNewPoints.filter { (element) -> Bool in
-                    if element.tradingDate > lastExistingDate { return true }
-                    else { return false }
-                }
-                if pointsToAdd.count > 0 {
-                    for point in pointsToAdd {
-                        newList.append(point)
-                        let lastMACD = existingMACDs?.last
-                        existingMACDs?.append(MAC_D(currentPrice: point.close, lastMACD: lastMACD, date: point.tradingDate))
-                    }
-                    self.macd = convertMACDToData(macds: existingMACDs) // doesn't save
-                    setDailyPrices(pricePoints: newList) // saves
-                }
-            }
-        }
-    }
+//    func updateDailyPrices(newPrices: [PricePoint]?) {
+//        
+//        guard let validNewPoints = newPrices else { return }
+//        
+//        if let existingPricePoints = getDailyPrices() {
+//            var newList = existingPricePoints
+//            var existingMACDs = getMACDs()
+//            if let lastExistingDate = existingPricePoints.last?.tradingDate {
+//                let pointsToAdd = validNewPoints.filter { (element) -> Bool in
+//                    if element.tradingDate > lastExistingDate { return true }
+//                    else { return false }
+//                }
+//                if pointsToAdd.count > 0 {
+//                    for point in pointsToAdd {
+//                        newList.append(point)
+//                        let lastMACD = existingMACDs?.last
+//                        existingMACDs?.append(MAC_D(currentPrice: point.close, lastMACD: lastMACD, date: point.tradingDate))
+//                    }
+//                    self.macd = convertMACDToData(macds: existingMACDs) // doesn't save
+//                    setDailyPrices(pricePoints: newList) // saves
+//                }
+//            }
+//        }
+//    }
     
     func getDailyPrices() -> [PricePoint]? {
 
