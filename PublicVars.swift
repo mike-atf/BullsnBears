@@ -18,7 +18,6 @@ let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
 let gradientBar = UIImage(named: "GradientBar")
 let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
-var appActivatedFromBackground = true
 
 var yahooRefDate: Date = {
     let calendar = Calendar.current

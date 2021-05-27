@@ -46,9 +46,9 @@ class StocksController: NSFetchedResultsController<Share> {
 //        print()
 //        print(#function)
         for share in fetchedObjects ?? [] {
-            let placeholder = SharePlaceHolder(share: share)
 
             if share.watchStatus < 2 || share.isEqual(selectedShare) {
+                let placeholder = SharePlaceHolder(share: share)
                 if placeholder.lastLivePriceDate == nil {
 //                    print("\(share.symbol!) start live price update process...")
                     placeholder.startLivePriceUpdate(delegate: self)

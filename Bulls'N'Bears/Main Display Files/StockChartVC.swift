@@ -48,7 +48,7 @@ class StockChartVC: UIViewController {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        chart.chartPricesView.currentLabelRefreshTimer?.invalidate()
+        chart?.chartPricesView.currentLabelRefreshTimer?.invalidate()
     }
     
     deinit {
