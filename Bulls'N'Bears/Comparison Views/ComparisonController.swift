@@ -484,22 +484,18 @@ class ComparisonController {
     private func singleFinancialText(values: [Double]?, growthCutOffRate:Double?=nil, biggerIsBetter: Bool?=true, cutOffGreen:Double, cutOffRed:Double) -> ([String], UIColor) {
         
         var text = [String]()
-        var color = UIColor.label
+        var color = UIColor.clear
                 
+        let consistency2 = values?.consistency(increaseIsBetter: biggerIsBetter ?? true) ?? Double()
         if let compoundGrowthRates = Calculator.compoundGrowthRates(values: values) {
             if let ema = compoundGrowthRates.ema(periods: 7) {
                 text.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
-                color = GradientColorFinder.gradientColor(lowerIsGreen: !(biggerIsBetter ?? true), min: 0, max: 1, value: ema, greenCutoff: cutOffGreen, redCutOff: cutOffRed)
+                color = ComparisonColorCategory.findColor(biggerIsBetter: biggerIsBetter ?? true, consistency: consistency2, growth: ema)
             } else {
                 text.append("-")
             }
             
-            let consistency2 = values?.consistency(increaseIsBetter: biggerIsBetter ?? true) ?? Double()
-            
             text.append(percentFormatter0Digits.string(from: consistency2 as NSNumber) ?? "-")
-            if consistency2 < 0.8 {
-                color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: consistency2, greenCutoff: 0.8, redCutOff: 0.49)
-            }
         }
         else {
             text = ["-","-"]
@@ -512,23 +508,21 @@ class ComparisonController {
     private func twoFinancialsText(values0: [Double]?, values1:[Double]?, biggerIsBetter: Bool?=nil, cutOffGreen:Double, cutOffRed:Double) -> ([String], UIColor) {
         
         var texts = [String]()
-        var color = UIColor.label
+        var color = UIColor.clear
         
         if let proportions = Calculator.proportions(array1: values1, array0: values0) {
+            let consistency2 = proportions.consistency(increaseIsBetter: biggerIsBetter ?? true)
+
             if let compoundGrowthRates = Calculator.compoundGrowthRates(values: proportions) {
                 if let ema = compoundGrowthRates.ema(periods: 7) {
                     texts.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: !(biggerIsBetter ?? true), min: -1, max: 0, value: ema, greenCutoff: cutOffGreen, redCutOff: cutOffRed)
+                    color = ComparisonColorCategory.findColor(biggerIsBetter: biggerIsBetter ?? true, consistency: consistency2, growth: ema)
                 } else {
                     texts.append("-")
 
                 }
                 
-                let consistency2 = proportions.consistency(increaseIsBetter: biggerIsBetter ?? true)
                 texts.append(percentFormatter0Digits.string(from: consistency2 as NSNumber) ?? "-")
-                if consistency2 < 0.8 {
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: consistency2, greenCutoff: 0.8, redCutOff: 0.49)
-                }
             }
         }
         else {

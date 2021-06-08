@@ -12,6 +12,7 @@ class ComparisonCell: UITableViewCell {
     @IBOutlet var rowTitleLabel: UILabel!
     
     var valueLabels: [UILabel]?
+    var labelBackgroundViews: [UIView]?
     var legendLabel: UILabel?
     var textViews: [UITextView]?
     var charts: [ValueChart]?
@@ -22,7 +23,7 @@ class ComparisonCell: UITableViewCell {
     let columnWidth: CGFloat = 150
     let firstColumnInset: CGFloat = 350
     var margins: UILayoutGuide!
-    let financialsFontSize: CGFloat = 16
+    let financialsFontSize: CGFloat = 20
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -40,6 +41,9 @@ class ComparisonCell: UITableViewCell {
         
         for label in valueLabels ?? [] {
             label.removeFromSuperview()
+        }
+        for view in labelBackgroundViews ?? [] {
+            view.removeFromSuperview()
         }
         for view in textViews ?? [] {
             view.removeFromSuperview()
@@ -69,6 +73,10 @@ class ComparisonCell: UITableViewCell {
 
         for label in valueLabels ?? [] {
             label.removeFromSuperview()
+        }
+
+        for view in labelBackgroundViews ?? [] {
+            view.removeFromSuperview()
         }
 
         for chart in charts ?? [] {
@@ -116,6 +124,9 @@ class ComparisonCell: UITableViewCell {
             legendLabel!.leadingAnchor.constraint(greaterThanOrEqualTo: rowTitleLabel.trailingAnchor, constant: 10).isActive = true
             
             createFinancialsTexts(cellPath: cellPath)
+            for view in labelBackgroundViews ?? [] {
+                print(view.frame)
+            }
         }
     }
     
@@ -123,6 +134,7 @@ class ComparisonCell: UITableViewCell {
         
         let (strings, colors) = controller.rowTexts(forPath: cellPath)
         valueLabels = [UILabel]()
+        labelBackgroundViews = [UIView]()
 
         var count: CGFloat = 0
         
@@ -242,19 +254,33 @@ class ComparisonCell: UITableViewCell {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.numberOfLines = 0
-                label.font = UIFont.systemFont(ofSize: financialsFontSize)
+                label.font = UIFont.systemFont(ofSize: financialsFontSize, weight: .bold)
                 label.text = duplet[0] + "\n" + duplet[1]
-                label.textColor = colors.first ?? UIColor.label
+//                label.textColor = colors.first ?? UIColor.label
                 label.textAlignment = .right
                 label.sizeToFit()
                 return label
             }()
+            let backgroundView: UIView = {
+                let view = UIView()
+                view.translatesAutoresizingMaskIntoConstraints = false
+                view.backgroundColor = colors[Int(count)]
+                return view
+            }()
+            self.contentView.addSubview(backgroundView)
+            labelBackgroundViews?.append(backgroundView)
             self.contentView.addSubview(label)
             valueLabels?.append(label)
             
+            
+            backgroundView.leadingAnchor.constraint(greaterThanOrEqualTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
+            backgroundView.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
+            backgroundView.bottomAnchor.constraint(equalTo: margins.bottomAnchor).isActive = true
+            backgroundView.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1)-5).isActive = true
+
             label.leadingAnchor.constraint(greaterThanOrEqualTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
             label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-            label.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1)).isActive = true
+            label.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1) - 20).isActive = true
             count += 1
         }
     }

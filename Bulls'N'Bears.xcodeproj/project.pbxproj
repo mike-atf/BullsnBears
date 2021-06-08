@@ -195,6 +195,7 @@
 		EAD8360025DC16470015C93A /* WBValuationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAD835FA25DC16470015C93A /* WBValuationCell.xib */; };
 		EAD921632607D0CA008312E0 /* StochasticOscillator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD921622607D0CA008312E0 /* StochasticOscillator.swift */; };
 		EAD921682607D980008312E0 /* StochastikOscillatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD921672607D980008312E0 /* StochastikOscillatorView.swift */; };
+		EADE428D266FBA8200EC8408 /* CompColorCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADE428C266FBA8200EC8408 /* CompColorCategory.swift */; };
 		EAEA758C25ACF53F008EEC05 /* ErrorLogListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */; };
 		EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */; };
 		EAED14DF25A8D78C0073C46F /* Bulls'N'BearsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */; };
@@ -344,6 +345,7 @@
 		EAD835FA25DC16470015C93A /* WBValuationCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WBValuationCell.xib; sourceTree = "<group>"; };
 		EAD921622607D0CA008312E0 /* StochasticOscillator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StochasticOscillator.swift; sourceTree = "<group>"; };
 		EAD921672607D980008312E0 /* StochastikOscillatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StochastikOscillatorView.swift; path = "Bulls'N'Bears/Main Display Files/StochastikOscillatorView.swift"; sourceTree = SOURCE_ROOT; };
+		EADE428C266FBA8200EC8408 /* CompColorCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompColorCategory.swift; sourceTree = "<group>"; };
 		EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ErrorLogListCell.xib; sourceTree = "<group>"; };
 		EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsTests.swift"; path = "TrendMyStocksTests/Bulls'N'BearsTests.swift"; sourceTree = SOURCE_ROOT; };
 		EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsUITests.swift"; path = "TrendMyStocksUITests/Bulls'N'BearsUITests.swift"; sourceTree = SOURCE_ROOT; };
@@ -388,6 +390,7 @@
 				EA9D7398264432C300672762 /* TrendIconView2.swift */,
 				EA0F889926395745009C980F /* ComparisonVC.swift */,
 				EA0F889D263959D6009C980F /* ComparisonController.swift */,
+				EADE428C266FBA8200EC8408 /* CompColorCategory.swift */,
 				EA0F889B2639575B009C980F /* ComparisonCell.swift */,
 			);
 			path = "Comparison Views";
@@ -840,6 +843,7 @@
 				EAC2FC3F25A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
 				EAC2FC3C25A0B76B0060F387 /* DCFValuation+CoreDataClass.swift in Sources */,
 				EAC07B6F25B8950E00B6C898 /* DCFWebDataAnalyser.swift in Sources */,
+				EADE428D266FBA8200EC8408 /* CompColorCategory.swift in Sources */,
 				EA06251A25D07A230015FA6E /* DownloadProgressView.swift in Sources */,
 				EAD835E725DC10700015C93A /* ValueListTVC.swift in Sources */,
 				EAC2FC7B25A240290060F387 /* ValuationListViewController.swift in Sources */,
