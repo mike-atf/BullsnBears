@@ -106,6 +106,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.refreshControl = UIRefreshControl()
         tableView.refreshControl?.addTarget(self, action: #selector(updateShares), for: .valueChanged)
         
+        updateShares()
+        
 // temp
 //        self.controller.research()
 // temp

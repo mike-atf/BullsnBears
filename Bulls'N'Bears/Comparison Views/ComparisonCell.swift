@@ -104,7 +104,6 @@ class ComparisonCell: UITableViewCell {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = UIFont.systemFont(ofSize: financialsFontSize)
-//                label.text = cellPath.section < 6 ? "EMA:\n>10%:" : "EMA:\n<0%:"
                 label.text = "Growth EMA:\nConsistency:"
                 label.textAlignment = .right
                 label.numberOfLines = 0
@@ -122,7 +121,7 @@ class ComparisonCell: UITableViewCell {
     
     private func createLabels(cellPath: IndexPath) {
         
-        let strings = controller.rowTexts(forPath: cellPath)
+        let (strings, colors) = controller.rowTexts(forPath: cellPath)
         valueLabels = [UILabel]()
 
         var count: CGFloat = 0
@@ -133,6 +132,7 @@ class ComparisonCell: UITableViewCell {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = UIFont.systemFont(ofSize: financialsFontSize)
+                label.textColor = colors[Int(count)]
                 label.text = string
                 label.numberOfLines = 0
                 label.sizeToFit()
@@ -150,7 +150,7 @@ class ComparisonCell: UITableViewCell {
     
     private func createTextView(cellPath: IndexPath) {
         
-        let strings = controller.rowTexts(forPath: cellPath)
+        let (strings,_) = controller.rowTexts(forPath: cellPath)
         textViews = [UITextView]()
 
         var count: CGFloat = 0
@@ -181,7 +181,7 @@ class ComparisonCell: UITableViewCell {
     
     private func chartsView(cellPath: IndexPath) {
         
-        let (correlation, values) = controller.fundamentals(forPath: cellPath)
+        let (_, values) = controller.fundamentals(forPath: cellPath)
         
         var count: CGFloat = 0
         
@@ -225,23 +225,26 @@ class ComparisonCell: UITableViewCell {
      
     private func createFinancialsTexts(cellPath: IndexPath) {
         
-        let texts = controller.financialsTexts(forPath: cellPath)
+        guard let (texts, colors) = controller.financialsTexts(forPath: cellPath) else {
+            return
+        }
         valueLabels = [UILabel]()
 
         var count: CGFloat = 0
         
-        for duplet in texts ?? [] {
+        for duplet in texts {
             
             guard duplet.count > 1 else {
                 return
             }
-            
+                        
             let label: UILabel = {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.numberOfLines = 0
                 label.font = UIFont.systemFont(ofSize: financialsFontSize)
                 label.text = duplet[0] + "\n" + duplet[1]
+                label.textColor = colors.first ?? UIColor.label
                 label.textAlignment = .right
                 label.sizeToFit()
                 return label

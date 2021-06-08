@@ -5,7 +5,7 @@
 //  Created by aDav on 28/04/2021.
 //
 
-import Foundation
+import UIKit
 
 class ComparisonController {
     
@@ -53,48 +53,60 @@ class ComparisonController {
         return titles[path.section][path.row]
     }
     
-    func rowTexts(forPath: IndexPath) -> [String] {
+    func rowTexts(forPath: IndexPath) -> ([String], [UIColor]) {
         
         var texts = [String]()
+        var colors = [UIColor]()
         
         switch forPath.section {
         case 0:
             if forPath.row == 0 {
                 for share in shares ?? [] {
                     texts.append(share.research?.theBuyStory ?? "")
+                    colors.append(UIColor.label)
                 }
             }
         case 1:
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if share.userEvaluationScore > 0 {
                         text = percentFormatter0Digits.string(from: share.userEvaluationScore as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: share.userEvaluationScore)
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if share.valueScore > 0 {
                         text = percentFormatter0Digits.string(from: share.valueScore as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: share.valueScore)
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if let moat = share.rule1Valuation?.moatScore() {
                         text = percentFormatter0Digits.string(from: moat as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: moat)
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    let color = UIColor.label
                     if share.rule1Valuation != nil {
                         let (price,_) = share.rule1Valuation!.stickerPrice()
                         if let validPrice = price {
@@ -103,11 +115,13 @@ class ComparisonController {
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    let color = UIColor.label
                     if share.dcfValuation != nil {
                         let (price,_) = share.dcfValuation!.returnIValue()
                         if let validPrice = price {
@@ -116,11 +130,13 @@ class ComparisonController {
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 5 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    let color = UIColor.label
                     if share.wbValuation != nil {
                         let (price,_) = share.wbValuation!.ivalue()
                         if let validPrice = price {
@@ -129,38 +145,47 @@ class ComparisonController {
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
         case 2:
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if share.peRatio != 0 {
                         text = numberFormatterWith1Digit.string(from: share.peRatio as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 10000, value: share.peRatio, greenCutoff: 40, redCutOff: 0)
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if share.wbValuation != nil {
                         if let ratio = share.wbValuation!.lynchRatio() {
                             text = numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "-"
+                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10000, value: ratio, greenCutoff: 3, redCutOff: 1)
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if share.wbValuation != nil {
                         if let values = share.wbValuation!.bookValuePerPrice() {
                             var t1$:String?
                             var t2$:String?
                             if let value1 = values[0] {
                                 t1$ = percentFormatter0Digits.string(from: value1 as NSNumber) ?? ""
+                                color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: value1)
                             }
                             if let value2 = values[1] {
                                 t2$ = currencyFormatterNoGapWithPence.string(from: value2 as NSNumber) ?? ""
@@ -176,325 +201,340 @@ class ComparisonController {
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
         case 3:
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if let retE = share.wbValuation?.equityRepurchased { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = retE.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
+                                color = UIColor.systemRed
                             }
                             else {
-                                if let ema = retE.growthRates()?.ema(periods: 7) {
+                                let cGrowth = Calculator.compoundGrowthRates(values: retE)
+                                if let ema = cGrowth?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0.05, redCutOff: 0.05)
                                 }
                             }
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if let values = share.wbValuation?.revenue { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
+                                color = UIColor.systemRed
                             }
                             else {
-                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0, redCutOff: 0)
                                 }
                             }
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if let values = share.wbValuation?.netEarnings { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
+                                color = UIColor.systemRed
                             }
                             else {
-                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0, redCutOff: 0)
                                 }
                             }
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if let values = share.wbValuation?.opCashFlow { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
+                                color = UIColor.systemRed
                             }
                             else {
-                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: ema, greenCutoff: 0.15, redCutOff: 0.0)
                                 }
                             }
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if let values = share.wbValuation?.grossProfit { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
+                                color = UIColor.systemRed
                             }
                             else {
-                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: ema, greenCutoff: 0.0, redCutOff: 0.0)
                                 }
                             }
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
             else if forPath.row == 5 {
                 for share in  shares ?? [] {
                     var text = "-"
+                    var color = UIColor.label
                     if let values = share.wbValuation?.eps { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
+                                color = UIColor.systemRed
                             }
                             else {
-                                if let ema = values.growthRates()?.ema(periods: 7) {
+                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
+                                    color = ema > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
                                 }
                             }
                         }
                     }
                     texts.append(text)
+                    colors.append(color)
                 }
             }
         default:
             texts = [String]()
+            colors = [UIColor]()
         }
         
-        return texts
+        return (texts, colors)
     }
     
-    func financialsTexts(forPath: IndexPath) -> [[String]]? {
+    func financialsTexts(forPath: IndexPath) -> ([[String]], [UIColor])? {
         
         guard forPath.section > 2 else {
             return nil
         }
         
         var finStrings = [[String]]()
+        var colors = [UIColor]()
         
         if forPath.section == 3 {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.wbValuation?.equityRepurchased)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.equityRepurchased,cutOffGreen: 0.15, cutOffRed: 0.05)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.wbValuation?.revenue)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.revenue, cutOffGreen: 0.15, cutOffRed: 0.05)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.wbValuation?.netEarnings)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.netEarnings,cutOffGreen: 0.15, cutOffRed: 0.05)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.wbValuation?.opCashFlow)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.opCashFlow, cutOffGreen: 0.15, cutOffRed: 0.05)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.wbValuation?.grossProfit, growthCutOffRate: 0.0)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.grossProfit, cutOffGreen: 0.15, cutOffRed: 0.05)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             else if forPath.row == 5 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.wbValuation?.eps)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.eps, cutOffGreen: 0.15, cutOffRed: 0.05)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
         }
         else if forPath.section == 4 {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let texts = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.grossProfit)
+                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.grossProfit, cutOffGreen: 0.15, cutOffRed: 0.05)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
-                    let texts = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.netEarnings)
+                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.netEarnings, cutOffGreen: 0.15, cutOffRed: 0.05)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
         }
         else if forPath.section == 5 { // outgoings - positive increase = BAD
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.rule1Valuation?.roic)
+                    let (texts, textColor) = singleFinancialText(values: share.rule1Valuation?.roic, cutOffGreen: 0.10, cutOffRed: 0.0)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             if forPath.row == 1 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.wbValuation?.roe)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.roe, cutOffGreen: 0.10, cutOffRed: 0.0)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             if forPath.row == 2 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.wbValuation?.roa)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.roa, cutOffGreen: 0.10, cutOffRed: 0.0)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
         }
         else if forPath.section == 6 {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let texts = twoFinancialsText(values0: share.wbValuation?.netEarnings, values1: share.wbValuation?.debtLT, growthCutOffRate: 0.0, biggerIsBetter: false)
+                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.netEarnings, values1: share.wbValuation?.debtLT, biggerIsBetter: false, cutOffGreen: 0.0, cutOffRed: 0.0)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     if let proportions = share.wbValuation?.ltDebtPerAdjEquityProportions() {
-                        let texts = singleFinancialText(values: proportions, growthCutOffRate: 0.0, biggerIsBetter: false)
+                        let (texts, textColor) = singleFinancialText(values: proportions, growthCutOffRate: 0.0, biggerIsBetter: false, cutOffGreen: 0.0, cutOffRed: 0.0)
                         finStrings.append(texts)
+                        colors.append(textColor)
                     }
                 }
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
-                    let texts = singleFinancialText(values: share.wbValuation?.capExpend, growthCutOffRate: 0.0, biggerIsBetter: false)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.capExpend, growthCutOffRate: 0.0, biggerIsBetter: false, cutOffGreen: 0.0, cutOffRed: 0.0)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
-                    let texts = twoFinancialsText(values0: share.wbValuation?.grossProfit, values1: share.wbValuation?.sgaExpense, growthCutOffRate: 0.0, biggerIsBetter: false)
+                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.grossProfit, values1: share.wbValuation?.sgaExpense, biggerIsBetter: false, cutOffGreen: 0, cutOffRed: 0.0)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
-                    let texts = twoFinancialsText(values0: share.wbValuation?.grossProfit, values1: share.wbValuation?.rAndDexpense, growthCutOffRate: 0.0, biggerIsBetter: false)
+                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.grossProfit, values1: share.wbValuation?.rAndDexpense, biggerIsBetter: false, cutOffGreen: 0, cutOffRed: 0.0)
                     finStrings.append(texts)
+                    colors.append(textColor)
                 }
             }
-
         }
 
-        return finStrings
+        return (finStrings, colors)
     }
     
-    private func singleFinancialText(values: [Double]?, growthCutOffRate:Double?=nil, biggerIsBetter: Bool?=nil) -> [String] {
+    private func singleFinancialText(values: [Double]?, growthCutOffRate:Double?=nil, biggerIsBetter: Bool?=true, cutOffGreen:Double, cutOffRed:Double) -> ([String], UIColor) {
         
         var text = [String]()
-        
-//        let lowestAcceptableGrowth = growthCutOffRate ?? 0.1
-//        let higherIsBetter = biggerIsBetter ?? true
-        
+        var color = UIColor.label
+                
         if let compoundGrowthRates = Calculator.compoundGrowthRates(values: values) {
             if let ema = compoundGrowthRates.ema(periods: 7) {
                 text.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
-            } else { text.append("-") }
+                color = GradientColorFinder.gradientColor(lowerIsGreen: !(biggerIsBetter ?? true), min: 0, max: 1, value: ema, greenCutoff: cutOffGreen, redCutOff: cutOffRed)
+            } else {
+                text.append("-")
+            }
             
-//            let countExceedingThreshold = higherIsBetter ? compoundGrowthRates.filter { rate in
-//                if rate < lowestAcceptableGrowth { return false }
-//                else { return true }
-//            } : compoundGrowthRates.filter { rate in
-//                if rate > lowestAcceptableGrowth { return false }
-//                else { return true }
-//            }
-            
-//            let nonNilGrowthRates = compoundGrowthRates //.filter { rate in
-//            let consistency = Double(countExceedingThreshold.count) / Double(nonNilGrowthRates.count)
             let consistency2 = values?.consistency(increaseIsBetter: biggerIsBetter ?? true) ?? Double()
             
             text.append(percentFormatter0Digits.string(from: consistency2 as NSNumber) ?? "-")
-                
-//            var years = [Double]()
-//            for i in 0..<compoundGrowthRates.count {
-//                years.append(Double(compoundGrowthRates.count-i))
-//            }
-
-//            if let correlation = Calculator.correlation(xArray: years, yArray: compoundGrowthRates) {
-//                text.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")
-//            }
-//            else { text.append("-") }
+            if consistency2 < 0.8 {
+                color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: consistency2, greenCutoff: 0.8, redCutOff: 0.49)
+            }
         }
-        else { text = ["-","-"] } //,"-"
+        else {
+            text = ["-","-"]
+        }
                 
-        return text
+        return (text,color)
     }
     
     /// proportions = values1 / values0
-    private func twoFinancialsText(values0: [Double]?, values1:[Double]?, growthCutOffRate:Double?=nil, biggerIsBetter: Bool?=nil) -> [String] {
+    private func twoFinancialsText(values0: [Double]?, values1:[Double]?, biggerIsBetter: Bool?=nil, cutOffGreen:Double, cutOffRed:Double) -> ([String], UIColor) {
         
         var texts = [String]()
-//        let lowestAcceptableGrowth = growthCutOffRate ?? 0.1
-//        let higherIsBetter = biggerIsBetter ?? true
-
+        var color = UIColor.label
+        
         if let proportions = Calculator.proportions(array1: values1, array0: values0) {
             if let compoundGrowthRates = Calculator.compoundGrowthRates(values: proportions) {
                 if let ema = compoundGrowthRates.ema(periods: 7) {
                     texts.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
-                } else { texts.append("-") }
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: !(biggerIsBetter ?? true), min: -1, max: 0, value: ema, greenCutoff: cutOffGreen, redCutOff: cutOffRed)
+                } else {
+                    texts.append("-")
+
+                }
                 
-//                let ratesOverTenPct = higherIsBetter ? compoundGrowthRates.filter { rate in
-//                    if rate < lowestAcceptableGrowth { return false }
-//                    else { return true }
-//                } : compoundGrowthRates.filter { rate in
-//                    if rate > lowestAcceptableGrowth { return false }
-//                    else { return true }
-//                }
-//
-//                let nonNilGrowthRates = compoundGrowthRates //.filter { rate in
-                
-//                let consistency = Double(ratesOverTenPct.count) / Double(nonNilGrowthRates.count)
                 let consistency2 = proportions.consistency(increaseIsBetter: biggerIsBetter ?? true)
                 texts.append(percentFormatter0Digits.string(from: consistency2 as NSNumber) ?? "-")
-                    
-//                var years = [Double]()
-//                for i in 0..<compoundGrowthRates.count {
-//                    years.append(Double(compoundGrowthRates.count-i))
-//                }
-
-//                if let correlation = Calculator.correlation(xArray: years, yArray: compoundGrowthRates) {
-//                    texts.append(percentFormatter0DigitsPositive.string(from: correlation.incline as NSNumber) ?? "-")
-//                }
-//                else { texts.append("-") }
-
+                if consistency2 < 0.8 {
+                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: consistency2, greenCutoff: 0.8, redCutOff: 0.49)
+                }
             }
         }
-        else { texts = ["-","-"] } //,"-"
-        return texts
+        else {
+            texts = ["-","-"]
+        } //,"-"
+        return (texts, color)
     }
     
     func fundamentals(forPath: IndexPath) -> ([Correlation?]?, [[Double]?]?) {

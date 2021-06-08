@@ -266,6 +266,8 @@ struct SharesListSortParameter {
     let sector = "sector"
     let growthType = "growthType"
     let symbol = "symbol"
+//    let moat = "Compet. strength"
+//    let lynchScore = "Lynch Score"
     
     func options() -> [String] {
         

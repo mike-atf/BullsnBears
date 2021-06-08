@@ -33,7 +33,7 @@ class GradientColorFinder: NSObject {
                 if value > validGreenCutoff { return greenGradientColor() }
                 else if value < redCutOff! { return redGradientColor() }
                 else {
-                    relativeValue = 1 - CGFloat(value - redCutOff!) / CGFloat(validGreenCutoff - redCutOff!)
+                    relativeValue = 1 - CGFloat(value - redCutOff!) / CGFloat(validGreenCutoff - redCutOff!) // 1 -
                     return gradientBar!.getPixelColor(pos: CGPoint(x: 2, y: relativeValue * gradientBarHeight))
                 }
             }

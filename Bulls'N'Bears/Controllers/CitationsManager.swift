@@ -41,6 +41,14 @@ class CitationsManager {
         let pL27 = "ultimately the earnings will decide the fate of a stock."
         let pL28 = "There are three phases to a growth company's life: the start-up phase..., the rapid expansion phase..., and the saturation phase...\nThe second phase is the safest phase, and also where the most money is made"
 
+        let pL1_0 = "Hold no more stocks than you can remained informed on"
+        let pL1_1 = "You want to see first that sales and earnings per share are moving forward at an acceptable rate, and second, that you can buy the stock at a reasonable price"
+        let pL1_2 = "Buy or do not buy the stock on the basis of whether or not growth meets your objectives and whether the price is reasonable"
+        let pL1_3 = "Understanding the reasons for past sales growth will help you form a good judgement as to the likelihood of past growth rates continuing"
+        let pL1_4 = "The key to make money in stocks is not to get scared out of them. This point cannot be overemphasized."
+        let pL1_5 = "The story of the 40 [stock market] declines continues to comfort me during gloomy periods when you and I have another chance in a long string of chances to buy great stocks at bargain prices."
+
+
         let wb0 = "Warren [Buffett] realized ... that if a company's competitive advantage could be maintained for a long period of time - if it was 'durable' - then the underlying vaue of the business would continue to increase year after year"
         let wb1 = "Because these businesses [with durable competitive advantage] had such incredible business economics working in their favor, there was zero chance of them ever going into bankruptcy."
         let wb2 = "the longer [Warren Buffett] held on to these positions, the more time he had to profit from these businesses' great underlying economics."
@@ -62,11 +70,13 @@ class CitationsManager {
         let wb18 = "... if a company is showing a net earnings history of more than 20% on total revenues, there is a real good chance that it is benefiting from some kind of long-term competitive advantage."
 
         let plCitatations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
+        let pl1Citatations = [pL1_0, pL1_1, pL1_2, pL1_3, pL1_4, pL1_5]
         let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10,wb11,wb12, wb13, wb14, wb15, wb16, wb17, wb18]
         
         var allCitations = plCitatations
         allCitations.append(contentsOf: wbCitations)
-        
+        allCitations.append(contentsOf: pl1Citatations)
+
         if let lastCitation = UserDefaults.standard.value(forKey: userDefaultTerms.lastCitation) as? String {
             var count = 0
             for citation in allCitations {
@@ -82,9 +92,20 @@ class CitationsManager {
         let randomCitationNo = Int.random(in: 0..<citationCount)
         let randomCitation = "\"" + allCitations[randomCitationNo] + "\""
         let tributePL = "\n\nPeter Lynch\n'One up on Wall Street'\nSimon & Schuster, 1989"
+        let tributePL2 = "\n\nPeter Lynch w John Rothchild\n'Beating The Street'\nSimon & Schuster"
         let tributeWB = "\n\nMary Buffett and David Clark\n'Warren Buffett and the Interpretation of Financial Statements'\nSimon & Schuster, 2008"
 
-        let tribute = randomCitationNo < plCitatations.count ? tributePL : tributeWB
+        var tribute = String()
+        
+        if randomCitationNo < plCitatations.count {
+            tribute = tributePL
+        } else if randomCitationNo < (plCitatations.count + wbCitations.count) {
+            tribute = tributeWB
+        }
+        else {
+            tribute = tributePL2
+        }
+        
         let font = UIFont.italicSystemFont(ofSize: 18)
         let fontColor = UIColor.label
         let paragraphStyle1 = NSMutableParagraphStyle()

@@ -148,19 +148,29 @@ public class Rule1Valuation: NSManagedObject {
         
         var sumValidRates = 0
         for moatArray in moatArrays {
-            var moatGrowthArray = [Double]()
-            if let endValue = moatArray?.first {
-                for yearBack in 1..<(moatArray?.count ?? 0) {
-                    if let startValue = moatArray?[yearBack] {
-                        moatGrowthArray.append(Calculator.compoundGrowthRate(endValue: endValue, startValue: startValue, years: Double(yearBack)) ?? Double())
-                        sumValidRates += 1
-                    }
-                    else {
-                        moatGrowthArray.append(Double())
-                    }
-                }
+//            var moatGrowthArray = [Double]()
+            if let compoundRates = Calculator.compoundGrowthRates(values: moatArray) {
+                moatGrowthRates.append(compoundRates)
+                sumValidRates += compoundRates.filter({ element in
+                    if element != Double() { return true }
+                    else { return false }
+                }).count
             }
-            moatGrowthRates.append(moatGrowthArray)
+            else {
+                moatGrowthRates.append([Double]())
+            }
+            
+//            if let endValue = moatArray?.first {
+//                for yearBack in 1..<(moatArray?.count ?? 0) {
+//                    if let startValue = moatArray?[yearBack] {
+//                        moatGrowthArray.append(Calculator.compoundGrowthRate(endValue: endValue, startValue: startValue, years: Double(yearBack)) ?? Double())
+//                        sumValidRates += 1
+//                    }
+//                    else {
+//                        moatGrowthArray.append(Double())
+//                    }
+//                }
+//            }
         }
         
         sumValidRates += roic?.compactMap{ $0 }.count ?? 0

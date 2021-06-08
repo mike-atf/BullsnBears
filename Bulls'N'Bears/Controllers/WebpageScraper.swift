@@ -655,6 +655,7 @@ class WebpageScraper {
         let dateFormatter: DateFormatter = {
             let formatter = DateFormatter()
             formatter.dateFormat = "dd MMM yyyy"
+            formatter.calendar.timeZone = TimeZone(identifier: "UTC")!
             return formatter
         }()
 

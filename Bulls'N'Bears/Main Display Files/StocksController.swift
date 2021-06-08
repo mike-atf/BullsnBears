@@ -27,7 +27,6 @@ class StocksController: NSFetchedResultsController<Share> {
     
     var pricesUpdateDelegate: StocksControllerDelegate?
     var stockDelegate: StockDelegate?
-//    lazy var yahooRefDate: Date = getYahooRefDate()
     var downloadErrors = [String]()
     var webDownLoader: WebDataDownloader?
     var sortParameter = UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as! String
@@ -53,7 +52,7 @@ class StocksController: NSFetchedResultsController<Share> {
 //                    print("\(share.symbol!) start live price update process...")
                     placeholder.startLivePriceUpdate(delegate: self)
                 }
-                else if Date().timeIntervalSince(placeholder.lastLivePriceDate!) > 10 {
+                else if Date().timeIntervalSince(placeholder.lastLivePriceDate!) > 120 {
 //                    print("\(share.symbol!) start live price update process...")
                     placeholder.startLivePriceUpdate(delegate: self)
                 }
@@ -80,17 +79,12 @@ class StocksController: NSFetchedResultsController<Share> {
         
         let placeholder = SharePlaceHolder(share: share)
         
-        var sharePriceNeedsUpdate = true
+//        var sharePriceNeedsUpdate = true
         if let lastPriceDate = placeholder.getDailyPrices()?.last?.tradingDate {
-            if (Date().timeIntervalSince(lastPriceDate) < 12 * 3600) {
-                sharePriceNeedsUpdate = false
+            if (Date().timeIntervalSince(lastPriceDate) > 12 * 3600) {
+                placeholder.startDailyPriceUpdate(yahooRefDate: yahooRefDate, delegate: self)
             }
         }
-        if sharePriceNeedsUpdate {
-            placeholder.startDailyPriceUpdate(yahooRefDate: yahooRefDate, delegate: self)
-            // returns to 'keyRatioDownloadComplete()' just below via the delegate
-        }
-        
 
     }
     
