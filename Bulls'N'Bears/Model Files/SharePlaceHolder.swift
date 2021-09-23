@@ -124,16 +124,20 @@ class SharePlaceHolder: NSObject {
     /// takes new prices and adds any newer ones than already saved to the exsitng list (rather than replce the existing list)
     func updateDailyPrices(newPrices: [PricePoint]?) {
         
+        print("updating daily prices for \(name_short ?? "missing name")")
         guard let validNewPoints = newPrices else { return }
 
         if let existingPricePoints = getDailyPrices() {
             var newList = existingPricePoints
+//            print("last existing pice is from \(existingPricePoints.last?.tradingDate)")
+//            print("latest new pice is \(validNewPoints.last?.tradingDate)")
             var existingMACDs = getMACDs()
             if let lastExistingDate = existingPricePoints.last?.tradingDate {
                 let pointsToAdd = validNewPoints.filter { (element) -> Bool in
                     if element.tradingDate > lastExistingDate { return true }
                     else { return false }
                 }
+                print("found \(pointsToAdd.count) new daily prices to add to plot")
                 if pointsToAdd.count > 0 {
                     for point in pointsToAdd {
                         newList.append(point)
@@ -329,8 +333,8 @@ class SharePlaceHolder: NSObject {
     
     func startDailyPriceUpdate(yahooRefDate: Date, delegate: StockDelegate) {
         
-        let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
-        let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
+        let nowSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
+        let yearAgoSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
 
         let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
         let start$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
@@ -355,7 +359,21 @@ class SharePlaceHolder: NSObject {
         // do not access the main viewContext or NSManagedObjects fetched from it!
         // the StocksController sending this via startPriceUpdate uses a seperate backgroundMOC and shares fetched from this to execute this tasks
         
-        let configuration = URLSessionConfiguration.default
+        // NEW Data download
+        var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
+        urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
+        if let sourceURL = urlComponents?.url {
+            downloadWebData(sourceURL, stockName: symbol, task: "priceHistory", delegate: delegate)
+            return
+        }
+        else {
+            return
+        }
+
+        
+        // OLD - file download
+        /*
+         let configuration = URLSessionConfiguration.default
         configuration.httpCookieAcceptPolicy = .always
         configuration.httpShouldSetCookies = true
         let session = URLSession(configuration: configuration)
@@ -398,21 +416,12 @@ class SharePlaceHolder: NSObject {
                 
                 guard CSVImporter.matchesExpectedFormat(url: tempURL) else {
                     removeFile(tempURL)
-                         
+                    print("invalid cookie error for \(tempURL)")
+                    print()
                     // invalid cookie error - try alternative method
-//                    let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
-//                    let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
-//
-//                    let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
-//                    let start$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
-                    
-                    // 18/5/21 - period1=1589760000 // period2=1621296000 https://uk.finance.yahoo.com/quote/AAPL/history?period1=1589760000&period2=1621296000&interval=1d&filter=history&frequency=1d&includeAdjustedClose=true
                     var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
                     urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
-//                    urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "filter", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
-                    
-                    
-                    if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
+                    if let sourceURL = urlComponents?.url {
                         downloadWebData(sourceURL, stockName: symbol, task: "priceHistory", delegate: delegate)
                         return
                     }
@@ -439,8 +448,8 @@ class SharePlaceHolder: NSObject {
                 }
             }
         }
-        
         downloadTask?.resume()
+         */
     }
 
     private func removeFile(_ atURL: URL) {
@@ -466,10 +475,12 @@ class SharePlaceHolder: NSObject {
             data, urlResponse, error in
             
             guard error == nil else {
+                print("web data download for \(url) failed with error \(error!.localizedDescription)")
                 return
             }
             
             guard urlResponse != nil else {
+                print("web data download for \(url) failed due to urlReponse == nil")
                 return
             }
             

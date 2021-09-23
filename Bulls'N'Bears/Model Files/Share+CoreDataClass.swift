@@ -1,8 +1,8 @@
 //
 //  Share+CoreDataClass.swift
-//  Bulls'N'Bears
+//  Share
 //
-//  Created by aDav on 11/03/2021.
+//  Created by aDav on 22/09/2021.
 //
 //
 
@@ -103,9 +103,9 @@ public class Share: NSManagedObject {
     
     /// takes new prices and adds any newer ones than already saved to the exsitng list (rather than replce the existing list)
 //    func updateDailyPrices(newPrices: [PricePoint]?) {
-//        
+//
 //        guard let validNewPoints = newPrices else { return }
-//        
+//
 //        if let existingPricePoints = getDailyPrices() {
 //            var newList = existingPricePoints
 //            var existingMACDs = getMACDs()

@@ -57,23 +57,23 @@ class ComparisonController {
         
         var texts = [String]()
         var colors = [UIColor]()
-        
+        var color = UIColor.clear
+
         switch forPath.section {
         case 0:
             if forPath.row == 0 {
                 for share in shares ?? [] {
                     texts.append(share.research?.theBuyStory ?? "")
-                    colors.append(UIColor.label)
+                    colors.append(UIColor.clear)
                 }
             }
         case 1:
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if share.userEvaluationScore > 0 {
                         text = percentFormatter0Digits.string(from: share.userEvaluationScore as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: share.userEvaluationScore)
+//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: share.userEvaluationScore)
                     }
                     texts.append(text)
                     colors.append(color)
@@ -82,10 +82,9 @@ class ComparisonController {
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if share.valueScore > 0 {
                         text = percentFormatter0Digits.string(from: share.valueScore as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: share.valueScore)
+//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: share.valueScore)
                     }
                     texts.append(text)
                     colors.append(color)
@@ -94,10 +93,9 @@ class ComparisonController {
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if let moat = share.rule1Valuation?.moatScore() {
                         text = percentFormatter0Digits.string(from: moat as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: moat)
+                        color = findCategoryColor(biggerIsBetter: true, consistency: moat, growth: 1.0, primaryGreenCutoff: 0.75, primaryRedCutOff: 0.5)
                     }
                     texts.append(text)
                     colors.append(color)
@@ -106,7 +104,6 @@ class ComparisonController {
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    let color = UIColor.label
                     if share.rule1Valuation != nil {
                         let (price,_) = share.rule1Valuation!.stickerPrice()
                         if let validPrice = price {
@@ -121,7 +118,6 @@ class ComparisonController {
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    let color = UIColor.label
                     if share.dcfValuation != nil {
                         let (price,_) = share.dcfValuation!.returnIValue()
                         if let validPrice = price {
@@ -136,7 +132,6 @@ class ComparisonController {
             else if forPath.row == 5 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    let color = UIColor.label
                     if share.wbValuation != nil {
                         let (price,_) = share.wbValuation!.ivalue()
                         if let validPrice = price {
@@ -152,10 +147,10 @@ class ComparisonController {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if share.peRatio != 0 {
                         text = numberFormatterWith1Digit.string(from: share.peRatio as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 10000, value: share.peRatio, greenCutoff: 40, redCutOff: 0)
+                        color = findCategoryColor(biggerIsBetter: true, consistency: 100.0 - share.peRatio, growth: 1.0, primaryGreenCutoff: 90, primaryRedCutOff: 60)
+//                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 10000, value: share.peRatio, greenCutoff: 40, redCutOff: 0)
                     }
                     texts.append(text)
                     colors.append(color)
@@ -164,11 +159,11 @@ class ComparisonController {
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if share.wbValuation != nil {
                         if let ratio = share.wbValuation!.lynchRatio() {
                             text = numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "-"
-                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10000, value: ratio, greenCutoff: 3, redCutOff: 1)
+                            color = findCategoryColor(biggerIsBetter: true, consistency: ratio, growth: 1.0, primaryGreenCutoff: 3.0, primaryRedCutOff: 1.0)
+//                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10000, value: ratio, greenCutoff: 3, redCutOff: 1)
                         }
                     }
                     texts.append(text)
@@ -178,14 +173,13 @@ class ComparisonController {
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if share.wbValuation != nil {
                         if let values = share.wbValuation!.bookValuePerPrice() {
                             var t1$:String?
                             var t2$:String?
                             if let value1 = values[0] {
                                 t1$ = percentFormatter0Digits.string(from: value1 as NSNumber) ?? ""
-                                color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 1, value: value1)
+                                color = findCategoryColor(biggerIsBetter: true, consistency: value1, growth: 1.0, primaryGreenCutoff: 0.8, primaryRedCutOff: 0.2)
                             }
                             if let value2 = values[1] {
                                 t2$ = currencyFormatterNoGapWithPence.string(from: value2 as NSNumber) ?? ""
@@ -208,7 +202,6 @@ class ComparisonController {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if let retE = share.wbValuation?.equityRepurchased { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = retE.first {
                             if lastRetEarnings < 0 {
@@ -219,7 +212,8 @@ class ComparisonController {
                                 let cGrowth = Calculator.compoundGrowthRates(values: retE)
                                 if let ema = cGrowth?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
-                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0.05, redCutOff: 0.05)
+                                    color = findCategoryColor(biggerIsBetter: true, consistency: ema, growth: 1.0, secondaryGreenCutoff: 0.15, secondaryRedCutOff: 0.0)
+//                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0.05, redCutOff: 0.05)
                                 }
                             }
                         }
@@ -231,7 +225,6 @@ class ComparisonController {
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if let values = share.wbValuation?.revenue { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
@@ -241,7 +234,8 @@ class ComparisonController {
                             else {
                                 if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
-                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0, redCutOff: 0)
+                                    color = findCategoryColor(biggerIsBetter: true, consistency: ema, growth: 1.0, secondaryGreenCutoff: 0.15, secondaryRedCutOff: 0.0)
+//                                   color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0, redCutOff: 0)
                                 }
                             }
                         }
@@ -253,7 +247,6 @@ class ComparisonController {
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if let values = share.wbValuation?.netEarnings { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
@@ -263,7 +256,8 @@ class ComparisonController {
                             else {
                                 if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
-                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0, redCutOff: 0)
+                                    color = findCategoryColor(biggerIsBetter: true, consistency: ema, growth: 1.0, secondaryGreenCutoff: 0.15, secondaryRedCutOff: 0.0)
+//                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0, redCutOff: 0)
                                 }
                             }
                         }
@@ -275,7 +269,6 @@ class ComparisonController {
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if let values = share.wbValuation?.opCashFlow { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
@@ -285,7 +278,8 @@ class ComparisonController {
                             else {
                                 if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
-                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: ema, greenCutoff: 0.15, redCutOff: 0.0)
+                                    color = findCategoryColor(biggerIsBetter: true, consistency: ema, growth: 1.0, secondaryGreenCutoff: 0.15, secondaryRedCutOff: 0.0)
+//                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: ema, greenCutoff: 0.15, redCutOff: 0.0)
                                 }
                             }
                         }
@@ -297,7 +291,6 @@ class ComparisonController {
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if let values = share.wbValuation?.grossProfit { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
@@ -319,7 +312,6 @@ class ComparisonController {
             else if forPath.row == 5 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    var color = UIColor.label
                     if let values = share.wbValuation?.eps { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
@@ -358,42 +350,42 @@ class ComparisonController {
         if forPath.section == 3 {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.equityRepurchased,cutOffGreen: 0.15, cutOffRed: 0.05)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.equityRepurchased,cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.revenue, cutOffGreen: 0.15, cutOffRed: 0.05)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.revenue, cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.netEarnings,cutOffGreen: 0.15, cutOffRed: 0.05)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.netEarnings,cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.opCashFlow, cutOffGreen: 0.15, cutOffRed: 0.05)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.opCashFlow, cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.grossProfit, cutOffGreen: 0.15, cutOffRed: 0.05)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.grossProfit, cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 5 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.eps, cutOffGreen: 0.15, cutOffRed: 0.05)
+                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.eps, cutOffGreen: 0.15, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
@@ -402,14 +394,14 @@ class ComparisonController {
         else if forPath.section == 4 {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.grossProfit, cutOffGreen: 0.15, cutOffRed: 0.05)
+                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.grossProfit, cutOffGreen: 0.05, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.netEarnings, cutOffGreen: 0.15, cutOffRed: 0.05)
+                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.netEarnings, cutOffGreen: 0.05, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
@@ -490,7 +482,7 @@ class ComparisonController {
         if let compoundGrowthRates = Calculator.compoundGrowthRates(values: values) {
             if let ema = compoundGrowthRates.ema(periods: 7) {
                 text.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
-                color = ComparisonColorCategory.findColor(biggerIsBetter: biggerIsBetter ?? true, consistency: consistency2, growth: ema)
+                color = findCategoryColor(biggerIsBetter: biggerIsBetter ?? true, consistency: consistency2, growth: ema,secondaryGreenCutoff: cutOffGreen, secondaryRedCutOff: cutOffRed)
             } else {
                 text.append("-")
             }
@@ -516,7 +508,7 @@ class ComparisonController {
             if let compoundGrowthRates = Calculator.compoundGrowthRates(values: proportions) {
                 if let ema = compoundGrowthRates.ema(periods: 7) {
                     texts.append(percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-")
-                    color = ComparisonColorCategory.findColor(biggerIsBetter: biggerIsBetter ?? true, consistency: consistency2, growth: ema)
+                    color = findCategoryColor(biggerIsBetter: biggerIsBetter ?? true, consistency: consistency2, growth: ema, secondaryGreenCutoff: cutOffGreen, secondaryRedCutOff: cutOffRed)
                 } else {
                     texts.append("-")
 
@@ -530,6 +522,29 @@ class ComparisonController {
         } //,"-"
         return (texts, color)
     }
+    
+    func findCategoryColor(biggerIsBetter: Bool, consistency: Double, growth: Double, primaryGreenCutoff: Double?=nil, primaryRedCutOff: Double?=nil, secondaryGreenCutoff: Double?=nil, secondaryRedCutOff: Double?=nil) -> UIColor {
+        
+        let adjustedGrowth = biggerIsBetter ? growth : growth * -1
+        let growthThresholds = biggerIsBetter ? [secondaryGreenCutoff ?? 0.15, secondaryRedCutOff ?? 0.1] : [secondaryGreenCutoff ?? 0.05 , secondaryRedCutOff ?? 0.0]
+        var categoryColor = UIColor.clear
+        
+        if consistency >= primaryGreenCutoff ?? 0.8 {
+            if adjustedGrowth >= growthThresholds[0] { categoryColor = UIColor(named: "Green")! }
+            else if adjustedGrowth >= growthThresholds[1] { categoryColor = UIColor.systemOrange }
+            else { categoryColor = UIColor(named: "Red")! }
+        }
+        else if consistency >= primaryRedCutOff ?? 0.5 {
+            if adjustedGrowth >= growthThresholds[1] { categoryColor = UIColor.systemOrange }
+            else { categoryColor = UIColor(named: "Red")! }
+        }
+        else {
+            categoryColor = UIColor(named: "Red")!
+        }
+        
+        return categoryColor
+    }
+
     
     func fundamentals(forPath: IndexPath) -> ([Correlation?]?, [[Double]?]?) {
         

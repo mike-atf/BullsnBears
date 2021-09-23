@@ -73,6 +73,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         return sL
     }()
+    
     var wbValuationView: WBValuationTVC?
     var selectedSharesToCompare = Set<Share>()
     var refreshControl: UIRefreshControl!
@@ -91,22 +92,20 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         controller.pricesUpdateDelegate = self
         controller.viewController = self
                 
-        if controller.fetchedObjects?.count ?? 0 > 0 {
-            showCitation()
-            tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
-            performSegue(withIdentifier: "showChartSegue", sender: nil)
-        }
-        else {
-            showWelcomeView()
-        }
-        
         sortView.delegate = self
         sortView.label?.text = "Sorted by " + ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore")
         
         tableView.refreshControl = UIRefreshControl()
         tableView.refreshControl?.addTarget(self, action: #selector(updateShares), for: .valueChanged)
         
-        updateShares()
+        if controller.fetchedObjects?.count ?? 0 > 0 {
+            tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
+            performSegue(withIdentifier: "showChartSegue", sender: nil)
+            updateShares()
+        }
+        else {
+            showWelcomeView()
+        }
         
 // temp
 //        self.controller.research()
@@ -138,10 +137,13 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC
     }
     
+    /// called when App activated from background
     @objc
     func updateShares() {
+                
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "ShowCitation"), object: nil, userInfo: nil)
         
-        guard controller.fetchedObjects != nil else {
+        guard controller.fetchedObjects?.count ?? 0 > 0 else {
             return
         }
         
@@ -191,6 +193,20 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func showCitation() {
         
+        var sourceView: UIView?
+        for nav in self.splitViewController?.children ?? [] {
+            if let navCo = nav as? UINavigationController {
+                if let detailViewC = navCo.topViewController as? StockChartVC {
+                    sourceView = detailViewC.view
+                }
+            }
+        }
+
+        guard let detailView = sourceView else {
+            return
+        }
+
+        
         let citationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WelcomeViewController")
                     
         citationView.view.backgroundColor = UIColor.systemGray4
@@ -205,9 +221,13 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
         let popUpController = citationView.popoverPresentationController
         popUpController!.permittedArrowDirections = UIPopoverArrowDirection.init(rawValue: 0)
-        popUpController?.sourceView = view
-        popUpController?.sourceRect = CGRect(x: view.frame.width * 0.8, y: view.frame.height * 0.75, width: 5, height: 5)
+        
+        popUpController?.sourceView = detailView
+        popUpController?.sourceRect = CGRect(x: detailView.frame.width * 0.8, y: detailView.frame.height * 0.75, width: 5, height: 5)
             
+//        self.splitViewController?.present(citationView, animated: true, completion: nil)
+        
+        
         self.parent?.present(citationView, animated: true, completion: nil)
         
 
@@ -313,13 +333,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "stockListCell", for: indexPath) as! StockListCellTableViewCell
 
-        
         let share = controller.object(at: indexPath)
-
-//        let valueRatingData = share.wbValuation?.valuesSummaryScores()
-//        let userRatingData = share.wbValuation?.userEvaluationScore()
-//
-//        share.setUserAndValueScores()
         
         let evaluationsCount = share.wbValuation?.returnUserEvaluations()?.compactMap{ $0.comment }.filter({ (comment) -> Bool in
             if !comment.starts(with: "Enter your notes here...") { return true }
@@ -357,6 +371,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             
             objectOwned.watchStatus = 1
             objectOwned.save()
+//            self.showPurchaseDialog(share: objectOwned, shareIndexPath: indexPath)
         }
         ownAction.backgroundColor = UIColor.systemGreen
         ownAction.image = UIImage(systemName: "bag.badge.plus")
@@ -499,6 +514,27 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             
         self.splitViewController?.present(tbyVC, animated: true, completion: nil)
     }
+    
+    func showPurchaseDialog(share: Share, shareIndexPath: IndexPath) {
+        
+        guard let dialog = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SharePurchaseDialog") as? SharePurchaseDialog else {
+            return
+        }
+        
+        let centreTopRect = CGRect(x: self.splitViewController!.view.bounds.midX - 5, y: 20, width: 10, height: 10)
+        
+        dialog.modalPresentationStyle = .popover
+        dialog.preferredContentSize = CGSize(width: 400, height: 600)
+
+        let popUpController = dialog.popoverPresentationController
+        popUpController!.permittedArrowDirections = .up
+        popUpController?.sourceView = tableView.cellForRow(at: shareIndexPath)?.contentView
+        popUpController?.sourceRect = tableView.cellForRow(at: shareIndexPath)?.contentView.frame ?? centreTopRect
+        dialog.share = share
+        
+        self.splitViewController?.present(dialog, animated: true, completion: nil)
+    }
+    
     
     // MARK: - Navigation
 

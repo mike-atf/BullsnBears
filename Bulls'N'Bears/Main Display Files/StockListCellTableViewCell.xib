@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19158" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19141"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -17,7 +17,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wei-cZ-Jf6">
-                        <rect key="frame" x="16" y="14" width="41.5" height="20.5"/>
+                        <rect key="frame" x="16" y="5" width="41.5" height="20.5"/>
                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -44,7 +44,13 @@
                         </constraints>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sIC-VG-f5n">
-                        <rect key="frame" x="16" y="36.5" width="26.5" height="12"/>
+                        <rect key="frame" x="16" y="27.5" width="26.5" height="12"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tow-Au-q2i">
+                        <rect key="frame" x="16" y="39.5" width="26.5" height="12"/>
                         <fontDescription key="fontDescription" type="system" pointSize="10"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -54,14 +60,16 @@
                     <constraint firstItem="JcG-ab-0AL" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.8" id="2Na-Dl-SPj"/>
                     <constraint firstItem="ovB-7I-mf5" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.6" id="2et-0M-LiP"/>
                     <constraint firstItem="sIC-VG-f5n" firstAttribute="leading" secondItem="Wei-cZ-Jf6" secondAttribute="leading" id="DYt-ge-ix4"/>
-                    <constraint firstItem="Wei-cZ-Jf6" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" multiplier="0.8" id="Dbk-Cb-NmG"/>
+                    <constraint firstItem="Wei-cZ-Jf6" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" multiplier="0.5" id="Dbk-Cb-NmG"/>
                     <constraint firstItem="kHJ-Tc-GPs" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="FH3-vx-EPo"/>
                     <constraint firstItem="ovB-7I-mf5" firstAttribute="leading" secondItem="kHJ-Tc-GPs" secondAttribute="trailing" constant="25" id="MLy-b7-Iyh"/>
+                    <constraint firstItem="tow-Au-q2i" firstAttribute="firstBaseline" secondItem="sIC-VG-f5n" secondAttribute="baseline" constant="12" symbolType="layoutAnchor" id="O02-Bf-VlX"/>
                     <constraint firstItem="JcG-ab-0AL" firstAttribute="centerY" secondItem="kHJ-Tc-GPs" secondAttribute="centerY" id="ONS-vF-Ohp"/>
                     <constraint firstItem="Wei-cZ-Jf6" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="SFQ-sc-QWq"/>
                     <constraint firstItem="JcG-ab-0AL" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wei-cZ-Jf6" secondAttribute="trailing" constant="5" id="Ti8-TQ-gHN"/>
                     <constraint firstItem="sIC-VG-f5n" firstAttribute="firstBaseline" secondItem="Wei-cZ-Jf6" secondAttribute="baseline" constant="16" symbolType="layoutAnchor" id="Tx0-27-yUd"/>
                     <constraint firstItem="ovB-7I-mf5" firstAttribute="top" secondItem="kHJ-Tc-GPs" secondAttribute="top" id="Vle-lB-yjZ"/>
+                    <constraint firstItem="tow-Au-q2i" firstAttribute="leading" secondItem="sIC-VG-f5n" secondAttribute="leading" id="cuU-yX-g4L"/>
                     <constraint firstAttribute="trailing" secondItem="ovB-7I-mf5" secondAttribute="trailing" constant="50" id="nLX-Nx-nsL"/>
                     <constraint firstItem="kHJ-Tc-GPs" firstAttribute="leading" secondItem="JcG-ab-0AL" secondAttribute="trailing" constant="30" id="vbc-NA-Jt5"/>
                     <constraint firstItem="kHJ-Tc-GPs" firstAttribute="height" secondItem="ovB-7I-mf5" secondAttribute="height" id="wIR-eo-BxJ"/>
@@ -72,6 +80,7 @@
                 <outlet property="actionView" destination="JcG-ab-0AL" id="4tX-oH-zle"/>
                 <outlet property="detail" destination="sIC-VG-f5n" id="L1X-ZI-haI"/>
                 <outlet property="ratingCircle" destination="kHJ-Tc-GPs" id="mol-MH-DPg"/>
+                <outlet property="reportDateLabel" destination="tow-Au-q2i" id="DKS-VK-CUb"/>
                 <outlet property="title" destination="Wei-cZ-Jf6" id="FqK-RQ-cey"/>
                 <outlet property="valueCircle" destination="ovB-7I-mf5" id="2zn-i7-uf5"/>
             </connections>

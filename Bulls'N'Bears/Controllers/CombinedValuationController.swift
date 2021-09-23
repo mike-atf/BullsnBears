@@ -116,7 +116,8 @@ class CombinedValuationController: ValuationHelper {
         }
         
         do {
-            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+//            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+            valuations = try fetchRequest.execute()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
         }
@@ -143,7 +144,8 @@ class CombinedValuationController: ValuationHelper {
         }
         
         do {
-            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+//            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+            valuations = try fetchRequest.execute()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching dcfValuations")
         }

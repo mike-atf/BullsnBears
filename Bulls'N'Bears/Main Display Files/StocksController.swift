@@ -207,7 +207,8 @@ class StocksController: NSFetchedResultsController<Share> {
         fetchRequest.returnsObjectsAsFaults = false
         
         do {
-            shares = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+//            shares = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+            shares = try fetchRequest.execute()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
         }
@@ -224,9 +225,11 @@ class StocksController: NSFetchedResultsController<Share> {
         let predicate = NSPredicate(format: "symbol == %@", argumentArray: [symbol])
         fetchRequest.returnsObjectsAsFaults = false
         fetchRequest.predicate = predicate
+        fetchRequest.fetchLimit = 1
         
         do {
-            share = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest).first
+//            share = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest).first
+            share = try fetchRequest.execute().first
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
         }

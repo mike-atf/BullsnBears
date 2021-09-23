@@ -43,9 +43,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
             
             // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
+            if let lastForegroundDate = UserDefaults.standard.value(forKey: "LastForegroundDate") as? Date {
+                if Date().timeIntervalSince(lastForegroundDate) > 300 {
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: "ActivatedFromBackground"), object:   nil, userInfo: nil) // send to
+                }
+            }
             
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "ActivatedFromBackground"), object:   nil, userInfo: nil) // send to
-
+            UserDefaults.standard.setValue(Date(), forKey: "LastForegroundDate")
+            
             let inboxFolder = documentFolder + "/Inbox"
             
             var pointer: ObjCBool = true
@@ -180,7 +185,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         request.sortDescriptors = [NSSortDescriptor(key: "symbol", ascending: true)]
                 
         do {
-            let shares = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(request)
+//            let shares = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(request)
+            let shares = try request.execute()
             for share in shares {
             
                 let valueRatingData = share.wbValuation?.valuesSummaryScores()

@@ -124,9 +124,6 @@ class ComparisonCell: UITableViewCell {
             legendLabel!.leadingAnchor.constraint(greaterThanOrEqualTo: rowTitleLabel.trailingAnchor, constant: 10).isActive = true
             
             createFinancialsTexts(cellPath: cellPath)
-            for view in labelBackgroundViews ?? [] {
-                print(view.frame)
-            }
         }
     }
     
@@ -143,19 +140,36 @@ class ComparisonCell: UITableViewCell {
             let label: UILabel = {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
-                label.font = UIFont.systemFont(ofSize: financialsFontSize)
-                label.textColor = colors[Int(count)]
+                label.font = UIFont.systemFont(ofSize: financialsFontSize, weight: .bold)
+//                label.font = UIFont.systemFont(ofSize: financialsFontSize)
+//                label.textColor = colors[Int(count)]
                 label.text = string
                 label.numberOfLines = 0
                 label.sizeToFit()
                 return label
             }()
+            
+            let backgroundView: UIView = {
+                let view = UIView()
+                view.translatesAutoresizingMaskIntoConstraints = false
+                view.backgroundColor = colors[Int(count)]
+                return view
+            }()
+            self.contentView.addSubview(backgroundView)
+            labelBackgroundViews?.append(backgroundView)
+            
             self.contentView.addSubview(label)
             valueLabels?.append(label)
+
+            backgroundView.leadingAnchor.constraint(greaterThanOrEqualTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
+            backgroundView.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
+            backgroundView.bottomAnchor.constraint(equalTo: margins.bottomAnchor).isActive = true
+            backgroundView.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1)-5).isActive = true
+
             
             label.leadingAnchor.constraint(greaterThanOrEqualTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*count).isActive = true
             label.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-            label.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1)).isActive = true
+            label.trailingAnchor.constraint(equalTo: margins.leadingAnchor, constant: firstColumnInset + columnWidth*(count+1)-20).isActive = true
             count += 1
         }
     }

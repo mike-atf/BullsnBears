@@ -694,7 +694,15 @@ class WebpageScraper {
             while columnEndIndex != nil {
                 rowText.removeSubrange(columnEndIndex!.lowerBound...)
                 if let dataIndex = rowText.range(of: ">", options: .backwards) {
-                    let data$ = rowText[dataIndex.upperBound...]
+                    // loading webpage outside OS browser loads September as 'Sept' which has no match in dateFormatter.
+                    // needs replacing with 'Sep'
+                    var data$ = rowText[dataIndex.upperBound...]
+                    if data$.contains("Sept") {
+                        if let septIndex = data$.range(of: "Sept") {
+                            data$.replaceSubrange(septIndex, with: "Sep")
+                        }
+                    }
+
                     if count == 6 {
                         if let date = dateFormatter.date(from: String(data$)) {
                             tradingDate = date

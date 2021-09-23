@@ -41,7 +41,7 @@ class CitationsManager {
         let pL27 = "ultimately the earnings will decide the fate of a stock."
         let pL28 = "There are three phases to a growth company's life: the start-up phase..., the rapid expansion phase..., and the saturation phase...\nThe second phase is the safest phase, and also where the most money is made"
 
-        let pL1_0 = "Hold no more stocks than you can remained informed on"
+        let pL1_0 = "Hold no more stocks than you can remain informed on"
         let pL1_1 = "You want to see first that sales and earnings per share are moving forward at an acceptable rate, and second, that you can buy the stock at a reasonable price"
         let pL1_2 = "Buy or do not buy the stock on the basis of whether or not growth meets your objectives and whether the price is reasonable"
         let pL1_3 = "Understanding the reasons for past sales growth will help you form a good judgement as to the likelihood of past growth rates continuing"
@@ -49,7 +49,7 @@ class CitationsManager {
         let pL1_5 = "The story of the 40 [stock market] declines continues to comfort me during gloomy periods when you and I have another chance in a long string of chances to buy great stocks at bargain prices."
 
 
-        let wb0 = "Warren [Buffett] realized ... that if a company's competitive advantage could be maintained for a long period of time - if it was 'durable' - then the underlying vaue of the business would continue to increase year after year"
+        let wb0 = "Warren [Buffett] realized ... that if a company's competitive advantage could be maintained for a long period of time - if it was 'durable' - then the underlying value of the business would continue to increase year after year"
         let wb1 = "Because these businesses [with durable competitive advantage] had such incredible business economics working in their favor, there was zero chance of them ever going into bankruptcy."
         let wb2 = "the longer [Warren Buffett] held on to these positions, the more time he had to profit from these businesses' great underlying economics."
         let wb3 = "[Warren Buffett] realized that he no longer had to wait for Wall Street to serve up a bargain price. He could pay a fair price for one of these super businesses and still come out ahead, provided he held the investment long enough"
@@ -60,7 +60,7 @@ class CitationsManager {
         let wb8 = "Warren [Buffett] has read thousands of 10K's over the years, as they do the best job of reporting the numbers without all the fluff that can get stuffed into a shareholder's annual report"
         let wb9 = "To Warren [Buffett], the source of the earnings is always more important than the earnings themselves"
         let wb10 = "Warren [Buffett] knows that one of the great secrets to making more money is spending less money"
-        let wb11 = "Companies with gross profit margins of 40% or better tend to be compnanies with some sort of durable competitive advantage...\nAny gross profit margin of 20% and below is usually a good indicator of a fiercely competitive industry."
+        let wb11 = "Companies with gross profit margins of 40% or better tend to be companies with some sort of durable competitive advantage...\nAny gross profit margin of 20% and below is usually a good indicator of a fiercely competitive industry."
         let wb12 = "Warren [Buffett] knows that when we look for companies with a durable competitive advantage, 'consistency' is the name of the game"
         let wb13 = "Companies that don't have a durable competitive advantage suffer from intense competition and show wild variation in SGA costs as a percentage of gross profit"
         let wb14 = "...the lower the company's SGA expenses, the better. If they can stay consistently low, all the better. [...] anything under 30% is considered fantastic."
@@ -68,14 +68,23 @@ class CitationsManager {
         let wb16 = "...the economics of companies with low SGA expenses can be destroyed by expensive research and development costs, high capital expenditure and/ or lots of debt."
         let wb17 = "Companies that have to spend heavily on R&D have an inherent flaw in their competitive advantage, that will always put their long-term economics at risk..."
         let wb18 = "... if a company is showing a net earnings history of more than 20% on total revenues, there is a real good chance that it is benefiting from some kind of long-term competitive advantage."
-
-        let plCitatations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
-        let pl1Citatations = [pL1_0, pL1_1, pL1_2, pL1_3, pL1_4, pL1_5]
-        let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10,wb11,wb12, wb13, wb14, wb15, wb16, wb17, wb18]
         
-        var allCitations = plCitatations
+        let jm1 = "Holding cash is uncomfortable, but not as uncomfortable as doing something stupid."
+        let jm2 = "Investing should be more like watching paint dry or watching grass grow. If you want excitement, take $800 and go to Las Vegas..."
+        let jm3 = "... in some bizarre mental world, people believe that a loss isn't a loss until they realize it. This belief tends to investors holding onto their losing stocks and selling their winning stocks - know as the disposition effect."
+        let jm4 = "Stop losses may be a useful form of pre-commitment that help alleviate the disposition effect in markets that witness momentum."
+        let jm5 = "If I have done my homework, and selected stocks that I think represent good value over the long term, why on earth would I want to sit and watch their performance day by day. [...] positions that should perform well in the long term [...] certainly aren't guaranteed to do so without short-term losses."
+        let jm6 = "...the Magic Formula portfolio fared poorly relative to the market average in 5 out of every 12 months tested. For full year periods the ... portfolio failed to beat the market average once every four years. [from Joel Greenblatt's 'The Little Book that beats the Market'] "
+            
+        let plCitations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
+        let pl1Citations = [pL1_0, pL1_1, pL1_2, pL1_3, pL1_4, pL1_5]
+        let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10,wb11,wb12, wb13, wb14, wb15, wb16, wb17, wb18]
+        let jmCitations = [jm1,jm2, jm3, jm4, jm5, jm6]
+        
+        var allCitations = plCitations
         allCitations.append(contentsOf: wbCitations)
-        allCitations.append(contentsOf: pl1Citatations)
+        allCitations.append(contentsOf: pl1Citations)
+        allCitations.append(contentsOf: jmCitations)
 
         if let lastCitation = UserDefaults.standard.value(forKey: userDefaultTerms.lastCitation) as? String {
             var count = 0
@@ -89,22 +98,37 @@ class CitationsManager {
         }
         
         let citationCount = allCitations.count
+//        let randomCitationNo = Int.random(in: 0..<citationCount)
         let randomCitationNo = Int.random(in: 0..<citationCount)
         let randomCitation = "\"" + allCitations[randomCitationNo] + "\""
         let tributePL = "\n\nPeter Lynch\n'One up on Wall Street'\nSimon & Schuster, 1989"
         let tributePL2 = "\n\nPeter Lynch w John Rothchild\n'Beating The Street'\nSimon & Schuster"
         let tributeWB = "\n\nMary Buffett and David Clark\n'Warren Buffett and the Interpretation of Financial Statements'\nSimon & Schuster, 2008"
+        let tributeJM = "\n\nJames Mortimer\n'The Little Book of Behavioural Investing'\nJohn Wiley & Sons Ltd,  2010"
 
         var tribute = String()
         
-        if randomCitationNo < plCitatations.count {
+        switch randomCitationNo {
+        case 0..<plCitations.count:
             tribute = tributePL
-        } else if randomCitationNo < (plCitatations.count + wbCitations.count) {
+        case plCitations.count..<(plCitations.count + wbCitations.count):
             tribute = tributeWB
-        }
-        else {
+        case (plCitations.count + wbCitations.count)..<(plCitations.count + wbCitations.count + pl1Citations.count):
             tribute = tributePL2
+        case (plCitations.count + wbCitations.count + pl1Citations.count)...:
+            tribute = tributeJM
+        default:
+            tribute = "missing"
         }
+        
+//        if randomCitationNo < plCitations.count {
+//            tribute = tributePL
+//        } else if randomCitationNo < (plCitations.count + wbCitations.count) {
+//            tribute = tributeWB
+//        }
+//        else {
+//            tribute = tributePL2
+//        }
         
         let font = UIFont.italicSystemFont(ofSize: 18)
         let fontColor = UIColor.label

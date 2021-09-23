@@ -21,6 +21,7 @@ class StockChartVC: UIViewController {
     @IBOutlet var dcfErrorsButton: UIButton!
     @IBOutlet var r1ErrorsButton: UIButton!
     @IBOutlet var researchButton: UIBarButtonItem!
+    @IBOutlet var purchaseButton: UIBarButtonItem!
     
     var buildLabel: UIBarButtonItem!
     var dcfErrors = [String]()
@@ -37,11 +38,12 @@ class StockChartVC: UIViewController {
         let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3) ,NSAttributedString.Key.foregroundColor: UIColor.label]
         barTitleButton.setTitleTextAttributes(titleAttributes, for: .normal)
                 
-        self.navigationItem.leftBarButtonItems = [barTitleButton,researchButton]
+        self.navigationItem.leftBarButtonItems = [barTitleButton,researchButton, purchaseButton]
         self.navigationItem.rightBarButtonItem = buildLabel
         barTitleButton.title = share?.name_long
         
         NotificationCenter.default.addObserver(self, selector: #selector(activateErrorButton), name: Notification.Name(rawValue: "NewErrorLogged"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showCitation), name: Notification.Name(rawValue: "ShowCitation"), object: nil)
         
         dcfErrorsButton.isHidden = true
         r1ErrorsButton.isHidden = true
@@ -60,6 +62,7 @@ class StockChartVC: UIViewController {
         chart.chartView.setNeedsDisplay()
         chart.macdView.setNeedsDisplay()
     }
+    
     
     func configure(share: Share?) {
         
@@ -254,7 +257,53 @@ class StockChartVC: UIViewController {
             present(errorsView, animated: true, completion:  nil)
         }
     }
+    
+    @objc
+    func showCitation() {
+                
+        let citationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WelcomeViewController")
+
+        let width = self.splitViewController?.view.bounds.width ?? 1180
+        let height = self.splitViewController?.view.bounds.height ?? 820
         
+        citationView.view.backgroundColor = UIColor.systemGray
+        citationView.modalPresentationStyle = .popover
+        citationView.preferredContentSize = CGSize(width: width * 0.4, height: height * 0.3)
+
+        citationView.loadViewIfNeeded()
+        if let textView = citationView.view.viewWithTag(10) as? UITextView {
+            textView.backgroundColor = UIColor.systemGray4
+            textView.attributedText = CitationsManager.cite()
+        }
+
+        let popUpController = citationView.popoverPresentationController
+        popUpController!.permittedArrowDirections = UIPopoverArrowDirection.init(rawValue: 0)
+//        popUpController!.permittedArrowDirections = [.down, .right]
+        popUpController?.sourceView = view
+        popUpController?.sourceRect = CGRect(x: 20, y: view.frame.height-20, width: 5, height: 5)
+
+        self.parent?.present(citationView, animated: true, completion: nil)
+
+    }
+        
+    @IBAction func purchaseAction(_ sender: UIBarButtonItem) {
+        
+        guard let dialog = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SharePurchaseDialog") as? SharePurchaseDialog else {
+            return
+        }
+        
+        dialog.modalPresentationStyle = .popover
+        dialog.preferredContentSize = CGSize(width: 400, height: 600)
+
+        let popUpController = dialog.popoverPresentationController
+        popUpController!.permittedArrowDirections = .up
+        popUpController?.barButtonItem = sender
+
+        dialog.share = share
+        
+        self.present(dialog, animated: true, completion: nil)
+
+    }
 }
 
 extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {

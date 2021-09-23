@@ -18,7 +18,9 @@ class ResearchTVC: UITableViewController {
         super.viewDidLoad()
 
         tableView.register(UINib(nibName: "ResearchCell", bundle: nil), forCellReuseIdentifier: "researchCell")
-        self.title = "\(share?.name_short ?? "missing") research"
+        tableView.register(UINib(nibName: "DateSelectionCell", bundle: nil), forCellReuseIdentifier: "dateSelectionCell")
+        
+        self.title = "\(share?.name_short ?? "missing")  - research"
         
         controller =  ResearchController(share: share, researchList: self)
         
@@ -51,19 +53,28 @@ class ResearchTVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        if (sectionTitles?[indexPath.section] ?? "").lowercased().contains("date") {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "dateSelectionCell", for: indexPath) as! DateSelectionCell
+
+            cell.configure(date: research?.nextReportDate, path: indexPath, delegate: controller)
+
+            return cell
+
+        } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "researchCell", for: indexPath) as! ResearchCell
 
             cell.configure(delegate: controller, path: indexPath)
 
             return cell
+        }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        let competitorsCount = research?.competitors?.count ?? 0
-        let newsCounts = research?.news?.count ?? 0
+//        let competitorsCount = research?.competitors?.count ?? 0
+//        let newsCounts = research?.news?.count ?? 0
         
-        if indexPath.section == 0 { // asste & values
+        if indexPath.section == 0 { // assets & values
             return 70
         }
         else if indexPath.section == 1	 { // size
@@ -75,38 +86,41 @@ class ResearchTVC: UITableViewController {
         else if indexPath.section == 3 { // competitors (sub rows)
             return 44
         }
-        else if indexPath.section == 4 { // future growth plan
+        else if indexPath.section == 4 { // Financial report date
+            return 60
+        }
+        else if indexPath.section == 5 { // future growth plan
             return 70
         }
-        else if indexPath.section == 5 { // category
+        else if indexPath.section == 6 { // category
             return 44
         }
-        else if indexPath.section == 6 { // sub category
+        else if indexPath.section == 7 { // sub category
             return 44
         }
-        else if indexPath.section == 7 { // news (sub rows)
+        else if indexPath.section == 8 { // news (sub rows)
+            return 60
+        }
+        else if indexPath.section == 9 { // industry
             return 44
         }
-        else if indexPath.section == 8 { // industry
+        else if indexPath.section == 10 { // insider buying selling
             return 44
         }
-        else if indexPath.section == 9 { // insider buying selling
-            return 44
-        }
-        else if indexPath.section == 10 { // crises performance
-            return 120
-        }
-        else if indexPath.section == 11 { // business description
+        else if indexPath.section == 11 { // crises performance
             return 100
         }
-        else if indexPath.section == 12 { // ret. earnings
+        else if indexPath.section == 12 { // business description
+            return 150
+        }
+        else if indexPath.section == 13 { // ret. earnings
             return 44
         }
-        else if indexPath.section == 13 { // special products
+        else if indexPath.section == 14 { // special products
             return 70
         }
-        else if indexPath.section == 14 { // buy story
-            return 120
+        else if indexPath.section == 15 { // buy story
+            return 150
         }
         else {
             return 100

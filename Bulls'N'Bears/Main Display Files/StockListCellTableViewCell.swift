@@ -12,6 +12,7 @@ class StockListCellTableViewCell: UITableViewCell {
 
     @IBOutlet var title: UILabel!
     @IBOutlet var detail: UILabel!
+    @IBOutlet var reportDateLabel: UILabel!
     @IBOutlet var ratingCircle: ScoreCircle!
     @IBOutlet var valueCircle: ScoreCircle!
     @IBOutlet var actionView: BuySellView!
@@ -40,6 +41,7 @@ class StockListCellTableViewCell: UITableViewCell {
     }
     
     public func configureCell(indexPath: IndexPath, stock: Share, userRatingScore: Double?, valueRatingScore: Double?, scoreDelegate: ScoreCircleDelegate, userCommentCount: Int) {
+        
         self.indexPath = indexPath
         self.stock = stock
         
@@ -47,6 +49,18 @@ class StockListCellTableViewCell: UITableViewCell {
         if let lastPrice = stock.getDailyPrices()?.last {
             detail.text = timeFormatter.localizedString(for: lastPrice.tradingDate, relativeTo: Date())
         }
+        
+        var reportDate$ = "Report: -"
+        if let valid = stock.research?.nextReportDate {
+            let dateFormatter: DateFormatter = {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .short
+                return formatter
+            }()
+            reportDate$ = "Report: " + dateFormatter.string(from: valid)
+        }
+        reportDateLabel.text = reportDate$
+
         
         actionView.configure(share: stock)
         ratingCircle.configure(score: userRatingScore,delegate: scoreDelegate, path: indexPath, isUserScore: true, userCommentsCount: userCommentCount)

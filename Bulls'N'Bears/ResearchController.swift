@@ -137,6 +137,8 @@ class ResearchController {
                 sectionTitles[name] = "Growth Sub Category" // enum GrowthCategoryNames
             case "businessDescription":
                 sectionTitles[name] = "Products or Services" // enum GrowthCategoryNames
+            case "nextReportDate":
+                sectionTitles[name] = "Date of next Financial Report"
             default:
                 print("error: default")
             }
@@ -267,6 +269,14 @@ class ResearchController {
 }
 
 extension ResearchController: ResearchCellDelegate {
+    
+    
+    func userEnteredDate(date: Date, cellPath: IndexPath) {
+        
+        if sectionTitles()[cellPath.section].lowercased().contains("report") {
+            share?.research?.nextReportDate = date
+        }
+    }
 
     func userEnteredNotes(notes: String, cellPath: IndexPath) {
         

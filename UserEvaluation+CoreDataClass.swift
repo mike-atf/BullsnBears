@@ -11,19 +11,7 @@ import CoreData
 
 @objc(UserEvaluation)
 public class UserEvaluation: NSManagedObject {
-    
-    public override func awakeFromFetch() {
-        //TODO: - temporary, remove for release
-//        if let valid = self.wbvParameter {
-//            for term in WBVParameters().higherIsWorseParameters() {
-//                if valid == term {
-//                    higherIsBetter = false
-//                    save()
-//                }
-//            }
-//        }
-    }
-    
+        
     static func create(valuation: WBValuation, in managedObjectContext: NSManagedObjectContext) {
         let newEvaluation = self.init(context: managedObjectContext)
         newEvaluation.userEvaluation = valuation

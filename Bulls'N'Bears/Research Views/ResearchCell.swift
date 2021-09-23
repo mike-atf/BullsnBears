@@ -9,6 +9,7 @@ import UIKit
 
 protocol ResearchCellDelegate {
     func userEnteredNotes(notes: String, cellPath: IndexPath)
+    func userEnteredDate(date: Date, cellPath: IndexPath)
     func value(indexPath: IndexPath) -> String?
 }
 
@@ -17,7 +18,6 @@ class ResearchCell: UITableViewCell {
 
     @IBOutlet var textView: UITextView!
     var cellDelegate: ResearchCellDelegate!
-//    var researchParameter: String!
     var originalText: String?
     var indexPath: IndexPath!
     var textSaved = Bool()
