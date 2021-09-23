@@ -78,6 +78,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var selectedSharesToCompare = Set<Share>()
     var refreshControl: UIRefreshControl!
     
+    var searchController: UISearchController?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -106,6 +108,15 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         else {
             showWelcomeView()
         }
+        
+        searchController = UISearchController(searchResultsController: nil)
+        searchController?.searchResultsUpdater = self
+        searchController?.searchBar.placeholder = "Enter symbol"
+        searchController?.delegate = self
+        searchController?.searchBar.delegate = self
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+ 
         
 // temp
 //        self.controller.research()
@@ -371,7 +382,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             
             objectOwned.watchStatus = 1
             objectOwned.save()
-//            self.showPurchaseDialog(share: objectOwned, shareIndexPath: indexPath)
         }
         ownAction.backgroundColor = UIColor.systemGreen
         ownAction.image = UIImage(systemName: "bag.badge.plus")
@@ -496,6 +506,9 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
     }
     
+    @IBAction func showAllShares(_ sender: UIBarButtonItem) {
+        sortParameterChanged()
+    }
     
     @IBAction func showTBYView(_ sender: Any) {
         
@@ -513,26 +526,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         popUpController?.barButtonItem = treasuryBondYieldsButton
             
         self.splitViewController?.present(tbyVC, animated: true, completion: nil)
-    }
-    
-    func showPurchaseDialog(share: Share, shareIndexPath: IndexPath) {
-        
-        guard let dialog = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SharePurchaseDialog") as? SharePurchaseDialog else {
-            return
-        }
-        
-        let centreTopRect = CGRect(x: self.splitViewController!.view.bounds.midX - 5, y: 20, width: 10, height: 10)
-        
-        dialog.modalPresentationStyle = .popover
-        dialog.preferredContentSize = CGSize(width: 400, height: 600)
-
-        let popUpController = dialog.popoverPresentationController
-        popUpController!.permittedArrowDirections = .up
-        popUpController?.sourceView = tableView.cellForRow(at: shareIndexPath)?.contentView
-        popUpController?.sourceRect = tableView.cellForRow(at: shareIndexPath)?.contentView.frame ?? centreTopRect
-        dialog.share = share
-        
-        self.splitViewController?.present(dialog, animated: true, completion: nil)
     }
     
     
@@ -808,6 +801,62 @@ extension StocksListTVC: NSFetchedResultsControllerDelegate {
         }
 
     }
+    
+}
+
+extension StocksListTVC: UISearchBarDelegate, UISearchResultsUpdating, UISearchControllerDelegate {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        
+        guard let searchText = searchController.searchBar.text  else {
+            return
+        }
+        
+        guard searchText != "" else {
+            return
+        }
+        
+        NotificationCenter.default.addObserver(
+          forName: UIResponder.keyboardWillHideNotification,
+          object: nil, queue: .main) { (notification) in
+            self.searchKeyBoardDismissed()
+        }
+        
+        let request = NSFetchRequest<Share>(entityName: "Share")
+
+        let namePredicate = NSPredicate(format: "symbol contains[c] %@", searchText.lowercased())
+    
+        request.predicate = namePredicate
+        request.sortDescriptors = [NSSortDescriptor(key: "symbol", ascending: true)]
+        controller.delegate = nil
+        controller = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "watchStatus", cacheName: nil)
+
+        do {
+            try controller.performFetch()
+        } catch let error as NSError {
+            print(error.localizedDescription)
+            
+        }
+
+        self.navigationItem.leftBarButtonItem?.isEnabled = true
+        tableView.reloadData()
+        controller.delegate = self
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        
+        sortParameterChanged()
+
+    }
+
+
+    
+    @objc
+    func searchKeyBoardDismissed() {
+        searchController?.isActive = false
+        
+    }
+
     
 }
 

@@ -105,6 +105,11 @@
                                     <action selector="selectToCompare:" destination="cqX-eK-jk9" id="LWb-yu-dAC"/>
                                 </connections>
                             </barButtonItem>
+                            <barButtonItem title="Show all" id="tWR-mj-qlk">
+                                <connections>
+                                    <action selector="showAllShares:" destination="cqX-eK-jk9" id="Pkm-Ss-UoC"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
@@ -1369,7 +1374,7 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="HCm-I9-2PD"/>
-        <segue reference="mBp-dp-A5V"/>
+        <segue reference="IOb-p8-cQu"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.up.arrow.down" catalog="system" width="128" height="98"/>
