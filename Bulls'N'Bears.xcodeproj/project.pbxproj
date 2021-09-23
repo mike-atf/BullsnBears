@@ -165,6 +165,7 @@
 		EAC2FC7B25A240290060F387 /* ValuationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */; };
 		EAC2FC7C25A240290060F387 /* ValuationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */; };
 		EAC2FC7D25A240290060F387 /* ValuationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */; };
+		EAC5FB1826FCF53400419CA7 /* ChartLegendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC5FB1726FCF53400419CA7 /* ChartLegendView.swift */; };
 		EAC61A1326FB6788000FAC81 /* SharePurchase+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC61A1126FB6788000FAC81 /* SharePurchase+CoreDataClass.swift */; };
 		EAC61A1426FB6788000FAC81 /* SharePurchase+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC61A1126FB6788000FAC81 /* SharePurchase+CoreDataClass.swift */; };
 		EAC61A1526FB6788000FAC81 /* SharePurchase+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC61A1126FB6788000FAC81 /* SharePurchase+CoreDataClass.swift */; };
@@ -345,6 +346,7 @@
 		EAC2FC6F25A23FFC0060F387 /* ValuationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationTableViewCell.swift; sourceTree = "<group>"; };
 		EAC2FC7025A23FFC0060F387 /* ValuationTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ValuationTableViewCell.xib; sourceTree = "<group>"; };
 		EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationListViewController.swift; sourceTree = "<group>"; };
+		EAC5FB1726FCF53400419CA7 /* ChartLegendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartLegendView.swift; sourceTree = "<group>"; };
 		EAC61A1026FB6737000FAC81 /* TrendMyStocks 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 8.xcdatamodel"; sourceTree = "<group>"; };
 		EAC61A1126FB6788000FAC81 /* SharePurchase+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SharePurchase+CoreDataClass.swift"; sourceTree = "<group>"; };
 		EAC61A1226FB6788000FAC81 /* SharePurchase+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SharePurchase+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -602,6 +604,7 @@
 				EAC190D42576731B0030B331 /* StockChartVC.swift */,
 				EAC190E92577E2E20030B331 /* ChartContainerView.swift */,
 				EA5639E7262C481600010964 /* ChartPricesView.swift */,
+				EAC5FB1726FCF53400419CA7 /* ChartLegendView.swift */,
 				EAA099C32588020B00DBB93C /* CheckButton.swift */,
 				EAC190F32577E3B60030B331 /* ChartView.swift */,
 				EA5639E0262C47F700010964 /* ChartTimeLineView.swift */,
@@ -804,6 +807,7 @@
 				EA4B5F0625DD53900070CC70 /* WebDataDownloader.swift in Sources */,
 				EA6AACDF26053294002DE9DF /* MACD_View.swift in Sources */,
 				EAFCB97D25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
+				EAC5FB1826FCF53400419CA7 /* ChartLegendView.swift in Sources */,
 				EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */,
 				EAC190D52576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC190EA2577E2E20030B331 /* ChartContainerView.swift in Sources */,

@@ -139,7 +139,7 @@
         <element name="CompanyNews" positionX="-225" positionY="-90" width="128" height="74"/>
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="313"/>
         <element name="Rule1Valuation" positionX="11.38879394531261" positionY="548.8145751953125" width="128" height="314"/>
-        <element name="Share" positionX="-200.2494506835938" positionY="165.3962707519531" width="128" height="448"/>
+        <element name="Share" positionX="-200.2494506835938" positionY="165.3962707519531" width="128" height="434"/>
         <element name="SharePurchase" positionX="-234" positionY="-99" width="128" height="119"/>
         <element name="StockResearch" positionX="-380.44580078125" positionY="-85.78861999511719" width="128" height="283"/>
         <element name="UserEvaluation" positionX="187.350341796875" positionY="352.4636840820313" width="128" height="148"/>

@@ -138,6 +138,8 @@ class SharePurchaseDialog: UIViewController, UITextViewDelegate, UITextFieldDele
             
             share.addToPurchase(newPurchase)
             share.watchStatus = 1
+            share.save()
+            print(share.purchase?.count)
             
             self.dismiss(animated: true, completion: nil)
         }

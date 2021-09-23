@@ -201,10 +201,11 @@ class ChartView: UIView {
         }
 
         
-        //MARK: - current price line
         let nonNullLivePrice = (share?.lastLivePrice != 0.0) ? share?.lastLivePrice : nil
         if let dailyPrices = share?.getDailyPrices() {
             if dailyPrices.count > 0 {
+                
+                //MARK: - current price line
                 if let currentPrice = nonNullLivePrice ?? dailyPrices.last?.close {
                     let currentPriceLine = UIBezierPath()
                     let pp1 = PriceDate(dailyPrices.first!.tradingDate, currentPrice)
@@ -220,8 +221,31 @@ class ChartView: UIView {
                     currentPriceLine.stroke()
       
                 }
+                
+                //MARK: - purchase Price line
+                if let purchasePrice = share?.purchasePrice() {
+                    
+                    let purchasePriceLine = UIBezierPath()
+                    let pp1 = PriceDate(dailyPrices.first!.tradingDate, purchasePrice)
+                    let pp2 = PriceDate(dailyPrices.last!.tradingDate, purchasePrice)
+                    
+                    let startPoint = plotPricePoint(pricePoint: pp1)
+                    var endPoint = plotPricePoint(pricePoint: pp2)
+                    endPoint.x = rect.maxX // yAxisLabels.first!.frame.maxX + 5
+                    purchasePriceLine.move(to: startPoint)
+                    purchasePriceLine.addLine(to: endPoint)
+//                    let dashPattern:[CGFloat] = [3,7]
+                    purchasePriceLine.setLineDash([3,7], count: 2, phase: 0)
+                    
+                    UIColor(named: "Green")?.setStroke()
+                    purchasePriceLine.stroke()
+
+                    
+                }
+
             }
         }
+                
         trendLabels.forEach { (label) in
             label.removeFromSuperview()
         }

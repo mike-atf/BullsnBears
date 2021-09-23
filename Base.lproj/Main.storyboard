@@ -298,7 +298,7 @@
                                     <constraint firstAttribute="width" constant="150" id="yN6-bi-8Ct"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4v4-Xi-Ewh">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4v4-Xi-Ewh" customClass="ChartLegendView" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="709.5" y="165.5" width="150" height="250.5"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mac D " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="roV-AV-Ii6">
@@ -325,13 +325,21 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eBK-Hm-dX3">
+                                        <rect key="frame" x="5" y="190.5" width="31" height="14.5"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                        <color key="textColor" systemColor="systemOrangeColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="rA8-Yp-xLD" secondAttribute="trailing" constant="5" id="4Td-eM-D0v"/>
+                                    <constraint firstItem="eBK-Hm-dX3" firstAttribute="leading" secondItem="itd-Fz-tR8" secondAttribute="leading" id="4zo-AD-ytX"/>
                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="laM-o4-Csj" secondAttribute="trailing" constant="5" id="KsM-rG-h1b"/>
                                     <constraint firstItem="rA8-Yp-xLD" firstAttribute="leading" secondItem="itd-Fz-tR8" secondAttribute="leading" id="S7f-fa-ccv"/>
                                     <constraint firstItem="rA8-Yp-xLD" firstAttribute="firstBaseline" secondItem="itd-Fz-tR8" secondAttribute="baseline" constant="16" symbolType="layoutAnchor" id="Suh-zp-LFU"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="eBK-Hm-dX3" secondAttribute="trailing" constant="10" id="Tgu-JL-ueA"/>
                                     <constraint firstItem="itd-Fz-tR8" firstAttribute="leading" secondItem="roV-AV-Ii6" secondAttribute="leading" id="bUO-vN-HVu"/>
                                     <constraint firstItem="rA8-Yp-xLD" firstAttribute="leading" secondItem="laM-o4-Csj" secondAttribute="leading" id="bc5-13-NF9"/>
                                     <constraint firstItem="laM-o4-Csj" firstAttribute="firstBaseline" secondItem="roV-AV-Ii6" secondAttribute="baseline" constant="16" symbolType="layoutAnchor" id="dXd-Q5-56Y"/>
@@ -340,6 +348,9 @@
                                     <constraint firstItem="roV-AV-Ii6" firstAttribute="leading" secondItem="4v4-Xi-Ewh" secondAttribute="leading" constant="5" id="jPq-fq-IcC"/>
                                     <constraint firstItem="laM-o4-Csj" firstAttribute="leading" secondItem="roV-AV-Ii6" secondAttribute="leading" id="r6I-TP-bp9"/>
                                 </constraints>
+                                <connections>
+                                    <outlet property="ownedLabel" destination="eBK-Hm-dX3" id="b9Z-6M-Ero"/>
+                                </connections>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="HJZ-h8-yHo"/>
@@ -370,6 +381,7 @@
                             <constraint firstItem="vMW-cw-G3E" firstAttribute="leading" secondItem="pyF-an-nSb" secondAttribute="trailing" constant="10" id="QwG-G3-Ppu"/>
                             <constraint firstItem="Hrq-ff-sUC" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="s3a-vi-G4m" secondAttribute="trailing" constant="10" id="VAw-gi-lr8"/>
                             <constraint firstItem="MVz-dh-kgA" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="5" id="VSM-dg-lDx"/>
+                            <constraint firstItem="eBK-Hm-dX3" firstAttribute="top" secondItem="gGa-pp-Cwa" secondAttribute="top" id="Vd3-jU-fd4"/>
                             <constraint firstItem="A2B-RG-uHy" firstAttribute="centerY" secondItem="QfP-lA-cgL" secondAttribute="centerY" id="Vz6-mJ-ds4"/>
                             <constraint firstItem="Hrq-ff-sUC" firstAttribute="height" secondItem="hAd-Vi-f51" secondAttribute="height" id="YmY-Ex-1yf"/>
                             <constraint firstItem="miC-j2-Brw" firstAttribute="leading" secondItem="fni-R7-t11" secondAttribute="trailing" constant="10" id="ZEQ-qp-NRH"/>
@@ -405,6 +417,7 @@
                             <outlet property="button4" destination="Hrq-ff-sUC" id="VPn-ps-2aL"/>
                             <outlet property="button5" destination="hAd-Vi-f51" id="Jkj-wC-zDZ"/>
                             <outlet property="button6" destination="28E-NM-pCT" id="bgv-RZ-vEb"/>
+                            <outlet property="chartLegendView" destination="4v4-Xi-Ewh" id="N6P-Pg-zXA"/>
                             <outlet property="chartPricesView" destination="ZUx-G2-2hE" id="JFh-56-Rds"/>
                             <outlet property="chartView" destination="B5Z-ih-tAD" id="rLP-Zb-1tP"/>
                             <outlet property="chartsContentView" destination="Cg7-eQ-58P" id="Xx5-Lh-Kmw"/>

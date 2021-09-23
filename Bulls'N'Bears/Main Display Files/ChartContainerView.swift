@@ -33,6 +33,8 @@ class ChartContainerView: UIView {
     @IBOutlet var button4: CheckButton!
     @IBOutlet var button5: CheckButton!
     @IBOutlet var button6: CheckButton!
+    @IBOutlet var chartLegendView: ChartLegendView!
+    
     let percentFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .percent
@@ -111,6 +113,8 @@ class ChartContainerView: UIView {
             
             zoomFactor = 1.0
         }
+        
+        chartLegendView.configure(share: shareToShow)
         
     }
     

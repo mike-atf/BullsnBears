@@ -1370,13 +1370,6 @@ public class Share: NSManagedObject {
         //take last of the three as sell signal -> price
         //calculate price difference % between buy date and sell date
         
-//        var smaBuy: LineCrossing
-//        var macDBuy: LineCrossing
-//        var oscBuy: LineCrossing
-//
-//        var smaSell: LineCrossing
-//        var macDSell: LineCrossing
-//        var oscSell: LineCrossing
         
         let upwardCrossing = firstUpwardCrossing
         let secondCrossing = allCrossings.filter { (crossing) -> Bool in
@@ -1397,9 +1390,40 @@ public class Share: NSManagedObject {
         
         }
         
-    func buyTriggersThreeLowOnly() {
+    func purchasePrice() -> Double? {
+                        
+        guard let purchases = self.purchase else { return  nil }
+        
+        var priceSum = Double()
+        var quantitySum = Double()
+        for element in purchases.allObjects {
+            if let transaction = element as? SharePurchase {
+                priceSum += transaction.price * transaction.quantity
+                quantitySum += transaction.quantity
+            }
+        }
+        
+        guard quantitySum > 0 else { return nil }
+        
+        return priceSum / quantitySum
         
     }
 
+    func quantityOwned() -> Double? {
+        
+        guard let purchases = self.purchase else { return  nil }
+
+        var quantitySum = Double()
+        for element in purchases.allObjects {
+            if let transaction = element as? SharePurchase {
+                quantitySum += transaction.quantity
+            }
+        }
+        
+        guard quantitySum > 0 else { return nil }
+        
+        return quantitySum
+
+    }
 
 }

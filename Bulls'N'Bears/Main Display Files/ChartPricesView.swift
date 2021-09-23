@@ -127,48 +127,6 @@ class ChartPricesView: UIView {
             labelPrice -= step
         }
         
-//        if let validMACD = validShare.latestMCDCrossing() {
-//            if let validSMA10 = validShare.latestSMA10Crossing() {
-//                if let validOSC = validShare.latestStochastikCrossing() {
-//
-//                    let indicators = [validMACD, validOSC, validSMA10].sorted { (lc0, lc1) -> Bool in
-//                        if lc0.date < lc1.date { return true }
-//                        else { return false }
-//                    }
-//
-//                    let labelColor = indicators.last!.signal > 0 ? UIColor(named: "Green") : UIColor(named: "Red")
-//                    let earlierSignalsSame = indicators[..<2].compactMap{ $0.signalIsBuy() }.filter { (buySignal) -> Bool in
-//                        if buySignal == indicators.last!.signalIsBuy() { return true }
-//                        else { return false }
-//                    }
-//
-//                    if earlierSignalsSame.count == 2 {
-//                        var price$ = String()
-//                        if let validPrice = indicators.last!.crossingPrice {
-//                            buySellPrice = validPrice
-//                            price$ = currencyFormatterNoGapWithPence.string(from: buySellPrice! as NSNumber) ?? ""
-//
-//                            buySellPriceLabel = {
-//                                let label = UILabel()
-//                                label.font = UIFont.preferredFont(forTextStyle: .footnote)
-//                                label.textAlignment = .right
-//                                label.text = " " + price$ + " "
-//                                label.sizeToFit()
-//                                label.backgroundColor = labelColor
-//                                label.isHidden = true
-//                                self.addSubview(label)
-//                                return label
-//                            }()
-//                        }
-//                    }
-//                    else {
-//                        buySellPriceLabel?.removeFromSuperview()
-//                        buySellPrice = nil
-//                    }
-//
-//                }
-//            }
-//        }
         
         if let latestSignals = validShare.latest3Crossings() {
             if let lastCrossing = latestSignals[2] {
