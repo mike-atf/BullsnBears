@@ -75,11 +75,14 @@ class CitationsManager {
         let jm4 = "Stop losses may be a useful form of pre-commitment that help alleviate the disposition effect in markets that witness momentum."
         let jm5 = "If I have done my homework, and selected stocks that I think represent good value over the long term, why on earth would I want to sit and watch their performance day by day. [...] positions that should perform well in the long term [...] certainly aren't guaranteed to do so without short-term losses."
         let jm6 = "...the Magic Formula portfolio fared poorly relative to the market average in 5 out of every 12 months tested. For full year periods the ... portfolio failed to beat the market average once every four years. [from Joel Greenblatt's 'The Little Book that beats the Market'] "
+        
+        let bg1 = "In searching for value and avoiding glamour, it is the cheapest of the cheap you want to embrace and the most expensive you want to avoid."
             
         let plCitations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
         let pl1Citations = [pL1_0, pL1_1, pL1_2, pL1_3, pL1_4, pL1_5]
         let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10,wb11,wb12, wb13, wb14, wb15, wb16, wb17, wb18]
         let jmCitations = [jm1,jm2, jm3, jm4, jm5, jm6]
+        let bgCitations = [bg1]
         
         var allCitations = plCitations
         allCitations.append(contentsOf: wbCitations)
@@ -105,31 +108,32 @@ class CitationsManager {
         let tributePL2 = "\n\nPeter Lynch w John Rothchild\n'Beating The Street'\nSimon & Schuster"
         let tributeWB = "\n\nMary Buffett and David Clark\n'Warren Buffett and the Interpretation of Financial Statements'\nSimon & Schuster, 2008"
         let tributeJM = "\n\nJames Mortimer\n'The Little Book of Behavioural Investing'\nJohn Wiley & Sons Ltd,  2010"
+        let tributeBG = "\n\nBruce Greenwald\n'Value Investing (2nd Ed)\nJohn Wiley & Sons Ltd,  2021"
 
         var tribute = String()
         
+        let step1Count = plCitations.count
+        let step2Count = step1Count + pl1Citations.count
+        let step3Count = step2Count + wbCitations.count
+        let step4Count = step3Count + jmCitations.count
+        let step5Count = step4Count + bgCitations.count
+        
+        
         switch randomCitationNo {
-        case 0..<plCitations.count:
+        case 0..<step1Count:
             tribute = tributePL
-        case plCitations.count..<(plCitations.count + wbCitations.count):
+        case step1Count..<step2Count:
             tribute = tributeWB
-        case (plCitations.count + wbCitations.count)..<(plCitations.count + wbCitations.count + pl1Citations.count):
+        case step2Count..<step3Count:
             tribute = tributePL2
-        case (plCitations.count + wbCitations.count + pl1Citations.count)...:
+        case step3Count..<step4Count:
             tribute = tributeJM
+        case step4Count...:
+            tribute = tributeBG
         default:
             tribute = "missing"
         }
-        
-//        if randomCitationNo < plCitations.count {
-//            tribute = tributePL
-//        } else if randomCitationNo < (plCitations.count + wbCitations.count) {
-//            tribute = tributeWB
-//        }
-//        else {
-//            tribute = tributePL2
-//        }
-        
+                
         let font = UIFont.italicSystemFont(ofSize: 18)
         let fontColor = UIColor.label
         let paragraphStyle1 = NSMutableParagraphStyle()

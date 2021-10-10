@@ -1,8 +1,8 @@
 //
 //  Share+CoreDataProperties.swift
-//  Share
+//  Bulls'N'Bears
 //
-//  Created by aDav on 22/09/2021.
+//  Created by aDav on 10/10/2021.
 //
 //
 
@@ -33,33 +33,32 @@ extension Share {
     @NSManaged public var peRatio: Double
     @NSManaged public var purchaseStory: String?
     @NSManaged public var sector: String?
-    @NSManaged public var sharePurchaseReason: String?
     @NSManaged public var symbol: String?
     @NSManaged public var userEvaluationScore: Double
     @NSManaged public var valueScore: Double
     @NSManaged public var watchStatus: Int16
     @NSManaged public var dcfValuation: DCFValuation?
-    @NSManaged public var purchase: NSSet?
+    @NSManaged public var transactions: NSSet?
     @NSManaged public var research: StockResearch?
     @NSManaged public var rule1Valuation: Rule1Valuation?
     @NSManaged public var wbValuation: WBValuation?
 
 }
 
-// MARK: Generated accessors for purchase
+// MARK: Generated accessors for transactions
 extension Share {
 
-    @objc(addPurchaseObject:)
-    @NSManaged public func addToPurchase(_ value: SharePurchase)
+    @objc(addTransactionsObject:)
+    @NSManaged public func addToTransactions(_ value: ShareTransaction)
 
-    @objc(removePurchaseObject:)
-    @NSManaged public func removeFromPurchase(_ value: SharePurchase)
+    @objc(removeTransactionsObject:)
+    @NSManaged public func removeFromTransactions(_ value: ShareTransaction)
 
-    @objc(addPurchase:)
-    @NSManaged public func addToPurchase(_ values: NSSet)
+    @objc(addTransactions:)
+    @NSManaged public func addToTransactions(_ values: NSSet)
 
-    @objc(removePurchase:)
-    @NSManaged public func removeFromPurchase(_ values: NSSet)
+    @objc(removeTransactions:)
+    @NSManaged public func removeFromTransactions(_ values: NSSet)
 
 }
 

@@ -21,6 +21,7 @@ class SharePlaceHolder: NSObject {
     var eps = Double()
     var creationDate: Date?
     var purchaseStory: String?
+    var transactions: NSSet?
     var growthType: String?
     var growthSubType: String?
     var industry: String?
@@ -33,6 +34,7 @@ class SharePlaceHolder: NSObject {
     var lastLivePrice: Double = 0.0
     var lastLivePriceDate: Date?
     var priceUpdateComplete = false
+    var share: Share?
 
     override init() {
         super.init()
@@ -42,6 +44,7 @@ class SharePlaceHolder: NSObject {
     convenience init(share: Share?) {
         self.init()
         
+        self.share = share
         self.macd = share?.macd
         self.divYieldCurrent = share?.divYieldCurrent ?? Double()
         self.watchStatus = share?.watchStatus ?? Int16() // 0 watchList, 1 owned, 2 archived
@@ -63,6 +66,7 @@ class SharePlaceHolder: NSObject {
         self.dailyPrices = share?.dailyPrices
         self.lastLivePrice = share?.lastLivePrice ?? Double()
         self.lastLivePriceDate = share?.lastLivePriceDate
+        self.transactions = share?.transactions
     }
     
     /// does NOT save the NSManagedObject Share to it's context
@@ -90,6 +94,7 @@ class SharePlaceHolder: NSObject {
         share?.dailyPrices = self.dailyPrices
         share?.lastLivePrice = self.lastLivePrice
         share?.lastLivePriceDate = self.lastLivePriceDate
+        share?.transactions = self.transactions
 
     }
     
@@ -119,35 +124,58 @@ class SharePlaceHolder: NSObject {
         guard let validPoints = pricePoints else { return }
 
         self.dailyPrices = convertDailyPricesToData(dailyPrices: validPoints)
+        shareFromPlaceholder(share: share)
+        DispatchQueue.main.async {
+            self.share?.save()
+        }
+        
     }
     
     /// takes new prices and adds any newer ones than already saved to the exsitng list (rather than replce the existing list)
     func updateDailyPrices(newPrices: [PricePoint]?) {
         
-        print("updating daily prices for \(name_short ?? "missing name")")
+//        print("updating daily prices for \(name_short ?? "missing name")")
         guard let validNewPoints = newPrices else { return }
 
         if let existingPricePoints = getDailyPrices() {
-            var newList = existingPricePoints
-//            print("last existing pice is from \(existingPricePoints.last?.tradingDate)")
-//            print("latest new pice is \(validNewPoints.last?.tradingDate)")
-            var existingMACDs = getMACDs()
-            if let lastExistingDate = existingPricePoints.last?.tradingDate {
-                let pointsToAdd = validNewPoints.filter { (element) -> Bool in
-                    if element.tradingDate > lastExistingDate { return true }
-                    else { return false }
-                }
-                print("found \(pointsToAdd.count) new daily prices to add to plot")
-                if pointsToAdd.count > 0 {
-                    for point in pointsToAdd {
-                        newList.append(point)
-                        let lastMACD = existingMACDs?.last
-                        existingMACDs?.append(MAC_D(currentPrice: point.close, lastMACD: lastMACD, date: point.tradingDate))
-                    }
-                    self.macd = convertMACDToData(macds: existingMACDs) // doesn't save
-                    setDailyPrices(pricePoints: newList) // saves
-                }
+            
+            var pricePointsSet = Set<PricePoint>(existingPricePoints)
+
+//            var newList = existingPricePoints
+//            var existingMACDs = getMACDs()
+            
+            for point in validNewPoints {
+                pricePointsSet.insert(point)
             }
+            
+            let pricePointsSortedArray = Array(pricePointsSet).sorted { e0, e1 in
+                if e0.tradingDate < e1.tradingDate { return true }
+                else { return false }
+            }
+        
+//        self.macd = convertMACDToData(macds: existingMACDs)
+        let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
+        setDailyPrices(pricePoints: pricePointsSortedArray)
+
+                
+//                let pointsToAdd = validNewPoints.filter { element in
+//                    if pricePointsSet.contains(element) { return false }
+//                    else { return true }
+//                }
+////                print("found \(pointsToAdd.count) new daily prices to add to plot")
+//                if pointsToAdd.count > 0 {
+//                    for point in pointsToAdd {
+//                        newList.append(point)
+//                        let lastMACD = existingMACDs?.last
+//                        existingMACDs?.append(MAC_D(currentPrice: point.close, lastMACD: lastMACD, date: point.tradingDate))
+//                    }
+//                    newList.sort { e0, e1 in
+//                        if e0.tradingDate < e1.tradingDate { return true }
+//                        else { return false }
+//                    }
+//                    self.macd = convertMACDToData(macds: existingMACDs)
+//                    setDailyPrices(pricePoints: newList)
+//                }
         }
     }
 
@@ -495,7 +523,7 @@ class SharePlaceHolder: NSObject {
                 
                 DispatchQueue.main.async {
                     priceUpdateComplete = true
-                    updateDailyPrices(newPrices: pricePoints) // this saves the downloaded data to the backgroundMOC used
+                    updateDailyPrices(newPrices: pricePoints)
                     downloadKeyRatios(delegate: delegate)
                 }
             }

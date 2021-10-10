@@ -76,10 +76,11 @@
     </entity>
     <entity name="SharePurchase" representedClassName="SharePurchase" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isSale" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="lessonsLearnt" optional="YES" attributeType="String"/>
         <attribute name="price" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="quantity" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="reason" optional="YES" attributeType="String"/>
-        <attribute name="share" optional="YES" attributeType="String"/>
         <relationship name="sharePurchase" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Share" inverseName="purchases" inverseEntity="Share"/>
     </entity>
     <entity name="StockResearch" representedClassName="StockResearch" syncable="YES">
@@ -139,7 +140,7 @@
         <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="313"/>
         <element name="Rule1Valuation" positionX="11.38879394531261" positionY="548.8145751953125" width="128" height="314"/>
         <element name="Share" positionX="-200.2494506835938" positionY="165.3962707519531" width="128" height="419"/>
-        <element name="SharePurchase" positionX="-234" positionY="-99" width="128" height="119"/>
+        <element name="SharePurchase" positionX="-234" positionY="-99" width="128" height="134"/>
         <element name="StockResearch" positionX="-380.44580078125" positionY="-85.78861999511719" width="128" height="283"/>
         <element name="UserEvaluation" positionX="187.350341796875" positionY="352.4636840820313" width="128" height="148"/>
         <element name="WBValuation" positionX="-37.604248046875" positionY="-7.48974609375" width="128" height="374"/>

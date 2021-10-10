@@ -114,9 +114,10 @@ class ChartContainerView: UIView {
             zoomFactor = 1.0
         }
         
-        chartLegendView.configure(share: shareToShow)
+        chartLegendView.configure(share: shareToShow, parent: self)
         
     }
+        
     
     @IBAction func chartButtonAction(_ sender: CheckButton) {
         sender.active.toggle()
@@ -160,21 +161,6 @@ class ChartContainerView: UIView {
             let offset = scrollView.contentSize.width
             scrollView.setContentOffset(CGPoint(x: offset, y: 0), animated: false)
         }
-        
-//        chartsContentViewWidth.constant = newWidth
-//        chartsContentView.setNeedsDisplay()
-//        macdView.setNeedsDisplay()
-//        stochOscView.setNeedsDisplay()
-//        chartView.setNeedsDisplay()
-//
-//        zoomFactor = change
-    }
+            }
     
 }
-
-//extension ChartContainerView: UIScrollViewDelegate {
-//
-//    func scrollViewDidZoom(_ scrollView: UIScrollView) {
-//        print("zoom changed - \(scrollView.zoomScale)")
-//    }
-//}

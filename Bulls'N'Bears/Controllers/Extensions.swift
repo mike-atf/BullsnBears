@@ -7,12 +7,18 @@
 
 import UIKit
 
-//extension Array where Element == DatedValue {
-//    
-//    func encode() -> Data? {
-//        
-//    }
-//}
+extension UIView {
+    func findViewController() -> UIViewController? {
+        if let nextResponder = self.next as? UIViewController {
+            return nextResponder
+        } else if let nextResponder = self.next as? UIView {
+            return nextResponder.findViewController()
+        } else {
+            return nil
+        }
+    }
+}
+
 
 extension Array where Element == Double {
     

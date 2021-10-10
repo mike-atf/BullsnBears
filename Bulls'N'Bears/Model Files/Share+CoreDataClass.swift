@@ -1,8 +1,8 @@
 //
 //  Share+CoreDataClass.swift
-//  Share
+//  Bulls'N'Bears
 //
-//  Created by aDav on 22/09/2021.
+//  Created by aDav on 10/10/2021.
 //
 //
 
@@ -1392,14 +1392,17 @@ public class Share: NSManagedObject {
         
     func purchasePrice() -> Double? {
                         
-        guard let purchases = self.purchase else { return  nil }
+        guard let transaction = self.transactions else { return  nil }
         
         var priceSum = Double()
         var quantitySum = Double()
-        for element in purchases.allObjects {
-            if let transaction = element as? SharePurchase {
-                priceSum += transaction.price * transaction.quantity
-                quantitySum += transaction.quantity
+        
+        for element in transaction.allObjects {
+            if let transaction = element as? ShareTransaction {
+                if !transaction.isSale {
+                    priceSum += transaction.price * transaction.quantity
+                    quantitySum += transaction.quantity
+                }
             }
         }
         
@@ -1411,12 +1414,16 @@ public class Share: NSManagedObject {
 
     func quantityOwned() -> Double? {
         
-        guard let purchases = self.purchase else { return  nil }
+        guard let transactions = self.transactions else { return  nil }
 
         var quantitySum = Double()
-        for element in purchases.allObjects {
-            if let transaction = element as? SharePurchase {
-                quantitySum += transaction.quantity
+        for element in transactions.allObjects {
+            if let transaction = element as? ShareTransaction {
+                if transaction.isSale {
+                    quantitySum -= transaction.quantity
+                } else {
+                    quantitySum += transaction.quantity
+                }
             }
         }
         

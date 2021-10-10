@@ -500,7 +500,7 @@ struct TrendProperties {
     }
 }
 
-struct PricePoint: Codable {
+struct PricePoint: Codable, Hashable {
     
     var tradingDate: Date
     var open: Double

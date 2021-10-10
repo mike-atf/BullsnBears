@@ -100,6 +100,20 @@ public class WBValuation: NSManagedObject {
         
     }
     
+    func historicPEratio(for date: Date) -> Double? {
+        
+        guard let datedValues = peRatiosWithDates() else {
+            return nil
+        }
+
+        let inRangeValues = datedValues.filter { dv in
+            if abs(dv.date.timeIntervalSince(date)) <= 24*3600 { return true }
+            else { return false }
+        }
+        
+        return inRangeValues.compactMap{ $0.value }.mean()
+    }
+    
     func minMeanMaxPER(from:Date, to: Date?=nil) -> (Double, Double, Double)? {
         
         guard let datedValues = peRatiosWithDates() else {

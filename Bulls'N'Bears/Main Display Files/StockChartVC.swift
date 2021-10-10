@@ -34,13 +34,20 @@ class StockChartVC: UIViewController {
             configure(share: share)
         }
         
-        buildLabel = UIBarButtonItem(title: "Build: " + appBuild, style: .plain, target: nil, action: nil)
-        let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3) ,NSAttributedString.Key.foregroundColor: UIColor.label]
-        barTitleButton.setTitleTextAttributes(titleAttributes, for: .normal)
-                
-        self.navigationItem.leftBarButtonItems = [barTitleButton,researchButton, purchaseButton]
-        self.navigationItem.rightBarButtonItem = buildLabel
+//        let titleItem = UILabel()
+//        titleItem.text = share?.name_long
+//        titleItem.font = UIFont.preferredFont(forTextStyle: .title3)
+//        titleItem.bounds = CGRect(origin: CGPoint.zero, size: CGSize(width: view.bounds.width / 4, height: titleItem.bounds.height))
+//        barTitleButton = UIBarButtonItem(customView: titleItem)
         barTitleButton.title = share?.name_long
+
+        buildLabel = UIBarButtonItem(title: "Build " + appBuild, style: .plain, target: nil, action: nil)
+//        let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3) ,NSAttributedString.Key.foregroundColor: UIColor.label]
+//        barTitleButton.setTitleTextAttributes(titleAttributes, for: .normal)
+                
+        let fixedSizeItem = UIBarButtonItem.fixedSpace(100)
+        self.navigationItem.leftBarButtonItems = [barTitleButton,researchButton, purchaseButton, fixedSizeItem]
+        self.navigationItem.rightBarButtonItem = buildLabel
         
         NotificationCenter.default.addObserver(self, selector: #selector(activateErrorButton), name: Notification.Name(rawValue: "NewErrorLogged"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showCitation), name: Notification.Name(rawValue: "ShowCitation"), object: nil)
@@ -168,7 +175,7 @@ class StockChartVC: UIViewController {
     func activateErrorButton() {
         
         DispatchQueue.main.async {
-            self.navigationItem.leftBarButtonItems = [self.barTitleButton,self.researchButton, self.errorButton]
+            self.navigationItem.leftBarButtonItems = [self.barTitleButton,self.researchButton, self.purchaseButton ,self.errorButton]
             self.view.setNeedsLayout()
         }
 
@@ -288,7 +295,7 @@ class StockChartVC: UIViewController {
         
     @IBAction func purchaseAction(_ sender: UIBarButtonItem) {
         
-        guard let dialog = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SharePurchaseDialog") as? SharePurchaseDialog else {
+        guard let dialog = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SharePurchaseDialog") as? ShareTransactionDialog else {
             return
         }
         
@@ -300,10 +307,35 @@ class StockChartVC: UIViewController {
         popUpController?.barButtonItem = sender
 
         dialog.share = share
+        dialog.presentingVC = self
         
         self.present(dialog, animated: true, completion: nil)
 
     }
+    
+    func displayPurchaseInfo(button: PurchasedButton) {
+        
+        guard let dialog = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SharePurchaseDialog") as? ShareTransactionDialog else {
+            return
+        }
+        
+        dialog.modalPresentationStyle = .popover
+        dialog.preferredContentSize = CGSize(width: 400, height: 600)
+
+        let popUpController = dialog.popoverPresentationController
+        popUpController!.permittedArrowDirections = .down
+        popUpController?.sourceView = button
+
+        dialog.loadViewIfNeeded()
+        
+        dialog.existingPurchase(transaction: button.transaction)
+        dialog.setCancelButtonToDelete()
+        dialog.presentingVC = self
+
+        self.present(dialog, animated: true, completion: nil)
+
+    }
+
 }
 
 extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {

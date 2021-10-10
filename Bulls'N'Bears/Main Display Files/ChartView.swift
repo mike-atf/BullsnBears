@@ -14,6 +14,7 @@ class ChartView: UIView {
     var trendLabels = [UILabel]()
     var valuationLabels = [UILabel]()
     var buySellLabel: UILabel?
+    var purchaseButtons: [PurchasedButton]?
 
     var candleBoxes = UIBezierPath()
     var candleSticks = UIBezierPath()
@@ -74,6 +75,7 @@ class ChartView: UIView {
             }).first as? LineCrossing
         }
 
+        addPurchaseButtons()
         self.setNeedsDisplay()
     }
     
@@ -225,6 +227,12 @@ class ChartView: UIView {
                 //MARK: - purchase Price line
                 if let purchasePrice = share?.purchasePrice() {
                     
+//                    for button in purchaseButtons ?? [] {
+//                        button.removeFromSuperview()
+//                    }
+//
+//                    purchaseButtons = [UIButton]()
+                    
                     let purchasePriceLine = UIBezierPath()
                     let pp1 = PriceDate(dailyPrices.first!.tradingDate, purchasePrice)
                     let pp2 = PriceDate(dailyPrices.last!.tradingDate, purchasePrice)
@@ -234,13 +242,31 @@ class ChartView: UIView {
                     endPoint.x = rect.maxX // yAxisLabels.first!.frame.maxX + 5
                     purchasePriceLine.move(to: startPoint)
                     purchasePriceLine.addLine(to: endPoint)
-//                    let dashPattern:[CGFloat] = [3,7]
                     purchasePriceLine.setLineDash([3,7], count: 2, phase: 0)
                     
                     UIColor(named: "Green")?.setStroke()
                     purchasePriceLine.stroke()
 
+                    //MARK: - buttons for purchases in timeLine
                     
+                   if let transactions = share?.transactions as? Set<ShareTransaction> {
+                        var counter = 0
+                        for transaction in transactions {
+
+                            let pricePoint = PriceDate(transaction.date!, purchasePrice)
+                            let point = plotPricePoint(pricePoint: pricePoint)
+                            
+                            purchaseButtons![counter].frame.origin = CGPoint(x: point.x - 15, y: point.y - 15)
+//                            button.heightAnchor.constraint(equalToConstant: 30).isActive = true
+//                            button.widthAnchor.constraint(equalTo: button.heightAnchor, multiplier: 1).isActive = true
+//                            button.leadingAnchor.constraint(equalTo: leadingAnchor, constant: point.x - 15).isActive = true
+//                            button.topAnchor.constraint(equalTo: topAnchor, constant: point.y - 15).isActive = true
+
+                            purchaseButtons![counter].transaction = transaction
+                            purchaseButtons![counter].tintColor = transaction.isSale ? UIColor.systemRed : UIColor.systemGreen
+                            counter += 1
+                        }
+                    }
                 }
 
             }
@@ -420,6 +446,39 @@ class ChartView: UIView {
                     trendLabels[i].frame = trendLabels[i].frame.offsetBy(dx: 0, dy: intersect.height)
                 }
             }
+        }
+    }
+    
+    private func addPurchaseButtons() {
+        // doing this in 'draw' triggers new layout request so infinate loop
+        
+        guard let transactions = share?.transactions as? Set<ShareTransaction> else { return }
+        
+        for button in purchaseButtons ?? [] {
+            button.removeFromSuperview()
+        }
+        
+        purchaseButtons = [PurchasedButton]()
+        
+        for _ in transactions {
+            
+            let button = PurchasedButton()
+            button.addTarget(self, action: #selector(displayPurchase(button:)), for: .touchUpInside)
+            button.setBackgroundImage(UIImage(systemName: "purchased.circle.fill"), for: .normal)
+            button.frame = CGRect(origin: CGPoint.zero, size: CGSize(width: 30, height: 30))
+
+            addSubview(button)
+            
+            purchaseButtons?.append(button)
+        }
+    }
+    
+    @objc
+    func displayPurchase(button: PurchasedButton) {
+        
+        if let chartVC = self.findViewController() as? StockChartVC {
+            
+            chartVC.displayPurchaseInfo(button: button)
         }
     }
     
