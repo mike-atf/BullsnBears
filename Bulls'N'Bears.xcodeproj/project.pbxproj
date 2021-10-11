@@ -33,6 +33,12 @@
 		EA163F78258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA163F79258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA1F86D725DC247C006791BD /* WBValuationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1F86D625DC247C006791BD /* WBValuationController.swift */; };
+		EA20160D2714BE3D004432EC /* DiaryListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20160B2714BE3D004432EC /* DiaryListCell.swift */; };
+		EA20160E2714BE3D004432EC /* DiaryListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20160B2714BE3D004432EC /* DiaryListCell.swift */; };
+		EA20160F2714BE3D004432EC /* DiaryListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20160B2714BE3D004432EC /* DiaryListCell.swift */; };
+		EA2016102714BE3D004432EC /* DiaryListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA20160C2714BE3D004432EC /* DiaryListCell.xib */; };
+		EA2016112714BE3D004432EC /* DiaryListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA20160C2714BE3D004432EC /* DiaryListCell.xib */; };
+		EA2016122714BE3D004432EC /* DiaryListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA20160C2714BE3D004432EC /* DiaryListCell.xib */; };
 		EA225B1D25F3DE9700871D7D /* ScoreCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */; };
 		EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */; };
 		EA3207F125EEA13200A6A6AB /* ValueListRatingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */; };
@@ -277,6 +283,8 @@
 		EA0F889F2639D03C009C980F /* ManualSearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualSearchVC.swift; sourceTree = SOURCE_ROOT; };
 		EA163F76258BA85E000974AB /* StockTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockTrend.swift; sourceTree = "<group>"; };
 		EA1F86D625DC247C006791BD /* WBValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBValuationController.swift; sourceTree = "<group>"; };
+		EA20160B2714BE3D004432EC /* DiaryListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryListCell.swift; sourceTree = "<group>"; };
+		EA20160C2714BE3D004432EC /* DiaryListCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DiaryListCell.xib; sourceTree = "<group>"; };
 		EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCircle.swift; sourceTree = "<group>"; };
 		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueListRatingCell.swift; sourceTree = "<group>"; };
@@ -544,6 +552,8 @@
 			isa = PBXGroup;
 			children = (
 				EADA38ED2713179C00B294E3 /* Diary_StocksListVC.swift */,
+				EA20160B2714BE3D004432EC /* DiaryListCell.swift */,
+				EA20160C2714BE3D004432EC /* DiaryListCell.xib */,
 			);
 			path = "Diary Files";
 			sourceTree = "<group>";
@@ -746,6 +756,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAFCB98B25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */,
+				EA2016102714BE3D004432EC /* DiaryListCell.xib in Resources */,
 				EA3207F225EEA13200A6A6AB /* ValueListRatingCell.xib in Resources */,
 				EADA38E92713164E00B294E3 /* Diary.storyboard in Resources */,
 				EA06251325D079310015FA6E /* DownloadProgressView.xib in Resources */,
@@ -770,6 +781,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA2016112714BE3D004432EC /* DiaryListCell.xib in Resources */,
 				EAFCB98C25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */,
 				EAED14FB25A8DA090073C46F /* Bulls'N'BearsTests.xctest in Resources */,
 				EAFCB96025C5F0240029AA4F /* MTCookies in Resources */,
@@ -789,6 +801,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA2016122714BE3D004432EC /* DiaryListCell.xib in Resources */,
 				EAFCB98D25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */,
 				EAED14FC25A8DA100073C46F /* Bulls'N'BearsUITests.xctest in Resources */,
 				EAFCB96125C5F0240029AA4F /* MTCookies in Resources */,
@@ -877,6 +890,7 @@
 				EAFCB98825C9A4DE0029AA4F /* ValuationSummaryCell.swift in Sources */,
 				EA736CCD25D7C8FF007FC981 /* ValuationDataCleaner.swift in Sources */,
 				EADA38FF27131C1A00B294E3 /* Share+CoreDataProperties.swift in Sources */,
+				EA20160D2714BE3D004432EC /* DiaryListCell.swift in Sources */,
 				EAD921632607D0CA008312E0 /* StochasticOscillator.swift in Sources */,
 				EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */,
 				EA0E2F302625E32500602BEE /* RimmedLabel.swift in Sources */,
@@ -963,6 +977,7 @@
 				EAC2FC5125A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
 				EAFCB96A25C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EAD835F025DC12000015C93A /* ValueListCell.swift in Sources */,
+				EA20160E2714BE3D004432EC /* DiaryListCell.swift in Sources */,
 				EA163F78258BA85E000974AB /* StockTrend.swift in Sources */,
 				EAA69FBE261222AF0067EE1A /* ResearchCell.swift in Sources */,
 				EADA390027131C1A00B294E3 /* Share+CoreDataProperties.swift in Sources */,
@@ -1021,6 +1036,7 @@
 				EAC2FC5225A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
 				EAFCB96B25C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EAD835F125DC12000015C93A /* ValueListCell.swift in Sources */,
+				EA20160F2714BE3D004432EC /* DiaryListCell.swift in Sources */,
 				EA163F79258BA85E000974AB /* StockTrend.swift in Sources */,
 				EAA69FBF261222AF0067EE1A /* ResearchCell.swift in Sources */,
 				EADA390127131C1A00B294E3 /* Share+CoreDataProperties.swift in Sources */,

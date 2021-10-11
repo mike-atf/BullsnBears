@@ -510,6 +510,17 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         sortParameterChanged()
     }
     
+    
+    @IBAction func showDiary(_ sender: Any) {
+        
+        guard let diarySplitView = UIStoryboard(name: "Diary", bundle: nil).instantiateViewController(withIdentifier: "DiarySplitView") as? UISplitViewController else {
+            return
+        }
+
+        self.splitViewController?.present(diarySplitView, animated: true, completion: nil)
+
+    }
+    
     @IBAction func showTBYView(_ sender: Any) {
         
         guard let tbyVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TBYChartViewController") as? TBYChartViewController else {

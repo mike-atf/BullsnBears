@@ -48,9 +48,6 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
         taQuantityLabel.text = transaction.isSale ? "Quantity sold" : "Quantity purchased"
         taReasonsLabel.text = transaction.isSale ? "Why did you sell?" : "Why did you purchase?"
         
-//        taQuantityLabel.sizeToFit()
-//        view.setNeedsDisplay()
-        
         self.transaction = transaction
         priceField.text = currencyFormatterNoGapWithPence.string(from: transaction.price as NSNumber)
         numberField.text = numberFormatterDecimals.string(from: transaction.quantity as NSNumber)
@@ -84,7 +81,6 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
             textField.text = currencyFormatterNoGapWithPence.string(from: (Double(numbers) ?? 0.0) as NSNumber)
                    
             guard let price = Double(numbers) else {
-                print("price: \(numbers)")
                 return true
             }
             
@@ -95,7 +91,6 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
         }
         else {
             guard let count = Double(numbers) else {
-                print("number: \(numbers)")
                 return true
             }
             

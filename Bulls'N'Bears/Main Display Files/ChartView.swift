@@ -253,7 +253,7 @@ class ChartView: UIView {
                         var counter = 0
                         for transaction in transactions {
 
-                            let pricePoint = PriceDate(transaction.date!, purchasePrice)
+                            let pricePoint = PriceDate(transaction.date!, transaction.price)
                             let point = plotPricePoint(pricePoint: pricePoint)
                             
                             purchaseButtons![counter].frame.origin = CGPoint(x: point.x - 15, y: point.y - 15)

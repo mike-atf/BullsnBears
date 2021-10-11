@@ -18,10 +18,11 @@
                         <viewLayoutGuide key="safeArea" id="WwS-wa-Op9"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <navigationItem key="navigationItem" id="nA1-XE-oio"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="t6X-gM-8vg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="658" y="915"/>
+            <point key="canvasLocation" x="1414" y="1061"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Emg-53-ddq">
@@ -37,19 +38,32 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Lgu-Q5-CQr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="658" y="306"/>
+            <point key="canvasLocation" x="658" y="252"/>
         </scene>
         <!--Investment Diary-->
         <scene sceneID="fGI-FQ-6dv">
             <objects>
-                <viewController id="Nlb-5e-kA6" sceneMemberID="viewController">
+                <viewController id="Nlb-5e-kA6" customClass="Diary_StocksListVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="vra-qv-nie">
                         <rect key="frame" x="0.0" y="0.0" width="420" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="B1h-v8-S4x">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="B1h-v8-S4x">
                                 <rect key="frame" x="0.0" y="74" width="420" height="746"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="9uv-Y9-NL3" customClass="DiaryListCell" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                        <rect key="frame" x="116" y="49.5" width="288" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="9uv-Y9-NL3" id="tBa-cJ-Afy">
+                                            <rect key="frame" x="0.0" y="0.0" width="288" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="boI-AB-1QF" kind="showDetail" id="1Ob-Pf-UgQ"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
                             </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="wqH-1N-hql"/>
@@ -61,27 +75,55 @@
                             <constraint firstAttribute="bottom" secondItem="B1h-v8-S4x" secondAttribute="bottom" id="xN5-KE-Jgz"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Investment Diary" id="ddv-u9-Vec"/>
+                    <navigationItem key="navigationItem" title="Investment Diary" id="ddv-u9-Vec">
+                        <barButtonItem key="leftBarButtonItem" image="chevron.left" catalog="system" id="H6D-PY-cGg">
+                            <connections>
+                                <action selector="backButtonAction:" destination="Nlb-5e-kA6" id="mWQ-pD-RIv"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xeO-7b-Tzu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1433.8983050847457" y="305.85365853658539"/>
+            <point key="canvasLocation" x="1414" y="252"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="uFo-Xk-Eth">
             <objects>
-                <splitViewController allowDoubleColumnStyle="YES" id="a7e-fH-Fnf" sceneMemberID="viewController">
+                <splitViewController storyboardIdentifier="DiarySplitView" allowDoubleColumnStyle="YES" id="a7e-fH-Fnf" sceneMemberID="viewController">
                     <connections>
                         <segue destination="BIi-Ul-Xhb" kind="relationship" relationship="masterViewController" id="aKb-lN-53G"/>
-                        <segue destination="VYu-KU-oIU" kind="relationship" relationship="detailViewController" id="qTK-KV-lkI"/>
+                        <segue destination="boI-AB-1QF" kind="relationship" relationship="detailViewController" id="qTK-KV-lkI"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BWX-ce-ezD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-44" y="611"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="z4I-YL-zzu">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="boI-AB-1QF" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Xda-G6-IfH">
+                        <rect key="frame" x="0.0" y="24" width="859.5" height="50"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="VYu-KU-oIU" kind="relationship" relationship="rootViewController" id="V9v-kc-BbF"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4DU-w6-Fw9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="658" y="1061"/>
+        </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="1Ob-Pf-UgQ"/>
+    </inferredMetricsTieBreakers>
     <resources>
+        <image name="chevron.left" catalog="system" width="96" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -15,7 +15,10 @@ class Diary_StocksListVC: UIViewController {
         // Do any additional setup after loading the view.
     }
     
-
+    @IBAction func backButtonAction(_ sender: Any) {
+        splitViewController?.dismiss(animated: true, completion: nil)
+    }
+    
     /*
     // MARK: - Navigation
 
