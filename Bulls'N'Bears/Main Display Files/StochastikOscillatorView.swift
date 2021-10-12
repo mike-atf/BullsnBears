@@ -21,7 +21,7 @@ class StochastikOscillatorView: UIView {
         }
         
         self.ssO = validShare.calculateSlowStochOscillators()
-        dateRange = validShare.priceDateRangeWorkWeeksForCharts()
+        dateRange = validShare.priceDateRangeWorkWeeksForCharts(withForecastTime: true)
                 
 //        latestCrossing = validShare.latestStochastikCrossing()
         

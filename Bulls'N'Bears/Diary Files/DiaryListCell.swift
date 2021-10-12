@@ -9,6 +9,9 @@ import UIKit
 
 class DiaryListCell: UITableViewCell {
 
+    @IBOutlet var titleLabel: UILabel!
+    @IBOutlet var transactionsCountLabel: UILabel!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -20,4 +23,14 @@ class DiaryListCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+    public func configure(share: Share) {
+        self.titleLabel.text = share.symbol
+        
+        let transactionsNo = (share.transactions?.count ?? 0)
+        var taText = numberFormatterWith1Digit.string(from: transactionsNo as NSNumber) ?? "-"
+        let text = transactionsNo > 1 ? " transactions" : " transaction"
+        taText += text
+        
+        transactionsCountLabel.text = taText
+    }
 }

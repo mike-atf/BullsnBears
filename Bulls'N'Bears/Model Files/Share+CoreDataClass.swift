@@ -266,11 +266,13 @@ public class Share: NSManagedObject {
     
     
     /// returns the dates of first Monday before first available tradingDate and the next Monday after today
-    public func priceDateRangeWorkWeeksForCharts() -> [Date] {
+    public func priceDateRangeWorkWeeksForCharts(withForecastTime: Bool) -> [Date] {
         
         guard let dailyPrices = getDailyPrices() else {
             return [Date(), Date().addingTimeInterval(7*24*3600)]
         }
+        
+        let previewTime = withForecastTime ? foreCastTime : 0
         
         let minDate = dailyPrices.compactMap { $0.tradingDate }.min()
         
@@ -279,7 +281,7 @@ public class Share: NSManagedObject {
                 calendar.timeZone = NSTimeZone.default
                 let components: Set<Calendar.Component> = [.year, .month, .hour, .minute, .weekOfYear ,.weekday]
                 var firstDateComponents = calendar.dateComponents(components, from: minDate_v)
-                var lastDateComponents = calendar.dateComponents(components, from: Date().addingTimeInterval(foreCastTime))
+                var lastDateComponents = calendar.dateComponents(components, from: Date().addingTimeInterval(previewTime))
                 firstDateComponents.second = 0
                 firstDateComponents.minute = 0
                 firstDateComponents.hour = 0

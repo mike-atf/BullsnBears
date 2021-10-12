@@ -1219,46 +1219,46 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transaction Dialog" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oVF-zN-Rij">
-                                <rect key="frame" x="48" y="38" width="304" height="37"/>
+                                <rect key="frame" x="47" y="38" width="306.5" height="37"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" tag="10" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="S0.00" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="j3p-Tm-wHB">
-                                <rect key="frame" x="249" y="104" width="103" height="22"/>
+                                <rect key="frame" x="248" y="104" width="105.5" height="22"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Purchase / sale price" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b9N-B1-vFV">
-                                <rect key="frame" x="48" y="105" width="158" height="21"/>
+                                <rect key="frame" x="47" y="105" width="158" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Number bought / sold" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n52-f0-09J">
-                                <rect key="frame" x="48" y="141.5" width="166" height="21"/>
+                                <rect key="frame" x="47" y="141.5" width="166" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transaction date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="B8a-JQ-Y7N">
-                                <rect key="frame" x="48" y="182" width="128" height="21"/>
+                                <rect key="frame" x="47" y="182" width="128" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <datePicker contentMode="right" contentHorizontalAlignment="left" contentVerticalAlignment="center" datePickerMode="date" style="compact" translatesAutoresizingMaskIntoConstraints="NO" id="mfW-UM-yoU">
-                                <rect key="frame" x="249" y="172" width="103" height="31"/>
+                                <rect key="frame" x="248" y="172" width="105.5" height="31"/>
                             </datePicker>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" text="Situation and rationale for learning from your investment diary" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="1ks-fC-xwe">
-                                <rect key="frame" x="48" y="245" width="304" height="299"/>
+                                <rect key="frame" x="47" y="245" width="306.5" height="299"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Why did you purchase / sell?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wfc-g0-i4Z">
-                                <rect key="frame" x="48" y="229" width="304" height="21"/>
+                                <rect key="frame" x="47" y="229" width="306.5" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -1281,7 +1281,7 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" tag="20" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="000" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="t7J-sh-06s">
-                                <rect key="frame" x="249" y="140.5" width="31" height="22"/>
+                                <rect key="frame" x="248" y="140.5" width="31" height="22"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
                             </textField>
@@ -1300,6 +1300,7 @@
                         <constraints>
                             <constraint firstItem="Wfc-g0-i4Z" firstAttribute="top" secondItem="B8a-JQ-Y7N" secondAttribute="bottom" constant="26" id="2yr-n5-tZ2"/>
                             <constraint firstItem="F8B-kX-8ET" firstAttribute="leading" secondItem="1ks-fC-xwe" secondAttribute="centerX" constant="70" id="3nu-Ao-6I8"/>
+                            <constraint firstItem="j3p-Tm-wHB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="b9N-B1-vFV" secondAttribute="trailing" constant="5" id="4Le-f7-31P"/>
                             <constraint firstItem="j3p-Tm-wHB" firstAttribute="trailing" secondItem="oVF-zN-Rij" secondAttribute="trailing" id="4g5-gi-7K8"/>
                             <constraint firstItem="V31-cF-uPp" firstAttribute="centerX" secondItem="1ks-fC-xwe" secondAttribute="centerX" id="65V-Cj-hg7"/>
                             <constraint firstItem="oVF-zN-Rij" firstAttribute="centerX" secondItem="8HJ-5H-L00" secondAttribute="centerX" id="6oO-gZ-M4S"/>
@@ -1316,14 +1317,18 @@
                             <constraint firstItem="1ks-fC-xwe" firstAttribute="centerX" secondItem="Wfc-g0-i4Z" secondAttribute="centerX" id="VWa-es-F00"/>
                             <constraint firstItem="8HJ-5H-L00" firstAttribute="bottom" secondItem="F8B-kX-8ET" secondAttribute="bottom" constant="14" id="W6B-eD-1d0"/>
                             <constraint firstItem="B8a-JQ-Y7N" firstAttribute="leading" secondItem="b9N-B1-vFV" secondAttribute="leading" id="apW-EO-v8Z"/>
+                            <constraint firstItem="8HJ-5H-L00" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="t7J-sh-06s" secondAttribute="trailing" constant="10" id="dzP-tP-TRk"/>
                             <constraint firstItem="j3p-Tm-wHB" firstAttribute="leading" secondItem="t7J-sh-06s" secondAttribute="leading" id="hBF-ma-ocK"/>
                             <constraint firstItem="j3p-Tm-wHB" firstAttribute="bottom" secondItem="b9N-B1-vFV" secondAttribute="bottom" id="kCR-4W-mRN"/>
+                            <constraint firstItem="Yfd-KA-CcY" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="8HJ-5H-L00" secondAttribute="leading" constant="10" id="khg-bW-sTX"/>
                             <constraint firstItem="8HJ-5H-L00" firstAttribute="centerX" secondItem="Yfd-KA-CcY" secondAttribute="trailing" constant="70" id="m2S-1S-UwW"/>
+                            <constraint firstItem="mfW-UM-yoU" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="B8a-JQ-Y7N" secondAttribute="trailing" constant="5" id="nJC-dT-MPa"/>
                             <constraint firstItem="oVF-zN-Rij" firstAttribute="top" secondItem="8HJ-5H-L00" secondAttribute="top" constant="14" id="nL8-ZS-lPz"/>
                             <constraint firstItem="t7J-sh-06s" firstAttribute="leading" secondItem="n52-f0-09J" secondAttribute="trailing" constant="35" id="o7W-fX-Us0"/>
                             <constraint firstItem="mfW-UM-yoU" firstAttribute="bottom" secondItem="B8a-JQ-Y7N" secondAttribute="bottom" id="qLL-hY-0C6"/>
                             <constraint firstItem="V31-cF-uPp" firstAttribute="bottom" secondItem="F8B-kX-8ET" secondAttribute="bottom" id="qSV-5y-lcT"/>
                             <constraint firstItem="F8B-kX-8ET" firstAttribute="firstBaseline" secondItem="1ks-fC-xwe" secondAttribute="baseline" constant="31.5" symbolType="layoutAnchor" id="rEs-UP-lQe"/>
+                            <constraint firstItem="8HJ-5H-L00" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="F8B-kX-8ET" secondAttribute="trailing" constant="10" id="s0T-3n-iVV"/>
                             <constraint firstItem="n52-f0-09J" firstAttribute="firstBaseline" secondItem="b9N-B1-vFV" secondAttribute="baseline" multiplier="1.1" constant="24" symbolType="layoutAnchor" id="v0A-vy-y3T"/>
                             <constraint firstItem="Yfd-KA-CcY" firstAttribute="firstBaseline" secondItem="V31-cF-uPp" secondAttribute="firstBaseline" id="v22-iT-XEO"/>
                             <constraint firstItem="mfW-UM-yoU" firstAttribute="trailing" secondItem="j3p-Tm-wHB" secondAttribute="trailing" id="x11-iR-58g"/>

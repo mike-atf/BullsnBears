@@ -39,6 +39,9 @@
 		EA2016102714BE3D004432EC /* DiaryListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA20160C2714BE3D004432EC /* DiaryListCell.xib */; };
 		EA2016112714BE3D004432EC /* DiaryListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA20160C2714BE3D004432EC /* DiaryListCell.xib */; };
 		EA2016122714BE3D004432EC /* DiaryListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA20160C2714BE3D004432EC /* DiaryListCell.xib */; };
+		EA2016142715B7CC004432EC /* DiaryDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2016132715B7CC004432EC /* DiaryDetailVC.swift */; };
+		EA2016152715B7CC004432EC /* DiaryDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2016132715B7CC004432EC /* DiaryDetailVC.swift */; };
+		EA2016162715B7CC004432EC /* DiaryDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2016132715B7CC004432EC /* DiaryDetailVC.swift */; };
 		EA225B1D25F3DE9700871D7D /* ScoreCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */; };
 		EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */; };
 		EA3207F125EEA13200A6A6AB /* ValueListRatingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */; };
@@ -285,6 +288,7 @@
 		EA1F86D625DC247C006791BD /* WBValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBValuationController.swift; sourceTree = "<group>"; };
 		EA20160B2714BE3D004432EC /* DiaryListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryListCell.swift; sourceTree = "<group>"; };
 		EA20160C2714BE3D004432EC /* DiaryListCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DiaryListCell.xib; sourceTree = "<group>"; };
+		EA2016132715B7CC004432EC /* DiaryDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryDetailVC.swift; sourceTree = "<group>"; };
 		EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCircle.swift; sourceTree = "<group>"; };
 		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueListRatingCell.swift; sourceTree = "<group>"; };
@@ -554,6 +558,7 @@
 				EADA38ED2713179C00B294E3 /* Diary_StocksListVC.swift */,
 				EA20160B2714BE3D004432EC /* DiaryListCell.swift */,
 				EA20160C2714BE3D004432EC /* DiaryListCell.xib */,
+				EA2016132715B7CC004432EC /* DiaryDetailVC.swift */,
 			);
 			path = "Diary Files";
 			sourceTree = "<group>";
@@ -895,6 +900,7 @@
 				EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */,
 				EA0E2F302625E32500602BEE /* RimmedLabel.swift in Sources */,
 				EA0E2F222625CBD500602BEE /* StocksListTVC.swift in Sources */,
+				EA2016142715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
 				EAA69F9526121CA30067EE1A /* StockResearch+CoreDataProperties.swift in Sources */,
 				EAC2FC7125A23FFC0060F387 /* ValuationTableViewCell.swift in Sources */,
 				EA6AACD826050457002DE9DF /* MAC_D.swift in Sources */,
@@ -998,6 +1004,7 @@
 				EADA38EF2713179C00B294E3 /* Diary_StocksListVC.swift in Sources */,
 				EA6AACE026053294002DE9DF /* MACD_View.swift in Sources */,
 				EA641C2A2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
+				EA2016152715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1057,6 +1064,7 @@
 				EADA38F02713179C00B294E3 /* Diary_StocksListVC.swift in Sources */,
 				EA6AACE126053294002DE9DF /* MACD_View.swift in Sources */,
 				EA641C2B2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
+				EA2016162715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1146,7 +1154,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1202,7 +1210,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

@@ -51,7 +51,7 @@ class ChartView: UIView {
         self.backgroundColor = UIColor.systemBackground
     }
     
-    public func configure(stock: Share) {
+    public func configure(stock: Share, withForeCast: Bool?=true) {
         
         share = stock
 
@@ -59,7 +59,7 @@ class ChartView: UIView {
 
         lowestPriceInRange = validStock.lowestPrice()
         highestPriceInRange = validStock.highestPrice()
-        dateRange = validStock.priceDateRangeWorkWeeksForCharts()
+        dateRange = validStock.priceDateRangeWorkWeeksForCharts(withForecastTime: withForeCast ?? true)
 
         guard lowestPriceInRange != nil else { return }
         guard highestPriceInRange != nil else { return }
@@ -257,11 +257,6 @@ class ChartView: UIView {
                             let point = plotPricePoint(pricePoint: pricePoint)
                             
                             purchaseButtons![counter].frame.origin = CGPoint(x: point.x - 15, y: point.y - 15)
-//                            button.heightAnchor.constraint(equalToConstant: 30).isActive = true
-//                            button.widthAnchor.constraint(equalTo: button.heightAnchor, multiplier: 1).isActive = true
-//                            button.leadingAnchor.constraint(equalTo: leadingAnchor, constant: point.x - 15).isActive = true
-//                            button.topAnchor.constraint(equalTo: topAnchor, constant: point.y - 15).isActive = true
-
                             purchaseButtons![counter].transaction = transaction
                             purchaseButtons![counter].tintColor = transaction.isSale ? UIColor.systemRed : UIColor.systemGreen
                             counter += 1

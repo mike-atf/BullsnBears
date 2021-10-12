@@ -8,21 +8,36 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Transaction details-->
         <scene sceneID="A6V-gP-med">
             <objects>
-                <viewController id="VYu-KU-oIU" sceneMemberID="viewController">
+                <viewController title="Transaction details" id="VYu-KU-oIU" customClass="DiaryDetailVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="iSs-pK-sGj">
                         <rect key="frame" x="0.0" y="0.0" width="859.5" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fSK-Kz-HYf" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="74" width="860" height="363"/>
+                                <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
+                            </view>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="WwS-wa-Op9"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="top" secondItem="WwS-wa-Op9" secondAttribute="top" id="CsD-u5-NNt"/>
+                            <constraint firstItem="WwS-wa-Op9" firstAttribute="centerY" secondItem="fSK-Kz-HYf" secondAttribute="bottom" id="Rzm-HT-X34"/>
+                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="trailing" secondItem="WwS-wa-Op9" secondAttribute="trailing" constant="0.5" id="S8U-4X-y6q"/>
+                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="leading" secondItem="WwS-wa-Op9" secondAttribute="leading" id="iYe-FZ-aOD"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="nA1-XE-oio"/>
+                    <connections>
+                        <outlet property="chart" destination="fSK-Kz-HYf" id="jwy-Le-Q5x"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="t6X-gM-8vg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1414" y="1061"/>
+            <point key="canvasLocation" x="1413.5593220338983" y="1060.9756097560976"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Emg-53-ddq">
@@ -52,7 +67,7 @@
                                 <rect key="frame" x="0.0" y="74" width="420" height="746"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="9uv-Y9-NL3" customClass="DiaryListCell" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="diaryListCell" id="9uv-Y9-NL3" customClass="DiaryListCell" customModule="Bulls_N_Bears" customModuleProvider="target">
                                         <rect key="frame" x="116" y="49.5" width="288" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="9uv-Y9-NL3" id="tBa-cJ-Afy">
@@ -60,10 +75,14 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <segue destination="boI-AB-1QF" kind="showDetail" id="1Ob-Pf-UgQ"/>
+                                            <segue destination="boI-AB-1QF" kind="showDetail" identifier="showDiaryDetailSegue" id="1Ob-Pf-UgQ"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="Nlb-5e-kA6" id="1cn-4W-TNl"/>
+                                    <outlet property="delegate" destination="Nlb-5e-kA6" id="MdP-0S-ju5"/>
+                                </connections>
                             </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="wqH-1N-hql"/>
@@ -82,6 +101,9 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="tableView" destination="B1h-v8-S4x" id="0p8-0R-x9h"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xeO-7b-Tzu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -124,6 +146,9 @@
     </inferredMetricsTieBreakers>
     <resources>
         <image name="chevron.left" catalog="system" width="96" height="128"/>
+        <systemColor name="opaqueSeparatorColor">
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

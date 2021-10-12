@@ -37,7 +37,7 @@ class MACD_View: UIView {
         }
 
         
-        dateRange = validShare.priceDateRangeWorkWeeksForCharts()
+        dateRange = validShare.priceDateRangeWorkWeeksForCharts(withForecastTime: true)
 
         macdLine = validMACDs.compactMap{ $0.mac_d }
         signals = validMACDs.compactMap{ $0.signalLine }
