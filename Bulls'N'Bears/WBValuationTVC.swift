@@ -170,7 +170,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
 
         progressView?.delegate = self
-        progressView?.title.text = "Public data download..."
+        progressView?.title.text = "Downloading..."
 
         controller?.downloadWBValuationData()
     }
@@ -484,7 +484,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
 extension WBValuationTVC: StockDelegate, WBValuationCellDelegate {
     
-    func livePriceDownloadCompleted(share: SharePlaceHolder?, errors: [String]) {
+    func livePriceUpdateCompleted(share: SharePlaceHolder?, errors: [String]) {
         
     }
     

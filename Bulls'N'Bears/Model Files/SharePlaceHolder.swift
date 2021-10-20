@@ -134,16 +134,12 @@ class SharePlaceHolder: NSObject {
     /// takes new prices and adds any newer ones than already saved to the exsitng list (rather than replce the existing list)
     func updateDailyPrices(newPrices: [PricePoint]?) {
         
-//        print("updating daily prices for \(name_short ?? "missing name")")
         guard let validNewPoints = newPrices else { return }
 
         if let existingPricePoints = getDailyPrices() {
             
             var pricePointsSet = Set<PricePoint>(existingPricePoints)
 
-//            var newList = existingPricePoints
-//            var existingMACDs = getMACDs()
-            
             for point in validNewPoints {
                 pricePointsSet.insert(point)
             }
@@ -153,29 +149,8 @@ class SharePlaceHolder: NSObject {
                 else { return false }
             }
         
-//        self.macd = convertMACDToData(macds: existingMACDs)
-        let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
-        setDailyPrices(pricePoints: pricePointsSortedArray)
-
-                
-//                let pointsToAdd = validNewPoints.filter { element in
-//                    if pricePointsSet.contains(element) { return false }
-//                    else { return true }
-//                }
-////                print("found \(pointsToAdd.count) new daily prices to add to plot")
-//                if pointsToAdd.count > 0 {
-//                    for point in pointsToAdd {
-//                        newList.append(point)
-//                        let lastMACD = existingMACDs?.last
-//                        existingMACDs?.append(MAC_D(currentPrice: point.close, lastMACD: lastMACD, date: point.tradingDate))
-//                    }
-//                    newList.sort { e0, e1 in
-//                        if e0.tradingDate < e1.tradingDate { return true }
-//                        else { return false }
-//                    }
-//                    self.macd = convertMACDToData(macds: existingMACDs)
-//                    setDailyPrices(pricePoints: newList)
-//                }
+            let _ = calculateMACDs(shortPeriod: 8, longPeriod: 17)
+            setDailyPrices(pricePoints: pricePointsSortedArray)
         }
     }
 
@@ -352,7 +327,9 @@ class SharePlaceHolder: NSObject {
             }
 
             let html$ = String(decoding: validData, as: UTF8.self)
-            self.livePriceDownloadComplete(html$: html$, delegate: delegate)
+            print()
+            print("downloaded live prices for \(self.symbol), analysis to follow...")
+            self.analyseLivePriceDownload(html$: html$, delegate: delegate)
         }
         dataTask?.resume()
 
@@ -503,12 +480,12 @@ class SharePlaceHolder: NSObject {
             data, urlResponse, error in
             
             guard error == nil else {
-                print("web data download for \(url) failed with error \(error!.localizedDescription)")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "web data download for \(url) failed with error \(error!.localizedDescription)")
                 return
             }
             
             guard urlResponse != nil else {
-                print("web data download for \(url) failed due to urlReponse == nil")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "web data download for \(url) failed due to urlReponse == nil")
                 return
             }
             
@@ -595,8 +572,10 @@ class SharePlaceHolder: NSObject {
                 }
             } else if title.starts(with: "Trailing") {
                 if let valid = values?.first {
-                    DispatchQueue.main.async {
-                        self.peRatio = valid
+                    if valid != 0 {
+                        DispatchQueue.main.async {
+                            self.peRatio = valid
+                        }
                     }
                 }
             } else if title.starts(with: "Diluted") {
@@ -614,27 +593,28 @@ class SharePlaceHolder: NSObject {
             }
         }
         
-        //exit tthe background thread to enable transferring the sharePlaceHolder object
+        //exit the background thread to enable transferring the sharePlaceHolder object
         //to an NSManagedObject 'Share' to be saved in the main viewContext. This MUST happen on the main thread
         DispatchQueue.main.async {
             delegate?.keyratioDownloadComplete(share: self, errors: loaderrors)
         }
     }
     
-    func livePriceDownloadComplete(html$: String, delegate: StockDelegate?) {
+    func analyseLivePriceDownload(html$: String, delegate: StockDelegate?) {
         
         let (values, errors) = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, rowTitle: "<span class=\"Trsdu(0.3s) Trsdu(0.3s) " , rowTerminal: "</span>", numberTerminal: "</span>")
-        
+        print("live price download analysed for \(symbol), update complete")
+        print()
         if let livePrice = values?.first {
             self.lastLivePrice = livePrice
             self.lastLivePriceDate = Date()
             DispatchQueue.main.async {
-                delegate?.livePriceDownloadCompleted(share: self, errors: errors)
+                delegate?.livePriceUpdateCompleted(share: self, errors: errors)
             }
         }
         else {
             DispatchQueue.main.async {
-                delegate?.livePriceDownloadCompleted(share: nil, errors: errors)
+                delegate?.livePriceUpdateCompleted(share: nil, errors: errors)
             }
         }
         

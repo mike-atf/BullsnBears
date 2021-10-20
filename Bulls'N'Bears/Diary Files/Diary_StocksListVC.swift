@@ -40,6 +40,7 @@ class Diary_StocksListVC: UIViewController, UITableViewDelegate, UITableViewData
         if controller.fetchedObjects?.count ?? 0 > 0 {
             tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
             performSegue(withIdentifier: "showDiaryDetailSegue", sender: nil)
+            tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: false)
         }
 
 

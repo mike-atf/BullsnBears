@@ -103,7 +103,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         if controller.fetchedObjects?.count ?? 0 > 0 {
             tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
             performSegue(withIdentifier: "showChartSegue", sender: nil)
-            updateShares()
+            // updateShares() call here NOT necessary as TVC acts as observer to "ActivatedFromBackground" even if launching (?)
         }
         else {
             showWelcomeView()
@@ -152,6 +152,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @objc
     func updateShares() {
                 
+        print("updating shares...")
         NotificationCenter.default.post(name: Notification.Name(rawValue: "ShowCitation"), object: nil, userInfo: nil)
         
         guard controller.fetchedObjects?.count ?? 0 > 0 else {

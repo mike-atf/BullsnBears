@@ -488,7 +488,7 @@ class WebpageScraper {
 
     }
     
-    class func scrapePERDatesTable(html$: String?, tableHeader: String, tableTerminal: String? = nil, columnTerminal: String? = nil) -> ([DatedValue]?, [String]) {
+    class func scrapePERDatesTable(html$: String?, tableHeader: String, tableTerminal: String? = nil, columnTerminal: String? = nil) -> ([DatedValue]?, [DatedValue]?, [String]) {
         
         let tableHeader = tableHeader
         let tableTerminal =  tableTerminal ?? "</td>\n\t\t\t\t </tr></tbody>"
@@ -503,22 +503,24 @@ class WebpageScraper {
         
         guard let titleIndex = pageText.range(of: tableHeader) else {
             errors.append("Did not find section \(tableHeader) on MT website")
-            return (nil, errors)
+            return (nil, nil ,errors)
         }
 
         let tableEndIndex = pageText.range(of: tableTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<pageText.endIndex, locale: nil)
         
         guard tableEndIndex != nil else {
             errors.append("Did not find table end in section \(tableHeader) on MT website")
-            return (nil, errors)
+            return (nil, nil ,errors)
         }
         pageText = String(pageText[titleIndex.upperBound..<tableEndIndex!.lowerBound])
         
         var rowEndIndex = pageText.range(of: columnTerminal, options: .backwards, range: nil, locale: nil)
-        var valueArray = [DatedValue]()
-        var count = 0 // row has four values, we only want the last of those four
+        var valueArray1 = [DatedValue]()
+        var valueArray2 = [DatedValue]()
+        var count = 0 // row has four values, we only want the last (PER) and first (date) of those four
         var dateElements = [Date?]()
         var perElements = [Double]()
+        var epsElements = [Double]()
         
         repeat {
             let labelStartIndex = pageText.range(of: labelStart, options: .backwards, range: nil, locale: nil)
@@ -527,8 +529,12 @@ class WebpageScraper {
             if count%4 == 0 { // PER value
                 perElements.append(Double(value$.filter("-0123456789.".contains)) ?? Double())
             }
-            else if count%3 == 0 { // date
-                dateElements.append(dateFormatter.date(from: String(value$)))
+            else if (count-1)%4 == 0 { // EPS value
+                epsElements.append(Double(value$.filter("-0123456789.".contains)) ?? Double())
+            }
+            else if (count+1)%4 == 0 {
+                let validDate = dateFormatter.date(from: String(value$)) // date
+                dateElements.append(validDate)
             }
 
             rowEndIndex = pageText.range(of: columnTerminal, options: .backwards, range: nil, locale: nil)
@@ -543,13 +549,22 @@ class WebpageScraper {
         for per in perElements {
             if dateElements.count > count {
                 if let date = dateElements[count] {
-                    valueArray.append(DatedValue(date: date, value: per))
+                    valueArray1.append(DatedValue(date: date, value: per))
                 }
             }
             count += 1
         }
-        
-        return (valueArray.reversed(), errors)
+        count = 0
+        for eps in epsElements {
+            if dateElements.count > count {
+                if let date = dateElements[count] {
+                    valueArray2.append(DatedValue(date: date, value: eps))
+                }
+            }
+            count += 1
+        }
+
+        return (valueArray1.reversed(), valueArray2.reversed(), errors)
 
     }
     

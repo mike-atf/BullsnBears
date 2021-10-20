@@ -1435,4 +1435,24 @@ public class Share: NSManagedObject {
 
     }
 
+    public func sortedTransactionsByDate(ascending: Bool) -> [ShareTransaction]? {
+        
+        guard let transactions = self.transactions as? Set<ShareTransaction> else {
+            return nil
+        }
+        
+        let sortedTA = transactions.sorted { t0, t1 in
+            if ascending {
+                if t0.date! < t1.date! { return true }
+                else { return false }
+            } else {
+                if t0.date! < t1.date! { return false }
+                else { return true }
+
+            }
+        }
+        
+        return sortedTA
+        
+    }
 }

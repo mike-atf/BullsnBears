@@ -71,18 +71,25 @@ class CitationsManager {
         
         let jm1 = "Holding cash is uncomfortable, but not as uncomfortable as doing something stupid."
         let jm2 = "Investing should be more like watching paint dry or watching grass grow. If you want excitement, take $800 and go to Las Vegas..."
-        let jm3 = "... in some bizarre mental world, people believe that a loss isn't a loss until they realize it. This belief tends to investors holding onto their losing stocks and selling their winning stocks - know as the disposition effect."
+        let jm3 = "... in some bizarre mental world, people believe that a loss isn't a loss until they realize it. This belief tends to investors holding onto their losing stocks and selling their winning stocks - known as the disposition effect."
         let jm4 = "Stop losses may be a useful form of pre-commitment that help alleviate the disposition effect in markets that witness momentum."
         let jm5 = "If I have done my homework, and selected stocks that I think represent good value over the long term, why on earth would I want to sit and watch their performance day by day. [...] positions that should perform well in the long term [...] certainly aren't guaranteed to do so without short-term losses."
-        let jm6 = "...the Magic Formula portfolio fared poorly relative to the market average in 5 out of every 12 months tested. For full year periods the ... portfolio failed to beat the market average once every four years. [from Joel Greenblatt's 'The Little Book that beats the Market'] "
+        let jm6 = "...the Magic Formula portfolio fared poorly relative to the market average in 5 out of every 12 months tested. For full year periods the ... portfolio failed to beat the market average once every four years."
         
         let bg1 = "In searching for value and avoiding glamour, it is the cheapest of the cheap you want to embrace and the most expensive you want to avoid."
-            
+        let bg2 = "...it is often the firms that ranked lowest on the measures - low returns on capital or narrow profit margins - that have tended to generate the highest future market returns."
+        let bg3 = "Portfolios of ugly, disappointing, obscure (small) and boring (e.g. low growth) stocks repeatedly generated higher returns than both market ... and, more strikingly, portfolios of attractive, highly profitable, well-known (big) and glamorous (e.g. fast growing) stocks."
+        let bg4 = "...it is the extremely unappealing portfolios - three years of disappointing returns - that produce the best results."
+        let bg5 = "The uglier, more boring, more obscure, more disappointing, and thetefore usually the cheaper the stock, the better the return have been."
+        let bg6 = "...If offered a portfolio of stocks two-thirds of which may go bankrupt, most investors will recoiled in horror before considering the the potentially enormous gains from the on-third that do survive, gains large enough to make the whole investment highly profitable."
+        let bg7 = "The shares of companies too small for big funds are always available on sale."
+        let bg8 = "Spin-offs are a wonderful opportunity for investors who are not constrained by questions of market capitalisation."
+        
         let plCitations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
         let pl1Citations = [pL1_0, pL1_1, pL1_2, pL1_3, pL1_4, pL1_5]
         let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10,wb11,wb12, wb13, wb14, wb15, wb16, wb17, wb18]
         let jmCitations = [jm1,jm2, jm3, jm4, jm5, jm6]
-        let bgCitations = [bg1]
+        let bgCitations = [bg1, bg2, bg3, bg4, bg5, bg6, bg7, bg8]
         
         var allCitations = plCitations
         allCitations.append(contentsOf: wbCitations)

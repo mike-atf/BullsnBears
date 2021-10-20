@@ -48,15 +48,41 @@ public class WBValuation: NSManagedObject {
                     return datedValues
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored EPS historical data")
             }
         }
         
         return nil
     }
     
+    /// returns sorted date-value pairs ascending by date
+    func epsWithDates() -> [DatedValue]? {
+        
+        if let valid = epsDates {
+            do {
+                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
+                    var datedValues = [DatedValue]()
+                    for element in dictionary {
+                        if element.value != 0 {
+                            datedValues.append(DatedValue(date: element.key, value: element.value))
+                        }
+                    }
+                    return datedValues.sorted { dv0, dv1 in
+                        if dv1.date < dv0.date { return false }
+                        else { return true}
+                    }
+                }
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+            }
+        }
+        
+        return nil
+    }
+
     
-    /// returns past PE ratios in date descendng order
+    
+    /// returns past PE ratios in date descending order
     func peRatios() -> [Double]? {
        
         if let valid = perDates {
@@ -100,19 +126,57 @@ public class WBValuation: NSManagedObject {
         
     }
     
+    func saveEPSWithDateArray(datesValuesArray: [DatedValue]?) {
+        
+        guard let datedValues = datesValuesArray else { return }
+        
+        var array = [Date: Double]()
+
+        for element in datedValues {
+            array[element.date] = element.value
+        }
+
+        do {
+            let data = try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
+            epsDates = data
+            save()
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
+        }
+        
+    }
+
+    
     func historicPEratio(for date: Date) -> Double? {
         
         guard let datedValues = peRatiosWithDates() else {
             return nil
         }
+        
+        let timesToDate = datedValues.sorted(by: { e0, e1 in
+            if abs(e1.date.timeIntervalSince(date)) < abs(e0.date.timeIntervalSince(date)) { return false }
+            else { return true }
+        })
 
-        let inRangeValues = datedValues.filter { dv in
-            if abs(dv.date.timeIntervalSince(date)) <= 24*3600 { return true }
-            else { return false }
+        let nearest = [timesToDate[0], timesToDate[1]]
+        return nearest.compactMap{ $0.value }.mean()
+    }
+    
+    func historicEPSratio(for date: Date) -> Double? {
+        
+        guard let datedValues = epsWithDates() else {
+            return nil
         }
         
-        return inRangeValues.compactMap{ $0.value }.mean()
+        let timesToDate = datedValues.sorted(by: { e0, e1 in
+            if abs(e1.date.timeIntervalSince(date)) < abs(e0.date.timeIntervalSince(date)) { return false }
+            else { return true }
+        })
+
+        let nearest = [timesToDate[0], timesToDate[1]]
+        return nearest.compactMap{ $0.value }.mean()
     }
+
     
     func minMeanMaxPER(from:Date, to: Date?=nil) -> (Double, Double, Double)? {
         

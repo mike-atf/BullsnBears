@@ -40,6 +40,7 @@ extension WBValuation {
     @NSManaged public var avAnStockPrice: [Double]?
     @NSManaged public var bvps: [Double]?
     @NSManaged public var perDates: Data?
+    @NSManaged public var epsDates: Data?
     @NSManaged public var share: Share?
 
 }

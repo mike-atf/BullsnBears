@@ -19,7 +19,7 @@ protocol StocksControllerDelegate {
 /// Share calls this when it wants to inform StocksController that the price update is complete
 protocol StockDelegate {
     func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String])
-    func livePriceDownloadCompleted(share: SharePlaceHolder?, errors: [String])
+    func livePriceUpdateCompleted(share: SharePlaceHolder?, errors: [String])
 }
 
 
@@ -41,11 +41,9 @@ class StocksController: NSFetchedResultsController<Share> {
     func updateLivePrices(selectedShare: Share) {
         // runs on backGround queue!
         
-//
-//        print()
-//        print(#function)
         for share in fetchedObjects ?? [] {
 
+            print("controller is updating \(share.symbol!)")
             if share.watchStatus < 2 || share.isEqual(selectedShare) {
                 let placeholder = SharePlaceHolder(share: share)
                 if placeholder.lastLivePriceDate == nil {
@@ -58,13 +56,13 @@ class StocksController: NSFetchedResultsController<Share> {
                 }
                 else if share.isEqual(selectedShare) {
 //                    print("\(share.symbol!) is currently selected . Live price update <300 secs. Ending refresh...")
-                    livePriceDownloadCompleted(share: nil, errors: [])
+                    livePriceUpdateCompleted(share: nil, errors: [])
                     // ends tableView refresh process if last update <300sec ago
                 }
             }
-            else {
-                updateDailyPrices(share: share)
-            }
+//            else {
+//                updateDailyPrices(share: share)
+//            }
         }
     }
     
@@ -319,7 +317,14 @@ class StocksController: NSFetchedResultsController<Share> {
         newShare.macd = newShare.convertMACDToData(macds: macds)
                 
         if let dictionary = stockTickerDictionary {
+            
             newShare.name_long = companyName ?? dictionary[stockName]
+            
+            // some dictionary values start with "\" for some reason or other
+            // this doesn't work with web addresses when downloading data so needs to be removed
+            if (newShare.name_long ?? "").starts(with: "\"") {
+                    newShare.name_long = String(newShare.name_long!.dropFirst())
+            }
             
             if let longNameComponents = newShare.name_long?.split(separator: " ") {
                 let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co."] // "Group",
@@ -385,7 +390,7 @@ class StocksController: NSFetchedResultsController<Share> {
 
 extension StocksController: StockDelegate {
     
-    func livePriceDownloadCompleted(share: SharePlaceHolder?, errors: [String]) {
+    func livePriceUpdateCompleted(share: SharePlaceHolder?, errors: [String]) {
         
         if share == nil {
 

@@ -42,6 +42,12 @@
 		EA2016142715B7CC004432EC /* DiaryDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2016132715B7CC004432EC /* DiaryDetailVC.swift */; };
 		EA2016152715B7CC004432EC /* DiaryDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2016132715B7CC004432EC /* DiaryDetailVC.swift */; };
 		EA2016162715B7CC004432EC /* DiaryDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2016132715B7CC004432EC /* DiaryDetailVC.swift */; };
+		EA2016182715EE75004432EC /* DiaryTransactionCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA2016172715EE75004432EC /* DiaryTransactionCard.xib */; };
+		EA2016192715EE75004432EC /* DiaryTransactionCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA2016172715EE75004432EC /* DiaryTransactionCard.xib */; };
+		EA20161A2715EE75004432EC /* DiaryTransactionCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA2016172715EE75004432EC /* DiaryTransactionCard.xib */; };
+		EA20161C2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */; };
+		EA20161D2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */; };
+		EA20161E2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */; };
 		EA225B1D25F3DE9700871D7D /* ScoreCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */; };
 		EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */; };
 		EA3207F125EEA13200A6A6AB /* ValueListRatingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */; };
@@ -289,6 +295,9 @@
 		EA20160B2714BE3D004432EC /* DiaryListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryListCell.swift; sourceTree = "<group>"; };
 		EA20160C2714BE3D004432EC /* DiaryListCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DiaryListCell.xib; sourceTree = "<group>"; };
 		EA2016132715B7CC004432EC /* DiaryDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryDetailVC.swift; sourceTree = "<group>"; };
+		EA2016172715EE75004432EC /* DiaryTransactionCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = DiaryTransactionCard.xib; path = "Bulls'N'Bears/Main Display Files/DiaryTransactionCard.xib"; sourceTree = SOURCE_ROOT; };
+		EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryTransactionCard.swift; sourceTree = "<group>"; };
+		EA20161F272034EB004432EC /* TrendMyStocks 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 11.xcdatamodel"; sourceTree = "<group>"; };
 		EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCircle.swift; sourceTree = "<group>"; };
 		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueListRatingCell.swift; sourceTree = "<group>"; };
@@ -555,6 +564,8 @@
 		EADA38EC271316CD00B294E3 /* Diary Files */ = {
 			isa = PBXGroup;
 			children = (
+				EA2016172715EE75004432EC /* DiaryTransactionCard.xib */,
+				EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */,
 				EADA38ED2713179C00B294E3 /* Diary_StocksListVC.swift */,
 				EA20160B2714BE3D004432EC /* DiaryListCell.swift */,
 				EA20160C2714BE3D004432EC /* DiaryListCell.xib */,
@@ -766,6 +777,7 @@
 				EADA38E92713164E00B294E3 /* Diary.storyboard in Resources */,
 				EA06251325D079310015FA6E /* DownloadProgressView.xib in Resources */,
 				EAD835F225DC12000015C93A /* ValueListCell.xib in Resources */,
+				EA2016182715EE75004432EC /* DiaryTransactionCard.xib in Resources */,
 				EAC61A2626FB74AC000FAC81 /* DateSelectionCell.xib in Resources */,
 				EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */,
 				EAD835FE25DC16470015C93A /* WBValuationCell.xib in Resources */,
@@ -788,6 +800,7 @@
 			files = (
 				EA2016112714BE3D004432EC /* DiaryListCell.xib in Resources */,
 				EAFCB98C25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */,
+				EA2016192715EE75004432EC /* DiaryTransactionCard.xib in Resources */,
 				EAED14FB25A8DA090073C46F /* Bulls'N'BearsTests.xctest in Resources */,
 				EAFCB96025C5F0240029AA4F /* MTCookies in Resources */,
 				EAD835F325DC12000015C93A /* ValueListCell.xib in Resources */,
@@ -808,6 +821,7 @@
 			files = (
 				EA2016122714BE3D004432EC /* DiaryListCell.xib in Resources */,
 				EAFCB98D25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */,
+				EA20161A2715EE75004432EC /* DiaryTransactionCard.xib in Resources */,
 				EAED14FC25A8DA100073C46F /* Bulls'N'BearsUITests.xctest in Resources */,
 				EAFCB96125C5F0240029AA4F /* MTCookies in Resources */,
 				EAD835F425DC12000015C93A /* ValueListCell.xib in Resources */,
@@ -876,6 +890,7 @@
 				EADA38F727131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift in Sources */,
 				EAC2FC4525A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
 				EA641C292642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
+				EA20161C2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */,
 				EA225B1D25F3DE9700871D7D /* ScoreCircle.swift in Sources */,
 				EAB58D8026F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */,
 				EADA38FC27131C1A00B294E3 /* Share+CoreDataClass.swift in Sources */,
@@ -1004,6 +1019,7 @@
 				EADA38EF2713179C00B294E3 /* Diary_StocksListVC.swift in Sources */,
 				EA6AACE026053294002DE9DF /* MACD_View.swift in Sources */,
 				EA641C2A2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
+				EA20161D2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */,
 				EA2016152715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1064,6 +1080,7 @@
 				EADA38F02713179C00B294E3 /* Diary_StocksListVC.swift in Sources */,
 				EA6AACE126053294002DE9DF /* MACD_View.swift in Sources */,
 				EA641C2B2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
+				EA20161E2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */,
 				EA2016162715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1392,6 +1409,7 @@
 		EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				EA20161F272034EB004432EC /* TrendMyStocks 11.xcdatamodel */,
 				EADA38F127131A1E00B294E3 /* TrendMyStocks 10.xcdatamodel */,
 				EADA38DB270DDFD200B294E3 /* TrendMyStocks 9.xcdatamodel */,
 				EAC61A1026FB6737000FAC81 /* TrendMyStocks 8.xcdatamodel */,
@@ -1403,7 +1421,7 @@
 				EAD835C225DB02030015C93A /* TrendMyStocks 2.xcdatamodel */,
 				EAC19053257641160030B331 /* TrendMyStocks.xcdatamodel */,
 			);
-			currentVersion = EADA38F127131A1E00B294E3 /* TrendMyStocks 10.xcdatamodel */;
+			currentVersion = EA20161F272034EB004432EC /* TrendMyStocks 11.xcdatamodel */;
 			path = TrendMyStocks.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

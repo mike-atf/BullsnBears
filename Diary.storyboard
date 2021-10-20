@@ -17,22 +17,53 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fSK-Kz-HYf" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="74" width="860" height="363"/>
+                                <rect key="frame" x="430" y="74" width="429.5" height="726"/>
                                 <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
                             </view>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KYk-0p-ABa">
+                                <rect key="frame" x="0.0" y="74" width="430" height="726"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bSP-73-oml">
+                                        <rect key="frame" x="8" y="8" width="422" height="1000"/>
+                                        <color key="backgroundColor" systemColor="systemOrangeColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="1000" id="Ikx-Aq-p82"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="bSP-73-oml" secondAttribute="trailing" id="Fmz-VH-9oN"/>
+                                    <constraint firstItem="bSP-73-oml" firstAttribute="trailing" secondItem="s6z-jb-Hv0" secondAttribute="trailing" id="Ikl-jp-8BJ"/>
+                                    <constraint firstAttribute="bottom" secondItem="bSP-73-oml" secondAttribute="bottom" id="Qd3-cj-MMu"/>
+                                    <constraint firstItem="bSP-73-oml" firstAttribute="leading" secondItem="KYk-0p-ABa" secondAttribute="leadingMargin" id="Y7g-Pi-KNx"/>
+                                    <constraint firstItem="bSP-73-oml" firstAttribute="top" secondItem="KYk-0p-ABa" secondAttribute="top" constant="8" id="bnN-IQ-7tf"/>
+                                </constraints>
+                                <viewLayoutGuide key="contentLayoutGuide" id="B53-Rx-gXw"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="s6z-jb-Hv0"/>
+                            </scrollView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="WwS-wa-Op9"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="top" secondItem="WwS-wa-Op9" secondAttribute="top" id="CsD-u5-NNt"/>
-                            <constraint firstItem="WwS-wa-Op9" firstAttribute="centerY" secondItem="fSK-Kz-HYf" secondAttribute="bottom" id="Rzm-HT-X34"/>
-                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="trailing" secondItem="WwS-wa-Op9" secondAttribute="trailing" constant="0.5" id="S8U-4X-y6q"/>
-                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="leading" secondItem="WwS-wa-Op9" secondAttribute="leading" id="iYe-FZ-aOD"/>
+                            <constraint firstItem="KYk-0p-ABa" firstAttribute="leading" secondItem="iSs-pK-sGj" secondAttribute="leading" id="F7q-QS-KbD"/>
+                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="top" secondItem="WwS-wa-Op9" secondAttribute="top" id="GVH-zx-Ogy"/>
+                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="leading" secondItem="WwS-wa-Op9" secondAttribute="centerX" id="QZQ-DX-81c"/>
+                            <constraint firstItem="WwS-wa-Op9" firstAttribute="bottom" secondItem="fSK-Kz-HYf" secondAttribute="bottom" id="aBp-B4-vtZ"/>
+                            <constraint firstItem="KYk-0p-ABa" firstAttribute="top" secondItem="fSK-Kz-HYf" secondAttribute="top" id="b42-yH-Yb0"/>
+                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="trailing" secondItem="WwS-wa-Op9" secondAttribute="trailing" id="g2P-4A-mj2"/>
+                            <constraint firstItem="fSK-Kz-HYf" firstAttribute="leading" secondItem="KYk-0p-ABa" secondAttribute="trailing" id="kJb-B9-6D8"/>
+                            <constraint firstItem="KYk-0p-ABa" firstAttribute="bottom" secondItem="WwS-wa-Op9" secondAttribute="bottom" id="yxa-dh-tzR"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="nA1-XE-oio"/>
+                    <navigationItem key="navigationItem" id="nA1-XE-oio">
+                        <barButtonItem key="leftBarButtonItem" title="Item" id="POI-bd-2me"/>
+                    </navigationItem>
                     <connections>
                         <outlet property="chart" destination="fSK-Kz-HYf" id="jwy-Le-Q5x"/>
+                        <outlet property="scrollContentView" destination="bSP-73-oml" id="xzV-lz-7by"/>
+                        <outlet property="scrollContentViewHeightConstraint" destination="Ikx-Aq-p82" id="ei5-QZ-uHi"/>
+                        <outlet property="scrollView" destination="KYk-0p-ABa" id="cYR-GS-Lvt"/>
+                        <outlet property="titleItem" destination="POI-bd-2me" id="AHE-ZM-JQb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="t6X-gM-8vg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -151,6 +182,9 @@
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemOrangeColor">
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -227,12 +227,6 @@ class ChartView: UIView {
                 //MARK: - purchase Price line
                 if let purchasePrice = share?.purchasePrice() {
                     
-//                    for button in purchaseButtons ?? [] {
-//                        button.removeFromSuperview()
-//                    }
-//
-//                    purchaseButtons = [UIButton]()
-                    
                     let purchasePriceLine = UIBezierPath()
                     let pp1 = PriceDate(dailyPrices.first!.tradingDate, purchasePrice)
                     let pp2 = PriceDate(dailyPrices.last!.tradingDate, purchasePrice)
@@ -249,7 +243,7 @@ class ChartView: UIView {
 
                     //MARK: - buttons for purchases in timeLine
                     
-                   if let transactions = share?.transactions as? Set<ShareTransaction> {
+                   if let transactions = share?.sortedTransactionsByDate(ascending: true) {
                         var counter = 0
                         for transaction in transactions {
 
@@ -257,15 +251,54 @@ class ChartView: UIView {
                             let point = plotPricePoint(pricePoint: pricePoint)
                             
                             purchaseButtons![counter].frame.origin = CGPoint(x: point.x - 15, y: point.y - 15)
-                            purchaseButtons![counter].transaction = transaction
-                            purchaseButtons![counter].tintColor = transaction.isSale ? UIColor.systemRed : UIColor.systemGreen
                             counter += 1
                         }
                     }
                 }
-
+                
             }
         }
+        
+        //MARK: - eps line
+        // uses different vertical scale!
+        
+        if let historicEPSWithDates = share?.wbValuation?.epsWithDates() {
+            let hxEPSInChartRange = historicEPSWithDates.filter { dv in
+                if dv.date > (dateRange?.min() ?? Date()) {
+                    return true
+                }
+                else { return false }
+            }
+            
+            if hxEPSInChartRange.count > 1 {
+                let minEPS = (hxEPSInChartRange.compactMap{ $0.value }.min()! * 0.9).rounded()
+                let maxEPS = (hxEPSInChartRange.compactMap{ $0.value }.max()! * 1.1).rounded() + 1
+
+                let epsLine = UIBezierPath()
+
+                var point = plotEPSPoint(datedValue: hxEPSInChartRange[0], min: minEPS, max: maxEPS)
+                print(point)
+                epsLine.move(to: point)
+                for i in 1..<hxEPSInChartRange.count {
+                    if hxEPSInChartRange[i].value > 0 {
+                        point = plotEPSPoint(datedValue: hxEPSInChartRange[i], min: minEPS, max: maxEPS)
+                        print(point)
+                        epsLine.addLine(to: point)
+                    }
+                }
+                let finalValue = DatedValue(date: (Date()), value: hxEPSInChartRange.last!.value)
+                point = plotEPSPoint(datedValue: finalValue, min: minEPS, max: maxEPS)
+                epsLine.addLine(to: point)
+                print(point)
+                
+                epsLine.lineWidth = 2.0
+                UIColor.systemGreen.setStroke()
+                epsLine.stroke()
+                
+            }
+            
+        }
+
                 
         trendLabels.forEach { (label) in
             label.removeFromSuperview()
@@ -381,6 +414,15 @@ class ChartView: UIView {
         return CGPoint(x: datePoint, y: point)
     }
     
+    private func plotEPSPoint(datedValue: DatedValue, min: Double, max: Double) -> CGPoint {
+        
+        let timeFromEarliest = datedValue.date.timeIntervalSince(dateRange![0])
+        let datePoint: CGFloat = chartOrigin.x + CGFloat(timeFromEarliest / chartTimeSpan) * chartAreaSize.width
+        let point: CGFloat = chartOrigin.y - CGFloat((datedValue.value - min) / (max - min)) * chartAreaSize.height
+        return CGPoint(x: datePoint, y: point)
+    }
+
+    
     private func addTrendLabel(price: Double, increase1: Double, increase2: Double? = nil, correlation: Double? = nil, reliability: Double? = nil, color: UIColor) {
         
         let endPrice$ = currencyFormatterNoGapWithPence.string(from: NSNumber(value: price))!
@@ -447,7 +489,7 @@ class ChartView: UIView {
     private func addPurchaseButtons() {
         // doing this in 'draw' triggers new layout request so infinate loop
         
-        guard let transactions = share?.transactions as? Set<ShareTransaction> else { return }
+        guard let transactions = share?.sortedTransactionsByDate(ascending: true) else { return }
         
         for button in purchaseButtons ?? [] {
             button.removeFromSuperview()
@@ -455,12 +497,17 @@ class ChartView: UIView {
         
         purchaseButtons = [PurchasedButton]()
         
-        for _ in transactions {
+        for transaction in transactions {
             
             let button = PurchasedButton()
             button.addTarget(self, action: #selector(displayPurchase(button:)), for: .touchUpInside)
             button.setBackgroundImage(UIImage(systemName: "purchased.circle.fill"), for: .normal)
+            button.tintColor = transaction.isSale ? UIColor.systemRed : UIColor.systemGreen
+
+//            button.setImage(UIImage(systemName: "purchased.circle.fill"), for: .normal)
             button.frame = CGRect(origin: CGPoint.zero, size: CGSize(width: 30, height: 30))
+            button.transaction = transaction
+            button.displayDelegate = self
 
             addSubview(button)
             
@@ -474,6 +521,9 @@ class ChartView: UIView {
         if let chartVC = self.findViewController() as? StockChartVC {
             
             chartVC.displayPurchaseInfo(button: button)
+        }
+        else if let card = button.relatedDiaryTransactionCard {
+            card.activatedByButton()
         }
     }
     
@@ -526,3 +576,21 @@ extension ChartView: ChartButtonDelegate {
     
 }
 
+extension ChartView: PurchasedButtonActivationDelegate {
+    
+    func buttonActivated(button: PurchasedButton) {
+        
+        for arraybutton in purchaseButtons ?? [] {
+            if arraybutton != button {
+                arraybutton.relatedDiaryTransactionCard?.isActive = false
+                arraybutton.tintColor = arraybutton.transaction.isSale ? UIColor.systemRed : UIColor.systemGreen
+                arraybutton.setNeedsDisplay()
+            }
+            else {
+                
+            }
+        }
+    }
+    
+    
+}

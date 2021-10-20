@@ -160,7 +160,15 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         webView?.section = section
-        webView?.load(request!)
+        
+        if let validRequest = request {
+            webView?.load(validRequest)
+        }
+        else {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Invzlid download request (url \(String(describing: url)) for symbol: \(stock.symbol) with shortName \(stockShortname)")
+//            mtDownloadTasks = [String]()
+            self.mtDownloadCompleted(section: nil)
+        }
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -272,12 +280,19 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
 
     // MARK: - completed download functions
     
-    func mtDownloadCompleted(section: String) {
+    func mtDownloadCompleted(section: String?) {
         // is called from a background thread!
+        
+        guard let validSection = section else {
+            DispatchQueue.main.async {
+                self.delegate?.downloadComplete(html$: "", pageTitle: "")
+            }
+            return
+        }
         
         var remove = Int()
         for i in 0..<mtDownloadTasks.count {
-            if mtDownloadTasks[i] == section {
+            if mtDownloadTasks[i] == validSection {
                 remove = i
             }
         }
@@ -286,7 +301,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
 
         DispatchQueue.main.async {
-            self.delegate?.downloadComplete(html$: self.mt_html$, pageTitle: section)
+            self.delegate?.downloadComplete(html$: self.mt_html$, pageTitle: validSection)
         }
 
         if let nextTask = mtDownloadTasks.first {

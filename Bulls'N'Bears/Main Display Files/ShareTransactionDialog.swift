@@ -106,6 +106,12 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
         return true
 
     }
+    
+    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        
+        addDoneButtonToKeyboard(sender: textView)
+        return true
+    }
         
     @objc
     func endedTextEntry() {
@@ -113,6 +119,7 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
         diaryField.resignFirstResponder()
     }
     
+
     func addDoneButtonToKeyboard (sender: UITextView) {
         
         let doneButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(endedTextEntry))

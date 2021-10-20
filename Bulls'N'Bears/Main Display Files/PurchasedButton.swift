@@ -7,16 +7,34 @@
 
 import UIKit
 
+protocol PurchasedButtonActivationDelegate {
+    func buttonActivated(button: PurchasedButton)
+}
+
 class PurchasedButton: UIButton {
     
     var transaction: ShareTransaction!
-
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
+    var relatedDiaryTransactionCard: DiaryTransactionCard?
+    var displayDelegate: PurchasedButtonActivationDelegate?
+    
+    public func makeActiveButton() {
+        relatedDiaryTransactionCard?.isActive = true
+        displayDelegate?.buttonActivated(button: self)
+        setNeedsDisplay()
     }
-    */
+
+    override func draw(_ rect: CGRect) {
+        
+        guard let card = relatedDiaryTransactionCard else { return }
+        
+        if card.isActive {
+            
+            self.tintColor = UIColor.systemBlue
+//            let rim = UIBezierPath(ovalIn: rect.insetBy(dx: 4, dy: 4))
+//            rim.lineWidth = 4
+//            UIColor.systemBlue.setStroke()
+//            rim.stroke()
+        }
+    }
 
 }

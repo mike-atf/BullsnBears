@@ -759,12 +759,16 @@ extension WBValuationController: DataDownloaderDelegate {
         }
         else if section == "pe-ratio" {
             result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
-            share?.peRatio = result.array?.last ?? Double()
+            share?.peRatio = result.array?.compactMap{ $0 }.filter({ per in
+                if per == 0 { return false }
+                else { return true }
+            }).last ?? Double()
             downloadErrors.append(contentsOf: result.errors)
             
-            let (results,errors) = WebpageScraper.scrapePERDatesTable(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
+            let (results1,results2, errors) = WebpageScraper.scrapePERDatesTable(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
             downloadErrors.append(contentsOf: errors)
-            valuation?.savePERWithDateArray(datesValuesArray: results)
+            valuation?.savePERWithDateArray(datesValuesArray: results1)
+            valuation?.saveEPSWithDateArray(datesValuesArray: results2)
 
             self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
         }
