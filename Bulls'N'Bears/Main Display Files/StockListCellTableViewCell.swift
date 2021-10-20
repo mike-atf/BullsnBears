@@ -34,6 +34,7 @@ class StockListCellTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         self.title.text = " "
+        self.title.textColor = .label
         self.detail.text = " "
         self.ratingCircle.isHidden = true
         actionView.resetForReuse()
@@ -45,7 +46,13 @@ class StockListCellTableViewCell: UITableViewCell {
         self.indexPath = indexPath
         self.stock = stock
         
-        title.text = stock.symbol
+//        var value$ = ""
+        if stock.peRatio != Double() {
+//            value$ = numberFormatterNoFraction.string(from: stock.peRatio as NSNumber) ?? ""
+            title.textColor = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: stock.peRatio, greenCutoff: 10.0, redCutOff: 40.0)
+        }
+        title.text = stock.symbol //! + "(" + value$ + ")"
+
         if let lastPrice = stock.getDailyPrices()?.last {
             detail.text = timeFormatter.localizedString(for: lastPrice.tradingDate, relativeTo: Date())
         }

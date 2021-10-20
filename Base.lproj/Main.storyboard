@@ -171,25 +171,25 @@
                                 <rect key="frame" x="10" y="141" width="544" height="549"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cg7-eQ-58P">
-                                        <rect key="frame" x="0.0" y="0.0" width="3320" height="549"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="1000" height="549"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Dm-Pf-iwX" customClass="StochastikOscillatorView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="82.5" width="3320" height="82.5"/>
+                                                <rect key="frame" x="0.0" y="82.5" width="1000" height="82.5"/>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uEG-z0-RcJ" customClass="MACD_View" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="3320" height="82.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="1000" height="82.5"/>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gGa-pp-Cwa" customClass="ChartTimeLineView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="165" width="3320" height="60"/>
+                                                <rect key="frame" x="0.0" y="165" width="1000" height="60"/>
                                                 <color key="backgroundColor" systemColor="systemOrangeColor"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="60" id="9DG-qj-Bjr"/>
                                                 </constraints>
                                             </view>
                                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="225" width="3320" height="324"/>
+                                                <rect key="frame" x="0.0" y="225" width="1000" height="324"/>
                                                 <color key="backgroundColor" systemColor="tertiarySystemBackgroundColor"/>
                                             </view>
                                         </subviews>
@@ -208,7 +208,7 @@
                                             <constraint firstItem="gGa-pp-Cwa" firstAttribute="top" secondItem="3Dm-Pf-iwX" secondAttribute="bottom" id="rcx-vM-cPv"/>
                                             <constraint firstItem="gGa-pp-Cwa" firstAttribute="leading" secondItem="Cg7-eQ-58P" secondAttribute="leading" id="sxX-ZC-cLR"/>
                                             <constraint firstAttribute="trailing" secondItem="3Dm-Pf-iwX" secondAttribute="trailing" id="tr2-dN-rFF"/>
-                                            <constraint firstAttribute="width" constant="3320" id="vPw-JW-IMX"/>
+                                            <constraint firstAttribute="width" constant="1000" id="vPw-JW-IMX"/>
                                             <constraint firstItem="uEG-z0-RcJ" firstAttribute="leading" secondItem="Cg7-eQ-58P" secondAttribute="leading" id="w4K-uy-TDc"/>
                                             <constraint firstItem="3Dm-Pf-iwX" firstAttribute="leading" secondItem="Cg7-eQ-58P" secondAttribute="leading" id="x2Q-ka-K4m"/>
                                         </constraints>
@@ -1219,46 +1219,46 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transaction Dialog" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oVF-zN-Rij">
-                                <rect key="frame" x="47" y="38" width="306.5" height="37"/>
+                                <rect key="frame" x="46" y="38" width="308.5" height="37"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" tag="10" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="S0.00" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="j3p-Tm-wHB">
-                                <rect key="frame" x="248" y="104" width="105.5" height="22"/>
+                                <rect key="frame" x="247" y="104" width="107.5" height="22"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Purchase / sale price" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b9N-B1-vFV">
-                                <rect key="frame" x="47" y="105" width="158" height="21"/>
+                                <rect key="frame" x="46" y="105" width="158" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Number bought / sold" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n52-f0-09J">
-                                <rect key="frame" x="47" y="141.5" width="166" height="21"/>
+                                <rect key="frame" x="46" y="141.5" width="166" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transaction date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="B8a-JQ-Y7N">
-                                <rect key="frame" x="47" y="182" width="128" height="21"/>
+                                <rect key="frame" x="46" y="182" width="128" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <datePicker contentMode="right" contentHorizontalAlignment="left" contentVerticalAlignment="center" datePickerMode="date" style="compact" translatesAutoresizingMaskIntoConstraints="NO" id="mfW-UM-yoU">
-                                <rect key="frame" x="248" y="172" width="105.5" height="31"/>
+                                <rect key="frame" x="247" y="172" width="107.5" height="31"/>
                             </datePicker>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" text="Situation and rationale for learning from your investment diary" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="1ks-fC-xwe">
-                                <rect key="frame" x="47" y="245" width="306.5" height="299"/>
+                                <rect key="frame" x="46" y="245" width="308.5" height="299"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Why did you purchase / sell?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wfc-g0-i4Z">
-                                <rect key="frame" x="47" y="229" width="306.5" height="21"/>
+                                <rect key="frame" x="46" y="229" width="308.5" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -1281,7 +1281,7 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" tag="20" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="000" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="t7J-sh-06s">
-                                <rect key="frame" x="248" y="140.5" width="31" height="22"/>
+                                <rect key="frame" x="247" y="140.5" width="31" height="22"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
                             </textField>

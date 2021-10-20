@@ -127,7 +127,7 @@ class ChartTimeLineView: UIView {
         let date$ = dateFormatter.string(from: Date())
         let stdLabel: UILabel = {
             let label = UILabel()
-            label.font = UIFont.preferredFont(forTextStyle: .footnote)
+            label.font = UIFont.systemFont(ofSize: 10)
             label.text = date$
             label.sizeToFit()
             return label
@@ -152,7 +152,7 @@ class ChartTimeLineView: UIView {
         for i in 0..<labelCount {
             let aLabel: UILabel = {
                 let label = UILabel()
-                label.font = UIFont.preferredFont(forTextStyle: .footnote)
+                label.font = UIFont.systemFont(ofSize: 12)
                 // building backwards from latest date = dateRange.last
                 let labelDate = dateRange.last!.addingTimeInterval(TimeInterval(-i) * timeIntervalBetweenLabels)
                 label.text = dateFormatter.string(from: labelDate)

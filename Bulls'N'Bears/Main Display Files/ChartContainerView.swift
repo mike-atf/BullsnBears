@@ -78,6 +78,10 @@ class ChartContainerView: UIView {
         }
         
         if let view = chartView {
+            chartsContentViewWidth.isActive = false
+            chartsContentViewWidth.constant = scrollView.bounds.width * 1.1
+            chartsContentViewWidth.isActive = true
+            
             view.configure(stock: with)
         }
         
@@ -97,6 +101,11 @@ class ChartContainerView: UIView {
             view.configure(share: shareToShow)
         }
         if let scroll = scrollView {
+            
+            chartsContentViewWidth.isActive = false
+            chartsContentViewWidth.constant = scrollView.bounds.width * 1.1
+            chartsContentViewWidth.isActive = true
+
 //            scroll.delegate = self
             scroll.minimumZoomScale = 0.2
             scroll.maximumZoomScale = 2.0

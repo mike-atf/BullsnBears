@@ -277,21 +277,18 @@ class ChartView: UIView {
                 let epsLine = UIBezierPath()
 
                 var point = plotEPSPoint(datedValue: hxEPSInChartRange[0], min: minEPS, max: maxEPS)
-                print(point)
                 epsLine.move(to: point)
                 for i in 1..<hxEPSInChartRange.count {
                     if hxEPSInChartRange[i].value > 0 {
                         point = plotEPSPoint(datedValue: hxEPSInChartRange[i], min: minEPS, max: maxEPS)
-                        print(point)
                         epsLine.addLine(to: point)
                     }
                 }
-                let finalValue = DatedValue(date: (Date()), value: hxEPSInChartRange.last!.value)
-                point = plotEPSPoint(datedValue: finalValue, min: minEPS, max: maxEPS)
-                epsLine.addLine(to: point)
-                print(point)
+//                let finalValue = DatedValue(date: (Date()), value: hxEPSInChartRange.last!.value)
+//                point = plotEPSPoint(datedValue: finalValue, min: minEPS, max: maxEPS)
+//                epsLine.addLine(to: point)
                 
-                epsLine.lineWidth = 2.0
+                epsLine.lineWidth = 1.5
                 UIColor.systemGreen.setStroke()
                 epsLine.stroke()
                 

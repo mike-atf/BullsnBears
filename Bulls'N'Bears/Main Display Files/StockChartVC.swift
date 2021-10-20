@@ -34,16 +34,9 @@ class StockChartVC: UIViewController {
             configure(share: share)
         }
         
-//        let titleItem = UILabel()
-//        titleItem.text = share?.name_long
-//        titleItem.font = UIFont.preferredFont(forTextStyle: .title3)
-//        titleItem.bounds = CGRect(origin: CGPoint.zero, size: CGSize(width: view.bounds.width / 4, height: titleItem.bounds.height))
-//        barTitleButton = UIBarButtonItem(customView: titleItem)
         barTitleButton.title = share?.name_long
 
         buildLabel = UIBarButtonItem(title: "Build " + appBuild, style: .plain, target: nil, action: nil)
-//        let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3) ,NSAttributedString.Key.foregroundColor: UIColor.label]
-//        barTitleButton.setTitleTextAttributes(titleAttributes, for: .normal)
                 
         let fixedSizeItem = UIBarButtonItem.fixedSpace(100)
         self.navigationItem.leftBarButtonItems = [barTitleButton,researchButton, purchaseButton, fixedSizeItem]
