@@ -186,15 +186,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                     // if so download webpage content with table
                     removeFile(tempURL)
                                         
-//                    let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
-//                    let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
-//
-//                    let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
-//                    let start$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
-                    
-                    // 18/5/21 - period1=1589760000 // 1621296000 https://uk.finance.yahoo.com/quote/AAPL/history?period1=1589760000&period2=1621296000&interval=1d&filter=history&frequency=1d&includeAdjustedClose=true
                     var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
-//                    urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "filter", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
                     urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
 
                     
@@ -303,7 +295,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                 let pricePoints = WebpageScraper.yahooPriceTable(html$: html$)
                 
                 DispatchQueue.main.async {
-                    self.downloadDelegate?.newShare(symbol: stockName, prices: pricePoints)
+                    self.downloadDelegate?.newShare(symbol: stockName,  prices: pricePoints)
                 }
             }
         }
@@ -335,6 +327,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
         DispatchQueue.main.async {
             self.stocksDictionary.insert((key: symbol, value: String(name$.dropLast())), at: 0)
+            stockTickerDictionary?[symbol] = String(name$.dropLast()) // TODO: - doesn't save expanded dictionary to file!!
             self.tableView.reloadData()
         }
 

@@ -53,7 +53,8 @@ class ValuationSummaryTVC: UITableViewController {
                 format = .percent
             }
             else if indexPath.row == 1 {
-                let dataArrays = [share.rule1Valuation?.bvps! ?? [], share.rule1Valuation?.eps! ?? []]
+                
+                let dataArrays = [share.rule1Valuation?.bvps ?? [], share.rule1Valuation?.eps ?? []]
                 let (cleanedArrays, _) = ValuationDataCleaner.cleanValuationData(dataArrays: dataArrays, method: .rule1)
                 
                 if let futureGrowth = share.rule1Valuation?.futureGrowthEstimate(cleanedBVPS: cleanedArrays[0]) {
