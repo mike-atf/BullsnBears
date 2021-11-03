@@ -41,25 +41,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
          ["SGA / profit"],
          ["R&D / profit"]
         ]]
-
-//        [["Comp. Growth","Revenue"],
-//         ["Comp. Growth","Net income"],
-//         ["Comp. Growth","net income / revenue","revenue"],
-//         ["Comp. Growth","Ret. earnings"],
-//         ["Comp. Growth","EPS"],
-//         ["Comp. Growth","profit / revenue","revenue"],
-//         ["Comp. Growth","Op. cash flow"]
-//        ],
-//        [
-//         ["Comp. Growth","Return on equity"],
-//         ["Comp. Growth","Return on assets"],
-//         ["Comp. Growth","lt debt / adj. equity","equity + ret. earnings"]
-//        ],
-//        [["Comp. Growth","cap.expend / earnings","earnings"],
-//         ["Comp. Growth"," LT debt / net income","revenue"],
-//         ["Comp. Growth","SGA / profit","profit"],
-//         ["Comp. Growth","R&D / profit","profit"]
-//        ]]
     var wbvParameters = WBVParameters()
     
     //MARK: - init
@@ -90,7 +71,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     valuation?.addToUserEvaluations(set)
                 }
             }
-
         }
                 
         rowTitles = returnRowTitles()
@@ -118,7 +98,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         do {
-//            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
             valuations = try fetchRequest.execute()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
@@ -717,7 +696,7 @@ extension WBValuationController: DataDownloaderDelegate {
             downloadErrors.append(contentsOf: result.errors)
             valuation?.debtLT = result.array
             
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Propoerty, Plant, And Equipment")
+            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Property, Plant, And Equipment")
             downloadErrors.append(contentsOf: result.errors)
             valuation?.ppe = result.array
             

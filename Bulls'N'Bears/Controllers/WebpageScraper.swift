@@ -745,5 +745,233 @@ class WebpageScraper {
 
         return pricePoints
     }
+    
+    //MARK: - new async functions
+    // simplified download process for MacroTrends using URLSession.shared.data without a webView
+    // utilising new async await function
+    // throws download and analysis errors
+    
+    /// returns historical pe ratios and eps TTM with dates from macro trends website
+    /// in form of [DatedValues] = (date, epsTTM, peRatio )
+    /// ; optional parameter 'date' returns values back to this date and the first set before.
+    /// ; throws downlad and analysis errors, which need to be caught by cailler
+    class func getHxEPSandPEData(url: URL, until date: Date?=nil) async throws -> [DatedValues]? {
+        
+            var htmlText = String()
+            var tableText = String()
+            var tableHeaderTexts = [String]()
+            var datedValues = [DatedValues]()
+            
+            do {
+                 htmlText = try await downloadData(url: url)
+            } catch let error as DownloadAndAnalysisError {
+                if error == .mimeType {
+                    print("response mime type is not html; can't decode")
+                } else if error == .urlError {
+                    print("a url error occurred")
+                }
+            }
+                
+            do {
+                tableText = try await extractTable(title:"Apple PE Ratio Historical Data", html: htmlText)
+            } catch let error as DownloadAndAnalysisError {
+                if error == .htmlTableHeaderEndNotFound {
+                    print("html analysis error: table end not found")
+                } else if error == .htmlTableTitleNotFound {
+                    print("html analysis error: title not found")
+                }
+            }
+
+            do {
+                tableHeaderTexts = try await extractHeaderTitles(html: tableText)
+            } catch let error as DownloadAndAnalysisError {
+                if error == .htmlTableRowStartIndexNotFound {
+                    print("html analysis error: header start not found")
+                } else if error == .htmlTableHeaderEndNotFound {
+                    print("html analysis error: header end not found")
+                } else if error == .htmlTableRowEndNotFound {
+                    print("html analysis error: row end not found")
+                }
+            }
+            
+            if tableHeaderTexts.count > 0 && tableHeaderTexts.contains("Date") {
+                do {
+                    datedValues = try await extractTableData(html: htmlText, titles: tableHeaderTexts, untilDate: date)
+                    return datedValues
+                } catch let error as DownloadAndAnalysisError {
+                    print(error)
+                }
+            } else {
+                print("did not find any table header titles, or missing date Column- over & out")
+            }
+            
+        return nil
+    }
+
+    
+    class func downloadData(url: URL) async throws -> String {
+        
+        let request = URLRequest(url: url)
+            
+        let (data,urlResponse) = try await URLSession.shared.data(for: request)
+        var htmlText = String()
+        
+        if let response = urlResponse as? HTTPURLResponse {
+            if response.statusCode == 200 {
+                if response.mimeType == "text/html" {
+                    htmlText = String(data: data, encoding: .utf8) ?? ""
+                }
+                else {
+                    throw DownloadAndAnalysisError.mimeType
+                }
+            }
+            else {
+                print("url error, code \(response.statusCode)")
+                throw DownloadAndAnalysisError.urlError
+            }
+        }
+        
+        return htmlText
+    }
+
+    class func extractTable(title: String, html: String) async throws -> String {
+        
+        guard let tableStartIndex = html.range(of: title) else {
+            throw DownloadAndAnalysisError.htmlTableTitleNotFound
+        }
+        
+        guard let tableEndIndex = html.range(of: "</table>",options: [NSString.CompareOptions.literal], range: tableStartIndex.upperBound..<html.endIndex, locale: nil) else {
+            throw DownloadAndAnalysisError.htmlTableEndNotFound
+        }
+        
+        let tableText = String(html[tableStartIndex.upperBound..<tableEndIndex.lowerBound])
+
+        return tableText
+    }
+
+    class func extractHeaderTitles(html: String) async throws -> [String] {
+        
+        let headerStartSequence = "</thead>"
+        let headerEndSequence = "<tbody><tr>"
+        let rowEndSequence = "</th>"
+        
+        guard let headerStartIndex = html.range(of: headerStartSequence) else {
+            throw DownloadAndAnalysisError.htmTablelHeaderStartNotFound
+        }
+        
+        guard let headerEndIndex = html.range(of: headerEndSequence,options: [NSString.CompareOptions.literal], range: headerStartIndex.upperBound..<html.endIndex, locale: nil) else {
+            throw DownloadAndAnalysisError.htmlTableHeaderEndNotFound
+        }
+        
+        var headerText = String(html[headerStartIndex.upperBound..<headerEndIndex.lowerBound])
+        var rowStartIndex = headerText.range(of: "<th ", options: [NSString.CompareOptions.literal])
+        var columnTitles = [String]()
+        
+        repeat {
+            
+            if let rsi = rowStartIndex {
+                if let rowEndIndex = headerText.range(of: rowEndSequence,options: [NSString.CompareOptions.literal], range: rsi.lowerBound..<headerText.endIndex) {
+                    
+                    let rowText = String(headerText[rsi.upperBound..<rowEndIndex.lowerBound])
+                    
+                    if let valueStartIndex = rowText.range(of: "\">", options: .backwards) {
+                        
+                        let value$ = String(rowText[valueStartIndex.upperBound..<rowText.endIndex])
+                        if value$ != "" {
+                            columnTitles.append(value$)
+                        }
+                    }
+                    headerText = String(headerText[rowEndIndex.lowerBound..<headerText.endIndex])
+                    
+                    rowStartIndex = headerText.range(of: "<th ", options: [NSString.CompareOptions.literal])
+                    }
+                else { break } // no rowEndIndex
+            }
+            else { break } // no rowStartIndex
+        } while rowStartIndex != nil
+        
+        return columnTitles
+    }
+
+    class func extractTableData(html: String, titles: [String], untilDate: Date?=nil) async throws -> [DatedValues] {
+        
+        let bodyStartSequence = "<tbody><tr>"
+        let bodyEndSequence = "</tr></tbody>"
+        let rowEndSequence = "</td>"
+        
+        var datedValues = [DatedValues]()
+        
+        guard let bodyStartIndex = html.range(of: bodyStartSequence) else {
+            throw DownloadAndAnalysisError.htmlTableBodyStartIndexNotFound
+        }
+        
+        guard let bodyEndIndex = html.range(of: bodyEndSequence,options: [NSString.CompareOptions.literal], range: bodyStartIndex.upperBound..<html.endIndex, locale: nil) else {
+            throw DownloadAndAnalysisError.htmlTableBodyEndIndexNotFound
+        }
+        
+        var tableText = String(html[bodyStartIndex.upperBound..<bodyEndIndex.lowerBound])
+        var rowStartIndex = tableText.range(of: "<td ", options: [NSString.CompareOptions.literal])
+
+        var columnCount = 0
+        let columnsExpected = titles.count
+        
+        var date: Date?
+        var epsValue: Double?
+        var peValue: Double?
+
+        outer: repeat {
+            
+            if let rsi = rowStartIndex {
+                if let rowEndIndex = tableText.range(of: rowEndSequence,options: [NSString.CompareOptions.literal], range: rsi.lowerBound..<tableText.endIndex) {
+                    
+                    let rowText = String(tableText[rsi.upperBound..<rowEndIndex.lowerBound])
+                    
+                    if let valueStartIndex = rowText.range(of: "\">", options: .backwards) {
+                        
+                        let value$ = String(rowText[valueStartIndex.upperBound..<rowText.endIndex])
+
+                        if (columnCount)%columnsExpected == 0 {
+                            if let validDate = dateFormatter.date(from: String(value$)) {// date
+                                date = validDate
+                            }
+                        }
+                        else {
+                            let value = Double(value$.filter("-0123456789.".contains)) ?? Double()
+
+                            if (columnCount-2)%columnsExpected == 0 { // EPS value
+                                epsValue = value
+                            }
+                            else if (columnCount+1)%columnsExpected == 0 { // PER value
+                                peValue = value
+                                if let validDate = date {
+                                    let newDV = DatedValues(date: validDate,epsTTM: (epsValue ?? Double()),peRatio: (peValue ?? Double()))
+                                    datedValues.append(newDV)
+                                    if let minDate = untilDate {
+                                        if minDate > validDate { return datedValues }
+                                    }
+                                    date = nil
+                                    peValue = nil
+                                    epsValue = nil
+
+                                }
+                            }
+                        }
+                    }
+                    
+                    tableText = String(tableText[rowEndIndex.lowerBound..<tableText.endIndex])
+                    
+                    rowStartIndex = tableText.range(of: "<td ", options: [NSString.CompareOptions.literal])
+
+                }
+                else { break } // no rowEndIndex
+            }
+            else { break } // no rowStartIndex
+            columnCount += 1
+
+            
+        } while rowStartIndex != nil
+
+        return datedValues
+    }
 
 }

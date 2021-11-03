@@ -264,15 +264,15 @@ class ChartView: UIView {
         
         if let historicEPSWithDates = share?.wbValuation?.epsWithDates() {
             let hxEPSInChartRange = historicEPSWithDates.filter { dv in
-                if dv.date > (dateRange?.min() ?? Date()) {
+                if dv.date > (dateRange?.min()?.addingTimeInterval(-180*24*3600) ?? Date()) {
                     return true
                 }
                 else { return false }
             }
             
             if hxEPSInChartRange.count > 1 {
-                let minEPS = (hxEPSInChartRange.compactMap{ $0.value }.min()! * 0.9).rounded()
-                let maxEPS = (hxEPSInChartRange.compactMap{ $0.value }.max()! * 1.1).rounded() + 1
+                let minEPS = (hxEPSInChartRange.compactMap{ $0.value }.min()! * 0.9)//.rounded()
+                let maxEPS = (hxEPSInChartRange.compactMap{ $0.value }.max()! * 1.1) + 1// .rounded() + 1
 
                 let epsLine = UIBezierPath()
 
@@ -284,9 +284,6 @@ class ChartView: UIView {
                         epsLine.addLine(to: point)
                     }
                 }
-//                let finalValue = DatedValue(date: (Date()), value: hxEPSInChartRange.last!.value)
-//                point = plotEPSPoint(datedValue: finalValue, min: minEPS, max: maxEPS)
-//                epsLine.addLine(to: point)
                 
                 epsLine.lineWidth = 1.5
                 UIColor.systemGreen.setStroke()

@@ -264,6 +264,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             
             guard error == nil else {
                 DispatchQueue.main.async {
+                    alertController.showDialog(title: "There's a problem", alertMessage: error!.localizedDescription, viewController: nil, delegate: nil)
                     stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
                     self.tableView.reloadData()
                 }
@@ -272,6 +273,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             
             guard urlResponse != nil else {
                 DispatchQueue.main.async {
+                    alertController.showDialog(title: "There's a problem", alertMessage: urlResponse!.description, viewController: self, delegate: nil)
                     stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
                     self.tableView.reloadData()
                 }

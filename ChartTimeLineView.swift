@@ -124,7 +124,7 @@ class ChartTimeLineView: UIView {
 
     private func getDateLabels() -> [UILabel] {
         
-        let date$ = dateFormatter.string(from: Date())
+        let date$ = "31/12/22" //dateFormatter.string(from: Date())
         let stdLabel: UILabel = {
             let label = UILabel()
             label.font = UIFont.systemFont(ofSize: 10)
@@ -132,7 +132,7 @@ class ChartTimeLineView: UIView {
             label.sizeToFit()
             return label
         }()
-        let stdLabelWidth = stdLabel.bounds.width * 1.3
+        let stdLabelWidth = stdLabel.bounds.width * 1.75
         
         var labels = [UILabel]()
         let maxLabelCount = Int(self.bounds.width / stdLabelWidth)

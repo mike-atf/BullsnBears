@@ -152,7 +152,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @objc
     func updateShares() {
                 
-        print("updating shares...")
         NotificationCenter.default.post(name: Notification.Name(rawValue: "ShowCitation"), object: nil, userInfo: nil)
         
         guard controller.fetchedObjects?.count ?? 0 > 0 else {
@@ -423,7 +422,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         if !tableView.isEditing {
             performSegue(withIdentifier: "showChartSegue", sender: nil)
-            tableView.deselectRow(at: indexPath, animated: true)
+//            tableView.deselectRow(at: indexPath, animated: true)
         }
         else {
             let selectedShare = controller.object(at: indexPath)

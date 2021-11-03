@@ -250,6 +250,7 @@ public class Share: NSManagedObject {
         return pricesInRange.compactMap { $0.high }.max()
     }
 
+    // returns [earliest, latest] dates of daily prices
     public func priceDateRange() -> [Date]? {
         
         guard let dailyPrices = getDailyPrices() else {
@@ -1245,13 +1246,6 @@ public class Share: NSManagedObject {
         
         let abovePct$ = percentFormatter2Digits.string(from: abovePct as NSNumber) ?? ""
         let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
-
-        print()
-        print("\(symbol!) mean price increase after MACD crossings above zero is " + above$)
-        print( abovePct$ + " of \(abovePriceIncreases.count) are actual increases")
-        print("\(symbol!) mean price increase after MACD crossings BELOW zero is " +  below$)
-        print( belowPct$ + " of \(belowPriceIncreases.count) are actual increases")
-        print()
 
     }
     

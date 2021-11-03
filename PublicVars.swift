@@ -7,6 +7,24 @@
 
 import UIKit
 
+enum DownloadAndAnalysisError: Error {
+    case mimeType
+    case urlError
+    case htmlTableTitleNotFound
+    case htmlTableEndNotFound
+    case htmTablelHeaderStartNotFound
+    case htmlTableHeaderEndNotFound
+    case htmlTableRowEndNotFound
+    case htmlTableRowStartIndexNotFound
+    case htmlTableBodyStartIndexNotFound
+    case htmlTableBodyEndIndexNotFound
+    case urlInvalid
+    case shareSymbolMissing
+    case shareShortNameMissing
+    case shareWBValuationMissing
+}
+
+typealias DatedValues = (date: Date, epsTTM: Double, peRatio: Double)
 typealias PriceDate = (date: Date, price: Double)
 typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
 

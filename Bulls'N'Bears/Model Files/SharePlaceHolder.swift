@@ -327,8 +327,6 @@ class SharePlaceHolder: NSObject {
             }
 
             let html$ = String(decoding: validData, as: UTF8.self)
-            print()
-            print("downloaded live prices for \(self.symbol), analysis to follow...")
             self.analyseLivePriceDownload(html$: html$, delegate: delegate)
         }
         dataTask?.resume()
@@ -603,8 +601,7 @@ class SharePlaceHolder: NSObject {
     func analyseLivePriceDownload(html$: String, delegate: StockDelegate?) {
         
         let (values, errors) = WebpageScraper.scrapeRowForDoubles(website: .yahoo, html$: html$, rowTitle: "<span class=\"Trsdu(0.3s) Trsdu(0.3s) " , rowTerminal: "</span>", numberTerminal: "</span>")
-        print("live price download analysed for \(symbol), update complete")
-        print()
+
         if let livePrice = values?.first {
             self.lastLivePrice = livePrice
             self.lastLivePriceDate = Date()

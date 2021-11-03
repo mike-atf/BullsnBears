@@ -43,7 +43,6 @@ class StocksController: NSFetchedResultsController<Share> {
         
         for share in fetchedObjects ?? [] {
 
-            print("controller is updating \(share.symbol!)")
             if share.watchStatus < 2 || share.isEqual(selectedShare) {
                 let placeholder = SharePlaceHolder(share: share)
                 if placeholder.lastLivePriceDate == nil {
@@ -60,9 +59,6 @@ class StocksController: NSFetchedResultsController<Share> {
                     // ends tableView refresh process if last update <300sec ago
                 }
             }
-//            else {
-//                updateDailyPrices(share: share)
-//            }
         }
     }
     
@@ -77,7 +73,6 @@ class StocksController: NSFetchedResultsController<Share> {
         
         let placeholder = SharePlaceHolder(share: share)
         
-//        var sharePriceNeedsUpdate = true
         if let lastPriceDate = placeholder.getDailyPrices()?.last?.tradingDate {
             if (Date().timeIntervalSince(lastPriceDate) > 12 * 3600) {
                 placeholder.startDailyPriceUpdate(yahooRefDate: yahooRefDate, delegate: self)
@@ -86,6 +81,7 @@ class StocksController: NSFetchedResultsController<Share> {
 
     }
     
+        
     func updateTreasuryBondYields() {
         
         if let lastDate = treasuryBondYields?.compactMap({ $0.date }).sorted().last {
