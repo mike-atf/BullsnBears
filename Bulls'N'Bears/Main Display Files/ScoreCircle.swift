@@ -27,13 +27,7 @@ class ScoreCircle: UIView {
     var isUserScoreType: Bool!
 
     func configure( score: Double?, delegate: ScoreCircleDelegate, path: IndexPath, isUserScore: Bool, userCommentsCount: Int) {
-               
-//        guard let validData = ratingStruct else {
-//            self.isHidden = true
-//            self.tapGestureRecognizer?.isEnabled = false
-//            return
-//        }
-        
+                      
         guard let validScore = score else {
             self.isHidden = true
             self.tapGestureRecognizer?.isEnabled = false
@@ -66,8 +60,9 @@ class ScoreCircle: UIView {
             fillColor = UIColor.systemGreen
         }
         
-        setNeedsDisplay()
 
+        setNeedsDisplay()
+        /*
         if symbol == .star {
             centerImageView = UIImageView(image: UIImage(systemName: "star.circle")!)
         } else {
@@ -91,10 +86,29 @@ class ScoreCircle: UIView {
         else {
             tapGestureRecognizer = nil
         }
+         */
     }
     
     override func draw(_ rect: CGRect) {
         
+        let rim = UIBezierPath(roundedRect: rect.insetBy(dx: 5, dy: 5), cornerRadius: 5)
+        rim.lineWidth = 2.0
+        
+        let line = UIBezierPath()
+        line.lineWidth = rect.width - 10
+        
+        let lineHeight = (rect.height - 10) * scoreRatio
+        line.move(to: CGPoint(x: rect.midX, y: rect.maxY - 5))
+        line.addLine(to: CGPoint(x: rect.midX, y: rect.maxY - 5 - lineHeight))
+        fillColor.setStroke()
+        line.stroke()
+        
+        UIColor.label.setStroke()
+        rim.stroke()
+        
+        
+// OLD
+        /*
         let startAngle = 2 * π // ('eats' - rotated to 'north' below)
         let lineWidth = rect.height * 0.2 + 2
         let endAngle = startAngle - scoreRatio * 2 * π
@@ -120,7 +134,7 @@ class ScoreCircle: UIView {
         filledSegment.stroke()
 
         context!.restoreGState()
-
+        */
     }
     
     @objc

@@ -14,7 +14,6 @@ class StockListCellTableViewCell: UITableViewCell {
     @IBOutlet var detail: UILabel!
     @IBOutlet var reportDateLabel: UILabel!
     @IBOutlet var ratingCircle: ScoreCircle!
-    @IBOutlet var valueCircle: ScoreCircle!
     @IBOutlet var actionView: BuySellView!
     
     var indexPath: IndexPath!
@@ -38,7 +37,6 @@ class StockListCellTableViewCell: UITableViewCell {
         self.detail.text = " "
         self.ratingCircle.isHidden = true
         actionView.resetForReuse()
-        valueCircle.isHidden = true
     }
     
     public func configureCell(indexPath: IndexPath, stock: Share, userRatingScore: Double?, valueRatingScore: Double?, scoreDelegate: ScoreCircleDelegate, userCommentCount: Int) {
@@ -71,6 +69,5 @@ class StockListCellTableViewCell: UITableViewCell {
         
         actionView.configure(share: stock)
         ratingCircle.configure(score: userRatingScore,delegate: scoreDelegate, path: indexPath, isUserScore: true, userCommentsCount: userCommentCount)
-        valueCircle.configure(score: valueRatingScore, delegate: scoreDelegate, path: indexPath, isUserScore: false, userCommentsCount: 1)
     }
 }

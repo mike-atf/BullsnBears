@@ -90,7 +90,7 @@ class ResearchTVC: UITableViewController {
             return 60
         }
         else if indexPath.section == 5 { // future growth plan
-            return 70
+            return 120
         }
         else if indexPath.section == 6 { // category
             return 44
