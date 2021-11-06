@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import CoreData
 
 enum DownloadAndAnalysisError: Error {
     case mimeType
     case urlError
+    case emptyWebpageText
     case htmlTableTitleNotFound
     case htmlTableEndNotFound
     case htmTablelHeaderStartNotFound
@@ -22,11 +24,28 @@ enum DownloadAndAnalysisError: Error {
     case shareSymbolMissing
     case shareShortNameMissing
     case shareWBValuationMissing
+    case htmlSectionTitleNotFound
+    case htmlRowStartIndexNotFound
+    case htmlRowEndIndexNotFound
+    case contentStartSequenceNotFound
+    case noBackgroundMOC
 }
 
-typealias DatedValues = (date: Date, epsTTM: Double, peRatio: Double)
+enum InternalErrors: Error {
+    case missingPricePointsInShareCreation
+    case noValidBackgroundMOC
+    case noShareFetched
+    case urlPathError
+    case mocReadError
+}
+
+typealias ShareID_Symbol_sName = (id: NSManagedObjectID, symbol: String?, shortName: String?)
+typealias ShareID_Value = (id: NSManagedObjectID, value: Double?)
+typealias Dated_EPS_PER_Values = (date: Date, epsTTM: Double, peRatio: Double)
+typealias ShareID_DatedValues = (id: NSManagedObjectID, values: [DatedValue]?)
 typealias PriceDate = (date: Date, price: Double)
 typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
+typealias ProfileData = (sector: String, industry: String, employees: Double)
 
 //var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600

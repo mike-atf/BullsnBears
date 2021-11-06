@@ -16,7 +16,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet var treasuryBondYieldsButton: UIBarButtonItem!
     @IBOutlet var sortView: SortView!
     
-    var controller: StocksController = {
+    var controller: StocksController2 = {
         
         // how to sort:
         // default: 1. watchStatus, 2 user evaluation
@@ -64,7 +64,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
         request.sortDescriptors = [ NSSortDescriptor(key: firstSortParameter, ascending: firstSortAscending), NSSortDescriptor(key: secondSortParameter, ascending: secondSortAscending), NSSortDescriptor(key: thirdSortParameter, ascending: thirdSortAscending)]
         
-        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: firstSortParameter, cacheName: nil)
+        let sL = StocksController2(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: firstSortParameter, cacheName: nil)
         
         do {
             try sL.performFetch()
@@ -79,7 +79,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var refreshControl: UIRefreshControl!
     
     var searchController: UISearchController?
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -91,7 +91,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         NotificationCenter.default.addObserver(self, selector: #selector(updateShares), name: Notification.Name(rawValue: "ActivatedFromBackground"), object: nil)
 
         controller.delegate = self
-        controller.pricesUpdateDelegate = self
+//        controller.pricesUpdateDelegate = self
         controller.viewController = self
                 
         sortView.delegate = self
@@ -116,8 +116,11 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         searchController?.searchBar.delegate = self
         navigationItem.searchController = searchController
         definesPresentationContext = true
- 
         
+//        Task.init(priority: .background) {
+//            await updateShares()
+//        }
+         
 // temp
 //        self.controller.research()
 // temp
@@ -153,21 +156,35 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func updateShares() {
                 
         NotificationCenter.default.post(name: Notification.Name(rawValue: "ShowCitation"), object: nil, userInfo: nil)
+
         
         guard controller.fetchedObjects?.count ?? 0 > 0 else {
             return
         }
         
-        DispatchQueue.main.async {
-            let selectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
-            let selectedShare = self.controller.object(at: selectedPath)
-            self.controller.updateLivePrices(selectedShare: selectedShare) // uses selectedShare to end refresh process
-            // also triggers other keyRatioUpdates after livePrice have been udpated
+//        let selectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
+//        let selectedShare = self.controller.object(at: selectedPath)
+        
+//        let updater = SharesUpdater()
+        
+        Task.init(priority: .background) {
+            do {
+                try await controller.updateStocksData()
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: "StocksListVC - updateShares", systemError: nil, errorInfo: "error when trying to update stock data: \(error)")
+            }
         }
         
-        DispatchQueue.main.async {
-            self.controller.updateTreasuryBondYields()
-        }
+//        DispatchQueue.main.async {
+//            let selectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
+//            let selectedShare = self.controller.object(at: selectedPath)
+//            self.controller.updateLivePrices(selectedShare: selectedShare) // uses selectedShare to end refresh process
+//            // also triggers other keyRatioUpdates after livePrice have been udpated
+//        }
+        
+//        DispatchQueue.main.async {
+//            self.controller.updateTreasuryBondYields()
+//        }
         
         // jobs to do:
         // 1. - update prices in controller.updatePrices() downloading all shares csv. files from Yahoo
@@ -282,27 +299,38 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     public func addShare(fileURL: URL, companyName: String?=nil) {
         
-        if let share = StocksController.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
+//        if let share = try StocksController2.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
             
             do {
-                try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+                if let share = try StocksController2.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
+                    try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+                    if let bgShare = controller.fetchSpecificShare(symbol: (share.symbol ?? "missing"), fromBackgroundContext: true) {
+                        
+                        Task.init(priority: .background) {
+                            try await controller.downloadProfile(share: bgShare)
+                        }
+                        
+                    }
+                    if let indexPath = controller.indexPath(forObject: share) {
+                        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+                        performSegue(withIdentifier: "showChartSegue", sender: nil)
+                    }
+
+                }
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Failure to add new share from file \(fileURL)")
             }
 
-            if let indexPath = controller.indexPath(forObject: share) {
-                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                performSegue(withIdentifier: "showChartSegue", sender: nil)
-            }
             
-            let placeHolder = SharePlaceHolder(share: share)
-            placeHolder.downloadKeyRatios(delegate: controller)
-            placeHolder.downloadProfile(delegate: controller)
+            
+//            let placeHolder = SharePlaceHolder(share: share)
+//            placeHolder.downloadKeyRatios(delegate: controller)
+//            placeHolder.downloadProfile(delegate: controller)
 
-        }
-        else {
-            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from file \(fileURL)")
-       }
+//        }
+//        else {
+//            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from file \(fileURL)")
+//       }
     }
     
     
@@ -579,33 +607,44 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
     
     func newShare(symbol: String, prices: [PricePoint]?) {
                 
-        if let share = StocksController.createShare(with: prices, symbol: symbol) {
+//        if let share = StocksController2.createShare(with: prices, symbol: symbol) {
             do {
-                try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+                if let share = try StocksController2.createShare(with: prices, symbol: symbol) {
+                    try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+                    
+                    if let bgShare = controller.fetchSpecificShare(symbol: (share.symbol ?? "missing"), fromBackgroundContext: true) {
+                        
+                        Task.init(priority: .background) {
+                            try await controller.downloadProfile(share: bgShare)
+                        }
+                    }
+                    
+                    if let indexPath = controller.indexPath(forObject: share) {
+                        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+                        performSegue(withIdentifier: "showChartSegue", sender: nil)
+                    }
+
+                }
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol) \(error)")
             }
 
-            if let indexPath = controller.indexPath(forObject: share) {
-                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                performSegue(withIdentifier: "showChartSegue", sender: nil)
-            }
             
-            let placeHolder = SharePlaceHolder(share: share)
-            placeHolder.downloadKeyRatios(delegate: controller)
-            placeHolder.downloadProfile(delegate: controller)
+//            let placeHolder = SharePlaceHolder(share: share)
+//            placeHolder.downloadKeyRatios(delegate: controller)
+//            placeHolder.downloadProfile(delegate: controller)
 
-        }
-        else {
-            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol)")
-       }
+//        }
+//        else {
+//            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol)")
+//       }
     }
 
     
     func sortParameterChanged() {
         
         
-        let newController: StocksController = {
+        let newController: StocksController2 = {
             
             var firstSortParameter = String()
             var secondSortParameter = String()
@@ -649,7 +688,7 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
 
             request.sortDescriptors = [ NSSortDescriptor(key: firstSortParameter, ascending: firstSortAscending), NSSortDescriptor(key: secondSortParameter, ascending: secondSortAscending), NSSortDescriptor(key: thirdSortParameter, ascending: thirdSortAscending)]
 
-            let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: firstSortParameter, cacheName: nil)
+            let sL = StocksController2(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: firstSortParameter, cacheName: nil)
             
             do {
                 try sL.performFetch()
@@ -840,7 +879,7 @@ extension StocksListTVC: UISearchBarDelegate, UISearchResultsUpdating, UISearchC
         request.predicate = namePredicate
         request.sortDescriptors = [NSSortDescriptor(key: "symbol", ascending: true)]
         controller.delegate = nil
-        controller = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "watchStatus", cacheName: nil)
+        controller = StocksController2(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "watchStatus", cacheName: nil)
 
         do {
             try controller.performFetch()

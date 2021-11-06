@@ -46,20 +46,63 @@ public class Share: NSManagedObject {
         
     }
     
+    //MARK: - updates involving downloads
+    
+//    func updateCurrentPrice() throws {
+//
+//        print("updating current price within share object \(symbol ?? "")")
+//        
+//        guard let symbol = self.symbol else {
+//            throw DownloadAndAnalysisError.shareSymbolMissing
+//        }
+//
+//        var components: URLComponents?
+//
+//        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)")
+//        components?.queryItems = [URLQueryItem(name: "p", value: symbol), URLQueryItem(name: ".tsrc", value: "fin-srch")]
+//
+//        guard let validURL = components?.url else {
+//            throw DownloadAndAnalysisError.urlError
+//        }
+//
+//
+//        var price: Double?
+//        do {
+//            try await price = WebPageScraper2.getCurrentPrice(url: validURL)
+//            if let valid = price {
+//                self.lastLivePrice = valid
+//                let cDate = Date()
+//                self.lastLivePriceDate = cDate
+//
+////                do {
+//                    try save()
+////                } catch let error as InternalErrors {
+////                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(symbol ?? "missing") occurred: \(error)")
+////                }
+//            }
+//        } catch let error as DownloadAndAnalysisError {
+//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(symbol ?? "missing") occurred: \(error)")
+//        }
+//
+//
+//    }
+
+    
    func save() {
     
-    
-    if self.managedObjectContext?.hasChanges ?? false {
-        do {
-            try self.managedObjectContext?.save()
-        } catch {
-            // TODO: - Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-    }
+        if self.managedObjectContext?.hasChanges ?? false {
+            self.managedObjectContext?.perform {
+                do {
+                    try self.managedObjectContext?.save()
+                } catch {
+                    // TODO: - Replace this implementation with code to handle the error appropriately.
+                    // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                    let nserror = error as NSError
+                    fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+                }
 
+            }
+        }
     }
     
     func setDailyPrices(pricePoints: [PricePoint]?) {

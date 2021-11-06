@@ -26,5 +26,6 @@ class ErrorController {
         
         NotificationCenter.default.post(name: Notification.Name(rawValue: "NewErrorLogged"), object: nil, userInfo: nil)
     }
+    
 
 }
