@@ -8,12 +8,18 @@
 import UIKit
 import CoreData
 
+protocol StocksController2Delegate {
+    func treasuryBondRatesDownloaded()
+}
+
 
 class StocksController2: NSFetchedResultsController<Share> {
     
     var treasuryBondYields: [PriceDate]?
     var viewController: StocksListTVC?
     var backgroundMoc: NSManagedObjectContext?
+    
+    var tbRatesDelegate: StocksController2Delegate?
     
     // MARK: - FRC functions
     // these use the main MOC
@@ -307,7 +313,11 @@ class StocksController2: NSFetchedResultsController<Share> {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "couldn't save background MOC")
             }
         }
-
+        
+        print("downloading and analysing TB Yiels rates...")
+        treasuryBondYields = try await updateTreasuryBondYields()
+        tbRatesDelegate?.treasuryBondRatesDownloaded()
+        
     }
     
     func updateOneShare(share: Share) async throws {
@@ -448,6 +458,39 @@ class StocksController2: NSFetchedResultsController<Share> {
 //        }
     }
 
+    func updateTreasuryBondYields() async throws -> [PriceDate]? {
+        
+        if let lastDate = treasuryBondYields?.compactMap({ $0.date }).sorted().last {
+            if Date().timeIntervalSince(lastDate) < 14*3600 {
+                return nil
+            }
+        }
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = NSLocale.current
+            formatter.timeZone = NSTimeZone.local
+            formatter.dateFormat = "YYYY"
+            return formatter
+        }()
+        let year$ = dateFormatter.string(from: Date())
+        
+        var urlComponents = URLComponents(string: "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx")
+        urlComponents?.queryItems = [URLQueryItem(name: "data", value: "yieldYear"),URLQueryItem(name: "year", value: year$)]
+        
+        guard let url = urlComponents?.url else {
+            throw DownloadAndAnalysisError.urlError
+        }
+        
+        do {
+            return try await WebPageScraper2.downloadAndAanalyseTreasuryYields(url: url)
+        } catch let error {
+            throw error
+        }
+        
+
+    }
+        
     
     // MARK: - ManagedObjectContext
     func setBackgroundMOC() {

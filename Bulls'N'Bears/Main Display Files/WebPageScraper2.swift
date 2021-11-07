@@ -135,7 +135,87 @@ class WebPageScraper2 {
         return ProfileData(sector: sector, industry: industry, employees: employees)
                 
     }
+    
+    /// returns (priceDate, errors) in time-DESCENDING order
+    class func downloadAndAanalyseTreasuryYields(url: URL) async throws -> [PriceDate]? {
+        
+        var htmlText = String()
 
+        do {
+            htmlText = try await Downloader.downloadData(url: url)
+        } catch let error as DownloadAndAnalysisError {
+            throw error
+        }
+        
+        var priceDates = [PriceDate]()
+        
+        let tableEnd = "</td></tr></table>\r\n<div class=\"updated\""
+        let columnStart = "</td><td class=\"text_view_data\">"
+        let rowStart = "<td scope=\"row\" class=\"text_view_data\">"
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = NSLocale.current
+            formatter.timeZone = NSTimeZone.local
+            formatter.dateFormat = "MM/dd/yy"
+            return formatter
+        }()
+
+        guard let tableStartIndex = htmlText.range(of: rowStart) else {
+            throw DownloadAndAnalysisError.htmlTableRowStartIndexNotFound
+        }
+        
+        htmlText = String(htmlText.suffix(from: tableStartIndex.lowerBound))
+        
+        guard let tableEndIndex = htmlText.range(of: tableEnd) else {
+            throw DownloadAndAnalysisError.htmlTableEndNotFound
+        }
+        
+        htmlText = String(htmlText.prefix(through: tableEndIndex.upperBound))
+        
+        var rows = [String]()
+        var rowStartIndex = htmlText.range(of: rowStart, options: .backwards)
+        guard rowStartIndex != nil else {
+            throw DownloadAndAnalysisError.htmlTableRowStartIndexNotFound
+        }
+        
+        repeat {
+            let row$ = String(htmlText[rowStartIndex!.upperBound...])
+            rows.append(row$)
+            htmlText.removeSubrange(rowStartIndex!.lowerBound...)
+            rowStartIndex = htmlText.range(of: rowStart, options: .backwards)
+        } while rowStartIndex != nil
+        
+        for i in 0..<rows.count {
+            var row = rows[i]
+
+            for _ in 0..<2 {
+                if let columStartIndex = row.range(of: columnStart, options: .backwards) {
+                    row.removeSubrange(columStartIndex.lowerBound...)
+                }
+            }
+            
+            var value: Double?
+            var date: Date?
+            if let columStartIndex = row.range(of: columnStart, options: .backwards) {
+                let value$ = row[columStartIndex.upperBound...]
+                value = Double(value$.filter("-0123456789.".contains))
+            }
+            if let endOfDateIndex = row.range(of: "</td><td ") {
+                let date$ = String(String(row[...endOfDateIndex.lowerBound]).dropLast())
+                date = dateFormatter.date(from: date$)
+            }
+            
+            if value != nil && date != nil {
+                priceDates.append((date:date!, price: value!))
+            }
+        }
+        
+        return priceDates
+        
+    }
+
+
+    
     
     //MARK: - general MacroTrend functions
     

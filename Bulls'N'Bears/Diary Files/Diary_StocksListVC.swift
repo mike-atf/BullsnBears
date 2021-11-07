@@ -12,7 +12,7 @@ class Diary_StocksListVC: UIViewController, UITableViewDelegate, UITableViewData
     
     @IBOutlet var tableView: UITableView!
     
-    var controller: StocksController = {
+    var controller: StocksController2 = {
         
         let request = NSFetchRequest<Share>(entityName: "Share")
 
@@ -21,7 +21,7 @@ class Diary_StocksListVC: UIViewController, UITableViewDelegate, UITableViewData
         request.predicate = transactionsPredicate
         request.sortDescriptors = [NSSortDescriptor(key: "watchStatus", ascending: true)]
         
-        let sL = StocksController(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "watchStatus", cacheName: nil)
+        let sL = StocksController2(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: "watchStatus", cacheName: nil)
         
         do {
             try sL.performFetch()

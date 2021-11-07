@@ -345,7 +345,7 @@ extension ResearchController: ResearchCellDelegate {
     
     func transferCompetitors(symbol: String) {
         
-        if let competitor = StocksController.allShares()?.filter({ (share) -> Bool in
+        if let competitor = StocksController2.allShares()?.filter({ (share) -> Bool in
             if share.symbol == symbol { return true }
             else { return false }
         }).first {

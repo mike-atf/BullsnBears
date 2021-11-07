@@ -91,7 +91,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         NotificationCenter.default.addObserver(self, selector: #selector(updateShares), name: Notification.Name(rawValue: "ActivatedFromBackground"), object: nil)
 
         controller.delegate = self
-//        controller.pricesUpdateDelegate = self
+        controller.tbRatesDelegate = self
         controller.viewController = self
                 
         sortView.delegate = self
@@ -706,7 +706,7 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
     
 }
 
-extension StocksListTVC: StocksControllerDelegate, ScoreCircleDelegate {
+extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
     
     func livePriceUpdated(indexPath: IndexPath?) {
 
@@ -772,8 +772,7 @@ extension StocksListTVC: StocksControllerDelegate, ScoreCircleDelegate {
         }
 
     }
-    
-    
+    /*
     func allSharesHaveUpdatedTheirPrices() {
                 
         DispatchQueue.main.async {
@@ -782,10 +781,12 @@ extension StocksListTVC: StocksControllerDelegate, ScoreCircleDelegate {
             self.performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
         }
     }
-    
+    */
     func treasuryBondRatesDownloaded() {
         
         if let yieldDates = controller.treasuryBondYields {
+            print("TB Yields rates updated, refresh UI")
+
             let yields = yieldDates.compactMap{ $0.price }
             if let ema = yields.ema(periods: 10) {
                 treasuryBondYieldsButton.isEnabled = true

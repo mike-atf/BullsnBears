@@ -8,6 +8,7 @@
 import UIKit
 import CoreData
 
+/*
 /// StocksController calls this delegate when all shares have updated their price to inform StocksListVC
 /// then update the stockChartVC - > chartView candleStick chart
 protocol StocksControllerDelegate {
@@ -442,3 +443,4 @@ extension StocksController: StockDelegate {
         }
     }
 }
+*/

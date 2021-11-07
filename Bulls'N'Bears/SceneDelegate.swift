@@ -44,7 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
             // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
             if let lastForegroundDate = UserDefaults.standard.value(forKey: "LastForegroundDate") as? Date {
-                if Date().timeIntervalSince(lastForegroundDate) > 300 {
+                if Date().timeIntervalSince(lastForegroundDate) > 10 {
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "ActivatedFromBackground"), object:   nil, userInfo: nil) // send to
                 }
             }
