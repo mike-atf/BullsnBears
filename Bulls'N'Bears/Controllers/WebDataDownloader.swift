@@ -23,16 +23,15 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
     var mt_html$: String?
     var yahoo_html$: String?
     var webView: HiddenWebView?
-    var stock: SharePlaceHolder!
+    var stock: Share!
     var hyphenatedShortName: String?
     var errors = [String]()
     
-    init(stock: SharePlaceHolder, delegate: DataDownloaderDelegate) {
+    init(stock: Share, delegate: DataDownloaderDelegate) {
         super.init()
         
         self.stock = stock
         self.delegate = delegate
-        
     }
     
     public func yahooDownload(pageTitles:[String]) {
@@ -56,23 +55,28 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             return
         }
         
-        guard let shortName = stock.name_short else {
+        guard var shortName = stock.name_short?.lowercased() else {
             alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
             return
         }
-                     
-        let shortNameComponents = shortName.split(separator: " ")
-        hyphenatedShortName = String(shortNameComponents.first ?? "").lowercased()
-        guard hyphenatedShortName != nil && hyphenatedShortName != "" else {
-            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't construct a stock term for the macrotrends website.")
-            return
-        }
         
-        for index in 1..<shortNameComponents.count {
-            if !shortNameComponents[index].contains("(") {
-                hyphenatedShortName! += "-" + String(shortNameComponents[index])
-            }
+        if shortName.contains(" ") {
+            shortName = shortName.replacingOccurrences(of: " ", with: "-")
         }
+
+                     
+//        let shortNameComponents = shortName.split(separator: " ")
+//        hyphenatedShortName = String(shortNameComponents.first ?? "").lowercased()
+//        guard hyphenatedShortName != nil && hyphenatedShortName != "" else {
+//            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't construct a stock term for the macrotrends website.")
+//            return
+//        }
+//        
+//        for index in 1..<shortNameComponents.count {
+//            if !shortNameComponents[index].contains("(") {
+//                hyphenatedShortName! += "-" + String(shortNameComponents[index])
+//            }
+//        }
 
         
         let webConfiguration = WKWebViewConfiguration()

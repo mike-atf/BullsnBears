@@ -509,19 +509,26 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         
     func downloadWBValuationData() {
                 
-        let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios","pe-ratio", "stock-price-history"]
+//        let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios","pe-ratio", "stock-price-history"]
+//
+//        guard share.name_short != nil else {
+//
+//            progressDelegate?.downloadError(error: "Unable to load WB valuation data, can't find a short name in dictionary.")
+//            return
+//        }
         
-        guard share.name_short != nil else {
-            
-            progressDelegate?.downloadError(error: "Unable to load WB valuation data, can't find a short name in dictionary.")
-            return
+//        let placeholder = SharePlaceHolder(share: share)
+//
+//        downloader = WebDataDownloader(stock: placeholder, delegate: self)
+//
+//        downloader?.macroTrendsDownload(pageTitles: webPageNames)
+//        downloadTasks = webPageNames.count
+        
+// NEW
+        Task.init(priority: .background) {
+            let results = try await WebPageScraper2.downloadAnalyseWBValuationData(shareSymbol: share.symbol, shortName: share.name_short)
         }
-        
-        let placeholder = SharePlaceHolder(share: share)
-                
-        downloader = WebDataDownloader(stock: placeholder, delegate: self)
-        downloader?.macroTrendsDownload(pageTitles: webPageNames)
-        downloadTasks = webPageNames.count
+
     }
     
     public func stopDownload() {

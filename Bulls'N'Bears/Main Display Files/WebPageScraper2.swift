@@ -214,7 +214,76 @@ class WebPageScraper2 {
         
     }
 
+    class func downloadAnalyseWBValuationData(shareSymbol: String?, shortName: String?) async throws -> [LabelledValues] {
+        
+        guard let symbol = shareSymbol else {
+            throw DownloadAndAnalysisError.shareSymbolMissing
+        }
+        
+        guard var shortName = shortName else {
+            throw DownloadAndAnalysisError.shareShortNameMissing
+        }
+        
+        if shortName.contains(" ") {
+            shortName = shortName.replacingOccurrences(of: " ", with: "-")
+        }
 
+        let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios"]
+        
+        // TODO: - complete with values from WBValuationController.downloadComplete()
+        let rowNames = [["Revenue","Gross Profit","Research And Development Expenses","SG&amp;A Expenses","Net Income", "Operating Income", "EPS - Earnings Per Share"],["Long Term Debt","Property, Plant, And Equipment","Retained Earnings (Accumulated Deficit)", "Share Holder Equity"],["Cash Flow From Investing Activities", "Cash Flow From Operating Activities"],["ROE - Return On Equity", "ROA - Return On Assets", "Book Value Per Share"]]
+        
+        var results = [LabelledValues]()
+        var sectionCount = 0
+        for section in webPageNames {
+        
+            guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(shortName)/\(section)") else {
+                    throw DownloadAndAnalysisError.urlInvalid
+            }
+            
+            guard let url = components.url else {
+                throw DownloadAndAnalysisError.urlError
+            }
+            
+            let htmlText = try await Downloader.downloadData(url: url)
+            for rowTitle in rowNames[sectionCount] {
+                var labelledValues = LabelledValues(rowTitle, [Double]())
+                let values: [Double] = try WebPageScraper2.scrapeRowForDoubles(website: .macrotrends, html$: htmlText, sectionHeader: nil, rowTitle: rowTitle)
+                labelledValues.values = values
+                results.append(labelledValues)
+            }
+            
+            sectionCount += 1
+        }
+        
+        // Historical PE and EPS data with dates
+        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(shortName)/pe-ratio") else {
+                throw DownloadAndAnalysisError.urlInvalid
+        }
+        
+        guard let url = components.url else {
+            throw DownloadAndAnalysisError.urlError
+        }
+        
+        let perAndEPSvalues = try await getHxEPSandPEData(url: url, companyName: shortName, until: nil)
+            
+        // Historical PE and EPS data with dates
+        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(shortName)/stock-price-history") else {
+                throw DownloadAndAnalysisError.urlInvalid
+        }
+        
+        // Historial astock prices
+        guard let url = components.url else {
+            throw DownloadAndAnalysisError.urlError
+        }
+        
+        let htmlText = try await Downloader.downloadData(url: url)
+        
+        let hxPriceValues = try await macrotrendsScrapeColumn(html$: htmlText, tableHeader: "Historical Annual Stock Price Data</th>", tableTerminal: "</td>\n\t\t\t\t </tr>\n\n\t\t\t\t\t\t\n\t\t\t\t</tbody>\n\t\t\t",noOfColumns: 7, targetColumnFromRight: 5)
+
+
+        return results
+    }
     
     
     //MARK: - general MacroTrend functions
@@ -394,6 +463,55 @@ class WebPageScraper2 {
         
         return valueArray  // in time_DESCENDING order
     }
+    
+    class func macrotrendsScrapeColumn(html$: String?, tableHeader: String, tableTerminal: String? = nil, columnTerminal: String? = nil, noOfColumns:Int?=4, targetColumnFromRight: Int?=0) async throws -> [Double]? {
+        
+        let tableHeader = tableHeader
+        let tableTerminal =  tableTerminal ?? "</td>\n\t\t\t\t </tr></tbody>"
+        let columnTerminal = columnTerminal ?? "</td>"
+        let labelStart = ">"
+        
+        var errors = [String]()
+
+        var pageText = String(html$ ?? "")
+        
+        guard let titleIndex = pageText.range(of: tableHeader) else {
+            errors.append("Did not find section \(tableHeader) on MT website")
+            return (nil, errors)
+        }
+
+        let tableEndIndex = pageText.range(of: tableTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<pageText.endIndex, locale: nil)
+        
+        guard tableEndIndex != nil else {
+            errors.append("Did not find table end in section \(tableHeader) on MT website")
+            return (nil, errors)
+        }
+        pageText = String(pageText[titleIndex.upperBound..<tableEndIndex!.lowerBound])
+        
+        var rowEndIndex = pageText.range(of: columnTerminal, options: .backwards, range: nil, locale: nil)
+        var valueArray = [Double]()
+        var count = 0 // row has four values, we only want the last of those four
+        
+        repeat {
+            let labelStartIndex = pageText.range(of: labelStart, options: .backwards, range: nil, locale: nil)
+            let value$ = pageText[labelStartIndex!.upperBound...]
+            
+            if count%(noOfColumns ?? 4) == (targetColumnFromRight ?? 0) {
+                valueArray.append(Double(value$.filter("-0123456789.".contains)) ?? Double())
+            }
+
+            rowEndIndex = pageText.range(of: columnTerminal, options: .backwards, range: nil, locale: nil)
+            if rowEndIndex != nil {
+                pageText.removeSubrange(rowEndIndex!.lowerBound...)
+                count += 1
+            }
+        }  while rowEndIndex != nil
+        
+        return (valueArray, errors)
+
+    }
+    
+
 
     //MARK: - general Yahoo functions
     
