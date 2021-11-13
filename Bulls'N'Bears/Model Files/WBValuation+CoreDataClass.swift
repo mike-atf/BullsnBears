@@ -106,7 +106,7 @@ public class WBValuation: NSManagedObject {
         return nil
     }
     
-    func savePERWithDateArray(datesValuesArray: [DatedValue]?) {
+    func savePERWithDateArray(datesValuesArray: [DatedValue]?, saveInContext:Bool?=true) {
         
         guard let datedValues = datesValuesArray else { return }
         
@@ -119,7 +119,9 @@ public class WBValuation: NSManagedObject {
         do {
             let data = try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
             perDates = data
-            save()
+            if saveInContext ?? true {
+                try self.managedObjectContext?.save()
+            }
         } catch let error {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
         }

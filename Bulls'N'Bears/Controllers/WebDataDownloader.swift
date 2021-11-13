@@ -8,6 +8,7 @@
 import UIKit
 import WebKit
 
+/*
 protocol DataDownloaderDelegate {
     func downloadComplete(html$: String?, pageTitle: String?)
 }
@@ -43,7 +44,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         yahooDownloadTasks = pageTitles
-        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(pageTitles.first!)")
+        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol!)/\(pageTitles.first!)")
         components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
         
         yahooDownloadPage(url: components?.url, for: yahooDownloadTasks.first!)
@@ -56,27 +57,22 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         guard var shortName = stock.name_short?.lowercased() else {
-            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't find a stock short name in dictionary.")
+            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol!)", alertMessage: "can't find a stock short name in dictionary.")
+            return
+        }
+                     
+        let shortNameComponents = shortName.split(separator: " ")
+        hyphenatedShortName = String(shortNameComponents.first ?? "").lowercased()
+        guard hyphenatedShortName != nil && hyphenatedShortName != "" else {
+            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol!)", alertMessage: "can't construct a stock term for the macrotrends website.")
             return
         }
         
-        if shortName.contains(" ") {
-            shortName = shortName.replacingOccurrences(of: " ", with: "-")
+        for index in 1..<shortNameComponents.count {
+            if !shortNameComponents[index].contains("(") {
+                hyphenatedShortName! += "-" + String(shortNameComponents[index]).lowercased()
+            }
         }
-
-                     
-//        let shortNameComponents = shortName.split(separator: " ")
-//        hyphenatedShortName = String(shortNameComponents.first ?? "").lowercased()
-//        guard hyphenatedShortName != nil && hyphenatedShortName != "" else {
-//            alertController.showDialog(title: "Unable to load Rule 1 valuation data for \(stock.symbol)", alertMessage: "can't construct a stock term for the macrotrends website.")
-//            return
-//        }
-//        
-//        for index in 1..<shortNameComponents.count {
-//            if !shortNameComponents[index].contains("(") {
-//                hyphenatedShortName! += "-" + String(shortNameComponents[index])
-//            }
-//        }
 
         
         let webConfiguration = WKWebViewConfiguration()
@@ -111,7 +107,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             return nil
         }()
 
-        loadWebView(url: nil, stockSymbol: stock.symbol, stockShortname: hyphenatedShortName!.lowercased(), section: mtDownloadTasks.first! )
+        loadWebView(url: nil, stockSymbol: stock.symbol!, stockShortname: hyphenatedShortName!.lowercased(), section: mtDownloadTasks.first! )
     }
     
     // MARK: - WebView functions
@@ -169,7 +165,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             webView?.load(validRequest)
         }
         else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Invzlid download request (url \(String(describing: url)) for symbol: \(stock.symbol) with shortName \(stockShortname)")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Invzlid download request (url \(String(describing: url)) for symbol: \(stock.symbol!) with shortName \(stockShortname)")
 //            mtDownloadTasks = [String]()
             self.mtDownloadCompleted(section: nil)
         }
@@ -247,7 +243,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     func yahooDownloadPage(url: URL?, for section: String) {
         
-        var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol)/\(section)")
+        var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(stock.symbol!)/\(section)")
         components?.queryItems = [URLQueryItem(name: "p", value: stock.symbol)]
 
         
@@ -309,7 +305,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
 
         if let nextTask = mtDownloadTasks.first {
-            loadWebView(stockSymbol: stock.symbol, stockShortname: hyphenatedShortName!.lowercased(), section: nextTask)
+            loadWebView(stockSymbol: stock.symbol!, stockShortname: hyphenatedShortName!.lowercased(), section: nextTask)
         }
 
     }
@@ -337,3 +333,4 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
 
     }
 }
+*/

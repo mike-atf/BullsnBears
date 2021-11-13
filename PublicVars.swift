@@ -20,6 +20,7 @@ enum DownloadAndAnalysisError: Error {
     case htmlTableRowStartIndexNotFound
     case htmlTableBodyStartIndexNotFound
     case htmlTableBodyEndIndexNotFound
+    case htmlTableSequenceStartNotFound
     case urlInvalid
     case shareSymbolMissing
     case shareShortNameMissing
@@ -29,6 +30,8 @@ enum DownloadAndAnalysisError: Error {
     case htmlRowEndIndexNotFound
     case contentStartSequenceNotFound
     case noBackgroundMOC
+    case htmlTableTextNotExtracted
+    case fileFormatNotCSV
 }
 
 enum InternalErrors: Error {
@@ -47,6 +50,8 @@ typealias PriceDate = (date: Date, price: Double)
 typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
 typealias ProfileData = (sector: String, industry: String, employees: Double)
 typealias LabelledValues = (label: String, values: [Double])
+typealias Labelled_DatedValues = (label: String, datedValues: [DatedValue])
+typealias DatedValue = (date: Date, value: Double)
 
 //var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
@@ -109,19 +114,19 @@ var stockTickerDictionary: [String:String]? = {
     return nil
 }()
 
-struct DatedValue {
-    var date: Date
-    var value: Double
-    
-    init(date: Date, value: Double) {
-        self.date = date
-        self.value = value
-    }
-    
-    func returnTuple() -> (Date, Double) {
-        return (date, value)
-    }
-}
+//struct DatedValue {
+//    var date: Date
+//    var value: Double
+//    
+//    init(date: Date, value: Double) {
+//        self.date = date
+//        self.value = value
+//    }
+//    
+//    func returnTuple() -> (Date, Double) {
+//        return (date, value)
+//    }
+//}
 
 var appVersion:String = {
     if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {

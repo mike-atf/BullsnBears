@@ -17,11 +17,12 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var rowTitles: [[String]]!
     var share: Share!
     var valuation: WBValuation?
-    weak var progressDelegate: ProgressViewDelegate?
+    var valuationID: NSManagedObjectID?
+    var progressDelegate: ProgressViewDelegate?
     var downloadTasks = 0
     var downloadTasksCompleted = 0
     var downloadErrors = [String]()
-    var downloader: WebDataDownloader?
+//    var downloader: WebDataDownloader?
     var valueListChartLegendTitles = [
         [["Revenue"],
          ["Net income"],
@@ -42,6 +43,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
          ["R&D / profit"]
         ]]
     var wbvParameters = WBVParameters()
+    var downloadTask: Task<Any?,Error>?
     
     //MARK: - init
 
@@ -54,10 +56,13 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         
         if let valuation = share.wbValuation {
             self.valuation = valuation
+            self.valuationID = valuation.objectID
         }
         else if let valuation = WBValuationController.returnWBValuations(share: share) {
             // find old disconnected valutions persisted after share was deleted
             self.valuation = valuation
+            self.valuationID = valuation.objectID
+
         }
         else {
             self.valuation = WBValuationController.createWBValuation(share: share)
@@ -65,6 +70,8 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             // these are linked to a company (symbol) as well as wbValuation parameters
             // when (re-)creating a WBValuation check whether there are any old userEvaluations
             // and if so re-add the relationships to this WBValuation via parameters
+            self.valuationID = valuation?.objectID
+
             if let ratings = WBValuationController.allUserRatings(for: share.symbol!) {
                 if ratings.count > 0 {
                     let set = NSSet(array: ratings)
@@ -76,6 +83,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         rowTitles = returnRowTitles()
     }
     
+    /*
     func deallocate() {
         self.downloader?.webView = nil
         self.downloader = nil
@@ -83,6 +91,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         self.valuation = nil
         
     }
+     */
     //MARK: - class functions
     
     static func returnWBValuations(share: Share) -> WBValuation? {
@@ -100,7 +109,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         do {
             valuations = try fetchRequest.execute()
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
+                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching WBValuation")
         }
         
         if valuations?.count ?? 0 > 1 {
@@ -154,6 +163,16 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
 
         return ratings
+    }
+    
+    func updateData() {
+        
+        guard let validID = valuationID else {
+            ErrorController.addErrorLog(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
+            return
+        }
+        
+        self.valuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? WBValuation)!
     }
 
     
@@ -486,7 +505,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         else {
             if let array1 = values?.first {
-//                proportions = array1?.growthRates()
                 proportions = Calculator.compoundGrowthRates(values: array1)
             }
         }
@@ -508,39 +526,40 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     // MARK: - Data download functions
         
     func downloadWBValuationData() {
+                     
+        // MUST happen on main thread
+        let symbol = share.symbol
+        let shortName = share.name_short
+        let valuationID = valuation?.objectID
+        let shareID = share.objectID
+        
+        
+        downloadTask = Task.init(priority: .background) {
+            let allTasks = 2
+            var completedTasks = 0
+            
+            do {
+                if let validID = valuationID {
+                    try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: validID)
+                    
+                    completedTasks += 1
+                    progressDelegate?.progressUpdate(allTasks: allTasks, completedTasks: completedTasks)
+                }
                 
-//        let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios","pe-ratio", "stock-price-history"]
-//
-//        guard share.name_short != nil else {
-//
-//            progressDelegate?.downloadError(error: "Unable to load WB valuation data, can't find a short name in dictionary.")
-//            return
-//        }
-        
-//        let placeholder = SharePlaceHolder(share: share)
-//
-//        downloader = WebDataDownloader(stock: placeholder, delegate: self)
-//
-//        downloader?.macroTrendsDownload(pageTitles: webPageNames)
-//        downloadTasks = webPageNames.count
-        
-// NEW
-        Task.init(priority: .background) {
-            let results = try await WebPageScraper2.downloadAnalyseWBValuationData(shareSymbol: share.symbol, shortName: share.name_short)
+                try Task.checkCancellation()
+                try await WebPageScraper2.keyratioDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID)
+            } catch let error {
+                progressDelegate?.downloadError(error: error.localizedDescription)
+            }
+            progressDelegate?.downloadComplete()
+            return nil
         }
 
     }
     
     public func stopDownload() {
         NotificationCenter.default.removeObserver(self)
-        
-        downloader?.webView?.stopLoading()
-        downloader?.yahooSession?.cancel()
-        downloader?.yahooSession = nil
-        progressDelegate = nil
-        downloader?.request = nil
-        downloader?.webView = nil
-        downloader = nil
+        downloadTask?.cancel()
     }
     
     /// searches for stored evaluation related to controller.wbvValuation with specified wbvParameter
@@ -647,6 +666,7 @@ extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
     
  }
 
+/*
 extension WBValuationController: DataDownloaderDelegate {
     
     /// caller MUST ensure this is called on the main thread to avoid viewContext concurrency problems
@@ -775,6 +795,6 @@ extension WBValuationController: DataDownloaderDelegate {
         }
     }
 }
-
+*/
 
 

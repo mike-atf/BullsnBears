@@ -22,8 +22,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     var sectionTitles: [String]?
     var rowTitles: [[String]]?
 
-    var valuationController: CombinedValuationController!
-    weak var helper: CombinedValuationController!
+    var controller: CombinedValuationController!
     var progressView: DownloadProgressView?
     
     var showDownloadCompleteMessage = false // used because asking alertConotrller to show message in 'dataUpdated' right after reloadData causes 'table view or one of its superviews has not been added to a window' error, assuming that reloading rows still takes place while the alertView is in front. so instead show this when the viewDidLayouSubviews, using this bool
@@ -33,12 +32,11 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
         tableView.register(UINib(nibName: "ValuationTableViewCell", bundle: nil), forCellReuseIdentifier: "valuationTableViewCell")
 
-        valuationController = CombinedValuationController(share: share, valuationMethod: valuationMethod, listView: self)
-        self.helper = valuationController
+        controller = CombinedValuationController(share: share, valuationMethod: valuationMethod, listView: self)
         
-        sectionTitles = helper.sectionTitles()
-        sectionSubtitles = helper.sectionSubTitles()
-        rowTitles = helper.rowTitles()
+        sectionTitles = controller.sectionTitles()
+        sectionSubtitles = controller.sectionSubTitles()
+        rowTitles = controller.rowTitles()
 
         NotificationCenter.default.addObserver(self, selector: #selector(dataUpdated), name: NSNotification.Name(rawValue: "UpdateValuationData"), object: nil)
         
@@ -87,8 +85,8 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: indexPath) as! ValuationTableViewCell
 
         
-        let info = helper.cellInfo(indexPath: indexPath)
-        cell.configure(info: info, indexPath: indexPath, method: valuationMethod, delegate: helper)
+        let info = controller.cellInfo(indexPath: indexPath)
+        cell.configure(info: info, indexPath: indexPath, method: valuationMethod, delegate: controller)
         
         return cell
     }
@@ -157,6 +155,8 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         
         if section == 0 {
             let donwloadButton = UIButton()
+//            donwloadButton.setTitle("Download", for: .normal)
+//            donwloadButton.sizeToFit()
             donwloadButton.setBackgroundImage(UIImage(systemName: "icloud.and.arrow.down.fill"), for: .normal)
             donwloadButton.addTarget(self, action: #selector(downloadValuationData), for: .touchUpInside)
             donwloadButton.translatesAutoresizingMaskIntoConstraints = false
@@ -164,22 +164,24 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
             donwloadButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
             donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-            donwloadButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
-            donwloadButton.widthAnchor.constraint(equalTo: donwloadButton.heightAnchor).isActive = true
+//            donwloadButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
+//            donwloadButton.widthAnchor.constraint(equalTo: donwloadButton.heightAnchor).isActive = true
 
         }
         
         if section == (sectionTitles?.count ?? 0) - 1 {
             let saveButton = UIButton()
+//            saveButton.setTitle("Save", for: .normal)
+//            saveButton.sizeToFit()
             saveButton.setBackgroundImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
-            saveButton.addTarget(self, action: #selector(saveValuation), for: .touchUpInside)
+            saveButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
             saveButton.translatesAutoresizingMaskIntoConstraints = false
             header.addSubview(saveButton)
 
             saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
             saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
-            saveButton.widthAnchor.constraint(equalTo: saveButton.heightAnchor).isActive = true
+//            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
+//            saveButton.widthAnchor.constraint(equalTo: saveButton.heightAnchor).isActive = true
         }
 
         return header
@@ -187,11 +189,11 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     }
     
     @objc
-    func saveValuation() {
+    func completeValuation() {
         
         // after 'save' button tapped in Val List VC
         
-        if let alerts = helper.saveValuation() {
+        if let alerts = controller.checkValuation() {
             var message = alerts.first!
             for i in 1..<alerts.count {
                 message = message + "\n\n" + alerts[i]
@@ -199,12 +201,12 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
             AlertController.shared().showDialog(title: "Caution" , alertMessage: message, viewController: self ,delegate: self)
         } else {
             // important - these will otherwise stay in memory
-            if let analyser = self.valuationController.webAnalyser {
+            if let analyser = self.controller.webAnalyser {
                 NotificationCenter.default.removeObserver(analyser)
                 NotificationCenter.default.removeObserver(self)
             }
 
-            self.valuationController.removeObjectsFromMemory()
+//            self.valuationController.removeObjectsFromMemory()
             
             if valuationMethod == .rule1 {
                 delegate?.valuationComplete(listView: self, r1Valuation: share.rule1Valuation)
@@ -232,15 +234,15 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
 
         progressView?.delegate = self
-        progressView?.title.text = "Trying public data acquisition..."
+        progressView?.title.text = "Downloading data..."
                 
-        helper.startDataDownload()
+        controller.startDataDownload()
         
     }
     
     func alertWasDismissed() {
         
-        delegate?.valuationComplete(listView: self, r1Valuation: valuationController.valuation as? Rule1Valuation)
+        delegate?.valuationComplete(listView: self, r1Valuation: controller.valuation as? Rule1Valuation)
     }
     
     public func helperUpdatedRows(paths: [IndexPath]) {
@@ -262,12 +264,21 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     @objc
     func dataUpdated(_ notification: Notification) {
                 
-        self.valuationController.webAnalyser = nil
+        controller.updateData()
         
+        sectionTitles = controller.sectionTitles()
+        sectionSubtitles = controller.sectionSubTitles()
+        rowTitles = controller.rowTitles()
+        
+        self.progressView?.delegate = nil
+        self.progressView?.removeFromSuperview()
+        self.progressView = nil
+
         if (sectionTitles?.count ?? 0) > 0 {
             tableView.reloadData()
         }
         
+
         if let errorList = notification.object as? [String] {
             
             if errorList.count > 0 {
@@ -288,15 +299,18 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 extension ValuationListViewController: ProgressViewDelegate {
     
     func downloadError(error: String) {
-        self.progressView?.updateProgress(tasks: 1, completed: 1)
-        self.progressView?.title.text = error
-        self.progressView?.cancelButton.setTitle("OK", for: .normal)
+        
+        DispatchQueue.main.async {
+            self.progressView?.updateProgress(tasks: 1, completed: 1)
+            self.progressView?.title.text = error
+            self.progressView?.cancelButton.setTitle("OK", for: .normal)
+        }
     }
     
     
     func cancelRequested() {
         downloadComplete()
-        helper.stopDownload()
+        controller.stopDownload()
     }
         
     func progressUpdate(allTasks: Int, completedTasks: Int) {
@@ -306,9 +320,11 @@ extension ValuationListViewController: ProgressViewDelegate {
     func downloadComplete() {
         
         // progressView calls this on it's own once completedTasks >= tasks
-        self.progressView?.delegate = nil
-        progressView?.removeFromSuperview()
-        progressView = nil
+        
+        DispatchQueue.main.async {
+            
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil)
+        }
     }
     
     

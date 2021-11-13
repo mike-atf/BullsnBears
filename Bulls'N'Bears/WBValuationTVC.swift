@@ -20,7 +20,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        downloadButton = UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down.fill"), style: .plain, target: self, action: #selector(startDownload))
+        downloadButton = UIBarButtonItem(title: "Download", style: .plain, target: self, action: #selector(startDownload))
          self.navigationItem.rightBarButtonItem = downloadButton
         
         self.navigationController?.title = share.name_short
@@ -33,8 +33,8 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        controller?.deallocate()
-        controller = nil
+//        controller?.deallocate()
+//        controller = nil
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -434,68 +434,46 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     
     func downloadError(error: String) {
 
-        self.progressView?.title.font = UIFont.systemFont(ofSize: 14)
-        self.progressView?.title.text = error
-        self.progressView?.cancelButton.setTitle("OK", for: .normal)
+        DispatchQueue.main.async {
+            self.progressView?.title.font = UIFont.systemFont(ofSize: 14)
+            self.progressView?.title.text = error
+            self.progressView?.cancelButton.setTitle("OK", for: .normal)
+        }
     }
     
     func progressUpdate(allTasks: Int, completedTasks: Int) {
-        self.progressView?.updateProgress(tasks: allTasks, completed: completedTasks)
+        DispatchQueue.main.async {
+            self.progressView?.updateProgress(tasks: allTasks, completed: completedTasks)
+        }
     }
     
     func cancelRequested() {
-        
-        controller?.stopDownload()
-        progressView?.delegate = nil
-        progressView?.removeFromSuperview()
-        progressView = nil
+        DispatchQueue.main.async {
+            self.controller?.stopDownload()
+            self.progressView?.delegate = nil
+            self.progressView?.removeFromSuperview()
+            self.progressView = nil
+        }
     }
     
     func downloadComplete() {
-        self.progressView?.delegate = nil
-        progressView?.removeFromSuperview()
-        progressView = nil
         
-        //create separate MOC that can be accessed from a background thread such as download tasks
-//        let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-//        backgroundContext.parent = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-//        let request = NSFetchRequest<Share>(entityName:"Share")
-//        let predicate = NSPredicate(format: "symbol == %@", argumentArray: [share.symbol!])
-//        request.predicate = predicate
-//
-//        request.sortDescriptors = [NSSortDescriptor(key:  "symbol" , ascending:  true )]
-//
-//        var shares: [Share]?
-//        do {
-//            shares  =  try backgroundContext.fetch(request)
-//        } catch let error as NSError{
-//            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
-//        }
+        DispatchQueue.main.async {
+            self.progressView?.delegate = nil
+            self.progressView?.removeFromSuperview()
+            self.progressView = nil
+            
+            self.controller?.updateData()
+            self.tableView.reloadData()
+        }
         
-        let placeholder = SharePlaceHolder(share: share)
-
-        placeholder.downloadKeyRatios(delegate: self)
-                
-//        share.downloadKeyRatios(delegate: self)
     }
 
 
 }
 
-extension WBValuationTVC: StockDelegate, WBValuationCellDelegate {
-    
-    func livePriceUpdateCompleted(share: SharePlaceHolder?, errors: [String]) {
+extension WBValuationTVC: WBValuationCellDelegate { //StockDelegate,
         
-    }
-    
-    func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String]) {
-        
-        share.shareFromPlaceholder(share: self.share)
-        self.share.save()
-        self.tableView.reloadData()
-    }
-    
-    
     func infoButtonAction(errors: [String]?, sender: UIView) {
         
         if let errorsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {

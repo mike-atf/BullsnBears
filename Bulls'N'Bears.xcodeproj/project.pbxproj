@@ -532,7 +532,6 @@
 				EAA548B82734302F0083808A /* WebPageScraper2.swift */,
 				EA51A9BF2632FD3200C857A8 /* CitationsManager.swift */,
 				EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */,
-				EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */,
 				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
 				EAC07B6E25B8950E00B6C898 /* DCFWebDataAnalyser.swift */,
 				EA52EDC725D18D760000155F /* WebpageScraper.swift */,
@@ -631,6 +630,7 @@
 			isa = PBXGroup;
 			children = (
 				EAC2FC7A25A240290060F387 /* ValuationListViewController.swift */,
+				EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */,
 				EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */,
 				EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */,
 				EAC2FC6F25A23FFC0060F387 /* ValuationTableViewCell.swift */,
@@ -1263,7 +1263,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.6;
+				MARKETING_VERSION = 0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1284,7 +1284,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.6;
+				MARKETING_VERSION = 0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

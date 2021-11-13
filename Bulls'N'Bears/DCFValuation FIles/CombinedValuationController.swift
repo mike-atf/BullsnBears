@@ -8,25 +8,27 @@
 import UIKit
 import CoreData
 
-protocol ValuationHelper {
+protocol ValuationDelegate {
     func rowTitles() -> [[String]]
     func getValue(indexPath: IndexPath) -> Any?
     func cellInfo(indexPath: IndexPath) -> ValuationListCellInfo
     func userEnteredText(sender: UITextField, indexPath: IndexPath)
     func sectionTitles() -> [String]
     func sectionSubTitles() -> [String]
-    func saveValuation() -> [String]?
+    func checkValuation() -> [String]?
 }
 
 
-class CombinedValuationController: ValuationHelper {
+class CombinedValuationController: ValuationDelegate {
     
     weak var valuationListViewController: ValuationListViewController!
     var valuation: Any?
+    var valuationID: NSManagedObjectID? // for coordinating background updates from donwloads
     var webAnalyser: Any?
     var share: Share!
     var method: ValuationMethods!
     var rowtitles: [[String]]!
+    var downloadTask: Task<Any?, Error>?
 
     init(share: Share, valuationMethod: ValuationMethods, listView: ValuationListViewController) {
         
@@ -48,6 +50,7 @@ class CombinedValuationController: ValuationHelper {
                 self.valuation = CombinedValuationController.createR1Valuation(company: share.symbol!)
                 share.rule1Valuation = self.valuation as? Rule1Valuation
             }
+            
         }
         else if valuationMethod == .dcf {
             
@@ -64,9 +67,15 @@ class CombinedValuationController: ValuationHelper {
                 share.dcfValuation = self.valuation as? DCFValuation
             }
         }
-
+        
+        if let vv = valuation as? Rule1Valuation {
+            valuationID = vv.objectID
+        } else if let vv = valuation as? DCFValuation {
+            valuationID = vv.objectID
+        }
     }
     
+    /*
     public func removeObjectsFromMemory() {
         if let analyser = webAnalyser as? DCFWebDataAnalyser {
             analyser.downloader.webView = nil
@@ -79,7 +88,7 @@ class CombinedValuationController: ValuationHelper {
             analyser.downloader = nil
         }
     }
-    
+    */
     //MARK: - Class functions
     
     static func createR1Valuation(company: String) -> Rule1Valuation? {
@@ -116,8 +125,8 @@ class CombinedValuationController: ValuationHelper {
         }
         
         do {
-//            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
-            valuations = try fetchRequest.execute()
+            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+//            valuations = try fetchRequest.execute()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
         }
@@ -144,8 +153,8 @@ class CombinedValuationController: ValuationHelper {
         }
         
         do {
-//            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
-            valuations = try fetchRequest.execute()
+            valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
+//            valuations = try fetchRequest.execute()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching dcfValuations")
         }
@@ -184,7 +193,7 @@ class CombinedValuationController: ValuationHelper {
         
         var titles = [String]()
         
-        var valuationDate$: String!
+        var valuationDate$ = "missing date"
         if let dcf = valuation as? DCFValuation {
             valuationDate$ = dateFormatter.string(from: dcf.creationDate ?? Date())
         } else if let r1 = valuation as? Rule1Valuation {
@@ -192,10 +201,10 @@ class CombinedValuationController: ValuationHelper {
         }
         
         if method == .dcf {
-            titles = ["DCF Valuation - \(share.symbol!) from " + valuationDate$,"Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
+            titles = ["\(share.symbol!) DCF Valuation (\(valuationDate$))","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
         } else
         if method == .rule1 {
-            titles = ["Growth-based Valuation - \(share.symbol!) from " + valuationDate$,
+            titles = ["\(share.symbol!) growth-based Valuation (\(valuationDate$))",
             "Moat parameters: Values 5-10 years back",
             "", "", "", "",
             "PE Ratios", "Growth predictions",
@@ -284,14 +293,20 @@ class CombinedValuationController: ValuationHelper {
         return rowtitles
     }
     
-    func saveValuation() -> [String]? {
+    func checkValuation() -> [String]? {
         
+        guard let validID = valuationID else {
+            ErrorController.addErrorLog(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
+            return nil
+        }
+
         if let valuation = self.valuation as? DCFValuation  {
             // check alignment of profit = net income and fcf
             var alerts:[String]?
             
-            valuation.save()
-           
+            self.valuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? DCFValuation)!
+                
+                       
             for income in valuation.netIncome ?? [] {
                 if income < 0 {
                     alerts = [String]()
@@ -312,10 +327,10 @@ class CombinedValuationController: ValuationHelper {
             return alerts
         }
         else if let valuation = self.valuation as? Rule1Valuation  {
-            valuation.save()
 
             var alerts:[String]?
 
+            self.valuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? Rule1Valuation)!
 
             if let moatCount = r1MoatParameterCount() {
                 if moatCount < 25 {
@@ -338,43 +353,79 @@ class CombinedValuationController: ValuationHelper {
         return nil
     }
     
+    func updateData() {
+        
+        guard let validID = valuationID else {
+            ErrorController.addErrorLog(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
+            return
+        }
+
+        if (self.valuation as? DCFValuation) != nil  {
+            
+            self.valuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? DCFValuation)!
+            
+        } else if (self.valuation as? Rule1Valuation) != nil {
+            
+            self.valuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? Rule1Valuation)!
+        }
+    }
+    
     //MARK: - Internal functions
     
     public func startDataDownload() {
         
-        if method == .rule1 {
-            webAnalyser = R1WebDataAnalyser(stock: self.share, controller: self, progressDelegate: self.valuationListViewController)
+        // accessing share must happen on main thread!
+        let symbol =  share.symbol
+        let shortName = share.name_short
+        
+        guard let validID = valuationID else {
+            ErrorController.addErrorLog(errorLocation: "CombinedValController.strartDataDownload", systemError: nil, errorInfo: "failed data donwload - no valid valuaiton object ID")
+            return
+        }
+        // must happen on main thread!
 
+        if method == .rule1 {
+
+            // NEW
+            downloadTask = Task.init(priority: .background) {
+                do {
+                    try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: validID, progressDelegate: self.valuationListViewController)
+                    try Task.checkCancellation()
+                } catch let error {
+                    ErrorController.addErrorLog(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                }
+                return nil
+            }
+             // OLD
+            //            webAnalyser = R1WebDataAnalyser(stock: self.share, controller: self, progressDelegate: self.valuationListViewController)
         }
         else {
-            webAnalyser = DCFWebDataAnalyser(stock: share, controller: self, pDelegate: self.valuationListViewController)
+            // NEW
+            downloadTask = Task.init(priority: .background) {
+
+                do {
+                    try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: validID)
+                    try Task.checkCancellation()
+                } catch let error {
+                    ErrorController.addErrorLog(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                }
+                return nil
+            }
+            // OLD
+//            webAnalyser = DCFWebDataAnalyser(stock: share, controller: self, pDelegate: self.valuationListViewController)
         }
         
     }
     
+
     public func stopDownload() {
         
         NotificationCenter.default.removeObserver(webAnalyser as Any)
         
-        if let analyser = webAnalyser as? R1WebDataAnalyser {
-            analyser.downloader.webView?.stopLoading()
-            analyser.downloader.yahooSession?.cancel()
-            analyser.downloader.yahooSession = nil
-            analyser.progressDelegate = nil
-            analyser.downloader.request = nil
-            analyser.downloader.webView = nil
-            analyser.downloader = nil
-        }
-        else if let analyser = webAnalyser as? DCFWebDataAnalyser {
-            analyser.downloader.yahooSession?.cancel()
-            analyser.downloader.yahooSession = nil
-            analyser.progressDelegate = nil
-            analyser.downloader = nil
-        }
-        
-        webAnalyser = nil
+        downloadTask?.cancel()
     }
-    
+
+     
     internal func convertUserEntryDCF(_ value: Double, indexPath: IndexPath) {
         
         guard let valuation = self.valuation as? DCFValuation else {

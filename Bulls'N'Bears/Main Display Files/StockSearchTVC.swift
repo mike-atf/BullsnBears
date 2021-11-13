@@ -110,12 +110,13 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         tableView.deselectRow(at: indexPath, animated: false)
-        yahooStockDownload(stocksDictionary[indexPath.row].key, companyName: stocksDictionary[indexPath.row].value)
+        newCompanyDataDownload(stocksDictionary[indexPath.row].key, companyName: stocksDictionary[indexPath.row].value)
         self.navigationController?.popToRootViewController(animated: true)
 
     }
     
-    func yahooStockDownload(_ ticker: String?, companyName: String?) {
+    /// downloads from Yahoo finance either price file or table data
+    func newCompanyDataDownload(_ ticker: String?, companyName: String?) {
         
         guard let symbol = ticker else {
             return
@@ -128,20 +129,54 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
         let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
 
-        let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
-        let start$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
+        let start$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
+        let end$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
         
         var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(symbol)")
         urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
         
         
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-            downLoadWebFile(sourceURL, symbol: symbol, companyName: companyName!)
+            
+// first try to download historical prices from Yahoo finance as CSV file
+            Task.init(priority: .background) {
+                do {
+                    // the next functions returns by sending notification "FileDownloadComplete' with fileURL in object sent
+                    // this should be picked up by StocksListTVC
+                    try await Downloader.downloadFile(url: sourceURL, symbol: symbol)
+                } catch let error as DownloadAndAnalysisError {
+                    ErrorController.addErrorLog(errorLocation: "StockSearchTVC.yahooStockDownload", systemError: nil, errorInfo: "dowload failure for \(symbol) - \(error.localizedDescription)")
+                    NotificationCenter.default.removeObserver(self)
+                    
+                    if error == DownloadAndAnalysisError.fileFormatNotCSV {
+                        var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
+                        urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
+
+                        
+// secxond, if file donwlod fails download price page table and extract price data
+                        if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
+                            do {
+                                try await downloadWebData(sourceURL, stockName: (companyName ?? ""), task: "priceHistory")
+                            } catch let error {
+                                alertController.showDialog(title: "Dowload failed", alertMessage: "can't find any company data for \(symbol) on Yahoo finance \(error.localizedDescription)")
+                                return
+                            }
+                        }
+                        else {
+                            alertController.showDialog(title: "Download failed", alertMessage: "invalid URL for data download \(symbol) on Yahoo finance")
+                            return
+                        }
+                    }
+                }
+            }
         }
     }
+    
+    /*
+    func downLoadWebFile(_ url: URL, symbol: String, companyName: String) async throws {
         
-    func downLoadWebFile(_ url: URL, symbol: String, companyName: String) {
         
+// OLD
         let session = URLSession.shared
         var downloadTask: URLSessionDownloadTask?// URLSessionDataTask stores downloaded data in memory, DownloadTask as File
 
@@ -221,6 +256,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
         downloadTask?.resume()
     }
+    */
     
     private func removeFile(_ atURL: URL) {
        
@@ -245,14 +281,46 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         urlComponents?.queryItems = [URLQueryItem(name: "p", value: name)]
         
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-            downloadWebData(sourceURL, stockName: name, task: "name")
+            Task.init(priority: .background) {
+                do {
+                    try await downloadWebData(sourceURL, stockName: name, task: "name")
+                } catch let error {
+                    ErrorController.addErrorLog(errorLocation: "StockSearchTVC.findNameOnYahoo", systemError: nil, errorInfo: "failed web data download \(error.localizedDescription)")
+                }
+            }
+
         }
 
 
     }
 
-    func downloadWebData(_ url: URL, stockName: String, task: String) {
+    func downloadWebData(_ url: URL, stockName: String, task: String) async throws {
         
+        var htmlText = String()
+        do {
+            htmlText = try await Downloader.downloadData(url: url)
+            
+            if task == "name" {
+                self.nameInWebData(html$: htmlText, symbol: stockName)
+            }
+            else if task == "priceHistory" {
+                let pricePoints = WebPageScraper2.yahooPriceTable(html$: htmlText)
+                
+                DispatchQueue.main.async {
+                    self.downloadDelegate?.newShare(symbol: stockName,  prices: pricePoints)
+                }
+            }
+ 
+            
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
+        }
+
+
+        
+        
+// OLD
+        /*
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieAcceptPolicy = .always
         configuration.httpShouldSetCookies = true
@@ -302,6 +370,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             }
         }
         downloadTask?.resume()
+        */
     }
     
     func nameInWebData(html$: String, symbol: String) {

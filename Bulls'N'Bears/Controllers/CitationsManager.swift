@@ -95,6 +95,7 @@ class CitationsManager {
         allCitations.append(contentsOf: wbCitations)
         allCitations.append(contentsOf: pl1Citations)
         allCitations.append(contentsOf: jmCitations)
+        allCitations.append(contentsOf: bgCitations)
 
         if let lastCitation = UserDefaults.standard.value(forKey: userDefaultTerms.lastCitation) as? String {
             var count = 0
@@ -123,7 +124,7 @@ class CitationsManager {
         let step2Count = step1Count + pl1Citations.count
         let step3Count = step2Count + wbCitations.count
         let step4Count = step3Count + jmCitations.count
-        let step5Count = step4Count + bgCitations.count
+//        let step5Count = step4Count + bgCitations.count
         
         
         switch randomCitationNo {

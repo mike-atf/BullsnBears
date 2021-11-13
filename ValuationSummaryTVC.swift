@@ -132,7 +132,7 @@ class ValuationSummaryTVC: UITableViewController {
         if section == 0 {
             let saveButton = UIButton()
             saveButton.setBackgroundImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
-            saveButton.addTarget(self, action: #selector(saveValuation), for: .touchUpInside)
+            saveButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
             saveButton.translatesAutoresizingMaskIntoConstraints = false
             header.addSubview(saveButton)
 
@@ -147,9 +147,9 @@ class ValuationSummaryTVC: UITableViewController {
     }
     
     @objc
-    func saveValuation() {
+    func completeValuation() {
 
-        self.share.rule1Valuation?.save()
+//        self.share.rule1Valuation?.save()
 
         // NEW
             for row in 0..<self.sectionsRowTitles.count {

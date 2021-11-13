@@ -7,6 +7,8 @@
 
 import UIKit
 
+
+/*
 class DCFWebDataAnalyser {
     
     var stock: Share
@@ -181,3 +183,4 @@ extension DCFWebDataAnalyser: DataDownloaderDelegate {
     }
     
 }
+*/

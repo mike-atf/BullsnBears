@@ -29,14 +29,19 @@ class DownloadProgressView: UIView {
     
     func updateProgress(tasks: Int, completed: Int) {
         
-        progressView.setProgress(Float(completed) / Float(tasks), animated: true)
-            if completed >= tasks {
-                delegate?.downloadComplete()
-            }
+        DispatchQueue.main.async {
+            self.progressView.setProgress(Float(completed) / Float(tasks), animated: true)
+                if completed >= tasks {
+                    self.delegate?.downloadComplete()
+                }
+        }
     }
             
     @IBAction func cancelAction(_ sender: UIButton) {
-        delegate?.cancelRequested()
+        
+        DispatchQueue.main.async {
+            self.delegate?.cancelRequested()
+        }
     }
     
 }

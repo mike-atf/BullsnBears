@@ -29,7 +29,11 @@ class AlertController: NSObject {
         
         DispatchQueue.main.async {
             
-            let presentingVC = viewController ?? UIApplication.shared.windows.filter({ $0.isKeyWindow }).first?.rootViewController?.children.first
+            let windowScene = (UIApplication.shared.connectedScenes.first as? UIWindowScene)
+            let sceneDelegate = windowScene?.delegate as? SceneDelegate
+            let presentingVC = viewController ?? sceneDelegate?.window?.rootViewController
+//
+//            let presentingVC = viewController ?? UIApplication.shared.windows.filter({ $0.isKeyWindow }).first?.rootViewController?.children.first
             
             guard presentingVC != nil else {
                 return

@@ -314,9 +314,10 @@ class StocksController2: NSFetchedResultsController<Share> {
             }
         }
         
-        print("downloading and analysing TB Yiels rates...")
         treasuryBondYields = try await updateTreasuryBondYields()
-        tbRatesDelegate?.treasuryBondRatesDownloaded()
+        DispatchQueue.main.async {
+            self.tbRatesDelegate?.treasuryBondRatesDownloaded()
+        }
         
     }
     
@@ -380,39 +381,15 @@ class StocksController2: NSFetchedResultsController<Share> {
             throw DownloadAndAnalysisError.urlError
         }
         
-//        Task.init(priority: .background) { () -> Double? in
-            var price: Double?
-            do {
-                try await price = WebPageScraper2.getCurrentPrice(url: validURL)
-                return (shareID, price)
-
-            } catch let error as DownloadAndAnalysisError {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(symbol) occurred: \(error)")
-            }
-            return (shareID, nil)
-//        }
-        
-//        return (shareID, nil)
-        
-        /*
+        var price: Double?
         do {
             try await price = WebPageScraper2.getCurrentPrice(url: validURL)
-            return price
-            if let valid = price {
-                share.lastLivePrice = valid
-                share.lastLivePriceDate = Date()
+            return (shareID, price)
 
-                do {
-                    try saveBackgroundMOC(share: share)
-                } catch let error as InternalErrors {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(share.symbol ?? "missing") occurred: \(error)")
-                }
-            }
         } catch let error as DownloadAndAnalysisError {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(symbol) occurred: \(error)")
         }
-        */
-        
+        return (shareID, nil)
     }
     
     func quarterlyEarningsUpdate(shareSymbol: String?, shortName: String? , shareID: NSManagedObjectID) async throws -> ShareID_DatedValues {

@@ -17,7 +17,7 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet var detail: UILabel!
     @IBOutlet var textField: UITextField!
         
-    var delegate: ValuationHelper!
+    var delegate: ValuationDelegate!
     var indexPath: IndexPath!
     var valueFormat: ValuationCellValueFormat!
     var method: ValuationMethods!
@@ -44,7 +44,7 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     }
     
     
-    public func configure(info: ValuationListCellInfo,  indexPath: IndexPath, method: ValuationMethods, delegate: ValuationHelper) {
+    public func configure(info: ValuationListCellInfo,  indexPath: IndexPath, method: ValuationMethods, delegate: ValuationDelegate) {
         
         self.method = method
         self.delegate = delegate

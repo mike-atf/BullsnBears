@@ -87,7 +87,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "DownloadAttemptComplete"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "FileDownloadComplete"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateShares), name: Notification.Name(rawValue: "ActivatedFromBackground"), object: nil)
 
         controller.delegate = self
@@ -299,8 +299,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     public func addShare(fileURL: URL, companyName: String?=nil) {
         
-//        if let share = try StocksController2.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
-            
             do {
                 if let share = try StocksController2.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
                     try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
@@ -607,7 +605,6 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
     
     func newShare(symbol: String, prices: [PricePoint]?) {
                 
-//        if let share = StocksController2.createShare(with: prices, symbol: symbol) {
             do {
                 if let share = try StocksController2.createShare(with: prices, symbol: symbol) {
                     try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
@@ -628,16 +625,6 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol) \(error)")
             }
-
-            
-//            let placeHolder = SharePlaceHolder(share: share)
-//            placeHolder.downloadKeyRatios(delegate: controller)
-//            placeHolder.downloadProfile(delegate: controller)
-
-//        }
-//        else {
-//            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol)")
-//       }
     }
 
     

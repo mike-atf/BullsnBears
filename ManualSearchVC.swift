@@ -148,7 +148,7 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
                         self.symbolFoundImage.image = UIImage(systemName: "checkmark.circle.fill")
                         self.symbolFoundImage.tintColor = UIColor.systemGreen
                                      
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadAttemptComplete"), object:   targetURL, userInfo: ["companyName":self.companyNameLabel.text!]) // send to
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadCompleter"), object:   targetURL, userInfo: ["companyName":self.companyNameLabel.text!]) // send to
                     }
 
             } catch {

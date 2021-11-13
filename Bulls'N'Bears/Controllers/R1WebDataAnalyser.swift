@@ -8,6 +8,7 @@
 import UIKit
 import WebKit
 
+/*
 class R1WebDataAnalyser: NSObject, WKUIDelegate, WKNavigationDelegate  {
         
     var share: Share!
@@ -201,3 +202,4 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
     
     
 }
+*/
