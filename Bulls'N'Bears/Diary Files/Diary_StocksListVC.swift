@@ -69,7 +69,6 @@ class Diary_StocksListVC: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         performSegue(withIdentifier: "showDiaryDetailSegue", sender: nil)
-        tableView.deselectRow(at: indexPath, animated: true)
     }
 
 

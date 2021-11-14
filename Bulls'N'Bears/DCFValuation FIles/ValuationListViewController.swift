@@ -129,8 +129,13 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         
         let subTitle: UILabel = {
             let label = UILabel()
-            label.font = UIFont.systemFont(ofSize: smallFontSize, weight: .regular)
-            label.textColor = UIColor.label
+            if section == 0 {
+                label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+                label.textColor = UIColor.label
+            } else {
+                label.font = UIFont.systemFont(ofSize: smallFontSize, weight: .regular)
+                label.textColor = UIColor.label
+            }
             label.adjustsFontSizeToFitWidth = true
             label.minimumScaleFactor = 0.8
             label.text = sectionSubtitles?[section]
@@ -154,34 +159,29 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
         
         if section == 0 {
-            let donwloadButton = UIButton()
-//            donwloadButton.setTitle("Download", for: .normal)
-//            donwloadButton.sizeToFit()
-            donwloadButton.setBackgroundImage(UIImage(systemName: "icloud.and.arrow.down.fill"), for: .normal)
+        
+            var config = UIButton.Configuration.borderedTinted()
+            config.title = "Download"
+            let donwloadButton = UIButton(configuration: config, primaryAction: nil)
             donwloadButton.addTarget(self, action: #selector(downloadValuationData), for: .touchUpInside)
             donwloadButton.translatesAutoresizingMaskIntoConstraints = false
             header.addSubview(donwloadButton)
 
-            donwloadButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+            donwloadButton.topAnchor.constraint(equalTo: titleLabel.topAnchor,constant: 5).isActive = true
             donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-//            donwloadButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
-//            donwloadButton.widthAnchor.constraint(equalTo: donwloadButton.heightAnchor).isActive = true
-
         }
         
         if section == (sectionTitles?.count ?? 0) - 1 {
-            let saveButton = UIButton()
-//            saveButton.setTitle("Save", for: .normal)
-//            saveButton.sizeToFit()
-            saveButton.setBackgroundImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
+            var config = UIButton.Configuration.borderedTinted()
+            config.title = "Save"
+
+            let saveButton = UIButton(configuration: config, primaryAction: nil)
             saveButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
             saveButton.translatesAutoresizingMaskIntoConstraints = false
             header.addSubview(saveButton)
 
             saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
             saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-//            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
-//            saveButton.widthAnchor.constraint(equalTo: saveButton.heightAnchor).isActive = true
         }
 
         return header
@@ -265,11 +265,8 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     func dataUpdated(_ notification: Notification) {
                 
         controller.updateData()
-        
-        sectionTitles = controller.sectionTitles()
-        sectionSubtitles = controller.sectionSubTitles()
-        rowTitles = controller.rowTitles()
-        
+                
+        self.sectionSubtitles?[0] = "Scroll down to save"
 
         if (sectionTitles?.count ?? 0) > 0 {
             tableView.reloadData()

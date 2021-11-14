@@ -44,9 +44,7 @@ class StockListCellTableViewCell: UITableViewCell {
         self.indexPath = indexPath
         self.stock = stock
         
-//        var value$ = ""
         if stock.peRatio != Double() {
-//            value$ = numberFormatterNoFraction.string(from: stock.peRatio as NSNumber) ?? ""
             title.textColor = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: stock.peRatio, greenCutoff: 10.0, redCutOff: 40.0)
         }
         title.text = stock.symbol //! + "(" + value$ + ")"
@@ -68,6 +66,7 @@ class StockListCellTableViewCell: UITableViewCell {
 
         
         actionView.configure(share: stock)
-        ratingCircle.configure(score: userRatingScore,delegate: scoreDelegate, path: indexPath, isUserScore: true, userCommentsCount: userCommentCount)
+        let score = ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore") == "valueScore" ? valueRatingScore : userRatingScore
+        ratingCircle.configure(score: score,delegate: scoreDelegate, path: indexPath, isUserScore: true, userCommentsCount: userCommentCount)
     }
 }

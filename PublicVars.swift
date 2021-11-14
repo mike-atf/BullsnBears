@@ -115,20 +115,6 @@ var stockTickerDictionary: [String:String]? = {
     return nil
 }()
 
-//struct DatedValue {
-//    var date: Date
-//    var value: Double
-//    
-//    init(date: Date, value: Double) {
-//        self.date = date
-//        self.value = value
-//    }
-//    
-//    func returnTuple() -> (Date, Double) {
-//        return (date, value)
-//    }
-//}
-
 var appVersion:String = {
     if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
         return version
@@ -310,8 +296,6 @@ struct SharesListSortParameter {
     let sector = "sector"
     let growthType = "growthType"
     let symbol = "symbol"
-//    let moat = "Compet. strength"
-//    let lynchScore = "Lynch Score"
     
     func options() -> [String] {
         
@@ -325,6 +309,13 @@ struct SharesListSortParameter {
             }
         }
         return properties
+    }
+    
+    func displayTerm(term: String) -> String {
+        if term == userEvaluationScore { return "User rating" }
+        else if term == valueScore { return "Financials score" }
+        else if term == growthType { return "Growth type" }
+        else { return term.capitalized }
     }
 }
 

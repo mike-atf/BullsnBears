@@ -95,7 +95,9 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         controller.viewController = self
                 
         sortView.delegate = self
-        sortView.label?.text = "Sorted by " + ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore")
+        let sort = SharesListSortParameter()
+        let sortTitle = sort.displayTerm(term: (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as! String))
+        sortView.label?.text = "Sorted by " + sortTitle
         
         tableView.refreshControl = UIRefreshControl()
         tableView.refreshControl?.addTarget(self, action: #selector(updateShares), for: .valueChanged)
@@ -117,13 +119,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         navigationItem.searchController = searchController
         definesPresentationContext = true
         
-//        Task.init(priority: .background) {
-//            await updateShares()
-//        }
-         
-// temp
-//        self.controller.research()
-// temp
     }
     
     // MARK: - ViewController functions
@@ -484,6 +479,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     @IBAction func selectToCompare(_ sender: UIBarButtonItem) {
         
+        sortView.label?.text = "Select shares to compare"
+
         tableView.allowsSelectionDuringEditing = false
         
         var editingStatus = tableView.isEditing
@@ -495,7 +492,12 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         if !editingStatus {
             // editing ended
+            let sort = SharesListSortParameter()
+            let sortTitle = sort.displayTerm(term: (UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as! String))
+            sortView.label?.text = "Sorted by " + sortTitle
+            
             if selectedSharesToCompare.count > 0 {
+                
                 
                 guard let comparisonVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ComparisonVC") as? ComparisonVC else {
                     return

@@ -123,7 +123,7 @@ class StockChartVC: UIViewController {
                 if let score = validValuation.moatScore() {
                     if !score.isNaN {
                         let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
-                        r1Title = r1Title + " (Compet. strength: " + n$ + ")"
+                        r1Title = r1Title + " (Moat: " + n$ + ")"
                     }
                 }
                 

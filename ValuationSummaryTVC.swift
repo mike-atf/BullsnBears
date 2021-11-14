@@ -130,7 +130,9 @@ class ValuationSummaryTVC: UITableViewController {
         subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
                 
         if section == 0 {
-            let saveButton = UIButton()
+            var config = UIButton.Configuration.borderedTinted()
+            config.title = "Save"
+            let saveButton = UIButton(configuration: config, primaryAction: nil)
             saveButton.setBackgroundImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
             saveButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
             saveButton.translatesAutoresizingMaskIntoConstraints = false

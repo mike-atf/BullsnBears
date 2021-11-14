@@ -20,6 +20,7 @@ class RimmedLabel: UIView {
     func configure(text: String?, delegate: SortLabelDelegate) {
         
         self.delegate = delegate
+        self.backgroundColor = UIColor.systemBackground
         
         label = UILabel(frame: CGRect.zero)
         label?.text = text
@@ -58,7 +59,7 @@ class RimmedLabel: UIView {
     
     @objc
     func userTap() {
-        UserDefaults.standard.setValue(label?.text ?? "userEvaluationScore", forKey: userDefaultTerms.sortParameter)
+        UserDefaults.standard.setValue(label?.text ?? "user score", forKey: userDefaultTerms.sortParameter)
         setNeedsDisplay()
         delegate?.userSelectedLabel()
     }

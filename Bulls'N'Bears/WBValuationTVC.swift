@@ -139,7 +139,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 label.textColor = UIColor.label
                 label.adjustsFontSizeToFitWidth = true
                 label.minimumScaleFactor = 0.8
-                label.text = subtitle
+                label.text = sTitle
                 return label
             }()
             

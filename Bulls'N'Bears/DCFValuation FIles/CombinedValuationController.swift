@@ -223,10 +223,10 @@ class CombinedValuationController: ValuationDelegate {
         var subtitles = [String]()
         
         if method == .dcf {
-            subtitles = ["General","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "values entered will be converted to negative","Details > Analysis > Revenue estimate", "", ""]
+            subtitles = ["Download, or enter data","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "values entered will be converted to negative","Details > Analysis > Revenue estimate", "", ""]
         } else
         if method == .rule1 {
-            subtitles = ["Creation date","1. Book Value per Share", "2. Earnings per Share", "3. Sales/ Revenue", "4. OP. Free Cash Flow Per Share", "5. Return on Invested Capital", "min and max last 5-10 years", "Analysts min and max predictions","Adjust predicted growth rates", "", "last 6 months", "Between 0 - 10"]
+            subtitles = ["Download, or enter data","1. Book Value per Share", "2. Earnings per Share", "3. Sales/ Revenue", "4. OP. Free Cash Flow Per Share", "5. Return on Invested Capital", "min and max last 5-10 years", "Analysts min and max predictions","Adjust predicted growth rates", "", "last 6 months", "Between 0 - 10"]
         }
         
         return subtitles

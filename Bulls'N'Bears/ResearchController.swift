@@ -55,7 +55,7 @@ class ResearchController {
                 
                 if validShare.research?.competitiveEdge == nil {
                     if let score = validR1.moatScore() {
-                        share?.research?.competitiveEdge = "Competitive strength score = " + (percentFormatter0Digits.string(from: score as NSNumber) ?? "-")
+                        share?.research?.competitiveEdge = "Moat = " + (percentFormatter0Digits.string(from: score as NSNumber) ?? "-")
                     }
                 }
             }
@@ -320,7 +320,7 @@ extension ResearchController: ResearchCellDelegate {
             share?.research?.returnNews()![cellPath.row].newsText = notes
         case "industry":
             share?.industry = notes
-        case "growthType":
+        case "growth type":
             share?.growthType = notes
         case "growthSubType":
             share?.growthSubType = notes

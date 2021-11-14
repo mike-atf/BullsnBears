@@ -50,6 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int == nil {
             UserDefaults.standard.set(7, forKey: userDefaultTerms.emaPeriodAnnualData)
         }
+//        UserDefaults.standard.set("userEvaluationScore", forKey: userDefaultTerms.sortParameter)
         if UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String == nil {
             UserDefaults.standard.set("userEvaluationScore", forKey: userDefaultTerms.sortParameter)
         }

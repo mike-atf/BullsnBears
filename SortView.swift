@@ -75,7 +75,7 @@ class SortView: UIView {
 
                 let newLabel: RimmedLabel = {
                     let label = RimmedLabel()
-                    label.configure(text: sortTerm, delegate: self)
+                    label.configure(text: sharesListSortParameter.displayTerm(term: sortTerm), delegate: self)
                     label.translatesAutoresizingMaskIntoConstraints = false
                     return label
                 }()
@@ -114,7 +114,9 @@ extension SortView: SortLabelDelegate {
     
     @objc
     func updateSort() {
-        self.label?.text = "Sorted by " + ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore")
+        let sortParameters = SharesListSortParameter()
+        let displayTerm = sortParameters.displayTerm(term:(UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore")
+        self.label?.text = "Sorted by " + displayTerm
         
         self.sortButtonAction(self.sortButton)
         

@@ -22,7 +22,7 @@ class ComparisonController {
     func rowTitles() -> [[String]]{
         
         let titleStructure = [["Why to buy"],
-                                ["Personal rating score", "Fundamentals score", "Compet. strength" ,"Share price / GB Value" ,"Share price / DCF Value", "Share price / Intrinsic value"],
+                                ["Personal rating score", "Fundamentals score", "Moat" ,"Share price / GB Value" ,"Share price / DCF Value", "Share price / Intrinsic value"],
                                 ["PE ratio", "Lynch ratio", "Book value / share price"],
                                 ["Ret. earnings", "Revenue", "Net income", "Op. Cash flow", "Gross profit", "EPS"],
                                 ["Profit margin", "Net earnings margin"],

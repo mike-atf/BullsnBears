@@ -598,7 +598,7 @@ public class WBValuation: NSManagedObject {
         if let score = share?.rule1Valuation?.moatScore() {
             allFactors.append(sqrt(score)*weights.moatScore)
             allWeights.append(weights.moatScore)
-            allFactorNames.append("Compet. strength")
+            allFactorNames.append("Moat")
         }
         let scoreSum = allFactors.reduce(0, +)
         let maximum = allWeights.reduce(0, +)
@@ -673,7 +673,7 @@ public class WBValuation: NSManagedObject {
         
         if let moatScore  = share?.rule1Valuation?.moatScore() {
             let score = sqrt(moatScore)
-            allFactorTexts.append("Competitive strength score: " + (numberFormatterWith1Digit.string(from: score as NSNumber) ?? "-"))
+            allFactorTexts.append("Moat: " + (numberFormatterWith1Digit.string(from: score as NSNumber) ?? "-"))
         }
         return allFactorTexts
     }
