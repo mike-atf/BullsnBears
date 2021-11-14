@@ -198,6 +198,7 @@ class WebPageScraper2 {
             }
             results.append(contentsOf: labelledValues)
             
+            // TODO: - use this to update year axis in ValueListTVC
             let newestDate = dateSet.max()
             
             progressTasks += 1
@@ -321,11 +322,16 @@ class WebPageScraper2 {
     class func dcfDataDownloadAndSave(shareSymbol: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil) async throws {
         
         guard let symbol = shareSymbol else {
+            progressDelegate?.downloadError(error: "Failed DCF valuation download: missing share symbol")
             throw DownloadAndAnalysisError.shareSymbolMissing
         }
          
  // 1 Download and analyse web page data
         var results = [LabelledValues]()
+        let allTasks = 6
+        var progressTasks = 0
+        
+//        let rowTitles = [["Market cap (intra-day)</span>", "Beta (5Y monthly)</span>", "Shares outstanding</span>"],["Total revenue</span>", "Net income</span>", "Interest expense</span>","Income before tax</span>","Income tax expense</span>"],["Current debt</span>","Long-term debt</span>", "Total Debt</span>"],["Operating cash flow</span>","Capital expenditure</span>"],["Avg. Estimate</span>", "Sales growth (year/est)</span>"]]
 
         for title in ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"] {
             var components: URLComponents?
@@ -334,6 +340,7 @@ class WebPageScraper2 {
             components?.queryItems = [URLQueryItem(name: "p", value: shareSymbol)]
                     
             guard let url = components?.url else {
+                progressDelegate?.downloadError(error: "Failed DCF valuation download for \(symbol): invalid url")
                 throw DownloadAndAnalysisError.urlInvalid
             }
             
@@ -341,8 +348,12 @@ class WebPageScraper2 {
             do {
                 htmlText = try await Downloader.downloadData(url: url)
             } catch let error as DownloadAndAnalysisError {
+                progressDelegate?.downloadError(error: "Failed DCF valuation download for \(symbol): \(error.localizedDescription)")
                 throw error
             }
+            
+            progressTasks += 1
+            progressDelegate?.progressUpdate(allTasks: allTasks, completedTasks: progressTasks)
             
             let labelledResults = try dcfDataExtraction(htmlText: htmlText, section: title)
             results.append(contentsOf: labelledResults)
@@ -354,58 +365,58 @@ class WebPageScraper2 {
         
         await backgroundMoc.perform {
             do {
-                if let backgroundShare = backgroundMoc.object(with: valuationID) as? Share {
-                    if let dcfv = backgroundShare.dcfValuation {
-                        do {
-                            for result in results {
-                                switch result.label {
-                                case _ where result.label.starts(with: "Market cap (intra-day)"):
-                                    dcfv.marketCap = result.values.first ?? Double()
-                                case _ where result.label.starts(with: "Beta (5Y monthly)"):
-                                    dcfv.beta = result.values.first ?? Double()
-                                case _ where result.label.starts(with: "Shares outstanding"):
-                                    dcfv.sharesOutstanding = result.values.first ?? Double()
-                                case _ where result.label.starts(with: "Total revenue"):
-                                    dcfv.tRevenueActual = result.values
-                                case _ where result.label.starts(with: "Net income"):
-                                    dcfv.netIncome = result.values
-                                case _ where result.label.starts(with: "Interest expense"):
-                                    dcfv.expenseInterest = result.values.first ?? Double()
-                                case _ where result.label.starts(with: "Income before tax"):
-                                    dcfv.incomePreTax = result.values.first ?? Double()
-                                case _ where result.label.starts(with: "Income tax expense"):
-                                    dcfv.expenseIncomeTax = result.values.first ?? Double()
-                                case _ where result.label.starts(with: "Current debt"):
-                                    dcfv.debtST = result.values.first ?? Double()
-                                case _ where result.label.starts(with: "Long-term debt"):
-                                    dcfv.debtLT = result.values.first ?? Double()
-                                case _ where result.label.starts(with: "Total Debt"):
-                                    dcfv.totalDebt = result.values.first ?? Double()
-                                case _ where result.label.starts(with: "Operating cash flow"):
-                                    dcfv.tFCFo = result.values
-                                case _ where result.label.starts(with: "Capital expenditure"):
-                                    dcfv.capExpend = result.values
-                                case _ where result.label.starts(with: "Avg. Estimate"):
-                                    dcfv.tRevenuePred = result.values
-                                case _ where result.label.starts(with: "Sales growth (year/est)"):
-                                    dcfv.revGrowthPred = result.values
-                                default:
-                                    ErrorController.addErrorLog(errorLocation: "WebPageScraper2.dcfDataDownload", systemError: nil, errorInfo: "unspecified result label \(result.label) for share \(symbol)")
-                                }
+                if let dcfv = backgroundMoc.object(with: valuationID) as? DCFValuation {
+                    print(results)
+                    do {
+                        for result in results {
+                            switch result.label {
+                            case _ where result.label.starts(with: "Market cap (intra-day)"):
+                                dcfv.marketCap = result.values.first ?? Double()
+                            case _ where result.label.starts(with: "Beta (5Y monthly)"):
+                                dcfv.beta = result.values.first ?? Double()
+                            case _ where result.label.starts(with: "Shares outstanding"):
+                                dcfv.sharesOutstanding = result.values.first ?? Double()
+                            case _ where result.label.starts(with: "Total revenue"):
+                                dcfv.tRevenueActual = result.values
+                            case _ where result.label.starts(with: "Net income"):
+                                dcfv.netIncome = result.values
+                            case _ where result.label.starts(with: "Interest expense"):
+                                dcfv.expenseInterest = result.values.first ?? Double()
+                            case _ where result.label.starts(with: "Income before tax"):
+                                dcfv.incomePreTax = result.values.first ?? Double()
+                            case _ where result.label.starts(with: "Income tax expense"):
+                                dcfv.expenseIncomeTax = result.values.first ?? Double()
+                            case _ where result.label.starts(with: "Current debt"):
+                                dcfv.debtST = result.values.first ?? Double()
+                            case _ where result.label.starts(with: "Long-term debt"):
+                                dcfv.debtLT = result.values.first ?? Double()
+                            case _ where result.label.starts(with: "Total Debt"):
+                                dcfv.totalDebt = result.values.first ?? Double()
+                            case _ where result.label.starts(with: "Operating cash flow"):
+                                dcfv.tFCFo = result.values
+                            case _ where result.label.starts(with: "Capital expenditure"):
+                                dcfv.capExpend = result.values
+                            case _ where result.label.starts(with: "Avg. Estimate"):
+                                dcfv.tRevenuePred = result.values
+                            case _ where result.label.starts(with: "Sales growth (year/est)"):
+                                dcfv.revGrowthPred = result.values
+                            default:
+                                ErrorController.addErrorLog(errorLocation: "WebPageScraper2.dcfDataDownload", systemError: nil, errorInfo: "unspecified result label \(result.label) for share \(symbol)")
                             }
-                            
-                            dcfv.creationDate = Date()
-                            try backgroundMoc.save()
-                        } catch let error {
-                            ErrorController.addErrorLog(errorLocation: "WebPageScraper2.dcfDataDownload", systemError: error, errorInfo: "Error saving DCF data download results for \(symbol)")
                         }
+                        
+                        dcfv.creationDate = Date()
+                        try backgroundMoc.save()
+                        progressDelegate?.downloadComplete()
+                        
+                    } catch let error {
+                        ErrorController.addErrorLog(errorLocation: "WebPageScraper2.dcfDataDownload", systemError: error, errorInfo: "Error saving DCF data download results for \(symbol)")
                     }
+                   
                 }
             }
         }
         
-        //TODO: - inform UI (ValuationListVC) of download complete via delegate
- 
     }
     
     class func downloadAndAanalyseTreasuryYields(url: URL) async throws -> [PriceDate]? {
@@ -1163,23 +1174,18 @@ class WebPageScraper2 {
 // Key stats,
             
             for rowTitle in ["Market cap (intra-day)</span>", "Beta (5Y monthly)</span>", "Shares outstanding</span>"] {
-                var labelledValue = LabelledValues(label: section, values: [Double]())
+                var labelledValue = LabelledValues(label: rowTitle, values: [Double]())
                 if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: rowTitle , rowTerminal: "</tr>", numberTerminal: "</td>", webpageExponent: 3.0) {
                 
                     labelledValue.values = [values.first ?? Double()]
                 }
                 results.append(labelledValue)
-                /*
-                valuation.marketCap = result.array?.first ?? Double()
-                valuation.beta = result.array?.first ?? Double()
-                valuation.sharesOutstanding = result.array?.first ?? Double()
-                 */
             }
         }
         else if section == yahooPages[1] {
 // Income
             for rowTitle in ["Total revenue</span>", "Net income</span>", "Interest expense</span>","Income before tax</span>","Income tax expense</span>"] {
-                var labelledValue = LabelledValues(label: section, values: [Double]())
+                var labelledValue = LabelledValues(label: rowTitle, values: [Double]())
                 
                 if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: rowTitle, rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0) {
 
@@ -1195,13 +1201,6 @@ class WebPageScraper2 {
                     }
                     }
                 results.append(labelledValue)
-                /*
-                valuation.tRevenueActual = result.array // Array(result.array?.dropFirst() ?? []) // remove TTM column
-                valuation.netIncome = result.array // Array(result.array?.dropFirst() ?? [])
-                valuation.expenseInterest = result.array?.first ?? Double()
-                valuation.incomePreTax = result.array?.first ?? Double()
-                valuation.expenseIncomeTax = result.array?.first ?? Double()
-                 */
             }
         }
         else if section == yahooPages[2] {
@@ -1209,7 +1208,7 @@ class WebPageScraper2 {
 // Balance sheet
             
             for title in rowTitles {
-                var labelledValue = LabelledValues(label: section, values: [Double]())
+                var labelledValue = LabelledValues(label: title, values: [Double]())
                 if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo,html$: htmlText, rowTitle: title, rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0) {
                     if (values.first ?? Double()) != Double() {
                         labelledValue.values = [values.first!]
@@ -1225,17 +1224,13 @@ class WebPageScraper2 {
             let rowTitles = ["Operating cash flow</span>","Capital expenditure</span>"]
             
             for title in rowTitles {
-                var labelledValue = LabelledValues(label: section, values: [Double]())
+                var labelledValue = LabelledValues(label: title, values: [Double]())
                 if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo,html$: htmlText, rowTitle: title, rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0) {
                     labelledValue.values = values
                 }
                 results.append(labelledValue)
             }
             
-            /*
-            valuation.tFCFo = result.array // Array(result.array?.dropFirst() ?? [])
-            valuation.capExpend = result.array // Array(result.array?.dropFirst() ?? [])
-             */
         }
         else if section == yahooPages[4] {
 // Analysis
@@ -1243,7 +1238,7 @@ class WebPageScraper2 {
             let rowTitles = ["Avg. Estimate</span>", "Sales growth (year/est)</span>"]
             
             for title in rowTitles {
-                var labelledValue = LabelledValues(label: section, values: [Double]())
+                var labelledValue = LabelledValues(label: title, values: [Double]())
                 if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo,html$: htmlText, sectionHeader: "Revenue estimate</span>" ,rowTitle: title, webpageExponent: 3.0) {
 
                     let a1 = values.dropLast()
@@ -1252,27 +1247,7 @@ class WebPageScraper2 {
                 }
                 results.append(labelledValue)
             }
-
-            /*
-            valuation.tRevenuePred = Array(a2 ?? []).reversed()
-            valuation.revGrowthPred = Array(b2 ?? []).reversed()
-             */
         }
-        /*
-        else if section == "Yahoo LT Debt" {
-            
-            // extra if 'Long-term debt not included in Financial > balance sheet
-            // use 'Total debt' instead
-            result = WebpageScraper.scrapeRowForDoubles(website: .yahoo,html$: validWebCode, rowTitle: "Total Debt</span>", rowTerminal: "</span></div></div>", numberTerminal: "</span></div>", webpageExponent: 3.0)
-            downloadErrors.append(contentsOf: result.errors)
-            valuation.debtLT = result.array?.first ?? Double()
-            
-            downloadErrors = downloadErrors.filter({ (error) -> Bool in
-                if error.contains("Long-term debt") { return false }
-                else { return true }
-            })
-        }
-        */
         
         return results
     }

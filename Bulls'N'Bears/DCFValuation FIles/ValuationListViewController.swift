@@ -270,14 +270,14 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         sectionSubtitles = controller.sectionSubTitles()
         rowTitles = controller.rowTitles()
         
-        self.progressView?.delegate = nil
-        self.progressView?.removeFromSuperview()
-        self.progressView = nil
 
         if (sectionTitles?.count ?? 0) > 0 {
             tableView.reloadData()
         }
         
+        self.progressView?.delegate = nil
+        self.progressView?.removeFromSuperview()
+        self.progressView = nil
 
         if let errorList = notification.object as? [String] {
             

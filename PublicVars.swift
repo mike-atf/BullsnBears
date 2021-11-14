@@ -32,6 +32,7 @@ enum DownloadAndAnalysisError: Error {
     case noBackgroundMOC
     case htmlTableTextNotExtracted
     case fileFormatNotCSV
+    case couldNotFindCompanyProfileData
 }
 
 enum InternalErrors: Error {

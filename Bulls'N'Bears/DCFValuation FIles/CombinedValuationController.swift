@@ -396,15 +396,13 @@ class CombinedValuationController: ValuationDelegate {
                 }
                 return nil
             }
-             // OLD
-            //            webAnalyser = R1WebDataAnalyser(stock: self.share, controller: self, progressDelegate: self.valuationListViewController)
         }
         else {
             // NEW
             downloadTask = Task.init(priority: .background) {
 
                 do {
-                    try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: validID)
+                    try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: validID, progressDelegate: self.valuationListViewController)
                     try Task.checkCancellation()
                 } catch let error {
                     ErrorController.addErrorLog(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
@@ -515,8 +513,12 @@ class CombinedValuationController: ValuationDelegate {
         if let updatePaths = rowsToUpdateAfterUserEntry(indexPath) {
             valuationListViewController.helperUpdatedRows(paths: updatePaths)
         }
-
-        valuation.save()
+        
+        do {
+            try valuation.managedObjectContext?.save()
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: "CombinedValController.convertUserEntryDCF", systemError: error , errorInfo: "Unable to to save user entry to valuation's moc")
+        }
         
         var jumpToCellPath = IndexPath(row: indexPath.row+1, section: indexPath.section)
         if jumpToCellPath.row > rowtitles[indexPath.section].count-1 {

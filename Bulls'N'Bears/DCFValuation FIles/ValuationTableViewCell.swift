@@ -54,7 +54,7 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
         self.detail.text = info.cellDetailInfo.text
         self.detail.textColor = info.cellDetailInfo.color
         let lighterPlaceHolderText = NSAttributedString(string: info.value$ ?? "",
-                                                    attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+                                                    attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
         textField.attributedPlaceholder = lighterPlaceHolderText
         if method == .rule1 {
             if indexPath == IndexPath(row: 2, section: 9) { // proportion debt/ fcf

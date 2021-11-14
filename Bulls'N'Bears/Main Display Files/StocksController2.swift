@@ -187,30 +187,47 @@ class StocksController2: NSFetchedResultsController<Share> {
     
     // MARK: - other general functions
     
-    /// share must be fetched from background MOC!
-    ///  functions saves profile to the background moc share
-    func downloadProfile(share: Share) async throws {
-        
-        var components: URLComponents?
-                
-        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(share.symbol ?? "missing")/pfile")
-        components?.queryItems = [URLQueryItem(name: "p", value: (share.symbol ?? ""))]
-            
+    /// Downloads sector, industry and employee count from Yahoo
+    /// saves this to shareID in background
+    func downloadProfile(symbol: String, shareID: NSManagedObjectID) async throws {
+
+// Download data first
+        var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/pfile")
+        components?.queryItems = [URLQueryItem(name: "p", value: (symbol))]
         
         guard let validURL = components?.url else {
             throw DownloadAndAnalysisError.urlError
         }
+
+        var profile: ProfileData?
+        do {
+            profile = try await WebPageScraper2.downloadAndAnalyseProfile(url: validURL)
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: "StocksController2 - downloadProfile", systemError: nil, errorInfo: "error downloading profile for \(symbol): \(error)")
+        }
+        
+        guard profile != nil else {
+            throw DownloadAndAnalysisError.couldNotFindCompanyProfileData
+        }
+
+// then save these to the share in the background
+        let backgroundMOC = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         
         do {
-            if let profile = try await WebPageScraper2.downloadAndAnalyseProfile(url: validURL) {
-                share.sector = profile.sector
-                share.industry = profile.industry
-                share.employees = profile.employees
-                
-                try saveBackgroundMOC(share: share)
+            try await backgroundMOC.perform {
+            
+            guard let backgroundShare = backgroundMOC.object(with: shareID) as? Share else {
+                throw InternalErrors.mocReadError
+            }
+            
+            backgroundShare.sector = profile!.sector
+            backgroundShare.industry = profile!.industry
+            backgroundShare.employees = profile!.employees
+            
+            try backgroundShare.managedObjectContext?.save()
             }
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "StocksController2 - downloadProfile", systemError: nil, errorInfo: "error downloading profile for \(share.symbol ?? "missing"): \(error)")
+            ErrorController.addErrorLog(errorLocation: "StocksController2 - downloadProfile", systemError: nil, errorInfo: "error saving profile for \(symbol): \(error.localizedDescription)")
         }
                 
     }

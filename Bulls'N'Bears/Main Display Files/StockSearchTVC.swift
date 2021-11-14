@@ -141,7 +141,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 // first try to download historical prices from Yahoo finance as CSV file
             Task.init(priority: .background) {
                 do {
-                    // the next functions returns by sending notification "FileDownloadComplete' with fileURL in object sent
+                    // the next functions returns by sending notification 'FileDownloadComplete' with fileURL in object sent
                     // this should be picked up by StocksListTVC
                     try await Downloader.downloadFile(url: sourceURL, symbol: symbol)
                 } catch let error as DownloadAndAnalysisError {
@@ -153,7 +153,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                         urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
 
                         
-// secxond, if file donwlod fails download price page table and extract price data
+// secxond, if file download fails download price page table and extract price data
                         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
                             do {
                                 try await downloadWebData(sourceURL, stockName: (companyName ?? ""), task: "priceHistory")

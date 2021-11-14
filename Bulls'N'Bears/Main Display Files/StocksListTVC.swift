@@ -302,12 +302,11 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             do {
                 if let share = try StocksController2.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
                     try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-                    if let bgShare = controller.fetchSpecificShare(symbol: (share.symbol ?? "missing"), fromBackgroundContext: true) {
+                    let shareID = share.objectID // is thread safe
                         
-                        Task.init(priority: .background) {
-                            try await controller.downloadProfile(share: bgShare)
-                        }
-                        
+                    
+                    Task.init(priority: .background) {
+                        try await controller.downloadProfile(symbol: share.symbol!, shareID: shareID)
                     }
                     if let indexPath = controller.indexPath(forObject: share) {
                         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
@@ -319,16 +318,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Failure to add new share from file \(fileURL)")
             }
 
-            
-            
-//            let placeHolder = SharePlaceHolder(share: share)
-//            placeHolder.downloadKeyRatios(delegate: controller)
-//            placeHolder.downloadProfile(delegate: controller)
-
-//        }
-//        else {
-//            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from file \(fileURL)")
-//       }
     }
     
     
@@ -608,14 +597,11 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
             do {
                 if let share = try StocksController2.createShare(with: prices, symbol: symbol) {
                     try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-                    
-                    if let bgShare = controller.fetchSpecificShare(symbol: (share.symbol ?? "missing"), fromBackgroundContext: true) {
-                        
-                        Task.init(priority: .background) {
-                            try await controller.downloadProfile(share: bgShare)
-                        }
+                                            
+                    Task.init(priority: .background) {
+                        try await controller.downloadProfile(symbol: share.symbol!, shareID: share.objectID)
                     }
-                    
+
                     if let indexPath = controller.indexPath(forObject: share) {
                         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
                         performSegue(withIdentifier: "showChartSegue", sender: nil)

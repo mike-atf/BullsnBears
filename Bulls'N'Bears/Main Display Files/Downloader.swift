@@ -89,7 +89,6 @@ class Downloader {
                 try FileManager.default.moveItem(at: tempURL, to: targetURL)
                 
                 DispatchQueue.main.async {
-
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadComplete"), object:   targetURL, userInfo: ["companySymbol": symbol]) // send to StocksListVC
                 }
 //                // the Company profile (industry, sector and employees) is downloaded after this in StocksController called from StocksListVC as delegate of this here download
