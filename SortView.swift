@@ -48,7 +48,7 @@ class SortView: UIView {
             contentView = UIStackView()
             contentView?.axis = .horizontal
             contentView?.distribution = .equalSpacing
-            contentView?.spacing = 15
+            contentView?.spacing = 5
 
             contentView?.translatesAutoresizingMaskIntoConstraints = false
 

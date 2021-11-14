@@ -36,7 +36,7 @@ extension Share {
     @NSManaged public var symbol: String?
     @NSManaged public var userEvaluationScore: Double
     @NSManaged public var valueScore: Double
-    @NSManaged public var watchStatus: Int16
+    @NSManaged public var watchStatus: Int16 // 0 watchList, 1 owned, 2 archived
     @NSManaged public var dcfValuation: DCFValuation?
     @NSManaged public var transactions: NSSet?
     @NSManaged public var research: StockResearch?

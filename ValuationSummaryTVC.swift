@@ -140,8 +140,8 @@ class ValuationSummaryTVC: UITableViewController {
 
             saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
             saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
-            saveButton.widthAnchor.constraint(equalTo: saveButton.heightAnchor).isActive = true
+//            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
+//            saveButton.widthAnchor.constraint(equalTo: saveButton.heightAnchor).isActive = true
         }
 
         return header

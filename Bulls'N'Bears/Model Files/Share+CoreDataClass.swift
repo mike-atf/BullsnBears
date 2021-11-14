@@ -46,47 +46,6 @@ public class Share: NSManagedObject {
         
     }
     
-    //MARK: - updates involving downloads
-    
-//    func updateCurrentPrice() throws {
-//
-//        print("updating current price within share object \(symbol ?? "")")
-//        
-//        guard let symbol = self.symbol else {
-//            throw DownloadAndAnalysisError.shareSymbolMissing
-//        }
-//
-//        var components: URLComponents?
-//
-//        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)")
-//        components?.queryItems = [URLQueryItem(name: "p", value: symbol), URLQueryItem(name: ".tsrc", value: "fin-srch")]
-//
-//        guard let validURL = components?.url else {
-//            throw DownloadAndAnalysisError.urlError
-//        }
-//
-//
-//        var price: Double?
-//        do {
-//            try await price = WebPageScraper2.getCurrentPrice(url: validURL)
-//            if let valid = price {
-//                self.lastLivePrice = valid
-//                let cDate = Date()
-//                self.lastLivePriceDate = cDate
-//
-////                do {
-//                    try save()
-////                } catch let error as InternalErrors {
-////                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(symbol ?? "missing") occurred: \(error)")
-////                }
-//            }
-//        } catch let error as DownloadAndAnalysisError {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(symbol ?? "missing") occurred: \(error)")
-//        }
-//
-//
-//    }
-
     
    func save() {
     
@@ -142,33 +101,6 @@ public class Share: NSManagedObject {
 
         return nil
     }
-
-    
-    /// takes new prices and adds any newer ones than already saved to the exsitng list (rather than replce the existing list)
-//    func updateDailyPrices(newPrices: [PricePoint]?) {
-//
-//        guard let validNewPoints = newPrices else { return }
-//
-//        if let existingPricePoints = getDailyPrices() {
-//            var newList = existingPricePoints
-//            var existingMACDs = getMACDs()
-//            if let lastExistingDate = existingPricePoints.last?.tradingDate {
-//                let pointsToAdd = validNewPoints.filter { (element) -> Bool in
-//                    if element.tradingDate > lastExistingDate { return true }
-//                    else { return false }
-//                }
-//                if pointsToAdd.count > 0 {
-//                    for point in pointsToAdd {
-//                        newList.append(point)
-//                        let lastMACD = existingMACDs?.last
-//                        existingMACDs?.append(MAC_D(currentPrice: point.close, lastMACD: lastMACD, date: point.tradingDate))
-//                    }
-//                    self.macd = convertMACDToData(macds: existingMACDs) // doesn't save
-//                    setDailyPrices(pricePoints: newList) // saves
-//                }
-//            }
-//        }
-//    }
     
     func getDailyPrices() -> [PricePoint]? {
 
@@ -186,6 +118,31 @@ public class Share: NSManagedObject {
                     if e0.tradingDate < e1.tradingDate { return true }
                     else { return false }
                 }
+//once
+//                if symbol == "NVDA" {
+//                    let dateFormatter: DateFormatter = {
+//                        let formatter = DateFormatter()
+//                        formatter.locale = NSLocale.current
+//                        formatter.timeZone = NSTimeZone.local
+//                        formatter.dateFormat = "MM/dd/yy"
+//                        return formatter
+//                    }()
+//                    let splitDate = dateFormatter.date(from: "07/20/21")!
+//                    var correctedPrices = [PricePoint]()
+//                    for point in prices ?? [] {
+//                        if point.tradingDate < splitDate {
+//                            let newPoint = PricePoint(open: point.open / 4, close: point.close / 4, low: point.low / 4, high: point.high / 4, volume: point.volume, date: point.tradingDate)
+//                            correctedPrices.append(newPoint)
+//                        }
+//                        else {
+//                            correctedPrices.append(point)
+//                        }
+//                    }
+//                    print("corrected NVDA pricePoints")
+//                    setDailyPrices(pricePoints: correctedPrices)
+//                    return correctedPrices
+//                }
+// once
                 return prices
             }
         } catch let error {

@@ -747,21 +747,10 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
         }
 
     }
-    /*
-    func allSharesHaveUpdatedTheirPrices() {
-                
-        DispatchQueue.main.async {
-            let currentlySelectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
-            self.tableView.selectRow(at: currentlySelectedPath, animated: true, scrollPosition: .top)
-            self.performSegue(withIdentifier: "stockSelectionSegue", sender: nil)
-        }
-    }
-    */
+
     func treasuryBondRatesDownloaded() {
         
         if let yieldDates = controller.treasuryBondYields {
-            print("TB Yields rates updated, refresh UI")
-
             let yields = yieldDates.compactMap{ $0.price }
             if let ema = yields.ema(periods: 10) {
                 treasuryBondYieldsButton.isEnabled = true

@@ -317,6 +317,14 @@ struct SharesListSortParameter {
         else if term == growthType { return "Growth type" }
         else { return term.capitalized }
     }
+    
+    func displayToUserDefaults(term: String) -> String {
+        if term == "User rating" { return userEvaluationScore }
+        else if term == "Financials score" { return  valueScore}
+        else if term == "Growth type" { return growthType }
+        else { return term.lowercased() }
+
+    }
 }
 
 

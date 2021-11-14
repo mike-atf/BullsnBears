@@ -59,7 +59,9 @@ class RimmedLabel: UIView {
     
     @objc
     func userTap() {
-        UserDefaults.standard.setValue(label?.text ?? "user score", forKey: userDefaultTerms.sortParameter)
+        let sorts = SharesListSortParameter()
+        let udTerm = sorts.displayToUserDefaults(term: label?.text ?? "User rating")
+        UserDefaults.standard.setValue(udTerm, forKey: userDefaultTerms.sortParameter)
         setNeedsDisplay()
         delegate?.userSelectedLabel()
     }

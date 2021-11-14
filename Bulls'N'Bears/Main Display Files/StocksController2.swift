@@ -253,7 +253,6 @@ class StocksController2: NSFetchedResultsController<Share> {
 
     func updateStocksData() async throws {
         
-        print("stocksUpdater received request to update...")
         backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc!.automaticallyMergesChangesFromParent = true
 
@@ -272,6 +271,10 @@ class StocksController2: NSFetchedResultsController<Share> {
             
             let newObject = ShareID_Symbol_sName(id: share.objectID, symbol: share.symbol, shortName: share.name_short)
             currentPriceIDSymbols.append(newObject)
+            
+            guard share.watchStatus < 2 else {
+                continue
+            }
             
             guard let wbv = share.wbValuation else {
                 continue
