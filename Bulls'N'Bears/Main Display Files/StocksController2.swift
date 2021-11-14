@@ -338,49 +338,6 @@ class StocksController2: NSFetchedResultsController<Share> {
         
     }
     
-    func updateOneShare(share: Share) async throws {
-        
-//        print("stocksUpdater received request to update...")
-//        setBackgroundMOC()
-//        var backgroundShares: [Share]?
-//
-//        NotificationCenter.default.addObserver(self, selector: #selector(backgroundContextDidSave(notification:)), name: .NSManagedObjectContextDidSave, object: nil)
-//
-//        let request = NSFetchRequest<Share>(entityName: "Share")
-//        request.predicate = NSPredicate(format: "symbol", argumentArray: [share.symbol ?? ""])
-//
-//        if backgroundMoc != nil {
-//            await backgroundMoc!.perform {
-//                do {
-//                    backgroundShares = try self.backgroundMoc!.fetch(request)
-//                } catch let error {
-//                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "couldn't fetch shares from background MOC: \(error)")
-//                }
-//            }
-//        }
-//
-//        print("fetched \((backgroundShares ?? []).count) shares")
-//
-//        guard let share = backgroundShares?.first else {
-//            throw InternalErrors.noShareFetched
-//        }
-//
-//        do {
-//            try await quarterlyEarningsUpdate(share: share)
-////            try await updateCurrentPrice(share: share)
-//            // update daily trading prices
-//            // update key ratios
-//            // update Treasury biond yield rates
-//
-//        } catch let error {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background update error for \(share.symbol ?? "missing") occurred: \(error)")
-//        }
-//
-//
-//        NotificationCenter.default.removeObserver(self)
-    }
-
-    
     //MARK: - specific update task functions
     
     func updateCurrentPrice(shareSymbol: String?, shareID: NSManagedObjectID) async throws -> ShareID_Value {
@@ -442,14 +399,6 @@ class StocksController2: NSFetchedResultsController<Share> {
         let epsDates = values?.compactMap{ DatedValue(date: $0.date, value: $0.epsTTM) }
         return ShareID_DatedValues(id: shareID, values: epsDates)
 
-        
-//        share.wbValuation?.saveEPSWithDateArray(datesValuesArray: epsDates)
-//
-//        do {
-//            try saveBackgroundMOC(share: share)
-//        } catch let error as InternalErrors {
-//            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(share.symbol ?? "missing") occurred: \(error)")
-//        }
     }
 
     func updateTreasuryBondYields() async throws -> [PriceDate]? {
@@ -513,7 +462,7 @@ class StocksController2: NSFetchedResultsController<Share> {
     @objc
     func backgroundContextDidSave(notification: Notification) {
         
-        print("moc did save notification received")
+//        print("moc did save notification received")
         if let _ = notification.object as? NSManagedObjectContext {
             
             DispatchQueue.main.async {
@@ -521,30 +470,6 @@ class StocksController2: NSFetchedResultsController<Share> {
                     (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.mergeChanges(fromContextDidSave: notification)
                     
                 }
-
-                /*
-                if moc.isEqual((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) {
-                    print("save notification came from MainQ moc")
-                }
-                else {
-                    print("save notification DID NOT come from MainQ moc")
-                    
-                    let mainMOC = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-                    let request = NSFetchRequest<Share>(entityName: "Share")
-                    
-                    do {
-                        let shares = try mainMOC.fetch(request)
-                        if let share1 = shares.first {
-                            print("share eps data: \(share1.epsWithDates())")
-                        } else {
-                            print("no shares")
-                        }
-                    } catch let error {
-                        print("main MOC fetch error \(error.localizedDescription)")
-                    }
-
-                }
-                */
             }
         }
 

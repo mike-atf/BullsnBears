@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -14,7 +14,7 @@
             <rect key="frame" x="0.0" y="0.0" width="514" height="44"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="483" height="44"/>
+                <rect key="frame" x="0.0" y="0.0" width="484.5" height="44"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KDU-EY-7DQ">
@@ -23,56 +23,56 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q5Z-L5-pk0">
-                        <rect key="frame" x="459.5" y="13" width="20.5" height="18"/>
-                        <color key="tintColor" systemColor="systemYellowColor"/>
-                        <state key="normal" backgroundImage="exclamationmark.triangle" catalog="system"/>
-                        <connections>
-                            <action selector="infoButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="7B5-h2-s2H"/>
-                        </connections>
-                    </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uoj-Dx-7bk">
-                        <rect key="frame" x="414" y="13" width="37.5" height="18"/>
+                        <rect key="frame" x="437" y="13" width="37.5" height="18"/>
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" image="star.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="kKl-qt-iSX">
-                        <rect key="frame" x="284.5" y="6" width="35" height="31"/>
+                        <rect key="frame" x="227" y="6" width="35.5" height="31"/>
                         <color key="tintColor" systemColor="systemGrayColor"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="kKl-qt-iSX" secondAttribute="height" multiplier="8:7" id="aaV-xi-lY1"/>
                         </constraints>
                     </imageView>
                     <view contentMode="scaleToFill" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="KjS-uh-uUV" customClass="TrendIconView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                        <rect key="frame" x="329.5" y="6.5" width="34.5" height="31"/>
+                        <rect key="frame" x="267.5" y="6.5" width="34" height="31"/>
                         <color key="backgroundColor" systemColor="systemGrayColor"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="KjS-uh-uUV" secondAttribute="height" multiplier="29:26" id="i20-0I-csc"/>
                         </constraints>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ytK-8O-sV5">
-                        <rect key="frame" x="295" y="16" width="13.5" height="14.5"/>
+                        <rect key="frame" x="238" y="16" width="13.5" height="14.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q5Z-L5-pk0">
+                        <rect key="frame" x="411.5" y="13" width="20.5" height="18"/>
+                        <color key="tintColor" systemColor="systemYellowColor"/>
+                        <state key="normal" backgroundImage="exclamationmark.triangle" catalog="system"/>
+                        <connections>
+                            <action selector="infoButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="7B5-h2-s2H"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="Q5Z-L5-pk0" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.454545" id="1lx-er-B0f"/>
                     <constraint firstItem="KDU-EY-7DQ" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="6yT-Ua-w3a"/>
-                    <constraint firstAttribute="trailing" secondItem="Q5Z-L5-pk0" secondAttribute="trailing" constant="3" id="A1M-YN-AXC"/>
                     <constraint firstItem="Q5Z-L5-pk0" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="JUs-AB-3sn"/>
+                    <constraint firstItem="uoj-Dx-7bk" firstAttribute="leading" secondItem="Q5Z-L5-pk0" secondAttribute="trailing" constant="5" id="OEx-aT-lj0"/>
                     <constraint firstItem="ytK-8O-sV5" firstAttribute="centerX" secondItem="kKl-qt-iSX" secondAttribute="centerX" id="PjB-Wn-wbU"/>
                     <constraint firstItem="KDU-EY-7DQ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="RVY-Se-5L5"/>
                     <constraint firstItem="kKl-qt-iSX" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="KDU-EY-7DQ" secondAttribute="trailing" constant="5" id="WZJ-ZY-y84"/>
                     <constraint firstItem="KjS-uh-uUV" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.7" id="agE-tm-Mlp"/>
-                    <constraint firstItem="kKl-qt-iSX" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" multiplier="1.25" id="bUE-0L-i4r"/>
+                    <constraint firstItem="kKl-qt-iSX" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" multiplier="1.01" id="bUE-0L-i4r"/>
                     <constraint firstItem="ytK-8O-sV5" firstAttribute="centerY" secondItem="kKl-qt-iSX" secondAttribute="centerY" multiplier="1.05" id="j3m-dK-Wvw"/>
-                    <constraint firstItem="Q5Z-L5-pk0" firstAttribute="leading" secondItem="uoj-Dx-7bk" secondAttribute="trailing" constant="8" symbolic="YES" id="lan-6p-fJZ"/>
+                    <constraint firstAttribute="trailing" secondItem="uoj-Dx-7bk" secondAttribute="trailing" constant="10" id="mGF-O9-zHp"/>
                     <constraint firstItem="KjS-uh-uUV" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="qkh-UO-quK"/>
                     <constraint firstItem="uoj-Dx-7bk" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="uPf-dP-orn"/>
-                    <constraint firstItem="KjS-uh-uUV" firstAttribute="leading" secondItem="kKl-qt-iSX" secondAttribute="trailing" constant="10" id="xrw-gC-JJg"/>
+                    <constraint firstItem="KjS-uh-uUV" firstAttribute="leading" secondItem="kKl-qt-iSX" secondAttribute="trailing" constant="5" id="xrw-gC-JJg"/>
                     <constraint firstItem="uoj-Dx-7bk" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="KjS-uh-uUV" secondAttribute="trailing" constant="5" id="yD3-Tw-7Ye"/>
                 </constraints>
             </tableViewCellContentView>

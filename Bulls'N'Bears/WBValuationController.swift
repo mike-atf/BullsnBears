@@ -13,7 +13,7 @@ import WebKit
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     var sectionTitles = ["Key financials","Earnings & incomings", "Returns", "Outgoings & debt"]
-    var sectionSubTitles = ["from Yahoo finance","Trend & growth EMA","Trend & growth EMA","Trend & Ratio"]
+    var sectionSubTitles: [String?] = [nil,"Trend & growth EMA","Trend & growth EMA","Trend & Ratio"]
     var rowTitles: [[String]]!
     var share: Share!
     var valuation: WBValuation?
@@ -26,21 +26,21 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var valueListChartLegendTitles = [
         [["Revenue"],
          ["Net income"],
-         ["net income / revenue"],
+//         ["net income / revenue"],
          ["Ret. earnings"],
          ["EPS"],
-         ["profit / revenue"],
-         ["Op. cash flow"]
+         ["Profit margin"],
+         ["OpCash flow"]
         ],
         [
-         ["Return on equity"],
-         ["Return on assets"],
-         ["lt debt / adj. equity"]
+         ["ROE"],
+         ["ROA"],
+//         ["lt debt / adj. equity"]
         ],
-        [["cap.expend / earnings"],
-         [" LT debt / net income"],
-         ["SGA / profit"],
-         ["R&D / profit"]
+        [["capExpend/earnings"],
+         ["LT debt/earnings"],
+         ["SGA /profit"],
+         ["R&D /profit"]
         ]]
     var wbvParameters = WBVParameters()
     var downloadTask: Task<Any?,Error>?
@@ -196,7 +196,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         return datedTitles[section]
     }
     
-    public func sectionSubHeaderText(section: Int) -> String {
+    public func sectionSubHeaderText(section: Int) -> String? {
         
         return sectionSubTitles[section]
     }
@@ -516,10 +516,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     private func returnRowTitles() -> [[String]] {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
-        return [["P/E ratio", "EPS", "Book value/share price","Lynch ratio","beta", "intr. share value (10y)"],
-                ["Revenue", "Net income", "Net inc./ Revenue (Trend & ratio)", "Ret. earnings", "EPS", "Profit margin (Trend & ratio)", "Op. cash flow"],
-                ["Return on equity", "Return on assets","LT debt / adj.sh.equity (Trend & ratio)"],
-                ["Cap. expend. / earnings", "LT Debt / net income", "SGA / profit", "R&D / profit"]
+        return [["P/E ratio", "EPS", "BVPS/price","Lynch ratio","beta", "intr. value (10y)"],
+                ["Revenue", "Net income", "Ret. earnings", "EPS", "Profit margin", "OpCash flow"],
+                ["ROE", "ROA"],
+                ["CapEx/earnings", "LT Debt/earnings", "SGA /profit", "R&D /profit"]
         ]
     }
         

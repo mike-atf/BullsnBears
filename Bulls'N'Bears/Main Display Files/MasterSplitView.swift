@@ -20,7 +20,7 @@ class MasterSplitView: UISplitViewController, UISplitViewControllerDelegate {
         delegate = self
         
         let minimumWidth = min(view.bounds.width, view.bounds.height)
-        self.minimumPrimaryColumnWidth = minimumWidth * 0.45
+        self.minimumPrimaryColumnWidth = minimumWidth * 0.4
         self.maximumPrimaryColumnWidth = minimumWidth
 
         
