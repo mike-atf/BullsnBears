@@ -162,13 +162,13 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
 //        let updater = SharesUpdater()
         
-        Task.init(priority: .background) {
+//        Task.init(priority: .background) {
             do {
-                try await controller.updateStocksData()
+                try controller.updateStocksData()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: "StocksListVC - updateShares", systemError: nil, errorInfo: "error when trying to update stock data: \(error)")
             }
-        }
+//        }
         
 //        DispatchQueue.main.async {
 //            let selectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)

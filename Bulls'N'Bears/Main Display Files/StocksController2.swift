@@ -251,9 +251,33 @@ class StocksController2: NSFetchedResultsController<Share> {
 
     // MARK: - update functions
 
-    func updateStocksData() async throws {
+    func updateStocksData() throws {
         
-        backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+        Task.init(priority: .background) {
+            treasuryBondYields = try await updateTreasuryBondYields()
+            DispatchQueue.main.async {
+                self.tbRatesDelegate?.treasuryBondRatesDownloaded()
+            }
+        }
+
+        let sharesToUpdate = fetchedObjects?.filter({ share in
+            if share.watchStatus < 2 { return true }
+            else { return false }
+        })
+        
+        var sharesDict = [String: String]()
+        var dateDict = [String: Date?]()
+        for share in sharesToUpdate ?? [] {
+            sharesDict[share.symbol ?? ""] = share.name_short ?? ""
+            dateDict[share.symbol ?? ""] = share.priceDateRange()?.first
+//            if let minDate = share.priceDateRange()?.first {
+//                dateDict[share.symbol ?? ""] = minDate
+//            } else {
+//                dateDict[share.symbol ?? ""] = nil
+//            }
+        }
+        
+        backgroundMoc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc!.automaticallyMergesChangesFromParent = true
 
         guard let validBackgroundMOC = backgroundMoc else {
@@ -262,6 +286,54 @@ class StocksController2: NSFetchedResultsController<Share> {
 
         NotificationCenter.default.addObserver(self, selector: #selector(backgroundContextDidSave(notification:)), name: .NSManagedObjectContextDidSave, object: nil)
         
+        let dict = sharesDict
+        let dDict = dateDict
+        Task.init(priority: .background, operation: {
+            
+            for dictionaryObject in dict {
+                
+                let time = Date()
+                print("updating share \(dictionaryObject.key)")
+                                
+                let labelledPrice = try await updateCurrentPrice(shareSymbol: dictionaryObject.key)
+                let minDate = dDict[dictionaryObject.key] ?? nil
+                let labelled_datedqEarnings = try await quarterlyEarningsUpdate(shareSymbol: dictionaryObject.key, shortName: dictionaryObject.value, minDate: minDate)
+                
+                guard labelledPrice.value != nil || labelled_datedqEarnings?.datedValues != nil else {
+                    continue
+                }
+                
+                await backgroundMoc?.perform({
+                    let request = NSFetchRequest<Share>(entityName: "Share")
+                    let predicate = NSPredicate(format: "symbol == %@", argumentArray: [dictionaryObject.key])
+                    
+                    request.predicate = predicate
+                    do {
+                        guard let backgroundShare = try validBackgroundMOC.fetch(request).first else {
+                            throw DownloadAndAnalysisError.noBackgroundShareWithSymbol
+                        }
+                        
+                        if let valid = labelledPrice.value {
+                            backgroundShare.lastLivePrice = valid
+                            backgroundShare.lastLivePriceDate = Date()
+                        }
+                        if let valid = labelled_datedqEarnings?.datedValues {
+                            backgroundShare.wbValuation?.saveEPSWithDateArray(datesValuesArray: valid, saveToMOC: false)
+                        }
+                        
+                        try validBackgroundMOC.save()
+                        print("updating \(dictionaryObject.key) took \(Date().timeIntervalSince(time))")
+                    } catch let error {
+                        ErrorController.addErrorLog(errorLocation: "StocksController2.updateStocksData", systemError: error, errorInfo: "error fetching from and/or saving backgroundMOC")
+                    }
+                    
+                })
+                
+            }
+        })
+
+// OLD
+        /*
         var shareIDs_prices = [ShareID_Value]()
         var currentPriceIDSymbols = [ShareID_Symbol_sName]()
         var qEarningsIDSymbols = [ShareID_Symbol_sName]()
@@ -333,26 +405,18 @@ class StocksController2: NSFetchedResultsController<Share> {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "couldn't save background MOC")
             }
         }
-        
-        treasuryBondYields = try await updateTreasuryBondYields()
-        DispatchQueue.main.async {
-            self.tbRatesDelegate?.treasuryBondRatesDownloaded()
-        }
+        */
         
     }
     
     //MARK: - specific update task functions
     
-    func updateCurrentPrice(shareSymbol: String?, shareID: NSManagedObjectID) async throws -> ShareID_Value {
-        
-        guard let symbol = shareSymbol else {
-            throw DownloadAndAnalysisError.shareSymbolMissing
-        }
-        
+    func updateCurrentPrice(shareSymbol: String) async throws -> LabelledValue {
+                
         var components: URLComponents?
                 
-        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)")
-        components?.queryItems = [URLQueryItem(name: "p", value: symbol), URLQueryItem(name: ".tsrc", value: "fin-srch")]
+        components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(shareSymbol)")
+        components?.queryItems = [URLQueryItem(name: "p", value: shareSymbol), URLQueryItem(name: ".tsrc", value: "fin-srch")]
         
         guard let validURL = components?.url else {
             throw DownloadAndAnalysisError.urlError
@@ -361,31 +425,24 @@ class StocksController2: NSFetchedResultsController<Share> {
         var price: Double?
         do {
             try await price = WebPageScraper2.getCurrentPrice(url: validURL)
-            return (shareID, price)
+            return (shareSymbol, price)
 
         } catch let error as DownloadAndAnalysisError {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(symbol) occurred: \(error)")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
         }
-        return (shareID, nil)
+        return (shareSymbol, nil)
     }
     
-    func quarterlyEarningsUpdate(shareSymbol: String?, shortName: String? , shareID: NSManagedObjectID) async throws -> ShareID_DatedValues {
-        
-        guard let symbol = shareSymbol else {
-            throw DownloadAndAnalysisError.shareSymbolMissing
-        }
-        
-        guard var shortName = shortName else {
-            throw DownloadAndAnalysisError.shareShortNameMissing
-        }
-        
+    func quarterlyEarningsUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil) async throws -> Labelled_DatedValues? {
+                
+        var shortName = shortName
         if shortName.contains(" ") {
             shortName = shortName.replacingOccurrences(of: " ", with: "-")
         }
         
-        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(shortName)/pe-ratio") else {
+        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(shareSymbol)/\(shortName)/pe-ratio") else {
             throw DownloadAndAnalysisError.urlInvalid
-            }
+        }
         
         guard let url = components.url else {
             throw DownloadAndAnalysisError.urlError
@@ -394,13 +451,15 @@ class StocksController2: NSFetchedResultsController<Share> {
         var values: [Dated_EPS_PER_Values]?
         
         do {
-            values = try await WebPageScraper2.getHxEPSandPEData(url: url, companyName: shortName, until: nil)
+            values = try await WebPageScraper2.getHxEPSandPEData(url: url, companyName: shortName, until: minDate)
         }  catch let error as DownloadAndAnalysisError {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol ?? "missing") occurred: \(error)")
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
         }
         
-        let epsDates = values?.compactMap{ DatedValue(date: $0.date, value: $0.epsTTM) }
-        return ShareID_DatedValues(id: shareID, values: epsDates)
+        guard let epsDates = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) }) else {
+            return nil
+        }
+        return Labelled_DatedValues(label: shareSymbol, datedValues: epsDates)
 
     }
 

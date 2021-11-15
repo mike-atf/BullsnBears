@@ -839,17 +839,29 @@ class WebPageScraper2 {
     /// for MT pages such as 'PE-Ratio' with dated rows and table header
     class func extractTable(title: String, html: String) async throws -> String {
         
-        let tableTitle = title.replacingOccurrences(of: "-", with: " ")
+        var tableTitle = title.replacingOccurrences(of: "-", with: " ")
+        var tableStartIndex = html.range(of: tableTitle)
+        var titleComponents = tableTitle.split(separator: " ")
         
-        guard let tableStartIndex = html.range(of: tableTitle) else {
+        repeat {
+            titleComponents = titleComponents.dropLast()
+            tableTitle = ""
+            for component in titleComponents {
+                tableTitle += String(component)
+            }
+            tableStartIndex = html.range(of: tableTitle)
+            
+        } while tableStartIndex == nil && titleComponents.count > 0
+        
+        if tableStartIndex == nil {
             throw DownloadAndAnalysisError.htmlTableTitleNotFound
         }
         
-        guard let tableEndIndex = html.range(of: "</table>",options: [NSString.CompareOptions.literal], range: tableStartIndex.upperBound..<html.endIndex, locale: nil) else {
+        guard let tableEndIndex = html.range(of: "</table>",options: [NSString.CompareOptions.literal], range: tableStartIndex!.upperBound..<html.endIndex, locale: nil) else {
             throw DownloadAndAnalysisError.htmlTableEndNotFound
         }
         
-        let tableText = String(html[tableStartIndex.upperBound..<tableEndIndex.lowerBound])
+        let tableText = String(html[tableStartIndex!.upperBound..<tableEndIndex.lowerBound])
 
         return tableText
     }

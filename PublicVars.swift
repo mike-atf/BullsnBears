@@ -25,6 +25,7 @@ enum DownloadAndAnalysisError: Error {
     case shareSymbolMissing
     case shareShortNameMissing
     case shareWBValuationMissing
+    case noBackgroundShareWithSymbol
     case htmlSectionTitleNotFound
     case htmlRowStartIndexNotFound
     case htmlRowEndIndexNotFound
@@ -50,6 +51,7 @@ typealias ShareID_DatedValues = (id: NSManagedObjectID, values: [DatedValue]?)
 typealias PriceDate = (date: Date, price: Double)
 typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
 typealias ProfileData = (sector: String, industry: String, employees: Double)
+typealias LabelledValue = (label: String, value: Double?)
 typealias LabelledValues = (label: String, values: [Double])
 typealias Labelled_DatedValues = (label: String, datedValues: [DatedValue])
 typealias DatedValue = (date: Date, value: Double)
