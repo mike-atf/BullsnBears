@@ -28,7 +28,7 @@ class WebPageScraper2 {
             var tableText = String()
             var tableHeaderTexts = [String]()
             var datedValues = [Dated_EPS_PER_Values]()
-            let title = companyName.capitalized(with: .current)
+//            let title = companyName.capitalized(with: .current)
         
             do {
                 htmlText = try await Downloader.downloadData(url: url)
@@ -37,7 +37,7 @@ class WebPageScraper2 {
             }
                 
             do {
-                tableText = try await extractTable(title:"\(title) PE Ratio Historical Data", html: htmlText)
+                tableText = try await extractTable(title:"PE Ratio Historical Data", html: htmlText) // \(title)
             } catch let error as DownloadAndAnalysisError {
                 throw error
             }
@@ -839,19 +839,19 @@ class WebPageScraper2 {
     /// for MT pages such as 'PE-Ratio' with dated rows and table header
     class func extractTable(title: String, html: String) async throws -> String {
         
-        var tableTitle = title.replacingOccurrences(of: "-", with: " ")
-        var tableStartIndex = html.range(of: tableTitle)
-        var titleComponents = tableTitle.split(separator: " ")
-        
-        repeat {
-            titleComponents = titleComponents.dropLast()
-            tableTitle = ""
-            for component in titleComponents {
-                tableTitle += String(component)
-            }
-            tableStartIndex = html.range(of: tableTitle)
-            
-        } while tableStartIndex == nil && titleComponents.count > 0
+        let tableTitle = title.replacingOccurrences(of: "-", with: " ")
+        let tableStartIndex = html.range(of: tableTitle)
+//        var titleComponents = tableTitle.split(separator: " ")
+//
+//        repeat {
+//            titleComponents = titleComponents.dropLast()
+//            tableTitle = ""
+//            for component in titleComponents {
+//                tableTitle += String(component)
+//            }
+//            tableStartIndex = html.range(of: tableTitle)
+//
+//        } while tableStartIndex == nil && titleComponents.count > 0
         
         if tableStartIndex == nil {
             throw DownloadAndAnalysisError.htmlTableTitleNotFound
