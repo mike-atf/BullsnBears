@@ -249,8 +249,6 @@
 		EAFCB96025C5F0240029AA4F /* MTCookies in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB95E25C5F0240029AA4F /* MTCookies */; };
 		EAFCB96125C5F0240029AA4F /* MTCookies in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB95E25C5F0240029AA4F /* MTCookies */; };
 		EAFCB96925C72DDB0029AA4F /* HiddenWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */; };
-		EAFCB96A25C72DDB0029AA4F /* HiddenWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */; };
-		EAFCB96B25C72DDB0029AA4F /* HiddenWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */; };
 		EAFCB97025C807A80029AA4F /* ValuationListCellData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */; };
 		EAFCB97125C807A80029AA4F /* ValuationListCellData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */; };
 		EAFCB97225C807A80029AA4F /* ValuationListCellData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */; };
@@ -415,7 +413,7 @@
 		EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedValuationController.swift; sourceTree = "<group>"; };
 		EAF5D74225B06F2E00E7A681 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		EAFCB95E25C5F0240029AA4F /* MTCookies */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = MTCookies; sourceTree = "<group>"; };
-		EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenWebView.swift; sourceTree = SOURCE_ROOT; };
+		EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HiddenWebView.swift; path = Unused/HiddenWebView.swift; sourceTree = SOURCE_ROOT; };
 		EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationListCellData.swift; sourceTree = SOURCE_ROOT; };
 		EAFCB97C25C9A4060029AA4F /* ValuationSummaryTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationSummaryTVC.swift; sourceTree = SOURCE_ROOT; };
 		EAFCB98625C9A4DE0029AA4F /* ValuationSummaryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationSummaryCell.swift; sourceTree = "<group>"; };
@@ -484,6 +482,7 @@
 				EA7B613825C412860018BA02 /* StockTickerDictionary.csv */,
 				EAFCB95E25C5F0240029AA4F /* MTCookies */,
 				EAED148325A8CED20073C46F /* Bulls'N'Bears */,
+				EADCE1FC274507A4003CAA3F /* Unused */,
 				EAED148F25A8CFF70073C46F /* Bulls'N'BearsUITests */,
 				EAED148425A8CF060073C46F /* Bulls'N'BearsTests */,
 				EAC19047257641160030B331 /* Products */,
@@ -530,15 +529,12 @@
 			isa = PBXGroup;
 			children = (
 				EAA548B82734302F0083808A /* WebPageScraper2.swift */,
-				EA51A9BF2632FD3200C857A8 /* CitationsManager.swift */,
-				EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */,
-				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
-				EAC07B6E25B8950E00B6C898 /* DCFWebDataAnalyser.swift */,
-				EA52EDC725D18D760000155F /* WebpageScraper.swift */,
-				EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */,
-				EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */,
 				EAA548B627342FA10083808A /* Downloader.swift */,
-				EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */,
+				EAC07B6E25B8950E00B6C898 /* DCFWebDataAnalyser.swift */,
+				EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */,
+				EA51A9BF2632FD3200C857A8 /* CitationsManager.swift */,
+				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
+				EA39A44625C5BF5300DE0FF9 /* R1WebDataAnalyser.swift */,
 				EAF5D74225B06F2E00E7A681 /* Extensions.swift */,
 				EAAA06AF25AA01A00077A972 /* ErrorController.swift */,
 				EAD835DF25DC06EC0015C93A /* Calculator.swift */,
@@ -579,6 +575,17 @@
 				EA2016132715B7CC004432EC /* DiaryDetailVC.swift */,
 			);
 			path = "Diary Files";
+			sourceTree = "<group>";
+		};
+		EADCE1FC274507A4003CAA3F /* Unused */ = {
+			isa = PBXGroup;
+			children = (
+				EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */,
+				EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */,
+				EA52EDC725D18D760000155F /* WebpageScraper.swift */,
+				EA50DEF125D427B10005B23A /* StocksController.swift */,
+			);
+			path = Unused;
 			sourceTree = "<group>";
 		};
 		EAED148325A8CED20073C46F /* Bulls'N'Bears */ = {
@@ -646,6 +653,8 @@
 		EAFD825025A4D2D800D27566 /* Main Display Files */ = {
 			isa = PBXGroup;
 			children = (
+				EA0E2F212625CBD500602BEE /* StocksListTVC.swift */,
+				EAA548B427342D170083808A /* StocksController2.swift */,
 				EA641C282642BCD4002FE8C1 /* TBYChartViewController.swift */,
 				EA0E2F282625D50A00602BEE /* SortView.swift */,
 				EA0E2F2F2625E32500602BEE /* RimmedLabel.swift */,
@@ -654,10 +663,7 @@
 				EA0F889F2639D03C009C980F /* ManualSearchVC.swift */,
 				EA805DC425D54D4E00720E68 /* StockSearchTVC.swift */,
 				EAC190B2257661F60030B331 /* MasterSplitView.swift */,
-				EA0E2F212625CBD500602BEE /* StocksListTVC.swift */,
 				EAB58D7F26F4CADE00F70F9A /* ShareTransactionDialog.swift */,
-				EA50DEF125D427B10005B23A /* StocksController.swift */,
-				EAA548B427342D170083808A /* StocksController2.swift */,
 				EAC2FC4F25A0B93D0060F387 /* StockListCellTableViewCell.xib */,
 				EAC2FC4E25A0B93D0060F387 /* StockListCellTableViewCell.swift */,
 				EAC190D42576731B0030B331 /* StockChartVC.swift */,
@@ -1008,7 +1014,6 @@
 				EAD835FC25DC16470015C93A /* WBValuationCell.swift in Sources */,
 				EAD835E825DC10700015C93A /* ValueListTVC.swift in Sources */,
 				EAC2FC5125A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
-				EAFCB96A25C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EAD835F025DC12000015C93A /* ValueListCell.swift in Sources */,
 				EA20160E2714BE3D004432EC /* DiaryListCell.swift in Sources */,
 				EA163F78258BA85E000974AB /* StockTrend.swift in Sources */,
@@ -1069,7 +1074,6 @@
 				EAD835FD25DC16470015C93A /* WBValuationCell.swift in Sources */,
 				EAD835E925DC10700015C93A /* ValueListTVC.swift in Sources */,
 				EAC2FC5225A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,
-				EAFCB96B25C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EAD835F125DC12000015C93A /* ValueListCell.swift in Sources */,
 				EA20160F2714BE3D004432EC /* DiaryListCell.swift in Sources */,
 				EA163F79258BA85E000974AB /* StockTrend.swift in Sources */,

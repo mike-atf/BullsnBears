@@ -8,8 +8,10 @@
 import UIKit
 import WebKit
 
+/*
 class HiddenWebView: WKWebView {
 
     var section = String()
     
 }
+*/

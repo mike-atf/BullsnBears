@@ -321,14 +321,19 @@ public class WBValuation: NSManagedObject {
     /// returns arary of sums of sahreholdersEquity + equityRepurchased
     public func adjustedEquity() -> [Double] {
         
+
+        guard let erp = equityRepurchased else {
+            return [Double]()
+        }
+
         var sums = [Double]()
         var count = 0
 
         if shareholdersEquity?.count ?? 0 > 0 {
         
             for element in shareholdersEquity ?? [] {
-                if (equityRepurchased?.count ?? 0) >= count {
-                    sums.append(element + equityRepurchased![count])
+                if (erp.count) > count {
+                    sums.append(element + erp[count])
                 }
                 
                 count += 1

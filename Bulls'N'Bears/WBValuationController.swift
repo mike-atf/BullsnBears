@@ -9,6 +9,76 @@ import Foundation
 import CoreData
 import WebKit
 
+struct WBVParameters {
+    // when adding new parameter check impact in WBVValuationController and WBVValuationTVC and ValueListTVC
+    // also adapt 'higherIsBetter' parameter in UserEvaluation
+    // careful - the '/' characters are used in ValueListVC to determine the charts to show
+    let revenueGrowth = "Revenue and its compound growth"
+    let earnigsGrowth = "Net earnings and their compound growth"
+    let retEarningsGrowth = "Ret. earnings and their compound growth"
+    let epsGrowth = "EPS and its compound growth"
+    let incomeOfRevenueGrowth = "[Net income / revenue] and its compound growth"
+    let profitOfRevenueGrowth = "[Profit / revenue] and its compound growth"
+    let capExpendOfEarningsGrowth = "[Cap. expend / net income] and its compound growth"
+    let earningsToPERratio = "[Earnings / pe ratio] and its compound growth"
+    let debtOfIncomeGrowth = "[LT debt / net income] and its compound growth"
+    let opCashFlowGrowth = "Op. cash flow and its compound growth"
+    let roeGrowth = "Return on equity and its compound growth"
+    let roaGrowth = "Rturn on assets and its compound growth"
+    let debtOfEqAndRtEarningsGrowth = "[LT debt / adj. equity] and its compound growth"
+    let sgaOfProfitGrowth = "[SGA / profit] and its compound growth"
+    let rAdOfProfitGrowth = "[R&D / profit]  and its compound growth"
+    
+    func allParameters() -> [String] {
+        return [earnigsGrowth,retEarningsGrowth, epsGrowth, incomeOfRevenueGrowth, profitOfRevenueGrowth, capExpendOfEarningsGrowth, debtOfIncomeGrowth, roeGrowth, roaGrowth ,debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth ,rAdOfProfitGrowth]
+    }
+    
+    func structuredTitlesParameters() -> [[[String]]] {
+        return [firstSection(), secondSection(), thirdSection()]
+    }
+        
+    func firstSection() -> [[String]] {
+        return [[revenueGrowth],
+                [earnigsGrowth],
+//                [incomeOfRevenueGrowth], //, "Revenue"
+                [retEarningsGrowth],
+                [epsGrowth],
+                [profitOfRevenueGrowth], //, "Revenue"
+                [opCashFlowGrowth]]
+    }
+    
+    func secondSection() -> [[String]] {
+        return [[roeGrowth],
+                [roaGrowth],
+//                [debtOfEqAndRtEarningsGrowth]
+        ] // , "equity + ret. earnings"
+    }
+    
+    func thirdSection() -> [[String]] {
+        return [[capExpendOfEarningsGrowth], //, "Net income"
+                [debtOfIncomeGrowth], //, "Net income"
+                [sgaOfProfitGrowth], // , "Profit"
+                [rAdOfProfitGrowth]] // , "Profit"]
+    }
+
+    /// all other WBVParameters have highIsBetter
+    func higherIsWorseParameters() -> [String] {
+        return [debtOfIncomeGrowth, debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth, rAdOfProfitGrowth]
+    }
+    
+    func isHigherBetter(for parameter: String) -> Bool {
+        
+        for term in higherIsWorseParameters() {
+            if parameter == term {
+                return false
+            }
+        }
+
+        return true
+    }
+}
+
+
 
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
@@ -184,20 +254,25 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     public func sectionHeaderText(section: Int) -> String {
         
-        var date$ = String()
-        if let date = valuation?.date {
-            date$ = dateFormatter.string(from: date)
-        }
-    
-        var datedTitles = [sectionTitles[0]] // not dated
-        for i in 1..<sectionTitles.count {
-            datedTitles.append(sectionTitles[i] + " (" + date$ + ")")
-        }
-        return datedTitles[section]
+        return sectionTitles[section]
+        
+//        var date$ = String()
+//        if let date = valuation?.date {
+//            date$ = dateFormatter.string(from: date)
+//        }
+//
+//        var datedTitles = [sectionTitles[0]] // not dated
+//        for i in 1..<sectionTitles.count {
+//            datedTitles.append(sectionTitles[i] + " (" + date$ + ")")
+//        }
+//        return datedTitles[section]
     }
     
     public func sectionSubHeaderText(section: Int) -> String? {
         
+        if let date = valuation?.date {
+            sectionSubTitles[0] =  "Valuation figures from " + dateFormatter.string(from: date)
+        }
         return sectionSubTitles[section]
     }
 
@@ -322,16 +397,16 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
                 return (value$, color, errors)
                 
+//            case 2:
+//            // net income / revenue
+//                let (proportions, es$) = valuation!.netIncomeProportion()
+//                errors = es$
+//                if let average = proportions.ema(periods: emaPeriod) {
+//                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
+//                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: average, greenCutoff: 0.2, redCutOff: 0.1)
+//                }
+//                return (value$, color, errors)
             case 2:
-            // net income / revenue
-                let (proportions, es$) = valuation!.netIncomeProportion()
-                errors = es$
-                if let average = proportions.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: average, greenCutoff: 0.2, redCutOff: 0.1)
-                }
-                return (value$, color, errors)
-            case 3:
             // Ret. earnings
                 let retEarningsGrowths = Calculator.compoundGrowthRates(values: valuation?.equityRepurchased)// valuation?.equityRepurchased?.growthRates()
                 
@@ -342,7 +417,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
                 return (value$, color, errors)
 
-            case 4:
+            case 3:
                 // EPS
                 if let growthRatesMean = Calculator.compoundGrowthRates(values: valuation!.eps)?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
@@ -351,7 +426,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
                 return (value$,color,errors)
 
-           case 5:
+           case 4:
             // profit margin
                 let (margins, es$) = valuation!.grossProfitMargins()
                 errors = es$
@@ -360,7 +435,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: averageMargin, greenCutoff: 0.4, redCutOff: 0.2)
                 }
                 return (value$,color,errors)
-            case 6:
+            case 5:
             // op. cash flow
                 let fcfGrowth = Calculator.compoundGrowthRates(values: valuation!.opCashFlow)
                 if let meanGrowth = fcfGrowth?.ema(periods: emaPeriod) {
@@ -401,10 +476,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
                 return (value$, color, errors)
 
-            case 2:
-            // LT debt / adj shareholder equity
-                
-                let (first3Average, average, mistakes) = valuation!.ltDebtPerAdjEquityProportion()
+//            case 2:
+//            // LT debt / adj shareholder equity
+//
+//                let (first3Average, average, mistakes) = valuation!.ltDebtPerAdjEquityProportion()
 //                let (shEquityWithRetEarnings, error) = valuation!.addElements(array1: valuation!.shareholdersEquity ?? [], array2: valuation!.equityRepurchased ?? [])
 //                if error != nil {
 //                    errors = [error!]
@@ -415,21 +490,21 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 //                    if errors != nil { errors?.append(contentsOf: es$!) }
 //                    else { errors = es$! }
 //                }
-                if average != nil {
-                    if first3Average ?? 0 < 0 && average! < 0 {
-                        // recently negative equity resulting in wrongly negative LT debt
-                        value$ = "neg!"
-                        errors = ["Long-term debt set against recently negative equity with retained earnings"]
-                        color = GradientColorFinder.redGradientColor()
-                    }
-                    else {
-                        errors = mistakes
-                        value$ = percentFormatter0Digits.string(from: average! as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average!, greenCutoff: 0.8, redCutOff: 0.8 )
-                    }
-                }
-
-                return (value$, color, errors)
+//                if average != nil {
+//                    if first3Average ?? 0 < 0 && average! < 0 {
+//                        // recently negative equity resulting in wrongly negative LT debt
+//                        value$ = "neg!"
+//                        errors = ["Long-term debt set against recently negative equity with retained earnings"]
+//                        color = GradientColorFinder.redGradientColor()
+//                    }
+//                    else {
+//                        errors = mistakes
+//                        value$ = percentFormatter0Digits.string(from: average! as NSNumber) ?? "-"
+//                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 100, value: average!, greenCutoff: 0.8, redCutOff: 0.8 )
+//                    }
+//                }
+//
+//                return (value$, color, errors)
 
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")

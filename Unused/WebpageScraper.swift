@@ -7,6 +7,7 @@
 
 import Foundation
 
+/*
 class WebpageScraper {
     
     /// webpageExponent = the exponent used by the webpage to listing financial figures, e.g. 'thousands' on yahoo = 3.0
@@ -747,3 +748,4 @@ class WebpageScraper {
     }
 
 }
+*/
