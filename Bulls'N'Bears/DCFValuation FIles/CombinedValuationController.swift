@@ -19,7 +19,7 @@ protocol ValuationDelegate {
 }
 
 
-class CombinedValuationController: ValuationDelegate {
+class CombinedValuationController: NSObject ,ValuationDelegate {
     
     weak var valuationListViewController: ValuationListViewController!
     var valuation: Any?
@@ -389,7 +389,7 @@ class CombinedValuationController: ValuationDelegate {
             // NEW
             downloadTask = Task.init(priority: .background) {
                 do {
-                    try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: validID, progressDelegate: self.valuationListViewController)
+                    try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: validID, progressDelegate: self.valuationListViewController, downloadRedirectDelegate: self)
                     try Task.checkCancellation()
                 } catch let error {
                     ErrorController.addErrorLog(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
@@ -1292,4 +1292,29 @@ class CombinedValuationController: ValuationDelegate {
         return countNonZero
     }
 
+}
+
+extension CombinedValuationController: URLSessionTaskDelegate {
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest) async -> URLRequest? {
+        
+    // TODO: deal with MT redirects
+        // resulting from wrong share.name_short
+        // need to re-start download and analysis with 'request' = newRequest (or the url)
+        // should also correct the share's name_short to avoid future re-directs
+                    
+        print("redirection request received to \(request.url!)")
+        
+        
+        do {
+            let html = try await Downloader.downloadDataWithRequest(request: request)
+            if html != "" {
+                print("web text received from redirection for \(request.url!)")
+            }
+        } catch let error {
+            print(error.localizedDescription)
+        }
+        
+        return nil
+    }
 }

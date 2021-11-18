@@ -600,14 +600,13 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         
     // MARK: - Data download functions
         
+    /// MUST be called  on main thread
     func downloadWBValuationData() {
                      
-        // MUST happen on main thread
         let symbol = share.symbol
         let shortName = share.name_short
         let valuationID = valuation?.objectID
         let shareID = share.objectID
-        
         
         downloadTask = Task.init(priority: .background) {
             let allTasks = 2
@@ -615,7 +614,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             
             do {
                 if let validID = valuationID {
-                    try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: validID)
+                    try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: validID, downloadRedirectDelegate: self)
                     
                     completedTasks += 1
                     progressDelegate?.progressUpdate(allTasks: allTasks, completedTasks: completedTasks)
@@ -626,6 +625,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             } catch let error {
                 progressDelegate?.downloadError(error: error.localizedDescription)
             }
+            NotificationCenter.default.removeObserver(self)
             progressDelegate?.downloadComplete()
             return nil
         }
@@ -741,135 +741,67 @@ extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
     
  }
 
-/*
-extension WBValuationController: DataDownloaderDelegate {
+extension WBValuationController: DownloadRedirectionDelegate {
     
-    /// caller MUST ensure this is called on the main thread to avoid viewContext concurrency problems
-    func downloadComplete(html$: String?, pageTitle: String?) {
+    @objc
+    func awaitingRedirection(notification: Notification) {
         
-        downloadTasksCompleted += 1
+        NotificationCenter.default.removeObserver(self)
         
-        guard html$ != nil else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
-            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
-            return
-        }
-        
-        guard let section = pageTitle else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete - notification did not contain section info!!")
-            return
-        }
-        
-        var result:(array: [Double]?, errors: [String])
-
-        if section == "financial-statements" {
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Revenue")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.revenue = result.array
-            
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Gross Profit")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.grossProfit = result.array
-            
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Research And Development Expenses")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.rAndDexpense = result.array
-
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "SG&amp;A Expenses")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.sgaExpense = result.array
-            
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Net Income")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.netEarnings = result.array
-            
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Operating Income")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.operatingIncome = result.array
-            
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "EPS - Earnings Per Share")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.eps = result.array
-
-            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-        }
-        else if section == "balance-sheet" {
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Long Term Debt")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.debtLT = result.array
-            
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Property, Plant, And Equipment")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.ppe = result.array
-            
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Retained Earnings (Accumulated Deficit)")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.equityRepurchased = result.array
-
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Share Holder Equity")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.shareholdersEquity = result.array
-            
-            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-        }
-        else if section == "cash-flow-statement" {
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Investing Activities")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.capExpend = result.array?.positives() // converted from negative for more intuitive correlation display in ValueLIstTVC and WBValuationTVC
-            
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Cash Flow From Operating Activities")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.opCashFlow = result.array
-
-            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-        }
-        else if section == "financial-ratios" {
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROE - Return On Equity")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.roe = result.array
-
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "ROA - Return On Assets")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.roa = result.array
-            
-            result = WebpageScraper.scrapeRowForDoubles(website: .macrotrends, html$: html$, sectionHeader: nil, rowTitle: "Book Value Per Share")
-            downloadErrors.append(contentsOf: result.errors)
-            valuation?.bvps = result.array
-            
-            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks, completedTasks: self.downloadTasksCompleted)
-        }
-        else if section == "pe-ratio" {
-            result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
-            share?.peRatio = result.array?.compactMap{ $0 }.filter({ per in
-                if per == 0 { return false }
-                else { return true }
-            }).last ?? Double()
-            downloadErrors.append(contentsOf: result.errors)
-            
-            let (results1,results2, errors) = WebpageScraper.scrapePERDatesTable(html$: html$, tableHeader: "PE Ratio Historical Data</th>")
-            downloadErrors.append(contentsOf: errors)
-            valuation?.savePERWithDateArray(datesValuesArray: results1)
-            valuation?.saveEPSWithDateArray(datesValuesArray: results2)
-
-            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
-        }
-        else if section == "stock-price-history" {
-            result = WebpageScraper.scrapeColumn(html$: html$, tableHeader: "Historical Annual Stock Price Data</th>", tableTerminal: "</td>\n\t\t\t\t </tr>\n\n\t\t\t\t\t\t\n\t\t\t\t</tbody>\n\t\t\t",noOfColumns: 7, targetColumnFromRight: 5) //    </table>\t\t\t\n\t\t\t\n\t\t\t</div>
-            valuation?.avAnStockPrice = result.array?.reversed()
-            downloadErrors.append(contentsOf: result.errors)
-
-            self.progressDelegate?.progressUpdate(allTasks: self.downloadTasks ,completedTasks: self.downloadTasksCompleted)
-        }
-        
-        
-        if downloadTasksCompleted == downloadTasks {
-            self.valuation?.date = Date()
-            self.valuation?.save()
-
-            self.progressDelegate?.downloadComplete()
+        if let request = notification.object as? URLRequest {
+            if let url = request.url {
+                var components = url.pathComponents.dropLast()
+                if let component = components.last {
+                    let mtShortName = String(component)
+                    components = components.dropLast()
+                    if let symbolComponent = components.last {
+                        let symbol = String(symbolComponent)
+                        
+                        DispatchQueue.main.async {
+                            if self.share.symbol == symbol {
+                                self.share.name_short = mtShortName
+                                do {
+                                    try self.share.managedObjectContext?.save()
+                                } catch let error {
+                                    ErrorController.addErrorLog(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "couldn't save \(symbol) in it's MOC after downlaod re-direction")
+                                }
+                                
+                                if let info = notification.userInfo as? [String:Any] {
+                                    if let task = info["task"] as? DownloadTask {
+                                        switch task {
+                                        case .epsPER:
+                                            print("WBValuationController: redirect for \(symbol) epsPER task recevied")
+                                        case .test:
+                                            print("WBValuationController: redirect for \(symbol) test task recevied")
+                                        case .wbValuation:
+                                            print("WBValuationController: redirect for \(symbol) wbValuation task recevied")
+                                            self.downloadWBValuationData()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest) async -> URLRequest? {
+           
+        // TODO: deal with MT redirects
+            // resulting from wrong share.name_short
+            // need to re-start download and analysis with 'request' = newRequest (or the url)
+            // should also correct the share's name_short to avoid future re-directs
+
+        print("WBValuationController received redirection method call to \(request.url!)")
+        let object = request
+        let notification = Notification(name: Notification.Name(rawValue: "Redirection"), object: object, userInfo: nil)
+        NotificationCenter.default.post(notification)
+
+        return nil
+    }
+
 }
-*/
 
 

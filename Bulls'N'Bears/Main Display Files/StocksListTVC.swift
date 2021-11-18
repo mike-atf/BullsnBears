@@ -91,7 +91,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         NotificationCenter.default.addObserver(self, selector: #selector(updateShares), name: Notification.Name(rawValue: "ActivatedFromBackground"), object: nil)
 
         controller.delegate = self
-        controller.tbRatesDelegate = self
+        controller.controllerDelegate = self
         controller.viewController = self
                 
         sortView.delegate = self
@@ -168,6 +168,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: "StocksListVC - updateShares", systemError: nil, errorInfo: "error when trying to update stock data: \(error)")
             }
+        tableView.refreshControl?.endRefreshing()
 //        }
         
 //        DispatchQueue.main.async {
@@ -295,7 +296,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     public func addShare(fileURL: URL, companyName: String?=nil) {
         
             do {
-                if let share = try StocksController2.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
+                if let share = try controller.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
                     try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
                     let shareID = share.objectID // is thread safe
                         
@@ -522,12 +523,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         
     }
-    
-    @IBAction func showAllShares(_ sender: UIBarButtonItem) {
-        sortParameterChanged()
-    }
-    
-    
+        
     @IBAction func showDiary(_ sender: Any) {
         
         guard let diarySplitView = UIStoryboard(name: "Diary", bundle: nil).instantiateViewController(withIdentifier: "DiarySplitView") as? UISplitViewController else {
@@ -597,7 +593,7 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
     func newShare(symbol: String, prices: [PricePoint]?) {
                 
             do {
-                if let share = try StocksController2.createShare(with: prices, symbol: symbol) {
+                if let share = try controller.createShare(with: prices, symbol: symbol) {
                     try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
                                             
                     Task.init(priority: .background) {
@@ -682,6 +678,15 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
 }
 
 extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
+    
+    func shareUpdateComplete(atPath: IndexPath) {
+        
+        print("delegate received 'update complete' notification")
+//        let targetCell = tableView.cellForRow(at: atPath) as! StockListCellTableViewCell
+//        targetCell.updateCycleCompleted()
+        tableView.reloadRows(at: [atPath], with: .none)
+    }
+    
     
     func livePriceUpdated(indexPath: IndexPath?) {
 

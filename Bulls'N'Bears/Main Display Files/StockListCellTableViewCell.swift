@@ -15,6 +15,7 @@ class StockListCellTableViewCell: UITableViewCell {
     @IBOutlet var reportDateLabel: UILabel!
     @IBOutlet var ratingCircle: ScoreCircle!
     @IBOutlet var actionView: BuySellView!
+    @IBOutlet var updateIcon: UIImageView!
     
     var indexPath: IndexPath!
     var stock: Share!
@@ -37,6 +38,8 @@ class StockListCellTableViewCell: UITableViewCell {
         self.detail.text = " "
         self.ratingCircle.isHidden = true
         actionView.resetForReuse()
+        updateIcon.image = nil
+//        updateIcon.tintColor = UIColor.systemRed
     }
     
     public func configureCell(indexPath: IndexPath, stock: Share, userRatingScore: Double?, valueRatingScore: Double?, scoreDelegate: ScoreCircleDelegate, userCommentCount: Int) {
@@ -68,5 +71,24 @@ class StockListCellTableViewCell: UITableViewCell {
         actionView.configure(share: stock)
         let score = ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore") == "valueScore" ? valueRatingScore : userRatingScore
         ratingCircle.configure(score: score,delegate: scoreDelegate, path: indexPath, isUserScore: true, userCommentsCount: userCommentCount)
+        
+        if stock.watchStatus > 1 {
+            updateIcon.image = nil
+            updateIcon.tintColor = UIColor.systemRed
+            return
+        }
+        
+        if let lastUpdateDate = stock.lastLivePriceDate {
+            if Date().timeIntervalSince(lastUpdateDate) < 3600 {
+                updateIcon.image = UIImage(systemName: "checkmark.circle.fill")
+                updateIcon.tintColor = UIColor.systemGreen
+            } else {
+                updateIcon.image = UIImage(systemName: "xmark.circle.fill")
+                updateIcon.tintColor = UIColor.systemRed
+            }
+        } else {
+            updateIcon.image = nil
+            updateIcon.tintColor = UIColor.systemRed
+        }
     }
 }

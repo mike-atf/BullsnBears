@@ -8,7 +8,12 @@
 import UIKit
 import CoreData
 
-class WebPageScraper2 {
+@objc protocol DownloadRedirectionDelegate: URLSessionTaskDelegate {
+    
+    func awaitingRedirection(notification: Notification)
+}
+
+class WebPageScraper2: NSObject {
     
     var progressDelegate: ProgressViewDelegate?
     
@@ -22,22 +27,31 @@ class WebPageScraper2 {
     /// in form of [DatedValues] = (date, epsTTM, peRatio )
     /// ; optional parameter 'date' returns values back to this date and the first set before.
     /// ; throws downlad and analysis errors, which need to be caught by cailler
-    class func getHxEPSandPEData(url: URL, companyName: String, until date: Date?=nil) async throws -> [Dated_EPS_PER_Values]? {
+    class func getHxEPSandPEData(url: URL, companyName: String, until date: Date?=nil, downloadRedirectDelegate: URLSessionTaskDelegate) async throws -> [Dated_EPS_PER_Values]? {
         
-            var htmlText = String()
+            var htmlText:String?
             var tableText = String()
             var tableHeaderTexts = [String]()
             var datedValues = [Dated_EPS_PER_Values]()
 //            let title = companyName.capitalized(with: .current)
+            let downloader = Downloader(task: .epsPER)
         
             do {
-                htmlText = try await Downloader.downloadData(url: url)
+                // to catch any redirections
+                NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
+                
+                htmlText = try await downloader.downloadDataWithRedirection(url: url)
             } catch let error as DownloadAndAnalysisError {
                 throw error
             }
+        
+            guard let validPageText = htmlText else {
+                throw DownloadAndAnalysisError.generalDownloadError // possible result of MT redirection
+//                return nil
+            }
                 
             do {
-                tableText = try await extractTable(title:"PE Ratio Historical Data", html: htmlText) // \(title)
+                tableText = try await extractTable(title:"PE Ratio Historical Data", html: validPageText) // \(title)
             } catch let error as DownloadAndAnalysisError {
                 throw error
             }
@@ -50,7 +64,7 @@ class WebPageScraper2 {
             
             if tableHeaderTexts.count > 0 && tableHeaderTexts.contains("Date") {
                 do {
-                    datedValues = try extractTableData(html: htmlText, titles: tableHeaderTexts, untilDate: date)
+                    datedValues = try extractTableData(html: validPageText, titles: tableHeaderTexts, untilDate: date)
                     return datedValues
                 } catch let error as DownloadAndAnalysisError {
                    throw error
@@ -126,7 +140,7 @@ class WebPageScraper2 {
         return ProfileData(sector: sector, industry: industry, employees: employees)
     }
     
-    class func r1DataDownloadAndSave(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil) async throws {
+    class func r1DataDownloadAndSave(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: URLSessionTaskDelegate) async throws {
         
         guard let symbol = shareSymbol else {
             progressDelegate?.downloadError(error: DownloadAndAnalysisError.shareSymbolMissing.localizedDescription)
@@ -218,7 +232,7 @@ class WebPageScraper2 {
             }
             
             // the following values are NOT ANNUAL but quarterly, sort of!
-            let values = try await getHxEPSandPEData(url: url, companyName: hyphenatedShortName.capitalized, until: nil)
+            let values = try await getHxEPSandPEData(url: url, companyName: hyphenatedShortName.capitalized, until: nil, downloadRedirectDelegate: downloadRedirectDelegate)
             var newLabelledValues = LabelledValues(label: "PE Ratio Historical Data", values: [Double]())
 
             if let per = values?.compactMap({ $0.peRatio }) {
@@ -496,103 +510,96 @@ class WebPageScraper2 {
         
     }
 
-    class func downloadAnalyseSaveWBValuationData(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil) async throws {
+    class func downloadAnalyseSaveWBValuationData(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
+        
+        print("downloadAnalyseSaveWBValuationData for \(shareSymbol ?? "")")
         
         guard let symbol = shareSymbol else {
             throw DownloadAndAnalysisError.shareSymbolMissing
         }
         
-        guard var shortName = shortName else {
+        guard var sn = shortName else {
             throw DownloadAndAnalysisError.shareShortNameMissing
         }
         
-        if shortName.contains(" ") {
-            shortName = shortName.replacingOccurrences(of: " ", with: "-")
+        if sn.contains(" ") {
+            sn = sn.replacingOccurrences(of: " ", with: "-")
         }
-
+        var downloadErrors: [DownloadAndAnalysisError]?
+        
         let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios"]
         
-//        let sgae = "SG&amp;A Expenses"
         let rowNames = [["Revenue","Gross Profit","Research And Development Expenses","SG&A Expenses","Net Income", "Operating Income", "EPS - Earnings Per Share"],["Long Term Debt","Property, Plant, And Equipment","Retained Earnings (Accumulated Deficit)", "Share Holder Equity"],["Cash Flow From Investing Activities", "Cash Flow From Operating Activities"],["ROE - Return On Equity", "ROA - Return On Assets", "Book Value Per Share"]]
         
         var results = [LabelledValues]()
         var sectionCount = 0
+        let downloader: Downloader? = Downloader(task: .wbValuation)
         for section in webPageNames {
             
 //            print("WPS2.downloading section \(section)")
         
-            guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(shortName)/\(section)") else {
-                    throw DownloadAndAnalysisError.urlInvalid
-            }
-            
-            guard let url = components.url else {
-                throw DownloadAndAnalysisError.urlError
-            }
-            
-            let htmlText = try await Downloader.downloadData(url: url)
-            
-            let labelledDatedValues = try await WebPageScraper2.extractDatedValuesFromMTTable(htmlText: htmlText, rowTitles: rowNames[sectionCount])
-            
-            let labelledValues = labelledDatedValues.compactMap{ LabelledValues(label: $0.label, values: $0.datedValues.compactMap{ $0.value }) }
-//            print(labelledValues)
+            if let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(sn)/\(section)")  {
+                if let url = components.url  {
+                    
+                    NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
 
-            results.append(contentsOf: labelledValues)
-            
-            /*
-            for rowTitle in rowNames[sectionCount] {
-                
-                var labelledValues = LabelledValues(rowTitle, [Double]())
-                
-                if let values: [Double] = WebPageScraper2.scrapeRowForDoubles(website: .macrotrends, html$: htmlText, sectionHeader: nil, rowTitle: rowTitle, rowTerminal: "},") {
-                    labelledValues.values = values
+                    let htmlText = try await downloader?.downloadDataWithRedirection(url: url)
+                    
+                    if let validPageText = htmlText {
+                        
+                        let labelledDatedValues = try await WebPageScraper2.extractDatedValuesFromMTTable(htmlText: validPageText, rowTitles: rowNames[sectionCount])
+                        
+                        
+                        let labelledValues = labelledDatedValues.compactMap{ LabelledValues(label: $0.label, values: $0.datedValues.compactMap{ $0.value }) }
+                        results.append(contentsOf: labelledValues)
+                        
+                        sectionCount += 1
+                    }
+                    else {
+                        if downloadErrors == nil { downloadErrors = [DownloadAndAnalysisError.generalDownloadError] }
+                        else { downloadErrors?.append(DownloadAndAnalysisError.generalDownloadError)}
+                    }
                 }
-                results.append(labelledValues)
             }
-            */
-            sectionCount += 1
         }
         
-        // Historical PE and EPS data with dates
-        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(shortName)/pe-ratio") else {
-                throw DownloadAndAnalysisError.urlInvalid
+// Historical PE and EPS with dates
+        var perAndEPSvalues: [Dated_EPS_PER_Values]?
+        if let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(sn)/pe-ratio") {
+            if let url = components.url {
+                perAndEPSvalues = try await getHxEPSandPEData(url: url, companyName: sn, until: nil, downloadRedirectDelegate: downloadRedirectDelegate)
+            }
         }
-        
-        guard let url = components.url else {
-            throw DownloadAndAnalysisError.urlError
-        }
-        
-        let perAndEPSvalues = try await getHxEPSandPEData(url: url, companyName: shortName, until: nil)
             
-        // Historical PE and EPS data with dates
-        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(shortName)/stock-price-history") else {
-                throw DownloadAndAnalysisError.urlInvalid
-        }
-        
-        // Historial astock prices
-        guard let url = components.url else {
-            throw DownloadAndAnalysisError.urlError
-        }
-        
-        var htmlText = String()
+// Historical stock prices
         var hxPriceValues: [Double]?
         
-        do {
-            htmlText = try await Downloader.downloadData(url: url)
-            
-            hxPriceValues = try macrotrendsScrapeColumn(html$: htmlText, tableHeader: "Historical Annual Stock Price Data</th>", tableTerminal: "</tbody>", columnTerminal: "</td>" ,noOfColumns: 7, targetColumnFromRight: 6)
-        } catch let error {
-            ErrorController.addErrorLog(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
+        if let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(sn)/stock-price-history") {
+            if let url = components.url {
+                
+                var htmlText = String()
+                do {
+                    htmlText = try await Downloader.downloadData(url: url)
+                    
+                    hxPriceValues = try macrotrendsScrapeColumn(html$: htmlText, tableHeader: "Historical Annual Stock Price Data</th>", tableTerminal: "</tbody>", columnTerminal: "</td>" ,noOfColumns: 7, targetColumnFromRight: 6)
+                } catch let error as DownloadAndAnalysisError {
+                    if error == .generalDownloadError {
+                        
+                        let info = ["Redirection": "Object"]
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "Redirection"), object: info)
+                        return
+                    } else {
+                        ErrorController.addErrorLog(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
+                    }
+                }
+            }
         }
-//        print("WPS2.downloadAnalyseSaveWBValuationData results: \(results)")
-//        print()
-//        print("WPS2.downloadAnalyseSaveWBValuationData hxPriceValues: \(hxPriceValues)")
-//        print()
-//        print("WPS2.downloadAnalyseSaveWBValuationData prepare backgroundMoc")
+        
 
         let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc.automaticallyMergesChangesFromParent = true
 
-        await backgroundMoc.perform {
+        try await backgroundMoc.perform {
 
             do {
 //                print("WPS2.downloadAnalyseSaveWBValuationData get wbv from backgroundMoc")
@@ -649,11 +656,13 @@ class WebPageScraper2 {
                         wbv.date = Date()
 
                 }
-//                print("WPS2.downloadAnalyseSaveWBValuationData saving backgroundMoc")
-
                 try backgroundMoc.save()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "couldn't save background MOC")
+            }
+            
+            if (downloadErrors ?? []).contains(DownloadAndAnalysisError.generalDownloadError) {
+                throw DownloadAndAnalysisError.generalDownloadError
             }
         }
     }
@@ -1600,7 +1609,5 @@ class WebPageScraper2 {
         
         return value
     }
-
-
-
 }
+

@@ -10,6 +10,7 @@ import CoreData
 
 protocol StocksController2Delegate {
     func treasuryBondRatesDownloaded()
+    func shareUpdateComplete(atPath: IndexPath)
 }
 
 
@@ -19,7 +20,7 @@ class StocksController2: NSFetchedResultsController<Share> {
     var viewController: StocksListTVC?
     var backgroundMoc: NSManagedObjectContext?
     
-    var tbRatesDelegate: StocksController2Delegate?
+    var controllerDelegate: StocksController2Delegate?
     
     // MARK: - FRC functions
     // these use the main MOC
@@ -61,7 +62,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         return share
     }
 
-    class func createShare(with pricePoints: [PricePoint]?, symbol: String, companyName: String?=nil) throws -> Share? {
+    func createShare(with pricePoints: [PricePoint]?, symbol: String, companyName: String?=nil) throws -> Share? {
         
         guard let validPrices = pricePoints else {
             throw InternalErrors.missingPricePointsInShareCreation
@@ -77,6 +78,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         let macds = newShare.calculateMACDs(shortPeriod: 8, longPeriod: 17)
         newShare.macd = newShare.convertMACDToData(macds: macds)
                 
+        var shortName: String?
         if let dictionary = stockTickerDictionary {
             
             newShare.name_long = companyName ?? dictionary[stockName]
@@ -86,7 +88,7 @@ class StocksController2: NSFetchedResultsController<Share> {
             if (newShare.name_long ?? "").starts(with: "\"") {
                     newShare.name_long = String(newShare.name_long!.dropFirst())
             }
-            
+
             if let longNameComponents = newShare.name_long?.split(separator: " ") {
                 let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co."] // "Group",
                 let replaceTerms = ["S.A.": "sa "]
@@ -98,9 +100,31 @@ class StocksController2: NSFetchedResultsController<Share> {
                         cleanedName += String(component) + " "
                     }
                 }
-                newShare.name_short = String(cleanedName.dropLast())
+                shortName = String(cleanedName.dropLast())
+                newShare.name_short = shortName
             }
         }
+        
+// correct name_short to match MacroTrends requirements.
+// if no match will receive re-direction URLRequest via delegate method at bottom leading to corretion of shortName
+        shortName = shortName?.replacingOccurrences(of: " ", with: "-")
+        let components =  URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(newShare.name_short ?? "")/revenue")
+
+        Task.init(priority: .background) {
+            // will receive redirect delegate call if shortName wrong in MT
+            
+                if let url = components?.url {
+                    NotificationCenter.default.addObserver(self, selector: #selector(awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil) // for MT download redirects
+
+                let test = try await Downloader.mtTestDownload(url: url, delegate: self)
+                if (test ?? false) {
+                    // correct pageTExt received -> no re-direct delegate call expected
+                    NotificationCenter.default.removeObserver(self)
+                }
+            }
+        }
+
+        
         
         // check for any exisisting valuations
         newShare.wbValuation = WBValuationController.returnWBValuations(share: newShare)
@@ -110,7 +134,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         return newShare
     }
 
-    class func createShare(from file: URL?, companyName: String?=nil, deleteFile: Bool?=false) throws -> Share? {
+    func createShare(from file: URL?, companyName: String?=nil, deleteFile: Bool?=false) throws -> Share? {
         
         guard let fileURL = file else {
             throw InternalErrors.missingPricePointsInShareCreation
@@ -131,6 +155,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         let macds = newShare.calculateMACDs(shortPeriod: 8, longPeriod: 17)
         newShare.macd = newShare.convertMACDToData(macds: macds)
                 
+        var shortName: String?
         if let dictionary = stockTickerDictionary {
             newShare.name_long = companyName ?? dictionary[stockName]
             
@@ -145,13 +170,34 @@ class StocksController2: NSFetchedResultsController<Share> {
                         cleanedName += String(component) + " "
                     }
                 }
-                newShare.name_short = String(cleanedName.dropLast())
+                shortName = String(cleanedName.dropLast())
+                newShare.name_short = shortName
             }
         }
         
         if deleteFile ?? false {
             removeFile(file)
         }
+        
+        // correct name_short to match MacroTrends requirements.
+        // if no match will receive re-direction URLRequest via delegate method at bottom leading to corretion of shortName
+        shortName = shortName?.replacingOccurrences(of: " ", with: "-")
+        let components =  URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(stockName)/\(shortName ?? "")/revenue")
+
+        Task.init(priority: .background) {
+            // will receive redirect delegate call if shortName wrong in MT
+            
+                if let url = components?.url {
+                    NotificationCenter.default.addObserver(self, selector: #selector(awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil) // for MT download redirects
+
+                let test = try await Downloader.mtTestDownload(url: url, delegate: self)
+                if (test ?? false) {
+                    // correct pageTExt received -> no re-direct delegate call expected
+                    NotificationCenter.default.removeObserver(self)
+                }
+            }
+        }
+
         
         // check for any exisisting valuations
         newShare.wbValuation = WBValuationController.returnWBValuations(share: newShare)
@@ -233,7 +279,7 @@ class StocksController2: NSFetchedResultsController<Share> {
     }
 
     
-    static func removeFile(_ atURL: URL?) {
+    func removeFile(_ atURL: URL?) {
        
         guard atURL != nil else {
             return
@@ -251,53 +297,80 @@ class StocksController2: NSFetchedResultsController<Share> {
 
     // MARK: - update functions
 
-    func updateStocksData() throws {
+    func updateStocksData(singleShare: Share?=nil) throws {
         
-        Task.init(priority: .background) {
-            treasuryBondYields = try await updateTreasuryBondYields()
-            DispatchQueue.main.async {
-                self.tbRatesDelegate?.treasuryBondRatesDownloaded()
+        if singleShare == nil {
+            Task.init(priority: .background) {
+                treasuryBondYields = try await updateTreasuryBondYields()
+                DispatchQueue.main.async {
+                    self.controllerDelegate?.treasuryBondRatesDownloaded()
+                }
             }
         }
-
-        let sharesToUpdate = fetchedObjects?.filter({ share in
-            if share.watchStatus < 2 { return true }
-            else { return false }
+        
+        var sharesToUpdate: [Share]?
+        if let validShare = singleShare {
+            sharesToUpdate = [validShare]
+        } else {
+            sharesToUpdate = fetchedObjects?.filter({ share in
+                if share.watchStatus < 2 { return true }
+                else { return false }
+            })
+        }
+        
+        let now = Date()
+        sharesToUpdate = sharesToUpdate?.filter({ share in
+            if now.timeIntervalSince(share.lastLivePriceDate ?? now) < 300 { return false }
+            else { return true }
         })
         
-        var sharesDict = [String: String]()
+        //TODO: - create two methods: livePriceupdate() and qEarningsUpdate
+        // two groups of filetere shares: 1. as here if last lic price date < 300
+        // the other to be passed to qEarningsUpdate filtered by last qEarnigsDate > 3 months
+        
+        let compDate = Date()
+        sharesToUpdate = sharesToUpdate?.sorted(by: { s0, s1 in
+            if (s0.lastLivePriceDate ?? compDate) < (s1.lastLivePriceDate ?? compDate) { return true
+            }  else { return false }
+        })
+        
         var dateDict = [String: Date?]()
+        var orderedDict = [ShareNamesDictionary]() // ordered by lastLivePriceUPdate
+        
         for share in sharesToUpdate ?? [] {
-            sharesDict[share.symbol ?? ""] = share.name_short ?? ""
+            let new = ShareNamesDictionary(symbol: share.symbol ?? "", shortName: share.name_short ?? "")
+            orderedDict.append(new)
             dateDict[share.symbol ?? ""] = share.priceDateRange()?.first
-//            if let minDate = share.priceDateRange()?.first {
-//                dateDict[share.symbol ?? ""] = minDate
-//            } else {
-//                dateDict[share.symbol ?? ""] = nil
-//            }
         }
         
         backgroundMoc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc!.automaticallyMergesChangesFromParent = true
 
-        guard let validBackgroundMOC = backgroundMoc else {
-            throw DownloadAndAnalysisError.noBackgroundMOC
-        }
+//        guard let validBackgroundMOC = backgroundMoc else {
+//            throw DownloadAndAnalysisError.noBackgroundMOC
+//        }
 
         NotificationCenter.default.addObserver(self, selector: #selector(backgroundContextDidSave(notification:)), name: .NSManagedObjectContextDidSave, object: nil)
         
-        let dict = sharesDict
+        let dict = orderedDict
         let dDict = dateDict
+        
+        let cookieStore = HTTPCookieStorage.shared
+        for cookie in cookieStore.cookies ?? [] {
+            cookieStore.deleteCookie(cookie)
+        }
+        
+        
         Task.init(priority: .background, operation: {
             
             for dictionaryObject in dict {
-                
+
                 let time = Date()
-                print("updating share \(dictionaryObject.key)")
-                                
-                let labelledPrice = try await updateCurrentPrice(shareSymbol: dictionaryObject.key)
-                let minDate = dDict[dictionaryObject.key] ?? nil
-                let labelled_datedqEarnings = try await quarterlyEarningsUpdate(shareSymbol: dictionaryObject.key, shortName: dictionaryObject.value, minDate: minDate)
+                print("updating share \(dictionaryObject.symbol)")
+                          
+                let labelledPrice = try await updateCurrentPrice(shareSymbol: dictionaryObject.symbol)
+                let minDate = dDict[dictionaryObject.symbol] ?? nil
+                let labelled_datedqEarnings = try await quarterlyEarningsUpdate(shareSymbol: dictionaryObject.symbol, shortName: dictionaryObject.shortName, minDate: minDate)
                 
                 guard labelledPrice.value != nil || labelled_datedqEarnings?.datedValues != nil else {
                     continue
@@ -305,11 +378,11 @@ class StocksController2: NSFetchedResultsController<Share> {
                 
                 await backgroundMoc?.perform({
                     let request = NSFetchRequest<Share>(entityName: "Share")
-                    let predicate = NSPredicate(format: "symbol == %@", argumentArray: [dictionaryObject.key])
+                    let predicate = NSPredicate(format: "symbol == %@", argumentArray: [dictionaryObject.symbol])
                     
                     request.predicate = predicate
                     do {
-                        guard let backgroundShare = try validBackgroundMOC.fetch(request).first else {
+                        guard let backgroundShare = try self.backgroundMoc?.fetch(request).first else {
                             throw DownloadAndAnalysisError.noBackgroundShareWithSymbol
                         }
                         
@@ -321,92 +394,30 @@ class StocksController2: NSFetchedResultsController<Share> {
                             backgroundShare.wbValuation?.saveEPSWithDateArray(datesValuesArray: valid, saveToMOC: false)
                         }
                         
-                        try validBackgroundMOC.save()
-                        print("updating \(dictionaryObject.key) took \(Date().timeIntervalSince(time))")
+                        try backgroundShare.managedObjectContext?.save()
+                        print("updating \(dictionaryObject.symbol) took \(Date().timeIntervalSince(time))")
+                        
+                        let id = backgroundShare.objectID
+                        
+                        DispatchQueue.main.async {
+                            self.updateCompleteToDelegate(id: id)
+                        }
                     } catch let error {
                         ErrorController.addErrorLog(errorLocation: "StocksController2.updateStocksData", systemError: error, errorInfo: "error fetching from and/or saving backgroundMOC")
                     }
                     
                 })
-                
             }
         })
-
-// OLD
-        /*
-        var shareIDs_prices = [ShareID_Value]()
-        var currentPriceIDSymbols = [ShareID_Symbol_sName]()
-        var qEarningsIDSymbols = [ShareID_Symbol_sName]()
-        var shareIDs_datedEPS = [ShareID_DatedValues]()
+    }
+    
+    /// must be called on main thread
+    func updateCompleteToDelegate(id: NSManagedObjectID) {
         
-        for share in fetchedObjects ?? [] {
-            
-            let newObject = ShareID_Symbol_sName(id: share.objectID, symbol: share.symbol, shortName: share.name_short)
-            currentPriceIDSymbols.append(newObject)
-            
-            guard share.watchStatus < 2 else {
-                continue
-            }
-            
-            guard let wbv = share.wbValuation else {
-                continue
-            }
-            
-            guard let historicEPS = wbv.epsWithDates() else {
-                continue
-            }
-            
-            if (historicEPS.last?.date ?? Date()) > Date().addingTimeInterval(-91*24*3600) { continue }
-            
-            qEarningsIDSymbols.append(newObject)
+        let updatedShare = managedObjectContext.object(with: id) as! Share
+        if let path = self.indexPath(forObject: updatedShare) {
+            controllerDelegate?.shareUpdateComplete(atPath: path)
         }
-            
-        for object in currentPriceIDSymbols {
-            shareIDs_prices.append(try await updateCurrentPrice(shareSymbol: object.symbol, shareID: object.id))
-        }
-        
-        for object in qEarningsIDSymbols {
-            do {
-                shareIDs_datedEPS.append(try await quarterlyEarningsUpdate(shareSymbol: object.symbol, shortName: object.shortName, shareID: object.id))
-            } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "qEarnings update error \(error) for \(object.shortName ?? "missing")")
-            }
-        }
-            
-        await validBackgroundMOC.perform {
-            
-            do {
-                let request = NSFetchRequest<Share>(entityName: "Share")
-                let backgroundShares = try validBackgroundMOC.fetch(request)
-                
-                for backgroundShare in backgroundShares {
-                    if let match = shareIDs_prices.filter({ object in
-                        if object.id == backgroundShare.objectID { return true }
-                        else { return false }
-                    }).first {
-                        if let validPrice = match.value {
-                            backgroundShare.lastLivePrice = validPrice
-                            backgroundShare.lastLivePriceDate = Date()
-                       }
-                    }
-                    
-                    if let match = shareIDs_datedEPS.filter({ object in
-                        if object.id == backgroundShare.objectID { return true }
-                        else { return false }
-                    }).first {
-                        if let datedEPS = match.values {
-                            backgroundShare.wbValuation?.saveEPSWithDateArray(datesValuesArray: datedEPS,saveToMOC: false)
-                       }
-                    }
-                }
-                
-                try self.backgroundMoc?.save()
-            } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "couldn't save background MOC")
-            }
-        }
-        */
-        
     }
     
     //MARK: - specific update task functions
@@ -435,12 +446,12 @@ class StocksController2: NSFetchedResultsController<Share> {
     
     func quarterlyEarningsUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil) async throws -> Labelled_DatedValues? {
                 
-        var shortName = shortName
-        if shortName.contains(" ") {
-            shortName = shortName.replacingOccurrences(of: " ", with: "-")
+        var sn = shortName
+        if sn.contains(" ") {
+            sn = sn.replacingOccurrences(of: " ", with: "-").lowercased()
         }
         
-        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(shareSymbol)/\(shortName)/pe-ratio") else {
+        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(shareSymbol)/\(sn)/pe-ratio") else {
             throw DownloadAndAnalysisError.urlInvalid
         }
         
@@ -451,7 +462,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         var values: [Dated_EPS_PER_Values]?
         
         do {
-            values = try await WebPageScraper2.getHxEPSandPEData(url: url, companyName: shortName, until: minDate)
+            values = try await WebPageScraper2.getHxEPSandPEData(url: url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
         }  catch let error as DownloadAndAnalysisError {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
         }
@@ -537,4 +548,66 @@ class StocksController2: NSFetchedResultsController<Share> {
 
     }
 
+}
+
+extension StocksController2: DownloadRedirectionDelegate {
+    
+    func awaitingRedirection(notification: Notification) {
+        
+        NotificationCenter.default.removeObserver(self)
+        
+        if let request = notification.object as? URLRequest {
+            if let url = request.url {
+                var components = url.pathComponents.dropLast()
+                if let component = components.last {
+                    let mtShortName = String(component)
+                    components = components.dropLast()
+                    if let symbolComponent = components.last {
+                        let symbol = String(symbolComponent)
+                        
+                        DispatchQueue.main.async {
+                            if let share = self.fetchedObjects?.filter({ share in
+                                if share.symbol == symbol { return true }
+                                else { return false }
+                            }).first {
+                                share.name_short = mtShortName
+                                do {
+                                    try share.managedObjectContext?.save()
+                                } catch let error {
+                                    ErrorController.addErrorLog(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "couldn't save \(symbol) in it's MOC after downlaod re-direction")
+                                }
+                                
+                                if let info = notification.userInfo as? [String:Any] {
+                                    if let task = info["task"] as? DownloadTask {
+                                        switch task {
+                                        case .epsPER:
+                                            do {
+                                                try self.updateStocksData(singleShare: share)
+                                            } catch let error {
+                                                print("StocksController2: error updating \(symbol) after redirect \(error.localizedDescription)")
+                                            }
+                                            print("StocksController2: redirect for \(symbol) epsPER task recevied")
+                                        case .test:
+                                            print("StocksController2: redirect for \(symbol) test task recevied")
+                                        case .wbValuation:
+                                            print("StocksController2: redirect for \(symbol) wbValuation task recevied")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest) async -> URLRequest? {
+           
+        let object = request
+        let notification = Notification(name: Notification.Name(rawValue: "Redirection"), object: object, userInfo: nil)
+        NotificationCenter.default.post(notification)
+
+        return nil
+    }
 }

@@ -7,7 +7,64 @@
 
 import Foundation
 
-class Downloader {
+enum DownloadTask {
+    case test
+    case epsPER
+    case wbValuation
+}
+
+class Downloader: NSObject {
+    
+    var task: DownloadTask?
+    
+    //MARK: - instance methods
+    convenience init(task: DownloadTask) {
+        self.init()
+        
+        self.task = task
+    }
+        
+    ///  posts notificaiton "Redirection" with object: URlReqeust and userInfo [task:Dowloadtask] and [dellocate:Downloader]
+    ///  caller should add a  DownloadRedirectionDelegate observer to NotificationCenter.default to receive any redirection nofitications
+    func downloadDataWithRedirection(url: URL) async throws -> String? {
+        
+        let request = URLRequest(url: url)
+            
+        let (data,urlResponse) = try await URLSession.shared.data(for: request,delegate: self)
+        
+        if let response = urlResponse as? HTTPURLResponse {
+            if response.statusCode == 200 {
+                if response.mimeType == "text/html" {
+                  return String(data: data, encoding: .utf8) ?? ""
+                }
+                else {
+                    throw DownloadAndAnalysisError.mimeType
+                }
+            }
+            else {
+                throw DownloadAndAnalysisError.generalDownloadError
+            }
+        }
+        
+        return nil
+    }
+
+    //MARK: - class functions
+    
+    /// returns true if download results in htmlText, false if not
+    /// calls delegate if redirect results (shortName wrong), in this case may return  nil
+    /// delegate should extract correct short name for MT from request.url in delegate method
+    class func mtTestDownload(url: URL, delegate: DownloadRedirectionDelegate) async throws -> Bool? {
+        
+            let html$ = try await downloadDataWithRedirectionDelegate(url: url, delegate: delegate)
+            if let validPageText = html$ {
+                if validPageText != "" {
+                    return true
+                }
+                else { return false }
+            }
+            else { return false }
+    }
     
     class func downloadData(url: URL) async throws -> String {
         
@@ -26,13 +83,65 @@ class Downloader {
                 }
             }
             else {
-                throw DownloadAndAnalysisError.urlError
+                throw DownloadAndAnalysisError.generalDownloadError
             }
         }
         
         return htmlText
     }
     
+    /// call this method when the caller provides a DownloadRedirectionDelegate with functions; this comes without the option of specific taks redirection
+    /// otherwise use instance method 'downloadDataWithRedirection' after initialising Downloader with a specific downloadTask for redirection
+    class func downloadDataWithRedirectionDelegate(url: URL, delegate: DownloadRedirectionDelegate) async throws -> String? {
+        
+        let request = URLRequest(url: url)
+            
+        let (data,urlResponse) = try await URLSession.shared.data(for: request,delegate: delegate)
+        
+        if let response = urlResponse as? HTTPURLResponse {
+            if response.statusCode == 200 {
+                if response.mimeType == "text/html" {
+                  return String(data: data, encoding: .utf8) ?? ""
+                }
+                else {
+                    throw DownloadAndAnalysisError.mimeType
+                }
+            }
+            else {
+                throw DownloadAndAnalysisError.generalDownloadError
+            }
+        }
+        
+        return nil
+    }
+    
+    class func downloadDataWithRequest(request: URLRequest?) async throws -> String? {
+        
+        guard let validRequest = request else {
+            return nil
+        }
+        
+        URLCache.shared.removeAllCachedResponses() // to avoid the 'too many redirects' error
+        
+        let (data,urlResponse) = try await URLSession.shared.data(for: validRequest)
+        var htmlText = String()
+        
+        if let response = urlResponse as? HTTPURLResponse {
+            if response.statusCode == 200 {
+                if response.mimeType == "text/html" {
+                    htmlText = String(data: data, encoding: .utf8) ?? ""
+                }
+                else {
+                    throw DownloadAndAnalysisError.mimeType
+                }
+            }
+            else {
+                throw DownloadAndAnalysisError.generalDownloadError
+            }
+        }
+        
+        return htmlText
+    }
     
     /// returns the downloaded file in Notification with message  "FileDownloadComplete" with fileURL as object
     /// or returns with throwing an error
@@ -104,7 +213,6 @@ class Downloader {
         downloadTask.resume()
     }
 
-
     class func removeFile(_ atURL: URL) {
        
         do {
@@ -117,4 +225,22 @@ class Downloader {
     }
 
 
+}
+
+extension Downloader: URLSessionTaskDelegate {
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest) async -> URLRequest? {
+
+        let object = request
+        var info: [String:Any]?
+        if let validTask = self.task {
+            info = [String:Any]()
+            info!["task"] = validTask
+            info!["deallocate"] = self
+        }
+        let notification = Notification(name: Notification.Name(rawValue: "Redirection"), object: object, userInfo: info)
+        NotificationCenter.default.post(notification)
+
+        return nil
+    }
 }

@@ -34,6 +34,7 @@ enum DownloadAndAnalysisError: Error {
     case htmlTableTextNotExtracted
     case fileFormatNotCSV
     case couldNotFindCompanyProfileData
+    case generalDownloadError
 }
 
 enum InternalErrors: Error {
@@ -55,6 +56,7 @@ typealias LabelledValue = (label: String, value: Double?)
 typealias LabelledValues = (label: String, values: [Double])
 typealias Labelled_DatedValues = (label: String, datedValues: [DatedValue])
 typealias DatedValue = (date: Date, value: Double)
+typealias ShareNamesDictionary = (symbol: String, shortName: String)
 
 //var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
