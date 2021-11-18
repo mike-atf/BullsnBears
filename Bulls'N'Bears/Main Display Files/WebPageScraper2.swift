@@ -27,7 +27,7 @@ class WebPageScraper2: NSObject {
     /// in form of [DatedValues] = (date, epsTTM, peRatio )
     /// ; optional parameter 'date' returns values back to this date and the first set before.
     /// ; throws downlad and analysis errors, which need to be caught by cailler
-    class func getHxEPSandPEData(url: URL, companyName: String, until date: Date?=nil, downloadRedirectDelegate: URLSessionTaskDelegate) async throws -> [Dated_EPS_PER_Values]? {
+    class func getHxEPSandPEData(url: URL, companyName: String, until date: Date?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws -> [Dated_EPS_PER_Values]? {
         
             var htmlText:String?
             var tableText = String()
@@ -140,7 +140,7 @@ class WebPageScraper2: NSObject {
         return ProfileData(sector: sector, industry: industry, employees: employees)
     }
     
-    class func r1DataDownloadAndSave(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: URLSessionTaskDelegate) async throws {
+    class func r1DataDownloadAndSave(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
         
         guard let symbol = shareSymbol else {
             progressDelegate?.downloadError(error: DownloadAndAnalysisError.shareSymbolMissing.localizedDescription)
@@ -175,6 +175,7 @@ class WebPageScraper2: NSObject {
         let rowTitles = [["Revenue","EPS - Earnings Per Share","Net Income"],["ROI - Return On Investment","Book Value Per Share","Operating Cash Flow Per Share"],["Long Term Debt"]] // ,["PE Ratio Historical Data"]
         
         var sectionCount = 0
+        let downloader = Downloader(task: .r1Valuation)
         for pageName  in ["financial-statements", "financial-ratios", "balance-sheet"] {
             
             var components: URLComponents?
@@ -185,19 +186,26 @@ class WebPageScraper2: NSObject {
                 throw DownloadAndAnalysisError.urlInvalid
             }
             
-            var htmlText = String()
+            var htmlText: String?
 
             do {
-                htmlText = try await Downloader.downloadData(url: url)
+                NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
+                
+                htmlText = try await downloader.downloadDataWithRedirection(url: url)
+//                htmlText = try await Downloader.downloadData(url: url)
             } catch let error as DownloadAndAnalysisError {
                 progressDelegate?.downloadError(error: error.localizedDescription)
                 throw error
+            }
+            
+            guard let pageText = htmlText else {
+                continue
             }
 
             progressTasks += 1
             progressDelegate?.progressUpdate(allTasks: allTasks, completedTasks: progressTasks)
             
-            let labelledDatedValues = try await extractDatedValuesFromMTTable(htmlText: htmlText, rowTitles: rowTitles[sectionCount])
+            let labelledDatedValues = try await extractDatedValuesFromMTTable(htmlText: pageText, rowTitles: rowTitles[sectionCount])
             
             // remove dates
             var dateSet = Set<Date>()

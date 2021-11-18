@@ -11,6 +11,7 @@ enum DownloadTask {
     case test
     case epsPER
     case wbValuation
+    case r1Valuation
 }
 
 class Downloader: NSObject {

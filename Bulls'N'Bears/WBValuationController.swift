@@ -153,15 +153,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         rowTitles = returnRowTitles()
     }
     
-    /*
-    func deallocate() {
-        self.downloader?.webView = nil
-        self.downloader = nil
-        self.progressDelegate = nil
-        self.valuation = nil
-        
-    }
-     */
     //MARK: - class functions
     
     static func returnWBValuations(share: Share) -> WBValuation? {
@@ -226,7 +217,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         }
         
         do {
-//            ratings = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
             ratings = try fetchRequest.execute()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching UserEvaluations")
@@ -256,16 +246,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         
         return sectionTitles[section]
         
-//        var date$ = String()
-//        if let date = valuation?.date {
-//            date$ = dateFormatter.string(from: date)
-//        }
-//
-//        var datedTitles = [sectionTitles[0]] // not dated
-//        for i in 1..<sectionTitles.count {
-//            datedTitles.append(sectionTitles[i] + " (" + date$ + ")")
-//        }
-//        return datedTitles[section]
     }
     
     public func sectionSubHeaderText(section: Int) -> String? {
@@ -776,6 +756,8 @@ extension WBValuationController: DownloadRedirectionDelegate {
                                         case .wbValuation:
                                             print("WBValuationController: redirect for \(symbol) wbValuation task recevied")
                                             self.downloadWBValuationData()
+                                        case .r1Valuation:
+                                            print("WBValuationController: redirect for \(symbol) r1V task recevied")
                                         }
                                     }
                                 }
@@ -789,11 +771,6 @@ extension WBValuationController: DownloadRedirectionDelegate {
     
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest) async -> URLRequest? {
            
-        // TODO: deal with MT redirects
-            // resulting from wrong share.name_short
-            // need to re-start download and analysis with 'request' = newRequest (or the url)
-            // should also correct the share's name_short to avoid future re-directs
-
         print("WBValuationController received redirection method call to \(request.url!)")
         let object = request
         let notification = Notification(name: Notification.Name(rawValue: "Redirection"), object: object, userInfo: nil)

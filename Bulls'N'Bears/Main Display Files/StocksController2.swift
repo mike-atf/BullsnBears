@@ -591,6 +591,8 @@ extension StocksController2: DownloadRedirectionDelegate {
                                             print("StocksController2: redirect for \(symbol) test task recevied")
                                         case .wbValuation:
                                             print("StocksController2: redirect for \(symbol) wbValuation task recevied")
+                                        case .r1Valuation:
+                                            print("StocksController2: redirect for \(symbol) r1V task recevied")
                                         }
                                     }
                                 }

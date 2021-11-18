@@ -1294,27 +1294,59 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
 
 }
 
-extension CombinedValuationController: URLSessionTaskDelegate {
+extension CombinedValuationController: DownloadRedirectionDelegate {
+    
+    func awaitingRedirection(notification: Notification) {
+        
+        NotificationCenter.default.removeObserver(self)
+        
+        if let request = notification.object as? URLRequest {
+            if let url = request.url {
+                var components = url.pathComponents.dropLast()
+                if let component = components.last {
+                    let mtShortName = String(component)
+                    components = components.dropLast()
+                    if let symbolComponent = components.last {
+                        let symbol = String(symbolComponent)
+                        
+                        DispatchQueue.main.async {
+                            if self.share.symbol == symbol {
+                                self.share.name_short = mtShortName
+                                do {
+                                    try self.share.managedObjectContext?.save()
+                                } catch let error {
+                                    ErrorController.addErrorLog(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "couldn't save \(symbol) in it's MOC after downlaod re-direction")
+                                }
+                                
+                                if let info = notification.userInfo as? [String:Any] {
+                                    if let task = info["task"] as? DownloadTask {
+                                        switch task {
+                                        case .epsPER:
+                                            print("CombinedValuationController: redirect for \(symbol) epsPER task recevied")
+                                        case .test:
+                                            print("CombinedValuationController: redirect for \(symbol) test task recevied")
+                                        case .wbValuation:
+                                            print("CombinedValuationController: redirect for \(symbol) wbValuation task recevied")
+                                        case .r1Valuation:
+                                            print("CombinedValuationController: redirect for \(symbol) r1Valuation task recevied")
+                                            self.startDataDownload()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest) async -> URLRequest? {
-        
-    // TODO: deal with MT redirects
-        // resulting from wrong share.name_short
-        // need to re-start download and analysis with 'request' = newRequest (or the url)
-        // should also correct the share's name_short to avoid future re-directs
-                    
-        print("redirection request received to \(request.url!)")
-        
-        
-        do {
-            let html = try await Downloader.downloadDataWithRequest(request: request)
-            if html != "" {
-                print("web text received from redirection for \(request.url!)")
-            }
-        } catch let error {
-            print(error.localizedDescription)
-        }
-        
+           
+        let object = request
+        let notification = Notification(name: Notification.Name(rawValue: "Redirection"), object: object, userInfo: nil)
+        NotificationCenter.default.post(notification)
+
         return nil
     }
 }
