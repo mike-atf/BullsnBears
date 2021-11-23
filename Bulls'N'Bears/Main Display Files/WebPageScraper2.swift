@@ -173,7 +173,6 @@ class WebPageScraper2: NSObject {
 // 1 Download and analyse web page data first MT then Yahoo
 // MacroTrends downloads for Rule1 Data
         let rowTitles = [["Revenue","EPS - Earnings Per Share","Net Income"],["ROI - Return On Investment","Book Value Per Share","Operating Cash Flow Per Share"],["Long Term Debt"]] // ,["PE Ratio Historical Data"]
-        
         var sectionCount = 0
         let downloader = Downloader(task: .r1Valuation)
         for pageName  in ["financial-statements", "financial-ratios", "balance-sheet"] {
@@ -219,10 +218,7 @@ class WebPageScraper2: NSObject {
                 dateSet.formUnion(dates)
             }
             results.append(contentsOf: labelledValues)
-            
-            // TODO: - use this to update year axis in ValueListTVC
-            let newestDate = dateSet.max()
-            
+                        
             progressTasks += 1
             progressDelegate?.progressUpdate(allTasks: allTasks, completedTasks: progressTasks)
             
@@ -339,6 +335,7 @@ class WebPageScraper2: NSObject {
                 ErrorController.addErrorLog(errorLocation: "WebPageScraper2.r1DataDownload", systemError: error, errorInfo: "Error saving R1 data download results for \(symbol)")
             }
         }
+        
     }
     
     class func dcfDataDownloadAndSave(shareSymbol: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil) async throws {
@@ -518,9 +515,9 @@ class WebPageScraper2: NSObject {
         
     }
 
-    class func downloadAnalyseSaveWBValuationData(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
+    class func downloadAnalyseSaveWBValuationData(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws -> Date? {
         
-        print("downloadAnalyseSaveWBValuationData for \(shareSymbol ?? "")")
+//        print("downloadAnalyseSaveWBValuationData for \(shareSymbol ?? "")")
         
         guard let symbol = shareSymbol else {
             throw DownloadAndAnalysisError.shareSymbolMissing
@@ -540,6 +537,7 @@ class WebPageScraper2: NSObject {
         let rowNames = [["Revenue","Gross Profit","Research And Development Expenses","SG&A Expenses","Net Income", "Operating Income", "EPS - Earnings Per Share"],["Long Term Debt","Property, Plant, And Equipment","Retained Earnings (Accumulated Deficit)", "Share Holder Equity"],["Cash Flow From Investing Activities", "Cash Flow From Operating Activities"],["ROE - Return On Equity", "ROA - Return On Assets", "Book Value Per Share"]]
         
         var results = [LabelledValues]()
+        var resultDates = [Date]()
         var sectionCount = 0
         let downloader: Downloader? = Downloader(task: .wbValuation)
         for section in webPageNames {
@@ -557,8 +555,14 @@ class WebPageScraper2: NSObject {
                         
                         let labelledDatedValues = try await WebPageScraper2.extractDatedValuesFromMTTable(htmlText: validPageText, rowTitles: rowNames[sectionCount])
                         
-                        
                         let labelledValues = labelledDatedValues.compactMap{ LabelledValues(label: $0.label, values: $0.datedValues.compactMap{ $0.value }) }
+                        
+                        var dates = [Date]()
+                        for ldv in labelledDatedValues {
+                            let extractedDates = ldv.datedValues.compactMap { $0.date }
+                            dates.append(contentsOf: extractedDates)
+                        }
+                        resultDates.append(contentsOf: dates)
                         results.append(contentsOf: labelledValues)
                         
                         sectionCount += 1
@@ -595,7 +599,7 @@ class WebPageScraper2: NSObject {
                         
                         let info = ["Redirection": "Object"]
                         NotificationCenter.default.post(name: Notification.Name(rawValue: "Redirection"), object: info)
-                        return
+                        return resultDates.max()
                     } else {
                         ErrorController.addErrorLog(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
                     }
@@ -673,6 +677,8 @@ class WebPageScraper2: NSObject {
                 throw DownloadAndAnalysisError.generalDownloadError
             }
         }
+        
+        return resultDates.max()
     }
     
     class func keyratioDownloadAndSave(shareSymbol: String?, shortName: String?, shareID: NSManagedObjectID) async throws {

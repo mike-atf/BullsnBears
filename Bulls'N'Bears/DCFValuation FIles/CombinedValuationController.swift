@@ -374,22 +374,20 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
     
     public func startDataDownload() {
         
-        // accessing share must happen on main thread!
+        // accessing share propoerties must happen on main thread!
         let symbol =  share.symbol
         let shortName = share.name_short
         
         guard let validID = valuationID else {
-            ErrorController.addErrorLog(errorLocation: "CombinedValController.strartDataDownload", systemError: nil, errorInfo: "failed data donwload - no valid valuaiton object ID")
+            ErrorController.addErrorLog(errorLocation: "CombinedValController.startDataDownload", systemError: nil, errorInfo: "failed data donwload - no valid valuation object ID")
             return
         }
-        // must happen on main thread!
 
         if method == .rule1 {
 
-            // NEW
             downloadTask = Task.init(priority: .background) {
                 do {
-                    try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: validID, progressDelegate: self.valuationListViewController, downloadRedirectDelegate: self)
+                    let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: validID, progressDelegate: self.valuationListViewController, downloadRedirectDelegate: self)
                     try Task.checkCancellation()
                 } catch let error {
                     ErrorController.addErrorLog(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
@@ -398,7 +396,6 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             }
         }
         else {
-            // NEW
             downloadTask = Task.init(priority: .background) {
 
                 do {
@@ -409,8 +406,6 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                 }
                 return nil
             }
-            // OLD
-//            webAnalyser = DCFWebDataAnalyser(stock: share, controller: self, pDelegate: self.valuationListViewController)
         }
         
     }
@@ -1302,6 +1297,12 @@ extension CombinedValuationController: DownloadRedirectionDelegate {
         
         if let request = notification.object as? URLRequest {
             if let url = request.url {
+                
+                guard url.path.starts(with: "https://www.macrotrends.net") else {
+                    ErrorController.addErrorLog(errorLocation: "awaitingRedirection", systemError: nil, errorInfo: "redirection request to non-macrotredns page reived \(request.url?.path ?? "")")
+                    return
+                }
+                       
                 var components = url.pathComponents.dropLast()
                 if let component = components.last {
                     let mtShortName = String(component)
