@@ -748,8 +748,73 @@ class WebPageScraper2: NSObject {
         }
     }
     
-    
-    
+    class func downloadAndAnalyseDailyTradingPrices(shareSymbol: String, minDate:Date?=nil) async throws -> [PricePoint]? {
+ 
+        // 1 csv file download - abandoned due to complexity and lack of async/ await API for URLSession.shared.downloadTask
+//        let nowSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate) // set to 00:00 today
+//
+//        var otherTimeAgoSinceRefDate: Date?
+//
+//        if minDate != nil {
+//            otherTimeAgoSinceRefDate = {
+//                let calendar = Calendar.current
+//                let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+//                var dateComponents = calendar.dateComponents(components, from: minDate!)
+//                dateComponents.second = 0
+//                dateComponents.minute = 0
+//                dateComponents.hour = 0
+//                return calendar.date(from: dateComponents) ?? Date()
+//            }()
+//        }
+//
+//        let startDateSinceRefDate = (otherTimeAgoSinceRefDate ?? yahooPricesStartDate).timeIntervalSince(yahooRefDate)
+//
+//        let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
+//        let start$ = numberFormatter.string(from: startDateSinceRefDate as NSNumber) ?? "" // yearAgoSinceRefDate
+//
+//        var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(shareSymbol)")
+//        urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
+//
+//        var webPath = "https://query1.finance.yahoo.com/v7/finance/download/"
+//        webPath += shareSymbol+"?"
+//        webPath += "period1=" + start$
+//        webPath += "&period2=" + end$
+//        webPath += "&interval=1d&events=history&includeAdjustedClose=true"
+//
+//        guard let sourceURL = urlComponents?.url else {
+//            throw DownloadAndAnalysisError.urlInvalid
+//        }
+//
+//        var pricePoints: [PricePoint]?
+ 
+
+//        await Downloader.downloadAndReturnFile(url: sourceURL, symbol: shareSymbol, completion: { fileURL in
+//
+//            guard fileURL != nil else {
+//                return
+//            }
+//
+//            pricePoints = CSVImporter.extractPricePointsFromFile(url: fileURL!, symbol: shareSymbol)
+//            self.removeFile(fileURL!)
+//            completion(pricePoints)
+//        })
+//
+
+// 2 data download usually for the last 3 momnths or so
+        var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(shareSymbol)/history?")
+        urlComponents?.queryItems = [URLQueryItem(name: "p", value: shareSymbol)]
+        
+        guard let sourceURL = urlComponents?.url else {
+            throw DownloadAndAnalysisError.urlInvalid
+        }
+        
+        let dataText = try await Downloader.downloadData(url: sourceURL)
+        
+        let downloadedPricePoints = analyseYahooPriceTable(html$: dataText)
+
+        return downloadedPricePoints
+    }
+        
     //MARK: - general MacroTrend functions
     
     class func extractDatedValuesFromMTTable(htmlText: String, rowTitles: [String]) async throws -> [Labelled_DatedValues] {
@@ -800,38 +865,32 @@ class WebPageScraper2: NSObject {
     
     class func extractMTTableRowText(tableText: String, rowTitle: String) -> String? {
 
-        let mtRowTitle = ">"+rowTitle+"<" //\/a>""
-        let mtRowDataStart = "/div>\"," //"fa-chart-bar'><\\/i><\\/span><\\/div>"
-        let mtRowDataEnd = "}"
+        let mtRowTitle = ">"+rowTitle+"<"
+        let mtRowDataStart = "/div>\","
+        let mtRowDataEnd = "},"
         let mtTableEndIndex = "}]"
         
-
         guard tableText.count > 0 else {
             return nil
-//            throw DownloadAndAnalysisError.emptyWebpageText
         }
 
         guard let rowStartIndex = tableText.range(of: mtRowTitle) else {
             return nil
-//            throw DownloadAndAnalysisError.htmlRowStartIndexNotFound
         }
         
-        guard let rowDataStartIndex = tableText.range(of: mtRowDataStart,options: [NSString.CompareOptions.literal], range: rowStartIndex.upperBound..<tableText.endIndex, locale: nil) else {
-            return nil
-//            throw DownloadAndAnalysisError.htmlRowStartIndexNotFound
-        }
-        
-        var rowDataEndIndex = tableText.range(of: mtRowDataEnd,options: [NSString.CompareOptions.literal], range: rowDataStartIndex.upperBound..<tableText.endIndex, locale: nil)
+        var rowDataEndIndex = tableText.range(of: mtRowDataEnd,options: [NSString.CompareOptions.literal], range: rowStartIndex.upperBound..<tableText.endIndex, locale: nil)
         
         if rowDataEndIndex == nil {
-            rowDataEndIndex = tableText.range(of: mtTableEndIndex,options: [NSString.CompareOptions.literal], range: rowDataStartIndex.upperBound..<tableText.endIndex, locale: nil)
+            rowDataEndIndex = tableText.range(of: mtTableEndIndex,options: [NSString.CompareOptions.literal], range: rowStartIndex.upperBound..<tableText.endIndex, locale: nil)
         }
         
         guard rowDataEndIndex != nil else {
             return nil
-//            throw DownloadAndAnalysisError.htmlTableRowEndNotFound
         }
 
+        guard let rowDataStartIndex = tableText.range(of: mtRowDataStart,options: [NSString.CompareOptions.literal], range: rowStartIndex.upperBound..<rowDataEndIndex!.lowerBound, locale: nil) else {
+            return nil
+        }
         
         return String(tableText[rowDataStartIndex.upperBound..<rowDataEndIndex!.lowerBound])
     }
@@ -856,7 +915,7 @@ class WebPageScraper2: NSObject {
             throw DownloadAndAnalysisError.htmlTableEndNotFound
         }
         
-        return String(pageText[tableStartIndex.upperBound...tableEndIndex.lowerBound])
+        return String(pageText[tableStartIndex.upperBound...tableEndIndex.upperBound]) // lowerBound
     }
     
     /// for MT pages such as 'PE-Ratio' with dated rows and table header
@@ -1491,7 +1550,7 @@ class WebPageScraper2: NSObject {
         return textArray
     }
     
-    class func yahooPriceTable(html$: String) -> [PricePoint]? {
+    class func analyseYahooPriceTable(html$: String) -> [PricePoint]? {
         
         let tableEnd$ = "</tbody><tfoot "
         let tableStart$ = "<thead "
@@ -1623,5 +1682,18 @@ class WebPageScraper2: NSObject {
         
         return value
     }
+    
+    
+    class func removeFile(_ atURL: URL) {
+       
+        do {
+            try FileManager.default.removeItem(at: atURL)
+        } catch let error {
+            DispatchQueue.main.async {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+            }
+        }
+    }
+
 }
 

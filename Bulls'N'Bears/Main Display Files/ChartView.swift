@@ -12,8 +12,9 @@ class ChartView: UIView {
     @IBOutlet var widthConstraint: NSLayoutConstraint!
     
     var trendLabels = [UILabel]()
-    var valuationLabels = [UILabel]()
+//    var valuationLabels = [UILabel]()
     var buySellLabel: UILabel?
+    var epsLabel: UILabel!
     var purchaseButtons: [PurchasedButton]?
 
     var candleBoxes = UIBezierPath()
@@ -76,6 +77,19 @@ class ChartView: UIView {
         }
 
         addPurchaseButtons()
+        
+        epsLabel = {
+            let label = UILabel()
+            label.numberOfLines = 1
+            label.font = UIFont.systemFont(ofSize: 12)
+            label.textColor = UIColor.white
+            label.backgroundColor = UIColor(named: "Green")!
+            label.text = " qEPS "
+                        
+            return label
+        }()
+        addSubview(epsLabel)
+        
         self.setNeedsDisplay()
     }
     
@@ -271,12 +285,13 @@ class ChartView: UIView {
             }
             
             if hxEPSInChartRange.count > 1 {
-                let minEPS = (hxEPSInChartRange.compactMap{ $0.value }.min()! * 0.9)//.rounded()
-                let maxEPS = (hxEPSInChartRange.compactMap{ $0.value }.max()! * 1.1) + 1// .rounded() + 1
+                let minEPS = (hxEPSInChartRange.compactMap{ $0.value }.min()! * 0.9)
+                let maxEPS = (hxEPSInChartRange.compactMap{ $0.value }.max()! * 1.1) + 1
 
                 let epsLine = UIBezierPath()
 
                 var point = plotEPSPoint(datedValue: hxEPSInChartRange[0], min: minEPS, max: maxEPS)
+                
                 epsLine.move(to: point)
                 for i in 1..<hxEPSInChartRange.count {
                     if hxEPSInChartRange[i].value > 0 {
@@ -289,6 +304,9 @@ class ChartView: UIView {
                 UIColor.systemGreen.setStroke()
                 epsLine.stroke()
                 
+                let lastpoint = plotEPSPoint(datedValue: hxEPSInChartRange.last!, min: minEPS, max: maxEPS)
+                epsLabel.sizeToFit()
+                epsLabel.frame = CGRect(x: lastpoint.x, y: lastpoint.y - epsLabel.frame.height / 2, width: epsLabel.frame.width, height: epsLabel.frame.height)
             }
             
         }
@@ -498,7 +516,6 @@ class ChartView: UIView {
             button.setBackgroundImage(UIImage(systemName: "purchased.circle.fill"), for: .normal)
             button.tintColor = transaction.isSale ? UIColor.systemRed : UIColor.systemGreen
 
-//            button.setImage(UIImage(systemName: "purchased.circle.fill"), for: .normal)
             button.frame = CGRect(origin: CGPoint.zero, size: CGSize(width: 30, height: 30))
             button.transaction = transaction
             button.displayDelegate = self

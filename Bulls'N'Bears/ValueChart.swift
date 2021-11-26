@@ -78,7 +78,8 @@ class ValueChart: UIView {
         maxValue1 = CGFloat(v1noNaN.max() ?? Double())
         
         let components: Set<Calendar.Component> = [.year]
-        let dateComponents = Calendar.current.dateComponents(components, from: Date())
+        let newestMTDataDate = UserDefaults.standard.value(forKey: UserDefaultTerms().newestMTDataDate) as? Date
+        let dateComponents = Calendar.current.dateComponents(components, from:  newestMTDataDate ??  Date())
         let mostRecentYear = dateComponents.year! - 2000
         
         if showXLabels{

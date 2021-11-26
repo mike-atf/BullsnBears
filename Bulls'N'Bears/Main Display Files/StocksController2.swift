@@ -319,13 +319,14 @@ class StocksController2: NSFetchedResultsController<Share> {
         }
         
         let now = Date()
+        let dateForNil = now.addingTimeInterval(-301)
         sharesToUpdate = sharesToUpdate?.filter({ share in
-            if now.timeIntervalSince(share.lastLivePriceDate ?? now) < 300 { return false }
+            if now.timeIntervalSince(share.lastLivePriceDate ?? dateForNil) < 300 { return false }
             else { return true }
         })
         
-        //TODO: - create two methods: livePriceupdate() and qEarningsUpdate
-        // two groups of filetere shares: 1. as here if last lic price date < 300
+        //TODO: - create two methods to reduce non-required sahre data downloads : livePriceupdate() and qEarningsUpdate
+        // two groups of filtered shares: 1. as here if last live price date < 300sec
         // the other to be passed to qEarningsUpdate filtered by last qEarnigsDate > 3 months
         
         let compDate = Date()
@@ -333,56 +334,30 @@ class StocksController2: NSFetchedResultsController<Share> {
             if (s0.lastLivePriceDate ?? compDate) < (s1.lastLivePriceDate ?? compDate) { return true
             }  else { return false }
         })
-        
-        var dateDict = [String: Date?]()
-        var orderedDict = [ShareNamesDictionary]() // ordered by lastLivePriceUPdate
-        
-        for share in sharesToUpdate ?? [] {
-            let new = ShareNamesDictionary(symbol: share.symbol ?? "", shortName: share.name_short ?? "")
-            orderedDict.append(new)
-            dateDict[share.symbol ?? ""] = share.priceDateRange()?.first
-        }
-        
+                
         backgroundMoc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc!.automaticallyMergesChangesFromParent = true
 
-//        guard let validBackgroundMOC = backgroundMoc else {
-//            throw DownloadAndAnalysisError.noBackgroundMOC
-//        }
-
         NotificationCenter.default.addObserver(self, selector: #selector(backgroundContextDidSave(notification:)), name: .NSManagedObjectContextDidSave, object: nil)
         
-        let dict = orderedDict
-        let dDict = dateDict
+        for share in sharesToUpdate ?? [] {
         
-        let cookieStore = HTTPCookieStorage.shared
-        for cookie in cookieStore.cookies ?? [] {
-            cookieStore.deleteCookie(cookie)
-        }
-        
-        
-        Task.init(priority: .background, operation: {
+            let symbol = share.symbol ?? ""
+            let shortName = share.name_short ?? ""
+            let existingPricePoints = share.getDailyPrices()
+            let shareID = share.objectID
+            let minDate = share.priceDateRange()?.first
             
-            for dictionaryObject in dict {
-
-                let time = Date()
-                print("updating share \(dictionaryObject.symbol)")
-                          
-                let labelledPrice = try await updateCurrentPrice(shareSymbol: dictionaryObject.symbol)
-                let minDate = dDict[dictionaryObject.symbol] ?? nil
-                let labelled_datedqEarnings = try await quarterlyEarningsUpdate(shareSymbol: dictionaryObject.symbol, shortName: dictionaryObject.shortName, minDate: minDate)
+            Task.init(priority: .background, operation: {
                 
-                guard labelledPrice.value != nil || labelled_datedqEarnings?.datedValues != nil else {
-                    continue
-                }
-                
+                let labelledPrice = try await getCurrentPriceForUpdate(shareSymbol: symbol)
+                let labelled_datedqEarnings = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
+                                        
+                let updatedPricePoints = try await getDailyPricesForUpdate(shareSymbol: symbol, existingDailyPrices: existingPricePoints)
+                                        
                 await backgroundMoc?.perform({
-                    let request = NSFetchRequest<Share>(entityName: "Share")
-                    let predicate = NSPredicate(format: "symbol == %@", argumentArray: [dictionaryObject.symbol])
-                    
-                    request.predicate = predicate
                     do {
-                        guard let backgroundShare = try self.backgroundMoc?.fetch(request).first else {
+                        guard let backgroundShare = self.backgroundMoc?.object(with: shareID) as? Share else {
                             throw DownloadAndAnalysisError.noBackgroundShareWithSymbol
                         }
                         
@@ -390,25 +365,28 @@ class StocksController2: NSFetchedResultsController<Share> {
                             backgroundShare.lastLivePrice = valid
                             backgroundShare.lastLivePriceDate = Date()
                         }
+                                                
                         if let valid = labelled_datedqEarnings?.datedValues {
                             backgroundShare.wbValuation?.saveEPSWithDateArray(datesValuesArray: valid, saveToMOC: false)
                         }
                         
-                        try backgroundShare.managedObjectContext?.save()
-                        print("updating \(dictionaryObject.symbol) took \(Date().timeIntervalSince(time))")
+                        if let valid = updatedPricePoints {
+                            backgroundShare.setDailyPrices(pricePoints: valid, saveInMOC: false)
+                            backgroundShare.reCalculateMACDs(newPricePoints: valid, shortPeriod: 8, longPeriod: 17)
+                        }
                         
-                        let id = backgroundShare.objectID
+                        try backgroundShare.managedObjectContext?.save()
                         
                         DispatchQueue.main.async {
-                            self.updateCompleteToDelegate(id: id)
+                            self.updateCompleteToDelegate(id: shareID)
                         }
                     } catch let error {
                         ErrorController.addErrorLog(errorLocation: "StocksController2.updateStocksData", systemError: error, errorInfo: "error fetching from and/or saving backgroundMOC")
                     }
                     
                 })
-            }
-        })
+            })
+        }
     }
     
     /// must be called on main thread
@@ -422,7 +400,8 @@ class StocksController2: NSFetchedResultsController<Share> {
     
     //MARK: - specific update task functions
     
-    func updateCurrentPrice(shareSymbol: String) async throws -> LabelledValue {
+    /// returns (shareSymbol, current tickerPrice)
+    func getCurrentPriceForUpdate(shareSymbol: String) async throws -> LabelledValue {
                 
         var components: URLComponents?
                 
@@ -444,7 +423,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         return (shareSymbol, nil)
     }
     
-    func quarterlyEarningsUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil) async throws -> Labelled_DatedValues? {
+    func getQuarterlyEarningsForUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil) async throws -> Labelled_DatedValues? {
                 
         var sn = shortName
         if sn.contains(" ") {
@@ -472,6 +451,42 @@ class StocksController2: NSFetchedResultsController<Share> {
         }
         return Labelled_DatedValues(label: shareSymbol, datedValues: epsDates)
 
+    }
+    
+    /// returns [PricePoints] sorted by date  with new daily trading prices added
+    /// or nil if there were no new price points
+    func getDailyPricesForUpdate(shareSymbol: String, existingDailyPrices: [PricePoint]?) async throws -> [PricePoint]? {
+
+        let weekDay = Calendar.current.component(.weekday, from: Date())
+        guard (weekDay > 1 && weekDay < 7) else {
+            return nil
+        }
+        
+        if let lastPriceDate = existingDailyPrices?.last?.tradingDate {
+            guard (Date().timeIntervalSince(lastPriceDate) > 12 * 3600) else {
+                return nil
+            }
+        }
+        
+        let minDate = existingDailyPrices?.last?.tradingDate
+
+        if let downloadedDailyPrices = try await WebPageScraper2.downloadAndAnalyseDailyTradingPrices(shareSymbol: shareSymbol, minDate: minDate) {
+            
+            guard let existingPricePoints = existingDailyPrices else {
+                return downloadedDailyPrices
+            }
+
+            var pricePointsSet = Set<PricePoint>(existingPricePoints)
+            pricePointsSet = pricePointsSet.union(downloadedDailyPrices)
+
+            return Array(pricePointsSet).sorted { e0, e1 in
+                if e0.tradingDate < e1.tradingDate { return true }
+                else { return false }
+            }
+
+        }
+        
+        return nil
     }
 
     func updateTreasuryBondYields() async throws -> [PriceDate]? {

@@ -594,7 +594,11 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             
             do {
                 if let validID = valuationID {
-                    try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: validID, downloadRedirectDelegate: self)
+                    let newestDate = try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: validID, downloadRedirectDelegate: self)
+                    
+                    if newestDate != nil {
+                        UserDefaults.standard.set(newestDate, forKey: UserDefaultTerms().newestMTDataDate)
+                    }
                     
                     completedTasks += 1
                     progressDelegate?.progressUpdate(allTasks: allTasks, completedTasks: completedTasks)

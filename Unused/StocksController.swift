@@ -5,10 +5,11 @@
 //  Created by aDav on 10/02/2021.
 //
 
+/*
 import UIKit
 import CoreData
 
-/*
+
 /// StocksController calls this delegate when all shares have updated their price to inform StocksListVC
 /// then update the stockChartVC - > chartView candleStick chart
 protocol StocksControllerDelegate {
@@ -22,8 +23,9 @@ protocol StockDelegate {
     func keyratioDownloadComplete(share: SharePlaceHolder, errors: [String])
     func livePriceUpdateCompleted(share: SharePlaceHolder?, errors: [String])
 }
+*/
 
-
+/*
 class StocksController: NSFetchedResultsController<Share> {
     
     var pricesUpdateDelegate: StocksControllerDelegate?

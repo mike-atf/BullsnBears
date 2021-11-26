@@ -402,6 +402,11 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             
             objectOwned.watchStatus = 0
             objectOwned.save()
+            do {
+                try self.controller.updateStocksData(singleShare: objectOwned)
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: "StocksListTVC", systemError: error, errorInfo: "unable to update data for \(objectOwned.symbol ?? "") when moving from archive to watch list.")
+            }
         }
         watchAction.backgroundColor = UIColor.systemGray
         watchAction.image = UIImage(systemName: "eyeglasses")
@@ -414,8 +419,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         archiveAction.backgroundColor = UIColor.systemOrange
         archiveAction.image = UIImage(systemName: "archivebox")
-        
-
         
         if objectOwned.watchStatus == 0 {
             return UISwipeActionsConfiguration(actions: [ownAction, archiveAction])
@@ -681,9 +684,11 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
     
     func shareUpdateComplete(atPath: IndexPath) {
         
-        print("delegate received 'update complete' notification")
-//        let targetCell = tableView.cellForRow(at: atPath) as! StockListCellTableViewCell
-//        targetCell.updateCycleCompleted()
+        let share = controller.object(at: atPath)
+        if let prices = share.getDailyPrices() {
+            print("updated latest daily price date for \(share.symbol!) = \(prices.last!.tradingDate)")
+        }
+        
         tableView.reloadRows(at: [atPath], with: .none)
     }
     

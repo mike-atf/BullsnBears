@@ -35,6 +35,7 @@ enum DownloadAndAnalysisError: Error {
     case fileFormatNotCSV
     case couldNotFindCompanyProfileData
     case generalDownloadError
+    case downloadedFileURLinvalid
 }
 
 enum InternalErrors: Error {
@@ -57,6 +58,7 @@ typealias LabelledValues = (label: String, values: [Double])
 typealias Labelled_DatedValues = (label: String, datedValues: [DatedValue])
 typealias DatedValue = (date: Date, value: Double)
 typealias ShareNamesDictionary = (symbol: String, shortName: String)
+typealias LabelledFileURL = (symbol: String, fileURL: URL)
 
 //var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
@@ -223,6 +225,7 @@ struct UserDefaultTerms {
     let emaPeriodAnnualData = "emaPeriodAnnualData"
     let sortParameter = "sortParameter"
     let lastCitation = "lastCitation"
+    let newestMTDataDate = "NewestMTDataDate"
 }
 
 struct SharesListSortParameter {

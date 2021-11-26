@@ -65,12 +65,15 @@ public class Share: NSManagedObject {
         }
     }
     
-    func setDailyPrices(pricePoints: [PricePoint]?) {
+    func setDailyPrices(pricePoints: [PricePoint]?, saveInMOC: Bool?=true) {
 
         guard let validPoints = pricePoints else { return }
 
         self.dailyPrices = convertDailyPricesToData(dailyPrices: validPoints)
-        save() // saves in the context the object was fetched in
+        self.prices = pricePoints
+        if saveInMOC ?? true {
+            save() // saves in the context the wbValuation object was fetched in
+        }
     }
        
     func convertDailyPricesToData(dailyPrices: [PricePoint]?) -> Data? {
@@ -103,12 +106,13 @@ public class Share: NSManagedObject {
         return nil
     }
     
-    func getDailyPrices() -> [PricePoint]? {
+    func getDailyPrices(needRecalcDueToNew: Bool?=false) -> [PricePoint]? {
 
-        if let alreadyConverted = prices {
-            return alreadyConverted
+        if (needRecalcDueToNew ?? false) == false {
+            if let alreadyConverted = prices {
+                return alreadyConverted
+            }
         }
-        
         guard let valid = dailyPrices else { return nil }
         
         do {
@@ -198,6 +202,12 @@ public class Share: NSManagedObject {
     }
     
     // MARK: - price functions
+    
+    public func priceRange(_ from: Date? = nil,_ to: Date? = nil) -> [Double]? {
+        
+        return nil
+    }
+    
     public func lowestPrice(_ from: Date? = nil,_ to: Date? = nil) -> Double? {
         
         guard let dailyPrices = getDailyPrices() else {
@@ -278,27 +288,44 @@ public class Share: NSManagedObject {
         
         let minDate = dailyPrices.compactMap { $0.tradingDate }.min()
         
+        
         if let minDate_v = minDate {
                 var calendar = NSCalendar.current
                 calendar.timeZone = NSTimeZone.default
-                let components: Set<Calendar.Component> = [.year, .month, .hour, .minute, .weekOfYear ,.weekday]
+            let components: Set<Calendar.Component> = [.year, .month, .hour, .minute, .weekOfYear ,.weekday]
                 var firstDateComponents = calendar.dateComponents(components, from: minDate_v)
                 var lastDateComponents = calendar.dateComponents(components, from: Date().addingTimeInterval(previewTime))
+            print(minDate_v)
+            print(firstDateComponents)
+            print()
+            print(Date().addingTimeInterval(previewTime))
+            print(lastDateComponents)
+            
                 firstDateComponents.second = 0
                 firstDateComponents.minute = 0
                 firstDateComponents.hour = 0
-                firstDateComponents.weekOfYear = (firstDateComponents.weekOfYear! > 0) ? (firstDateComponents.weekOfYear! - 1) : 0
+                firstDateComponents.weekOfYear! -= 1
+                if firstDateComponents.weekOfYear! < 0 {
+                    firstDateComponents.year! -= 1
+                    firstDateComponents.weekOfYear! += 52
+                }
+            
                 firstDateComponents.weekday = 2 // Monday, days are numbered 1-7, starting with Sunday
                 
                 lastDateComponents.second = 0
                 lastDateComponents.minute = 0
                 lastDateComponents.hour = 0
-                lastDateComponents.weekOfYear = (lastDateComponents.weekOfYear! < 52) ? (lastDateComponents.weekOfYear! + 1) : 52
+                lastDateComponents.weekOfYear! += 1
+                if lastDateComponents.weekOfYear! > 52 {
+                    lastDateComponents.year! += 1
+                    lastDateComponents.weekOfYear! -= 52
+                }
                 lastDateComponents.weekday = 2 // Monday, days are numbered 1-7, starting with Sunday
 
                 let firstMondayMidNight = calendar.date(from: firstDateComponents) ?? Date()
                 let lastMondayMidNight = calendar.date(from: lastDateComponents) ?? Date()
                 
+                print(firstMondayMidNight, lastMondayMidNight)
                 return [firstMondayMidNight, lastMondayMidNight]
         }
         
@@ -730,14 +757,16 @@ public class Share: NSManagedObject {
     // MARk: - technicals
     
     /// also converts to data stored as 'macd' property of share
-    func calculateMACDs(shortPeriod: Int, longPeriod: Int) -> [MAC_D]? {
+    func calculateMACDs(shortPeriod: Int, longPeriod: Int, needRecalcDueToNew: Bool?=false, shouldSaveInMOC: Bool?=true) -> [MAC_D]? {
         
-        if let alreadyCalculated = macds {
-            return alreadyCalculated
+        if (needRecalcDueToNew ?? false) == false {
+            if let alreadyCalculated = macds {
+                return alreadyCalculated
+            }
         }
         
-        guard let dailyPrices = getDailyPrices() else { return nil }
-        guard let closePrices = (getDailyPrices()?.compactMap{ $0.close }) else { return nil }
+        guard let dailyPrices = getDailyPrices(needRecalcDueToNew: needRecalcDueToNew) else { return nil }
+        let closePrices = dailyPrices.compactMap({ $0.close })
         
         guard shortPeriod < dailyPrices.count else {
             return nil
@@ -775,20 +804,67 @@ public class Share: NSManagedObject {
         
         macds = mac_ds
         self.macd = convertMACDToData(macds: mac_ds)
-        save()
+        if shouldSaveInMOC ?? true {
+            save()
+        }
         
         return mac_ds
     }
     
-    /// returns array[0] = fast oascillator K%
+    /// recalculates MACD from the sent pricePoints. Please note that these are stored in the macds parameter, and converted to data for the macd managed object property, but not saved to MOC!
+    func reCalculateMACDs(newPricePoints: [PricePoint]?, shortPeriod: Int, longPeriod: Int) {
+                
+        guard let dailyPrices = newPricePoints else { return }
+        let closePrices = dailyPrices.compactMap({ $0.close })
+        
+        guard shortPeriod < dailyPrices.count else {
+            return
+        }
+        
+        guard longPeriod < dailyPrices.count else {
+            return
+        }
+
+        let initialShortSMA = closePrices[(shortPeriod-1)..<longPeriod].reduce(0, +) / Double(shortPeriod)
+        let initialLongSMA = closePrices[0..<longPeriod].reduce(0, +) / Double(longPeriod)
+        
+        var lastMACD = MAC_D(currentPrice: closePrices[longPeriod-1], lastMACD: nil, date: dailyPrices[longPeriod-1].tradingDate)
+        lastMACD.emaShort = initialShortSMA
+        lastMACD.emaLong = initialLongSMA
+
+        var mac_ds = [MAC_D(currentPrice: dailyPrices[longPeriod].close, lastMACD: lastMACD, date: dailyPrices[longPeriod].tradingDate)]
+        
+        var macdSMA = [Double?]()
+        for i in longPeriod..<(longPeriod + 9) {
+            let macd = MAC_D(currentPrice: dailyPrices[i].close, lastMACD: lastMACD, date: dailyPrices[i].tradingDate)
+            mac_ds.append(macd)
+            lastMACD = macd
+            macdSMA.append(macd.mac_d)
+        }
+        
+        mac_ds[mac_ds.count-1].signalLine = macdSMA.compactMap{$0}.reduce(0, +) / Double(macdSMA.compactMap{$0}.count)
+        lastMACD = mac_ds[mac_ds.count-1]
+
+        for i in (longPeriod+9)..<dailyPrices.count {
+            let macd = MAC_D(currentPrice: dailyPrices[i].close, lastMACD: lastMACD, date: dailyPrices[i].tradingDate)
+            mac_ds.append(macd)
+            lastMACD = macd
+        }
+        
+        self.macd = convertMACDToData(macds: mac_ds)
+        macds = mac_ds
+    }
+
+    
+    /// returns array[0] = fast oscillator K%
     /// arrays[1] = slow oscillator D%
-    func calculateSlowStochOscillators() -> [StochasticOscillator]? {
+    func calculateSlowStochOscillators(newPricePoints: [PricePoint]?=nil) -> [StochasticOscillator]? {
         
         if let alreadyCalculated = osc {
             return alreadyCalculated
         }
         
-        guard let dailyPrices = getDailyPrices() else { return nil }
+        guard let dailyPrices = (newPricePoints ?? getDailyPrices()) else { return nil }
         
         guard dailyPrices.count > 14 else {
             return nil

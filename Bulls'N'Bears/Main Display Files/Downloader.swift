@@ -213,6 +213,71 @@ class Downloader: NSObject {
 
         downloadTask.resume()
     }
+    
+    /// returns the downloaded file in Notification with message  "FileDownloadComplete" with fileURL as object
+    /// or returns with throwing an error
+    class func downloadAndReturnFile(url: URL, symbol: String, completion: @escaping (URL?) -> Void) async -> Void {
+        
+        let downloadTask = URLSession.shared.downloadTask(with: url) {  [self]
+            urlOrNil, response, errorOrNil in
+            
+            guard errorOrNil == nil else {
+                DispatchQueue.main.async {
+                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(symbol) due to error \(errorOrNil!.localizedDescription)", viewController: nil, delegate: nil)
+                }
+                return
+            }
+            
+            guard response != nil else {
+                DispatchQueue.main.async {
+                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(symbol) due to error \(String(describing: response!.textEncodingName))", viewController: nil, delegate: nil)
+                }
+                return
+            }
+                        
+            guard let fileURL = urlOrNil else { return }
+            
+            do {
+                let documentsURL = try
+                    FileManager.default.url(for: .documentDirectory,
+                                            in: .userDomainMask,
+                                            appropriateFor: nil,
+                                            create: true)
+                
+                let tempURL = documentsURL.appendingPathComponent(symbol + "-temp.csv")
+                let targetURL = documentsURL.appendingPathComponent(symbol + ".csv")
+                
+                if FileManager.default.fileExists(atPath: tempURL.path) {
+                    removeFile(tempURL)
+                }
+
+                try FileManager.default.moveItem(at: fileURL, to: tempURL)
+            
+
+                if !CSVImporter.matchesExpectedFormat(url: tempURL) {
+                    // this may be due to 'invalid cookie' error
+                    // if so download webpage content with table
+                    removeFile(tempURL)
+                    
+                    throw DownloadAndAnalysisError.fileFormatNotCSV
+                }
+                
+                if FileManager.default.fileExists(atPath: targetURL.path) {
+                    removeFile(targetURL)
+                }
+
+                try FileManager.default.moveItem(at: tempURL, to: targetURL)
+                
+                completion(targetURL)
+            } catch {
+                DispatchQueue.main.async {
+                    ErrorController.addErrorLog(errorLocation: #function, systemError: error, errorInfo: "can't move and save downloaded file")
+                }
+            }
+        }
+
+        downloadTask.resume()
+    }
 
     class func removeFile(_ atURL: URL) {
        
@@ -224,6 +289,7 @@ class Downloader: NSObject {
             }
         }
     }
+
 
 
 }

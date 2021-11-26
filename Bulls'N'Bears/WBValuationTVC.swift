@@ -420,7 +420,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 arrays = [controller?.valuation?.debtLT ?? [], controller?.valuation?.netEarnings ?? []]
             }
             else if indexPath.row == 2 {
-            // SAG / profit
+            // sga / profit
                 arrays = [controller?.valuation?.sgaExpense ?? [], controller?.valuation?.grossProfit ?? []]
             }
             else if indexPath.row == 3 {

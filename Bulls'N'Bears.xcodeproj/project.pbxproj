@@ -511,7 +511,6 @@
 				EAA69F7C26121A940067EE1A /* CompanyNews+CoreDataClass.swift */,
 				EAA69F7D26121A940067EE1A /* CompanyNews+CoreDataProperties.swift */,
 				EAA69F72260E52550067EE1A /* GrowthCategory.swift */,
-				EA3E1D6B26317F8A0021B973 /* SharePlaceHolder.swift */,
 				EA32080725EED93A00A6A6AB /* UserEvaluation+CoreDataClass.swift */,
 				EA32080825EED93A00A6A6AB /* UserEvaluation+CoreDataProperties.swift */,
 				EA32082625EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift */,
@@ -580,6 +579,7 @@
 		EADCE1FC274507A4003CAA3F /* Unused */ = {
 			isa = PBXGroup;
 			children = (
+				EA3E1D6B26317F8A0021B973 /* SharePlaceHolder.swift */,
 				EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */,
 				EA4B5F0525DD53900070CC70 /* WebDataDownloader.swift */,
 				EA52EDC725D18D760000155F /* WebpageScraper.swift */,

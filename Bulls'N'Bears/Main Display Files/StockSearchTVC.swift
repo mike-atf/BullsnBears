@@ -304,7 +304,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                 self.nameInWebData(html$: htmlText, symbol: stockName)
             }
             else if task == "priceHistory" {
-                let pricePoints = WebPageScraper2.yahooPriceTable(html$: htmlText)
+                let pricePoints = WebPageScraper2.analyseYahooPriceTable(html$: htmlText)
                 
                 DispatchQueue.main.async {
                     self.downloadDelegate?.newShare(symbol: stockName,  prices: pricePoints)
