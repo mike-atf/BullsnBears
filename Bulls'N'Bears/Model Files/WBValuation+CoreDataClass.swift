@@ -720,6 +720,20 @@ public class WBValuation: NSManagedObject {
                 }
             }
         }
+        
+        if let research = share?.research {
+            if research.futureGrowthMean > 0.15 {
+                userSummaryScore += 10
+            }
+            else if research.futureGrowthMean > 0.1 {
+                userSummaryScore += 5
+            }
+            else if research.futureGrowthMean < 0 {
+                userSummaryScore -= 10
+            }
+            if userSummaryScore < 0 { userSummaryScore = 0 }
+            maximumScoreSum += 10
+        }
 
         return RatingCircleData(rating: userSummaryScore, maximum: maximumScoreSum, minimum: 0, symbol: .star)
     }
