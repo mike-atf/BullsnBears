@@ -92,34 +92,37 @@ class ResearchTVC: UITableViewController {
         else if indexPath.section == 5 { // future growth plan
             return 120
         }
-        else if indexPath.section == 6 { // category
+        else if indexPath.section == 6 { // future growth mean
             return 44
         }
-        else if indexPath.section == 7 { // sub category
+        else if indexPath.section == 7 { // category
             return 44
         }
-        else if indexPath.section == 8 { // news (sub rows)
+        else if indexPath.section == 8 { // sub category
+            return 44
+        }
+        else if indexPath.section == 9 { // news (sub rows)
             return 60
         }
-        else if indexPath.section == 9 { // industry
+        else if indexPath.section == 10 { // industry
             return 44
         }
-        else if indexPath.section == 10 { // insider buying selling
+        else if indexPath.section == 11 { // insider buying selling
             return 44
         }
-        else if indexPath.section == 11 { // crises performance
+        else if indexPath.section == 12 { // crises performance
             return 100
         }
-        else if indexPath.section == 12 { // business description
+        else if indexPath.section == 13 { // business description
             return 150
         }
-        else if indexPath.section == 13 { // ret. earnings
+        else if indexPath.section == 14 { // ret. earnings
             return 44
         }
-        else if indexPath.section == 14 { // special products
+        else if indexPath.section == 15 { // special products
             return 70
         }
-        else if indexPath.section == 15 { // buy story
+        else if indexPath.section == 16 { // buy story
             return 150
         }
         else {

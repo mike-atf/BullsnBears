@@ -109,6 +109,8 @@ class ResearchController {
             switch name {
             case "growthPlan":
                 sectionTitles[name] = "Future growth plan"
+            case "futureGrowthMean":
+                sectionTitles[name] = "Future mean earnings growth estimate (%)"
             case "crisisPerformance":
                 sectionTitles[name] = "Performance during last crises"
             case "companySize":
@@ -177,6 +179,12 @@ class ResearchController {
             else { return nil }
         case "growthPlan":
             if let valid = share?.research?.growthPlan { return [valid] }
+            else { return nil }
+        case "futureGrowthMean":
+            if let valid = share?.research?.futureGrowthMean {
+                let valid$ = percentFormatter2Digits.string(from: valid as NSNumber) ?? ""
+                return [valid$]
+            }
             else { return nil }
         case "crisisPerformance":
             if let valid = share?.research?.crisisPerformance { return [valid] }
@@ -297,6 +305,9 @@ extension ResearchController: ResearchCellDelegate {
             share?.research?.symbol = notes
         case "growthPlan":
             share?.research?.growthPlan = notes
+        case "futureGrowthMean":
+            let valid$ = notes.filter("-0123456789.".contains)
+            share?.research?.futureGrowthMean = (Double(valid$) ?? 0.0) / 100
         case "crisisPerformance":
             share?.research?.crisisPerformance = notes
         case "companySize":

@@ -519,6 +519,26 @@ public class WBValuation: NSManagedObject {
         allFactors.append(perValueFactor() * weights.peRatio) // 0-1 with cutOff at 40.0
         allWeights.append(weights.peRatio)
         
+        if let research = self.share?.research {
+            if research.futureGrowthMean != 0 {
+                var correctedFactor = Double()
+                if research.futureGrowthMean > 0.15 {
+                    correctedFactor = 1.0
+                }
+                else if research.futureGrowthMean > 0.1 {
+                    correctedFactor = 0.5
+                }
+                else if research.futureGrowthMean > 0 {
+                    correctedFactor = 0.25
+                }
+                else {
+                    correctedFactor = 0
+                }
+                allFactors.append(correctedFactor * weights.futureEarningsGrowth)
+                allWeights.append(weights.revenueGrowth)
+                allFactorNames.append("Future earnings growth")
+            }
+        }
         if let valid = valueFactor(values1: revenue, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
             allFactors.append(valid * weights.revenueGrowth)
             allWeights.append(weights.revenueGrowth)

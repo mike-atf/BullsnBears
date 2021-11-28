@@ -71,6 +71,11 @@ class Diary_StocksListVC: UIViewController, UITableViewDelegate, UITableViewData
         performSegue(withIdentifier: "showDiaryDetailSegue", sender: nil)
     }
 
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let sectionTitles = ["Watch list", "Stocks owned", "Archived stocks"]
+        
+        return sectionTitles[section]
+    }
 
 
 

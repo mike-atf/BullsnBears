@@ -313,18 +313,12 @@ public class Share: NSManagedObject {
         
         let minDate = dailyPrices.compactMap { $0.tradingDate }.min()
         
-        
         if let minDate_v = minDate {
                 var calendar = NSCalendar.current
                 calendar.timeZone = NSTimeZone.default
             let components: Set<Calendar.Component> = [.year, .month, .hour, .minute, .weekOfYear ,.weekday]
                 var firstDateComponents = calendar.dateComponents(components, from: minDate_v)
                 var lastDateComponents = calendar.dateComponents(components, from: Date().addingTimeInterval(previewTime))
-            print(minDate_v)
-            print(firstDateComponents)
-            print()
-            print(Date().addingTimeInterval(previewTime))
-            print(lastDateComponents)
             
                 firstDateComponents.second = 0
                 firstDateComponents.minute = 0
@@ -350,7 +344,6 @@ public class Share: NSManagedObject {
                 let firstMondayMidNight = calendar.date(from: firstDateComponents) ?? Date()
                 let lastMondayMidNight = calendar.date(from: lastDateComponents) ?? Date()
                 
-                print(firstMondayMidNight, lastMondayMidNight)
                 return [firstMondayMidNight, lastMondayMidNight]
         }
         

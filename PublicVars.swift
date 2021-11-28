@@ -555,7 +555,7 @@ struct ShareFinancialsValueWeights {
     let revenueGrowth = 1.0
     let netIncomeGrowth = 1.0
     let roeGrowth = 2.0
-
+    let futureEarningsGrowth = 2.0
     
     public func weightsSum() -> Double? {
         
