@@ -690,8 +690,13 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
         }
         
         tableView.reloadRows(at: [atPath], with: .none)
+        
+        if tableView.indexPathForSelectedRow == nil {
+            tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .top)
+        } else {
+            performSegue(withIdentifier: "showChartSegue", sender: nil)
+        }
     }
-    
     
     func livePriceUpdated(indexPath: IndexPath?) {
 

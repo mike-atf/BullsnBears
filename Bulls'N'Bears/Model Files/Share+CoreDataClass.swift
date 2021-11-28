@@ -65,10 +65,15 @@ public class Share: NSManagedObject {
         }
     }
     
+    /// stores prices in date sorted order.
     func setDailyPrices(pricePoints: [PricePoint]?, saveInMOC: Bool?=true) {
 
-        guard let validPoints = pricePoints else { return }
-
+        guard var validPoints = pricePoints else { return }
+        
+        validPoints = validPoints.sorted(by: { p0, p1 in
+            if p0.tradingDate > p1.tradingDate { return false }
+            else { return true }
+        })
         self.dailyPrices = convertDailyPricesToData(dailyPrices: validPoints)
         self.prices = pricePoints
         if saveInMOC ?? true {
@@ -118,11 +123,8 @@ public class Share: NSManagedObject {
         do {
             if let data = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? Data {
 
-                let array = try PropertyListDecoder().decode([PricePoint].self, from: data)
-                prices = array.sorted { (e0, e1) -> Bool in
-                    if e0.tradingDate < e1.tradingDate { return true }
-                    else { return false }
-                }
+                // the 'setDailyPrices' function ensure PricePoints are stored in date sorted order for faster retrieval without sorting
+                let prices = try PropertyListDecoder().decode([PricePoint].self, from: data)
 //once
 //                if symbol == "NVDA" {
 //                    let dateFormatter: DateFormatter = {
@@ -205,7 +207,30 @@ public class Share: NSManagedObject {
     
     public func priceRange(_ from: Date? = nil,_ to: Date? = nil) -> [Double]? {
         
-        return nil
+        guard let dailyPrices = getDailyPrices() else {
+            return nil
+        }
+        
+        var pricesInRange: [PricePoint]!
+        
+        if let validFrom = from {
+            pricesInRange = dailyPrices.filter({ (element) -> Bool in
+                if element.tradingDate < validFrom {
+                    return false
+                }
+                if element.tradingDate > to! {
+                    return false
+                }
+                
+                return true
+            })
+        }
+        else {
+            pricesInRange = dailyPrices
+        }
+        
+        let lowPrices = pricesInRange.compactMap { $0.low }
+        return [lowPrices.min()!, lowPrices.max()!]
     }
     
     public func lowestPrice(_ from: Date? = nil,_ to: Date? = nil) -> Double? {

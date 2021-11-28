@@ -58,8 +58,10 @@ class ChartView: UIView {
 
         guard let validStock = share else { return }
 
-        lowestPriceInRange = validStock.lowestPrice()
-        highestPriceInRange = validStock.highestPrice()
+        let priceRange = validStock.priceRange(nil, nil)
+        lowestPriceInRange = priceRange?.first
+        highestPriceInRange = priceRange?.last
+        
         dateRange = validStock.priceDateRangeWorkWeeksForCharts(withForecastTime: withForeCast ?? true)
 
         guard lowestPriceInRange != nil else { return }

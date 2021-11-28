@@ -321,7 +321,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         let now = Date()
         let dateForNil = now.addingTimeInterval(-301)
         sharesToUpdate = sharesToUpdate?.filter({ share in
-            if now.timeIntervalSince(share.lastLivePriceDate ?? dateForNil) < 300 { return false }
+            if now.timeIntervalSince(share.lastLivePriceDate ?? dateForNil) < 10 { return false }
             else { return true }
         })
         
