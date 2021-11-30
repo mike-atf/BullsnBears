@@ -225,6 +225,7 @@ class ChartView: UIView {
                 
                 //MARK: - current price line
                 if let currentPrice = nonNullLivePrice ?? dailyPrices.last?.close {
+                    
                     let currentPriceLine = UIBezierPath()
                     let pp1 = PriceDate(dailyPrices.first!.tradingDate, currentPrice)
                     let pp2 = PriceDate(dailyPrices.last!.tradingDate, currentPrice)

@@ -13,7 +13,7 @@ class StockListCellTableViewCell: UITableViewCell {
     @IBOutlet var title: UILabel!
     @IBOutlet var detail: UILabel!
     @IBOutlet var reportDateLabel: UILabel!
-    @IBOutlet var ratingCircle: ScoreCircle!
+    @IBOutlet var scoreIcon: ScoreCircle!
     @IBOutlet var actionView: BuySellView!
     @IBOutlet var updateIcon: UIImageView!
     
@@ -36,7 +36,7 @@ class StockListCellTableViewCell: UITableViewCell {
         self.title.text = " "
         self.title.textColor = .label
         self.detail.text = " "
-        self.ratingCircle.isHidden = true
+        self.scoreIcon.isHidden = true
         actionView.resetForReuse()
         updateIcon.image = nil
 //        updateIcon.tintColor = UIColor.systemRed
@@ -70,7 +70,7 @@ class StockListCellTableViewCell: UITableViewCell {
         
         actionView.configure(share: stock)
         let score = ((UserDefaults.standard.value(forKey: userDefaultTerms.sortParameter) as? String) ?? "userEvaluationScore") == "valueScore" ? valueRatingScore : userRatingScore
-        ratingCircle.configure(score: score,delegate: scoreDelegate, path: indexPath, isUserScore: true, userCommentsCount: userCommentCount)
+        scoreIcon.configure(score: score,delegate: scoreDelegate, path: indexPath, isUserScore: true, userCommentsCount: userCommentCount)
         
         if stock.watchStatus > 1 {
             updateIcon.image = nil

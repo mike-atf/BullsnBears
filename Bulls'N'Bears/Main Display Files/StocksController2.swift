@@ -299,6 +299,8 @@ class StocksController2: NSFetchedResultsController<Share> {
 
     func updateStocksData(singleShare: Share?=nil) throws {
         
+        print("SC2 updating shares...")
+        
         if singleShare == nil {
             Task.init(priority: .background) {
                 treasuryBondYields = try await updateTreasuryBondYields()
@@ -341,7 +343,11 @@ class StocksController2: NSFetchedResultsController<Share> {
         NotificationCenter.default.addObserver(self, selector: #selector(backgroundContextDidSave(notification:)), name: .NSManagedObjectContextDidSave, object: nil)
         
         for share in sharesToUpdate ?? [] {
+            
+            updateUserAndValueScores(share: share)
         
+//            print("updating \(share.symbol!)")
+            
             let symbol = share.symbol ?? ""
             let shortName = share.name_short ?? ""
             let existingPricePoints = share.getDailyPrices()
@@ -354,8 +360,14 @@ class StocksController2: NSFetchedResultsController<Share> {
                 let labelled_datedqEarnings = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
                                         
                 let updatedPricePoints = try await getDailyPricesForUpdate(shareSymbol: symbol, existingDailyPrices: existingPricePoints)
+                
+//                print("downloaded update data for \(symbol)")
+
                                         
                 await backgroundMoc?.perform({
+                    
+//                    print("trying to saveupdate for \(symbol)")
+
                     do {
                         guard let backgroundShare = self.backgroundMoc?.object(with: shareID) as? Share else {
                             throw DownloadAndAnalysisError.noBackgroundShareWithSymbol
@@ -378,6 +390,8 @@ class StocksController2: NSFetchedResultsController<Share> {
                         try backgroundShare.managedObjectContext?.save()
                         
                         DispatchQueue.main.async {
+//                            print("saved update for \(symbol)")
+
                             self.updateCompleteToDelegate(id: shareID)
                         }
                     } catch let error {
@@ -421,6 +435,32 @@ class StocksController2: NSFetchedResultsController<Share> {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
         }
         return (shareSymbol, nil)
+    }
+    
+    func updateUserAndValueScores(share: Share) {
+        
+        let calendar = Calendar.current
+        let components: Set<Calendar.Component> = [.day]
+        let dateComponents = calendar.dateComponents(components, from: Date())
+        
+        if (dateComponents.day ?? 0) > 3 { return }
+
+        let valueRatingData = share.wbValuation?.valuesSummaryScores()
+        let userRatingData = share.wbValuation?.userEvaluationScore()
+        
+        if let score = valueRatingData?.ratingScore() {
+            share.valueScore = score
+        }
+        if let score = userRatingData?.ratingScore() {
+            share.userEvaluationScore = score
+        }
+        
+        
+        do {
+            try share.managedObjectContext?.save()
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: "StocksController2.updateUserAndValueScores", systemError: error, errorInfo: "error trying to save updated user and value scores")
+        }
     }
     
     func getQuarterlyEarningsForUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil) async throws -> Labelled_DatedValues? {

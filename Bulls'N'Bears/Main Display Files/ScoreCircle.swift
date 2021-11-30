@@ -36,6 +36,9 @@ class ScoreCircle: UIView {
 
         
         self.scoreRatio = CGFloat(validScore)
+        if self.scoreRatio.isNaN {
+            self.scoreRatio = 0
+        }
         self.isHidden = false
         
         self.isUserScoreType = isUserScore
@@ -77,6 +80,7 @@ class ScoreCircle: UIView {
         centerImageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         centerImageView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.6).isActive = true
         centerImageView.widthAnchor.constraint(equalTo: centerImageView.heightAnchor).isActive = true
+         */
         
         if userCommentsCount > 0 {
             tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(userTap))
@@ -86,7 +90,7 @@ class ScoreCircle: UIView {
         else {
             tapGestureRecognizer = nil
         }
-         */
+
     }
     
     override func draw(_ rect: CGRect) {

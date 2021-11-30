@@ -44,6 +44,20 @@ public class Share: NSManagedObject {
             growthSubType = "Unknown"
         }
         
+        if let date = self.research?.nextReportDate {
+            if date < Date() {
+                self.research?.nextReportDate = nil
+            }
+        }
+        
+        if self.userEvaluationScore.isNaN {
+            self.userEvaluationScore = Double()
+        }
+        
+        if self.valueScore.isNaN {
+            self.valueScore = Double()
+        }
+
     }
     
     
@@ -1270,7 +1284,8 @@ public class Share: NSManagedObject {
         
         return crossingPoints.reversed()
     }
-       
+    
+    /*
     func priceIncreaseAfterMCDCrossings() {
         
         guard let aboveCrossingPoints = macDCrossings(aboveZero: true) else {
@@ -1343,7 +1358,9 @@ public class Share: NSManagedObject {
         let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
 
     }
+    */
     
+    /*
     func priceIncreaseAfterOscCrossings() {
         
         guard let aboveCrossingPoints = oscCrossings(oversold: true) else {
@@ -1406,25 +1423,26 @@ public class Share: NSManagedObject {
         }
 
         
-        let above$ = percentFormatter2Digits.string(from: (abovePriceIncreases.mean() ?? 0) as NSNumber) ?? ""
-        let below$ = percentFormatter2Digits.string(from: (belowPriceIncreases.mean() ?? 0) as NSNumber) ?? ""
-        
-        let abovePct = Double(actualIncreasesAbove.count) / Double(abovePriceIncreases.count)
-        let belowPct = Double(actualIncreasesBelow.count) / Double(belowPriceIncreases.count)
-        
-        let abovePct$ = percentFormatter2Digits.string(from: abovePct as NSNumber) ?? ""
-        let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
+//        let above$ = percentFormatter2Digits.string(from: (abovePriceIncreases.mean() ?? 0) as NSNumber) ?? ""
+//        let below$ = percentFormatter2Digits.string(from: (belowPriceIncreases.mean() ?? 0) as NSNumber) ?? ""
+//
+//        let abovePct = Double(actualIncreasesAbove.count) / Double(abovePriceIncreases.count)
+//        let belowPct = Double(actualIncreasesBelow.count) / Double(belowPriceIncreases.count)
+//
+//        let abovePct$ = percentFormatter2Digits.string(from: abovePct as NSNumber) ?? ""
+//        let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
 
-        print()
-        print("\(symbol!) mean price increase after OSC crossings in oversold area (>80) " + above$)
-        print( abovePct$ + " of \(abovePriceIncreases.count) are actual increases")
+//        print()
+//        print("\(symbol!) mean price increase after OSC crossings in oversold area (>80) " + above$)
+//        print( abovePct$ + " of \(abovePriceIncreases.count) are actual increases")
 //        print(abovePriceIncreases)
-        print("\(symbol!) mean price increase after OSC crossings in undersold area (<20) " +  below$)
-        print( belowPct$ + " of \(belowPriceIncreases.count) are actual increases")
+//        print("\(symbol!) mean price increase after OSC crossings in undersold area (<20) " +  below$)
+//        print( belowPct$ + " of \(belowPriceIncreases.count) are actual increases")
 //        print(belowPriceIncreases)
-        print()
+//        print()
 
     }
+    */
     
     func buyTriggersThreeAnywhere() {
         

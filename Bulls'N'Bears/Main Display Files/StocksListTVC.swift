@@ -103,7 +103,9 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.refreshControl?.addTarget(self, action: #selector(updateShares), for: .valueChanged)
         
         if controller.fetchedObjects?.count ?? 0 > 0 {
-            tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
+            if tableView.indexPathForSelectedRow == nil {
+                tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
+            }
             performSegue(withIdentifier: "showChartSegue", sender: nil)
             // updateShares() call here NOT necessary as TVC acts as observer to "ActivatedFromBackground" even if launching (?)
         }
@@ -168,7 +170,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: "StocksListVC - updateShares", systemError: nil, errorInfo: "error when trying to update stock data: \(error)")
             }
-        tableView.refreshControl?.endRefreshing()
+            tableView.refreshControl?.endRefreshing()
 //        }
         
 //        DispatchQueue.main.async {
@@ -362,6 +364,10 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             else { return false }
         }).count ?? 0
         
+//        print("saved scores for \(share.symbol!)")
+//        print("user score: \(share.userEvaluationScore)")
+//        print("valueScore score: \(share.valueScore)")
+//        print()
         cell.configureCell(indexPath: indexPath, stock: share, userRatingScore: share.userEvaluationScore, valueRatingScore: share.valueScore, scoreDelegate: self, userCommentCount: evaluationsCount)
         
         return cell
@@ -469,7 +475,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
 
         performSegue(withIdentifier: "showChartSegue", sender: nil)
-        tableView.deselectRow(at: indexPath, animated: true)
+//        tableView.deselectRow(at: indexPath, animated: true)
 
     }
     
@@ -684,10 +690,10 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
     
     func shareUpdateComplete(atPath: IndexPath) {
         
-        let share = controller.object(at: atPath)
-        if let prices = share.getDailyPrices() {
-            print("updated latest daily price date for \(share.symbol!) = \(prices.last!.tradingDate)")
-        }
+//        let share = controller.object(at: atPath)
+//        if let prices = share.getDailyPrices() {
+//            print("updated latest daily price date for \(share.symbol!) = \(prices.last!.tradingDate)")
+//        }
         
         tableView.reloadRows(at: [atPath], with: .none)
         
@@ -698,6 +704,7 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
         }
     }
     
+    /*
     func livePriceUpdated(indexPath: IndexPath?) {
 
 //        print()
@@ -720,7 +727,9 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
                         if let path = controller.indexPath(forObject: displayedShare) {
 //                            print(#function + " live price update complete for selected share \(displayedShare.symbol!)")
                             tableView.refreshControl?.endRefreshing()
-                            tableView.selectRow(at: path, animated: false, scrollPosition: .none)
+                            if tableView.indexPathForSelectedRow == nil {
+                                tableView.selectRow(at: path, animated: false, scrollPosition: .none)
+                            }
                             self.performSegue(withIdentifier: "showChartSegue", sender: nil)
                         }
                     }
@@ -729,7 +738,7 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
         }
         
     }
-    
+    */
     func tap(indexPath: IndexPath, isUserScoreType: Bool, sender: UIView) {
         
         if let evaluationsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {

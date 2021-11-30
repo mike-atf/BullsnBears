@@ -124,6 +124,27 @@
 		EAAA06B025AA01A00077A972 /* ErrorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAA06AF25AA01A00077A972 /* ErrorController.swift */; };
 		EAAA06B125AA01A00077A972 /* ErrorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAA06AF25AA01A00077A972 /* ErrorController.swift */; };
 		EAAA06B225AA01A00077A972 /* ErrorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAA06AF25AA01A00077A972 /* ErrorController.swift */; };
+		EAAB7BCD2753E7D900295DA7 /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAAB7BCC2753E7D900295DA7 /* Settings.storyboard */; };
+		EAAB7BCE2753E7D900295DA7 /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAAB7BCC2753E7D900295DA7 /* Settings.storyboard */; };
+		EAAB7BCF2753E7D900295DA7 /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EAAB7BCC2753E7D900295DA7 /* Settings.storyboard */; };
+		EAAB7BD22753E88B00295DA7 /* SettingsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BD12753E88B00295DA7 /* SettingsTVC.swift */; };
+		EAAB7BD32753E88B00295DA7 /* SettingsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BD12753E88B00295DA7 /* SettingsTVC.swift */; };
+		EAAB7BD42753E88B00295DA7 /* SettingsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BD12753E88B00295DA7 /* SettingsTVC.swift */; };
+		EAAB7BD72753E9A700295DA7 /* SettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BD52753E9A700295DA7 /* SettingsCell.swift */; };
+		EAAB7BD82753E9A700295DA7 /* SettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BD52753E9A700295DA7 /* SettingsCell.swift */; };
+		EAAB7BD92753E9A700295DA7 /* SettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BD52753E9A700295DA7 /* SettingsCell.swift */; };
+		EAAB7BDA2753E9A700295DA7 /* SettingsCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAAB7BD62753E9A700295DA7 /* SettingsCell.xib */; };
+		EAAB7BDB2753E9A700295DA7 /* SettingsCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAAB7BD62753E9A700295DA7 /* SettingsCell.xib */; };
+		EAAB7BDC2753E9A700295DA7 /* SettingsCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAAB7BD62753E9A700295DA7 /* SettingsCell.xib */; };
+		EAAB7BDE2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BDD2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift */; };
+		EAAB7BDF2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BDD2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift */; };
+		EAAB7BE02753FE9C00295DA7 /* RatingFactorSettingsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BDD2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift */; };
+		EAAB7BE32754038A00295DA7 /* RatingFactorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BE12754038A00295DA7 /* RatingFactorCell.swift */; };
+		EAAB7BE42754038A00295DA7 /* RatingFactorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BE12754038A00295DA7 /* RatingFactorCell.swift */; };
+		EAAB7BE52754038A00295DA7 /* RatingFactorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAAB7BE12754038A00295DA7 /* RatingFactorCell.swift */; };
+		EAAB7BE62754038A00295DA7 /* RatingFactorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAAB7BE22754038A00295DA7 /* RatingFactorCell.xib */; };
+		EAAB7BE72754038A00295DA7 /* RatingFactorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAAB7BE22754038A00295DA7 /* RatingFactorCell.xib */; };
+		EAAB7BE82754038A00295DA7 /* RatingFactorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAAB7BE22754038A00295DA7 /* RatingFactorCell.xib */; };
 		EAB58D8026F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB58D7F26F4CADE00F70F9A /* ShareTransactionDialog.swift */; };
 		EAB58D8126F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB58D7F26F4CADE00F70F9A /* ShareTransactionDialog.swift */; };
 		EAB58D8226F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB58D7F26F4CADE00F70F9A /* ShareTransactionDialog.swift */; };
@@ -348,6 +369,13 @@
 		EAA69FBC261222AF0067EE1A /* ResearchCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResearchCell.xib; sourceTree = "<group>"; };
 		EAAA06AF25AA01A00077A972 /* ErrorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorController.swift; sourceTree = SOURCE_ROOT; };
 		EAAB7BCB2753D71B00295DA7 /* TrendMyStocks 12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 12.xcdatamodel"; sourceTree = "<group>"; };
+		EAAB7BCC2753E7D900295DA7 /* Settings.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Settings.storyboard; sourceTree = "<group>"; };
+		EAAB7BD12753E88B00295DA7 /* SettingsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTVC.swift; sourceTree = SOURCE_ROOT; };
+		EAAB7BD52753E9A700295DA7 /* SettingsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCell.swift; sourceTree = "<group>"; };
+		EAAB7BD62753E9A700295DA7 /* SettingsCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsCell.xib; sourceTree = "<group>"; };
+		EAAB7BDD2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingFactorSettingsTVC.swift; sourceTree = "<group>"; };
+		EAAB7BE12754038A00295DA7 /* RatingFactorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingFactorCell.swift; sourceTree = "<group>"; };
+		EAAB7BE22754038A00295DA7 /* RatingFactorCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RatingFactorCell.xib; sourceTree = "<group>"; };
 		EAAC3393264D409200E5C6D6 /* TrendMyStocks 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 6.xcdatamodel"; sourceTree = "<group>"; };
 		EAB58D7E26F4C83300F70F9A /* TrendMyStocks 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 7.xcdatamodel"; sourceTree = "<group>"; };
 		EAB58D7F26F4CADE00F70F9A /* ShareTransactionDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTransactionDialog.swift; sourceTree = "<group>"; };
@@ -472,12 +500,26 @@
 			path = "Research Views";
 			sourceTree = "<group>";
 		};
+		EAAB7BD02753E85F00295DA7 /* Settings View */ = {
+			isa = PBXGroup;
+			children = (
+				EAAB7BD12753E88B00295DA7 /* SettingsTVC.swift */,
+				EAAB7BD52753E9A700295DA7 /* SettingsCell.swift */,
+				EAAB7BD62753E9A700295DA7 /* SettingsCell.xib */,
+				EAAB7BDD2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift */,
+				EAAB7BE12754038A00295DA7 /* RatingFactorCell.swift */,
+				EAAB7BE22754038A00295DA7 /* RatingFactorCell.xib */,
+			);
+			path = "Settings View";
+			sourceTree = "<group>";
+		};
 		EAC1903D257641160030B331 = {
 			isa = PBXGroup;
 			children = (
 				EAC1908E257642F20030B331 /* CSVImporter.swift */,
 				EAC190C0257663200030B331 /* PublicVars.swift */,
 				EAC1904F257641160030B331 /* Main.storyboard */,
+				EAAB7BCC2753E7D900295DA7 /* Settings.storyboard */,
 				EADA38E82713164E00B294E3 /* Diary.storyboard */,
 				EA163F76258BA85E000974AB /* StockTrend.swift */,
 				EA7B613825C412860018BA02 /* StockTickerDictionary.csv */,
@@ -599,6 +641,7 @@
 				EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */,
 				EAC07D6525ACEE350045D83B /* ErrorListVC.swift */,
 				EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */,
+				EAAB7BD02753E85F00295DA7 /* Settings View */,
 				EA0F8898263956FE009C980F /* Comparison Views */,
 				EAA69FA6261221B10067EE1A /* Research Views */,
 				EADA38EC271316CD00B294E3 /* Diary Files */,
@@ -793,6 +836,7 @@
 				EADA38E92713164E00B294E3 /* Diary.storyboard in Resources */,
 				EA06251325D079310015FA6E /* DownloadProgressView.xib in Resources */,
 				EAD835F225DC12000015C93A /* ValueListCell.xib in Resources */,
+				EAAB7BCD2753E7D900295DA7 /* Settings.storyboard in Resources */,
 				EA2016182715EE75004432EC /* DiaryTransactionCard.xib in Resources */,
 				EAC61A2626FB74AC000FAC81 /* DateSelectionCell.xib in Resources */,
 				EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */,
@@ -800,12 +844,14 @@
 				EAEA758C25ACF53F008EEC05 /* ErrorLogListCell.xib in Resources */,
 				EAC19056257641180030B331 /* Assets.xcassets in Resources */,
 				EAC2FC5325A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
+				EAAB7BDA2753E9A700295DA7 /* SettingsCell.xib in Resources */,
 				EAC19051257641160030B331 /* Main.storyboard in Resources */,
 				EAC2FC7425A23FFC0060F387 /* ValuationTableViewCell.xib in Resources */,
 				EA7B613925C412860018BA02 /* StockTickerDictionary.csv in Resources */,
 				EAFCB95F25C5F0240029AA4F /* MTCookies in Resources */,
 				EAA69FC0261222AF0067EE1A /* ResearchCell.xib in Resources */,
 				EAD34D5726545785004859A5 /* CategorySelectionCell.xib in Resources */,
+				EAAB7BE62754038A00295DA7 /* RatingFactorCell.xib in Resources */,
 				EA3207F925EEA15900A6A6AB /* ValueListTextEntryCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -816,6 +862,7 @@
 			files = (
 				EA2016112714BE3D004432EC /* DiaryListCell.xib in Resources */,
 				EAFCB98C25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */,
+				EAAB7BDB2753E9A700295DA7 /* SettingsCell.xib in Resources */,
 				EA2016192715EE75004432EC /* DiaryTransactionCard.xib in Resources */,
 				EAED14FB25A8DA090073C46F /* Bulls'N'BearsTests.xctest in Resources */,
 				EAFCB96025C5F0240029AA4F /* MTCookies in Resources */,
@@ -823,11 +870,13 @@
 				EAD835FF25DC16470015C93A /* WBValuationCell.xib in Resources */,
 				EA7B613A25C412860018BA02 /* StockTickerDictionary.csv in Resources */,
 				EAC2FC5425A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
+				EAAB7BCE2753E7D900295DA7 /* Settings.storyboard in Resources */,
 				EA06251425D079310015FA6E /* DownloadProgressView.xib in Resources */,
 				EADA38EA2713164E00B294E3 /* Diary.storyboard in Resources */,
 				EAA69FC1261222AF0067EE1A /* ResearchCell.xib in Resources */,
 				EAC2FC7525A23FFC0060F387 /* ValuationTableViewCell.xib in Resources */,
 				EAC61A2726FB74AC000FAC81 /* DateSelectionCell.xib in Resources */,
+				EAAB7BE72754038A00295DA7 /* RatingFactorCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -837,6 +886,7 @@
 			files = (
 				EA2016122714BE3D004432EC /* DiaryListCell.xib in Resources */,
 				EAFCB98D25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */,
+				EAAB7BDC2753E9A700295DA7 /* SettingsCell.xib in Resources */,
 				EA20161A2715EE75004432EC /* DiaryTransactionCard.xib in Resources */,
 				EAED14FC25A8DA100073C46F /* Bulls'N'BearsUITests.xctest in Resources */,
 				EAFCB96125C5F0240029AA4F /* MTCookies in Resources */,
@@ -844,11 +894,13 @@
 				EAD8360025DC16470015C93A /* WBValuationCell.xib in Resources */,
 				EA7B613B25C412860018BA02 /* StockTickerDictionary.csv in Resources */,
 				EAC2FC5525A0B93D0060F387 /* StockListCellTableViewCell.xib in Resources */,
+				EAAB7BCF2753E7D900295DA7 /* Settings.storyboard in Resources */,
 				EA06251525D079310015FA6E /* DownloadProgressView.xib in Resources */,
 				EADA38EB2713164E00B294E3 /* Diary.storyboard in Resources */,
 				EAA69FC2261222AF0067EE1A /* ResearchCell.xib in Resources */,
 				EAC2FC7625A23FFC0060F387 /* ValuationTableViewCell.xib in Resources */,
 				EAC61A2826FB74AC000FAC81 /* DateSelectionCell.xib in Resources */,
+				EAAB7BE82754038A00295DA7 /* RatingFactorCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -894,10 +946,12 @@
 				EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */,
 				EA0F889E263959D6009C980F /* ComparisonController.swift in Sources */,
 				EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */,
+				EAAB7BD22753E88B00295DA7 /* SettingsTVC.swift in Sources */,
 				EAD921682607D980008312E0 /* StochastikOscillatorView.swift in Sources */,
 				EA32080A25EED93A00A6A6AB /* UserEvaluation+CoreDataClass.swift in Sources */,
 				EAFCB96925C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
+				EAAB7BD72753E9A700295DA7 /* SettingsCell.swift in Sources */,
 				EA3DF0C4260A1184001A0098 /* LineCrossingSignal.swift in Sources */,
 				EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */,
 				EA0F889A26395745009C980F /* ComparisonVC.swift in Sources */,
@@ -970,6 +1024,8 @@
 				EAA69FB22612221B0067EE1A /* ResearchTVC.swift in Sources */,
 				EADA38EE2713179C00B294E3 /* Diary_StocksListVC.swift in Sources */,
 				EADA38F427131AA100B294E3 /* ShareTransaction+CoreDataClass.swift in Sources */,
+				EAAB7BE32754038A00295DA7 /* RatingFactorCell.swift in Sources */,
+				EAAB7BDE2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift in Sources */,
 				EAD835BC25DA9BA40015C93A /* WBValuationTVC.swift in Sources */,
 				EA805DC525D54D4E00720E68 /* StockSearchTVC.swift in Sources */,
 				EA0E2F292625D50A00602BEE /* SortView.swift in Sources */,
@@ -988,6 +1044,7 @@
 			files = (
 				EAC2FC4325A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EAC190C2257663200030B331 /* PublicVars.swift in Sources */,
+				EAAB7BE42754038A00295DA7 /* RatingFactorCell.swift in Sources */,
 				EAFCB98925C9A4DE0029AA4F /* ValuationSummaryCell.swift in Sources */,
 				EAC190F52577E3B60030B331 /* ChartView.swift in Sources */,
 				EADA38F527131AA100B294E3 /* ShareTransaction+CoreDataClass.swift in Sources */,
@@ -996,6 +1053,7 @@
 				EA5639E9262C481600010964 /* ChartPricesView.swift in Sources */,
 				EADA38E62710AE9E00B294E3 /* PurchasedButton.swift in Sources */,
 				EAC190EB2577E2E20030B331 /* ChartContainerView.swift in Sources */,
+				EAAB7BD32753E88B00295DA7 /* SettingsTVC.swift in Sources */,
 				EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */,
 				EAD835E125DC06EC0015C93A /* Calculator.swift in Sources */,
 				EAC61A2426FB74AC000FAC81 /* DateSelectionCell.swift in Sources */,
@@ -1027,6 +1085,7 @@
 				EA6AACD926050457002DE9DF /* MAC_D.swift in Sources */,
 				EAA69F74260E52550067EE1A /* GrowthCategory.swift in Sources */,
 				EAC190B4257661F60030B331 /* MasterSplitView.swift in Sources */,
+				EAAB7BDF2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift in Sources */,
 				EAA69FB32612221B0067EE1A /* ResearchTVC.swift in Sources */,
 				EAC2FC7C25A240290060F387 /* ValuationListViewController.swift in Sources */,
 				EAB58D8126F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */,
@@ -1039,6 +1098,7 @@
 				EA641C2A2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
 				EA20161D2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */,
 				EA2016152715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
+				EAAB7BD82753E9A700295DA7 /* SettingsCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1048,6 +1108,7 @@
 			files = (
 				EAC2FC4425A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EAC190C3257663200030B331 /* PublicVars.swift in Sources */,
+				EAAB7BE52754038A00295DA7 /* RatingFactorCell.swift in Sources */,
 				EAFCB98A25C9A4DE0029AA4F /* ValuationSummaryCell.swift in Sources */,
 				EAC190F62577E3B60030B331 /* ChartView.swift in Sources */,
 				EADA38F627131AA100B294E3 /* ShareTransaction+CoreDataClass.swift in Sources */,
@@ -1056,6 +1117,7 @@
 				EA5639EA262C481600010964 /* ChartPricesView.swift in Sources */,
 				EADA38E72710AE9E00B294E3 /* PurchasedButton.swift in Sources */,
 				EAC190EC2577E2E20030B331 /* ChartContainerView.swift in Sources */,
+				EAAB7BD42753E88B00295DA7 /* SettingsTVC.swift in Sources */,
 				EAD835E225DC06EC0015C93A /* Calculator.swift in Sources */,
 				EA5639E3262C47F700010964 /* ChartTimeLineView.swift in Sources */,
 				EAC61A2526FB74AC000FAC81 /* DateSelectionCell.swift in Sources */,
@@ -1087,6 +1149,7 @@
 				EA6AACDA26050457002DE9DF /* MAC_D.swift in Sources */,
 				EAA69F75260E52550067EE1A /* GrowthCategory.swift in Sources */,
 				EAC190B5257661F60030B331 /* MasterSplitView.swift in Sources */,
+				EAAB7BE02753FE9C00295DA7 /* RatingFactorSettingsTVC.swift in Sources */,
 				EAA69FB42612221B0067EE1A /* ResearchTVC.swift in Sources */,
 				EAC2FC7D25A240290060F387 /* ValuationListViewController.swift in Sources */,
 				EAB58D8226F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */,
@@ -1099,6 +1162,7 @@
 				EA641C2B2642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
 				EA20161E2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */,
 				EA2016162715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
+				EAAB7BD92753E9A700295DA7 /* SettingsCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

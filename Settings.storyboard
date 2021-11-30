@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="ipad10_9rounded" orientation="landscape" layout="fullscreen" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--SettingsTVC-->
+        <scene sceneID="T7v-u8-3bn">
+            <objects>
+                <tableViewController storyboardIdentifier="SettingsTVC" providesPresentationContextTransitionStyle="YES" id="W8I-OE-Qm7" customClass="SettingsTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="atF-3t-rn4">
+                        <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ratingFactorCell" id="YcV-TT-2IB" customClass="RatingFactorCell" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="49.5" width="1180" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="YcV-TT-2IB" id="sMB-wF-9o6">
+                                    <rect key="frame" x="0.0" y="0.0" width="1180" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="mlB-9m-6jL" kind="showDetail" identifier="ratingFactorsSegue" id="0GP-o1-tWz"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="W8I-OE-Qm7" id="RpL-JR-fyU"/>
+                            <outlet property="delegate" destination="W8I-OE-Qm7" id="qQT-Ne-FbI"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="xaY-sO-A5J"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="97O-zG-9k7" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2156.4406779661017" y="93.658536585365852"/>
+        </scene>
+        <!--Rating Factor SettingsTVC-->
+        <scene sceneID="f6o-Vv-1rg">
+            <objects>
+                <tableViewController storyboardIdentifier="RatingFactorSettingTVC" modalTransitionStyle="flipHorizontal" modalPresentationStyle="currentContext" id="Wlz-dK-dgJ" customClass="RatingFactorSettingsTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="G3c-QG-Yuu">
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="740"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="RatingFactorCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ratingFactorCell" id="S2D-TZ-MGk" customClass="RatingFactorCell" customModule="Bulls_N_Bears" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="44.5" width="704" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="S2D-TZ-MGk" id="Dco-qe-iAf">
+                                    <rect key="frame" x="0.0" y="0.0" width="704" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="Wlz-dK-dgJ" id="1Nc-6T-98Q"/>
+                            <outlet property="delegate" destination="Wlz-dK-dgJ" id="ujt-UE-FyZ"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="G3a-TQ-Ymg">
+                        <barButtonItem key="backBarButtonItem" title="Back" image="chevron.left" catalog="system" id="AnP-zx-B9h"/>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="EFH-3E-X6K" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3707.2881355932204" y="93.658536585365852"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="ftq-mH-g3a">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="currentContext" id="mlB-9m-6jL" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Qtg-jr-zGW">
+                        <rect key="frame" x="0.0" y="0.0" width="1180" height="50"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Wlz-dK-dgJ" kind="relationship" relationship="rootViewController" id="OOL-Ez-iJC"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="j6k-VA-Uv4" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2998.4745762711864" y="93.658536585365852"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="chevron.left" catalog="system" width="96" height="128"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

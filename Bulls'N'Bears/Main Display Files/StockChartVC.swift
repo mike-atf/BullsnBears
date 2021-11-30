@@ -23,7 +23,7 @@ class StockChartVC: UIViewController {
     @IBOutlet var researchButton: UIBarButtonItem!
     @IBOutlet var purchaseButton: UIBarButtonItem!
     
-    var buildLabel: UIBarButtonItem!
+    var settingsMenuButton: UIBarButtonItem!
     var dcfErrors = [String]()
     var r1Errors: [String]?
 
@@ -36,11 +36,12 @@ class StockChartVC: UIViewController {
         
         barTitleButton.title = share?.name_long
 
-        buildLabel = UIBarButtonItem(title: "Build " + appBuild, style: .plain, target: nil, action: nil)
-                
+//        buildLabel = UIBarButtonItem(title: "Build " + appBuild, style: .plain, target: nil, action: nil)
+        settingsMenuButton = UIBarButtonItem(image: UIImage(systemName: "slider.horizontal.3"), style: .plain, target: self, action: #selector(settingsMenu))
+
         let fixedSizeItem = UIBarButtonItem.fixedSpace(100)
         self.navigationItem.leftBarButtonItems = [barTitleButton,researchButton, purchaseButton, fixedSizeItem]
-        self.navigationItem.rightBarButtonItem = buildLabel
+        self.navigationItem.rightBarButtonItem = settingsMenuButton
         
         NotificationCenter.default.addObserver(self, selector: #selector(activateErrorButton), name: Notification.Name(rawValue: "NewErrorLogged"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showCitation), name: Notification.Name(rawValue: "ShowCitation"), object: nil)
@@ -55,6 +56,23 @@ class StockChartVC: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc
+    func settingsMenu() {
+        
+        if let settingsView = UIStoryboard(name: "Settings", bundle: nil).instantiateViewController(withIdentifier: "SettingsTVC") as? SettingsTVC {
+            
+            settingsView.modalPresentationStyle = .popover
+            settingsView.preferredContentSize = CGSize(width: self.view.bounds.width / 2, height: self.view.bounds.height)
+
+            let popUpController = settingsView.popoverPresentationController
+            popUpController!.permittedArrowDirections = .up
+            popUpController!.barButtonItem = settingsMenuButton
+            popUpController!.delegate = self
+            
+            present(settingsView, animated: true, completion: nil)
+        }
     }
     
     override func viewWillLayoutSubviews() {
@@ -331,8 +349,8 @@ class StockChartVC: UIViewController {
 
 }
 
-extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate {
-    
+extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate, UIPopoverPresentationControllerDelegate {
+        
     func valuationSummaryComplete(toDismiss: ValuationSummaryTVC?) {
 
         // return point from ValuationSummaryTVC for R1Valuations

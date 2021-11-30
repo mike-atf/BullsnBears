@@ -65,9 +65,10 @@ class ChartPricesView: UIView {
         guard let validShare = share else { return }
         self.share = validShare
         
-        lowestPriceInRange = validShare.lowestPrice()
-        highestPriceInRange = validShare.highestPrice()
-        
+        let priceRange = validShare.priceRange(nil, nil)
+        lowestPriceInRange = priceRange?.first
+        highestPriceInRange = priceRange?.last
+
         guard lowestPriceInRange != nil else { return }
         guard highestPriceInRange != nil else { return }
         

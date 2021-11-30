@@ -59,6 +59,7 @@ typealias Labelled_DatedValues = (label: String, datedValues: [DatedValue])
 typealias DatedValue = (date: Date, value: Double)
 typealias ShareNamesDictionary = (symbol: String, shortName: String)
 typealias LabelledFileURL = (symbol: String, fileURL: URL)
+typealias ScoreData = (score: Double, maxScore: Double, factorArray: [String])
 
 //var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
@@ -68,6 +69,7 @@ let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
 let gradientBar = UIImage(named: "GradientBar")
 let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
+var valuationWeightsSingleton = ShareFinancialsValueWeights()
 
 var yahooRefDate: Date = {
     let calendar = Calendar.current
@@ -226,6 +228,7 @@ struct UserDefaultTerms {
     let sortParameter = "sortParameter"
     let lastCitation = "lastCitation"
     let newestMTDataDate = "NewestMTDataDate"
+    let valuationFactorWeights = "valuationFactorWeights"
 }
 
 struct SharesListSortParameter {
@@ -539,23 +542,48 @@ struct PricePoint: Codable, Hashable {
 
 struct ShareFinancialsValueWeights {
     
-    let peRatio = 1.0
-    let retEarningsGrowth = 2.0
-    let lynchScore = 2.0
-    let moatScore = 2.0
-    let epsGrowth = 0.5
-    let netIncomeDivRevenue = 2.0
-    let capExpendDivEarnings = 1.0
-    let profitMargin = 1.0
-    let ltDebtDivIncome = 0.5
-    let opCashFlowGrowth = 1.0
-    let ltDebtDivadjEq = 2.0
-    let sgaDivRevenue = 1.0
-    let radDivRevenue = 0.5
-    let revenueGrowth = 1.0
-    let netIncomeGrowth = 1.0
-    let roeGrowth = 2.0
-    let futureEarningsGrowth = 2.0
+    var peRatio = 1.0
+    var retEarningsGrowth = 1.0
+    var lynchScore = 1.0
+    var moatScore = 1.0
+    var epsGrowth = 1.0
+//    var netIncomeDivRevenue = 1.0
+    var capExpendDivEarnings = 0.25
+    var profitMargin = 0.25
+    var ltDebtDivIncome = 0.25
+    var opCashFlowGrowth = 0.25
+//    var ltDebtDivadjEq = 1.0
+    var sgaDivProfit = 0.25
+    var radDivProfit = 0.25
+    var revenueGrowth = 0.25
+//    var netIncomeGrowth = 0.5
+    var roeGrowth = 0.5
+    var futureEarningsGrowth = 1.5
+    
+    init() {
+        if let defaults = UserDefaults.standard.value(forKey: userDefaultTerms.valuationFactorWeights) as? ShareFinancialsValueWeights {
+            self.peRatio = defaults.peRatio
+            self.retEarningsGrowth = defaults.retEarningsGrowth
+            self.lynchScore = defaults.lynchScore
+            self.moatScore = defaults.moatScore
+            self.epsGrowth = defaults.epsGrowth
+//            self.netIncomeDivRevenue = defaults.netIncomeDivRevenue
+            self.capExpendDivEarnings = defaults.capExpendDivEarnings
+            self.profitMargin = defaults.profitMargin
+//            self.ltDebtDivadjEq = defaults.ltDebtDivadjEq
+            self.opCashFlowGrowth = defaults.opCashFlowGrowth
+            self.sgaDivProfit = defaults.sgaDivProfit
+            self.radDivProfit = defaults.radDivProfit
+            self.revenueGrowth = defaults.revenueGrowth
+//            self.netIncomeGrowth = defaults.netIncomeGrowth
+            self.roeGrowth = defaults.roeGrowth
+            self.futureEarningsGrowth = defaults.futureEarningsGrowth
+        }
+    }
+    
+    public func saveUserDefaults() {
+        UserDefaults.standard.set(self, forKey: userDefaultTerms.valuationFactorWeights)
+    }
     
     public func weightsSum() -> Double? {
         
@@ -570,4 +598,325 @@ struct ShareFinancialsValueWeights {
         }
         return sum
     }
+    
+    public func maxWeightValue() -> Double? {
+        
+        let mirror = Mirror(reflecting: self)
+        var sum = [Double]()
+        
+        for property in mirror.children {
+            if let value = property.value as? Double {
+                sum.append(value)
+            }
+        }
+        
+        return sum.max()
+    }
+    
+    public func minWeightValue() -> Double? {
+        
+        let mirror = Mirror(reflecting: self)
+        var sum = [Double]()
+        
+        for property in mirror.children {
+            if let value = property.value as? Double {
+                sum.append(value)
+            }
+        }
+        
+        return sum.min()
+    }
+
+    
+    public func weightsCount() -> Int {
+        
+        let mirror = Mirror(reflecting: self)
+        
+        return mirror.children.count
+    }
+    
+    public func propertyNameList() -> [String] {
+        
+        let mirror = Mirror(reflecting: self)
+        var list = [String]()
+        
+        for property in mirror.children {
+            if let title = property.label {
+                list.append(title)
+            }
+        }
+        
+        return list
+    }
+    
+    public func value(forVariable: String) -> Double? {
+        
+        let mirror = Mirror(reflecting: self)
+        
+        for property in mirror.children {
+            if let title = property.label {
+                if title == forVariable {
+                    return property.value as? Double
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    /// ret
+    public func financialsScore(forShare: Share) -> ScoreData {
+        
+        print("financials score for \(forShare.symbol!)")
+        var allFactors = [Double]()
+        var allWeights = [Double]()
+        var allFactorNames = [String]()
+        let emaPeriods = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
+
+// 1 future earnings growth estimate
+        if self.futureEarningsGrowth > 0 {
+            if let research = forShare.research {
+                if research.futureGrowthMean != 0 {
+                    var correctedFactor = Double()
+                    if research.futureGrowthMean > 0.15 {
+                        correctedFactor = 1.0
+                    }
+                    else if research.futureGrowthMean > 0.1 {
+                        correctedFactor = 0.5
+                    }
+                    else if research.futureGrowthMean > 0 {
+                        correctedFactor = 0.25
+                    }
+                    else {
+                        correctedFactor = 0
+                    }
+                    print("Future earnings growth \(correctedFactor * futureEarningsGrowth) / \(futureEarningsGrowth)")
+                    allFactors.append(correctedFactor * futureEarningsGrowth)
+                    allWeights.append(futureEarningsGrowth)
+                    allFactorNames.append("Future earnings growth")
+                }
+            }
+        }
+        
+// 2 WBV trailing revenue growth
+        if let wbv = forShare.wbValuation {
+            
+            if let valid = valueFactor(values1: wbv.revenue, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+                print("Revenue growth \(valid * revenueGrowth) / \(revenueGrowth)")
+                allFactors.append(valid * revenueGrowth)
+                allWeights.append(revenueGrowth)
+                allFactorNames.append("Revenue growth trend")
+            }
+        
+// 3 WBC trailing retained earnings growth
+            if let valid = valueFactor(values1: wbv.equityRepurchased, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+                print("Ret. earnings growth \(valid * retEarningsGrowth) / \(retEarningsGrowth)")
+                allFactors.append(valid * retEarningsGrowth)
+                allWeights.append(retEarningsGrowth)
+                allFactorNames.append("Ret. earnings growth trend")
+            }
+            
+// 4 WBC trailing EPS growth
+            if let valid = valueFactor(values1: wbv.eps, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+                print("EPS growth \(valid * epsGrowth) / \(epsGrowth)")
+                allFactors.append(valid * epsGrowth)
+                allWeights.append(epsGrowth)
+                allFactorNames.append("EPS growth trend")
+            }
+
+// 5 WBV Profit margin growth
+            if let valid = valueFactor(values1: wbv.revenue, values2: wbv.grossProfit, maxCutOff: 1, emaPeriod: emaPeriods) {
+                print("Profit margin growth \(valid * profitMargin) / \(profitMargin)")
+                allFactors.append(valid * profitMargin)
+                allWeights.append(profitMargin)
+                allFactorNames.append("Growth trend profit margin")
+            }
+
+// 6 WBV Lynch score
+            if let earningsGrowth = wbv.netEarnings?.growthRates()?.ema(periods: emaPeriods) {
+                let denominator = (earningsGrowth + forShare.divYieldCurrent) * 100
+                if forShare.peRatio > 0 {
+                    var value = (denominator / forShare.peRatio) - 1
+                    if value > 1 { value = 1 }
+                    else if value < 0 { value = 0 }
+                    print("Lynch score \(value * lynchScore) / \(lynchScore)")
+                    allFactors.append(value * lynchScore)
+                    allWeights.append(lynchScore)
+                    allFactorNames.append("P Lynch sore")
+                }
+            }
+
+// 7 WBV CapEx
+            if let sumDiv = wbv.netEarnings?.reduce(0, +) {
+                // use 10 y sums / averages, not ema according to Book Ch 51
+                if let sumDenom = wbv.capExpend?.reduce(0, +) {
+                    let tenYAverages = abs(sumDenom / sumDiv)
+                    let maxCutOff = 0.5
+                    let factor = (tenYAverages < maxCutOff) ? ((maxCutOff - tenYAverages) / maxCutOff) : 0
+                    print("CapEx / earnings growth \(factor * capExpendDivEarnings) / \(capExpendDivEarnings)")
+                    allFactors.append(factor * capExpendDivEarnings)
+                    allWeights.append(capExpendDivEarnings)
+                    allFactorNames.append("Growth trend cap. expenditure / net earnings")
+                }
+            }
+            
+            if let valid = valueFactor(values1: wbv.roe, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+                print("ROE growth \(valid * roeGrowth) / \(roeGrowth)")
+                allFactors.append(valid * roeGrowth)
+                allWeights.append(roeGrowth)
+                allFactorNames.append("ROE growth trend")
+            }
+
+            if let valid = valueFactor(values1: wbv.opCashFlow, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+                print("OCF growth \(valid * opCashFlowGrowth) / \(opCashFlowGrowth)")
+                allFactors.append(valid * opCashFlowGrowth)
+                allWeights.append(opCashFlowGrowth)
+                allFactorNames.append("Op. cash flow growth trend")
+            }
+            
+            if let valid = inverseValueFactor(values1: wbv.netEarnings, values2: wbv.debtLT ?? [], maxCutOff: 3, emaPeriod: emaPeriods, removeZeroElements: false) {
+                print("LtDebt / Revenue growth \(valid * ltDebtDivIncome) / \(ltDebtDivIncome)")
+                allFactors.append(valid * ltDebtDivIncome)
+                allWeights.append(ltDebtDivIncome)
+                allFactorNames.append("Growth trend long-term debt / net earnings")
+            }
+
+            if let valid = valueFactor(values1: wbv.grossProfit, values2: wbv.sgaExpense ?? [], maxCutOff: 0.4, emaPeriod: emaPeriods) {
+                print("SGA growth \(valid * sgaDivProfit) / \(sgaDivProfit)")
+                allFactors.append(valid * sgaDivProfit)
+                allWeights.append(sgaDivProfit)
+                allFactorNames.append("Growth trend SGA expense / profit")
+            }
+            
+            if let valid = valueFactor(values1: wbv.grossProfit, values2: wbv.rAndDexpense ?? [], maxCutOff: 1, emaPeriod: emaPeriods) {
+                print("R&D growth \(valid * radDivProfit) / \(radDivProfit)")
+                allFactors.append(valid * radDivProfit)
+                allWeights.append(radDivProfit)
+                allFactorNames.append("Growth trend R&D expense / profit")
+            }
+
+        }
+        
+        if let score = forShare.rule1Valuation?.moatScore() {
+            print("Moat \(sqrt(score)*moatScore) / \(moatScore)")
+            allFactors.append(sqrt(score)*moatScore)
+            allWeights.append(moatScore)
+            allFactorNames.append("Moat")
+        }
+        
+        
+        let scoreSum = allFactors.reduce(0, +)
+        let maximum = allWeights.reduce(0, +)
+        
+        print("Total factor sum \(scoreSum) / \(maximum)")
+
+        return ScoreData(score: scoreSum, maxScore: maximum, factorArray: allFactorNames)
+    }
+    
+    /// for 'higherIsBetter' values; for 'higherIsWorse' use inverseValueFactor()
+    /// for 1 value array: returns nil or ema of values based factor between 0-1 for ema 0-maxCutoff
+    /// for 2 arrays returns growth-ema of porportions values2 / values1
+    /// values above cutOff are returned as 1.0
+    /// ema < 0 is returned as 0
+    private func valueFactor(values1: [Double]?, values2: [Double]?, maxCutOff: Double,emaPeriod: Int, removeZeroElements:Bool?=true) -> Double? {
+        
+        guard values1 != nil else {
+            return nil
+        }
+        
+        var array = values1!
+        
+        if values2 != nil {
+            (array,_) = proportions(array1: values1, array2: values2, removeZeroElements: removeZeroElements)
+        }
+        else {
+            array = Calculator.compoundGrowthRates(values: array) ?? []
+        }
+        
+        guard var ema = array.ema(periods: emaPeriod) else { return nil }
+        let consistency = array.consistency(increaseIsBetter: true) // may be Double() - 0.0
+        
+        if ema < 0 { ema = 0 } // TODO: - check EMA<0 for negative/ cost reduction
+        
+        let growthValue = (ema > maxCutOff ? maxCutOff : ema) / maxCutOff
+        let combined = sqrt(sqrt(growthValue) * sqrt(consistency))
+        return combined
+    }
+    
+    
+    /// same as velueFactor but for 'higherIsWorse' rather than 'higherIsBetter' values
+    /// negative ema is good
+    /// use postiive value for maxCutOff!
+    private func inverseValueFactor(values1: [Double]?, values2: [Double]?, maxCutOff: Double, emaPeriod: Int, removeZeroElements:Bool?=true) -> Double? {
+        
+        guard values1 != nil else {
+            return nil
+        }
+        
+        var array = values1!
+        
+        if values2 != nil {
+            (array,_) = proportions(array1: values1, array2: values2, removeZeroElements: removeZeroElements)
+        }
+        else {
+            array = Calculator.compoundGrowthRates(values: array) ?? []
+        }
+
+        
+        guard var ema = array.ema(periods: emaPeriod) else { return nil }
+        let consistency = array.consistency(increaseIsBetter: false) // may be Double() - 0.0
+
+        // maxCutOff is given as positive, despite lower/ negative being better
+        // negative ema is better than positive ema
+        
+        ema *= -1
+        if ema < 0 { ema = 0 } // positive growth is bad -> 0 points
+        let growthValue = (ema > maxCutOff ? maxCutOff : ema) / maxCutOff
+
+//        let growthValue = 1 - (((ema * -1) > maxCutOff ? maxCutOff : (ema * -1)) / maxCutOff)
+        let combined = sqrt(sqrt(growthValue) * sqrt(consistency))
+        return combined
+    }
+    
+    /// returns porportions of array 2 / array 1 elements
+    private func proportions(array1: [Double]?, array2: [Double]?, removeZeroElements: Bool?=true) -> ([Double], [String]?) {
+        
+        guard array1 != nil && array2 != nil else {
+            return ([Double()], ["missing data"])
+        }
+        
+        let rawData = [array1!, array2!]
+        
+        var cleanedData = [[Double]]()
+        var error: String?
+        
+        if removeZeroElements ?? true {
+            (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+        }
+        else {
+            cleanedData = ValuationDataCleaner.trimArraysToSameCount(array1: array1!, array2: array2!)
+        }
+        
+        
+        guard cleanedData[0].count == cleanedData[1].count else {
+            return ([Double()], ["insufficient data"])
+        }
+        
+        var proportions = [Double]()
+        var errorList: [String]?
+        for i in 0..<cleanedData[0].count {
+            if cleanedData[0][i] != 0 {
+                proportions.append(cleanedData[1][i] / cleanedData[0][i])
+            }
+        }
+        
+        if let validError = error {
+            errorList = [validError]
+        }
+        return (proportions, errorList)
+
+    }
+
+
+        
 }

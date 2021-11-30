@@ -509,7 +509,13 @@ public class WBValuation: NSManagedObject {
     
     func valuesSummaryScores() -> RatingCircleData? {
         
-        let weights = ShareFinancialsValueWeights()
+        if let validShare = self.share {
+            let scoreData = valuationWeightsSingleton.financialsScore(forShare: validShare)
+            return RatingCircleData(rating: scoreData.score, maximum: scoreData.maxScore, minimum: 0, symbol: .dollar)
+        }
+        else { return nil }
+        /*
+        let weights = valuationWeightsSingleton
         
         var allFactors = [Double]()
         var allFactorNames = [String]()
@@ -596,18 +602,18 @@ public class WBValuation: NSManagedObject {
             allFactorNames.append("Growth trend long-term debt / adj. share-holder equity")
         }
         if let valid = valueFactor(values1: grossProfit, values2: sgaExpense ?? [], maxCutOff: 0.4, emaPeriod: emaPeriods) {
-            allFactors.append(valid * weights.sgaDivRevenue)
-            allWeights.append(weights.sgaDivRevenue)
+            allFactors.append(valid * weights.sgaDivProfit)
+            allWeights.append(weights.sgaDivProfit)
             allFactorNames.append("Growth trend SGA expense / profit")
         }
         if let valid = valueFactor(values1: grossProfit, values2: rAndDexpense ?? [], maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactors.append(valid * weights.radDivRevenue)
-            allWeights.append(weights.radDivRevenue)
+            allFactors.append(valid * weights.radDivProfit)
+            allWeights.append(weights.radDivProfit)
             allFactorNames.append("Growth trend R&D expense / profit")
         }
-        let emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
+
         if let yield = share?.divYieldCurrent {
-            if let earningsGrowth = share?.wbValuation?.netEarnings?.growthRates()?.ema(periods: emaPeriod) {
+            if let earningsGrowth = share?.wbValuation?.netEarnings?.growthRates()?.ema(periods: emaPeriods) {
                 let denominator = (earningsGrowth + yield) * 100
                 if share?.peRatio ?? 0 > 0 {
                     var value = (denominator / share!.peRatio) - 1
@@ -627,18 +633,33 @@ public class WBValuation: NSManagedObject {
         }
         let scoreSum = allFactors.reduce(0, +)
         let maximum = allWeights.reduce(0, +)
-
-        return RatingCircleData(rating: scoreSum, maximum: maximum, minimum: 0, symbol: .dollar)
+         */
+        
+//        return RatingCircleData(rating: scoreSum, maximum: maximum, minimum: 0, symbol: .dollar)
     }
     
     func valuesSummaryTexts() -> [String] {
-                
+        
+        if let validShare = self.share {
+            let scoreData = valuationWeightsSingleton.financialsScore(forShare: validShare)
+            return scoreData.factorArray
+        }
+        else { return [] }
+
+        /*
         let weights = ShareFinancialsValueWeights()
         
         var allFactorTexts = [String]()
         let emaPeriods = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
         
         allFactorTexts.append("PE ratio: " + (numberFormatterWith1Digit.string(from: (perValueFactor() * weights.peRatio) as NSNumber) ?? "-"))
+        
+        if let valid = share?.research?.futureGrowthMean {
+            if valid != 0 {
+                let value$ = percentFormatter2Digits.string(from: valid as NSNumber) ?? ""
+                allFactorTexts.append("Future earnings growth " + value$)
+            }
+        }
 
         if let valid = valueFactor(values1: revenue, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
             allFactorTexts.append("Revenue: " + (numberFormatterWith1Digit.string(from: (valid * weights.revenueGrowth) as NSNumber) ?? "-"))
@@ -678,10 +699,10 @@ public class WBValuation: NSManagedObject {
             allFactorTexts.append("Long-term debt / adj. share-holder equity: " + (numberFormatterWith1Digit.string(from: (valid * weights.ltDebtDivadjEq) as NSNumber) ?? "-"))
         }
         if let valid = valueFactor(values1: grossProfit, values2: sgaExpense, maxCutOff: 0.4, emaPeriod: emaPeriods) {
-            allFactorTexts.append("SGA expense / profit: " + (numberFormatterWith1Digit.string(from: (valid * weights.sgaDivRevenue) as NSNumber) ?? "-"))
+            allFactorTexts.append("SGA expense / profit: " + (numberFormatterWith1Digit.string(from: (valid * weights.sgaDivProfit) as NSNumber) ?? "-"))
         }
         if let valid = valueFactor(values1: grossProfit, values2: rAndDexpense, maxCutOff: 1, emaPeriod: emaPeriods) {
-            allFactorTexts.append("R&D expense / profit: " + (numberFormatterWith1Digit.string(from: (valid * weights.radDivRevenue) as NSNumber) ?? "-"))
+            allFactorTexts.append("R&D expense / profit: " + (numberFormatterWith1Digit.string(from: (valid * weights.radDivProfit) as NSNumber) ?? "-"))
         }
         let emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
         if let yield = share?.divYieldCurrent {
@@ -701,6 +722,7 @@ public class WBValuation: NSManagedObject {
             allFactorTexts.append("Moat: " + (numberFormatterWith1Digit.string(from: score as NSNumber) ?? "-"))
         }
         return allFactorTexts
+         */
     }
     
     func userEvaluationScore() -> RatingCircleData? {
