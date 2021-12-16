@@ -69,7 +69,8 @@ let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
 let gradientBar = UIImage(named: "GradientBar")
 let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
-var valuationWeightsSingleton = ShareFinancialsValueWeights()
+var valuationWeightsSingleton = Financial_Valuation_Factors()
+let nonRefreshTimeInterval: TimeInterval  = 300
 
 var yahooRefDate: Date = {
     let calendar = Calendar.current
@@ -367,7 +368,7 @@ let numberFormatterWith1Digit: NumberFormatter = {
     return formatter
 }()
 
-let numberFormatterDecimals: NumberFormatter = {
+let numberFormatter2Decimals: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
     formatter.maximumFractionDigits = 2
@@ -540,128 +541,204 @@ struct PricePoint: Codable, Hashable {
     
 }
 
-struct ShareFinancialsValueWeights {
+struct Financial_Valuation_Factors {
     
-    var peRatio = 1.0
-    var retEarningsGrowth = 1.0
-    var lynchScore = 1.0
-    var moatScore = 1.0
-    var epsGrowth = 1.0
+    var peRatio = 0.67
+    var retEarningsGrowth = 0.67
+    var lynchScore = 0.67
+    var moatScore = 0.67
+    var epsGrowth = 0.67
 //    var netIncomeDivRevenue = 1.0
-    var capExpendDivEarnings = 0.25
-    var profitMargin = 0.25
-    var ltDebtDivIncome = 0.25
-    var opCashFlowGrowth = 0.25
+    var capExpendDivEarnings = 0.2
+    var profitMargin = 0.2
+    var ltDebtDivIncome = 0.2
+    var opCashFlowGrowth = 0.2
 //    var ltDebtDivadjEq = 1.0
-    var sgaDivProfit = 0.25
-    var radDivProfit = 0.25
-    var revenueGrowth = 0.25
+    var sgaDivProfit = 0.2
+    var radDivProfit = 0.2
+    var revenueGrowth = 0.2
 //    var netIncomeGrowth = 0.5
-    var roeGrowth = 0.5
-    var futureEarningsGrowth = 1.5
+    var roeGrowth = 0.33
+    var futureEarningsGrowth = 1.0
+    
+    var propertyDictionary = [String:Double]()
+
     
     init() {
-        if let defaults = UserDefaults.standard.value(forKey: userDefaultTerms.valuationFactorWeights) as? ShareFinancialsValueWeights {
-            self.peRatio = defaults.peRatio
-            self.retEarningsGrowth = defaults.retEarningsGrowth
-            self.lynchScore = defaults.lynchScore
-            self.moatScore = defaults.moatScore
-            self.epsGrowth = defaults.epsGrowth
-//            self.netIncomeDivRevenue = defaults.netIncomeDivRevenue
-            self.capExpendDivEarnings = defaults.capExpendDivEarnings
-            self.profitMargin = defaults.profitMargin
-//            self.ltDebtDivadjEq = defaults.ltDebtDivadjEq
-            self.opCashFlowGrowth = defaults.opCashFlowGrowth
-            self.sgaDivProfit = defaults.sgaDivProfit
-            self.radDivProfit = defaults.radDivProfit
-            self.revenueGrowth = defaults.revenueGrowth
-//            self.netIncomeGrowth = defaults.netIncomeGrowth
-            self.roeGrowth = defaults.roeGrowth
-            self.futureEarningsGrowth = defaults.futureEarningsGrowth
+        
+        if let defaults = UserDefaults.standard.value(forKey: userDefaultTerms.valuationFactorWeights) as? [String: Double] {
+            
+            self.peRatio = defaults["peRatio"] ?? 1.0
+            self.retEarningsGrowth = defaults["retEarningsGrowth"] ?? 1.0
+            self.lynchScore = defaults["lynchScore"] ?? 1.0
+            self.moatScore =  defaults["moatScore"] ?? 1.0
+            self.epsGrowth =  defaults["epsGrowth"] ?? 1.0
+            self.capExpendDivEarnings =  defaults["capExpendDivEarnings"] ?? 1.0
+            self.profitMargin =  defaults["profitMargin"] ?? 1.0
+            self.opCashFlowGrowth =  defaults["opCashFlowGrowth"] ?? 1.0
+            self.sgaDivProfit =  defaults["sgaDivProfit"] ?? 1.0
+            self.radDivProfit =  defaults["radDivProfit"] ?? 1.0
+            self.revenueGrowth =  defaults["revenueGrowth"] ?? 1.0
+            self.roeGrowth =  defaults["roeGrowth"] ?? 1.0
+            self.futureEarningsGrowth =  defaults["futureEarningsGrowth"] ?? 1.0
         }
+        
+        let mirror = Mirror(reflecting: self)
+        for property in mirror.children {
+            if let title = property.label {
+                if let value = property.value as? Double {
+                    propertyDictionary[title] = value
+                }
+            }
+        }
+
+        propertyDictionary = setPropertyDictionary()
+    }
+    
+    /// ensures values are between 0 and 1.0
+    mutating func setPropertyDictionary() -> [String: Double] {
+        
+        // translate into values 0-1.0
+        
+//        let sum = self.weightsSum() ?? 1.0
+//        peRatio /= sum
+//        retEarningsGrowth /= sum
+//        lynchScore /= sum
+//        moatScore /= sum
+//        epsGrowth /= sum
+//        capExpendDivEarnings /= sum
+//        profitMargin /= sum
+//        ltDebtDivIncome /= sum
+//        opCashFlowGrowth /= sum
+//        sgaDivProfit /= sum
+//        radDivProfit /= sum
+//        revenueGrowth /= sum
+//        roeGrowth /= sum
+//        futureEarningsGrowth /= sum
+
+        var dictionary = [String: Double]()
+        let mirror = Mirror(reflecting: self)
+        for property in mirror.children {
+            if let title = property.label {
+                if let value = property.value as? Double {
+                    dictionary[title] = value
+                }
+            }
+        }
+        return dictionary
+
     }
     
     public func saveUserDefaults() {
-        UserDefaults.standard.set(self, forKey: userDefaultTerms.valuationFactorWeights)
+        
+//        let data = NSKeyedArchiver.archivedData(withRootObject: propertyDictionary, requiringSecureCoding: false)
+        UserDefaults.standard.set(propertyDictionary, forKey: userDefaultTerms.valuationFactorWeights)
     }
     
     public func weightsSum() -> Double? {
         
-        let mirror = Mirror(reflecting: self)
+        return propertyDictionary.compactMap { $0.value }.reduce(0, +)
         
-        var sum: Double?
-        for child in mirror.children {
-            if sum == nil { sum = Double() }
-            if let value = child.value as? Double {
-                sum! += value
-            }
-        }
-        return sum
     }
     
     public func maxWeightValue() -> Double? {
         
-        let mirror = Mirror(reflecting: self)
-        var sum = [Double]()
-        
-        for property in mirror.children {
-            if let value = property.value as? Double {
-                sum.append(value)
-            }
-        }
-        
-        return sum.max()
+        return propertyDictionary.compactMap { $0.value }.max()
+
     }
     
     public func minWeightValue() -> Double? {
         
-        let mirror = Mirror(reflecting: self)
-        var sum = [Double]()
-        
-        for property in mirror.children {
-            if let value = property.value as? Double {
-                sum.append(value)
-            }
-        }
-        
-        return sum.min()
-    }
+        return propertyDictionary.compactMap { $0.value }.min()
 
+    }
     
     public func weightsCount() -> Int {
         
-        let mirror = Mirror(reflecting: self)
-        
-        return mirror.children.count
+        return propertyDictionary.count
     }
     
     public func propertyNameList() -> [String] {
         
-        let mirror = Mirror(reflecting: self)
-        var list = [String]()
-        
-        for property in mirror.children {
-            if let title = property.label {
-                list.append(title)
-            }
+        let sortedDictionary = propertyDictionary.sorted { member0, member1 in
+            if member0.value < member1.value { return false }
+            else { return true }
         }
         
-        return list
+        return sortedDictionary.compactMap { $0.key }
+        
+//        .filter { key in
+//            if key != "propertyDictionary" { return true }
+//            else { return false }
+//        }
+
     }
     
-    public func value(forVariable: String) -> Double? {
+    public func getValue(forVariable: String) -> Double? {
         
+        return propertyDictionary[forVariable]
+        
+    }
+    
+    public func getRelativeValue(forVariable: String) -> Double? {
+
         let mirror = Mirror(reflecting: self)
-        
+        let combinedValue = self.weightsSum() ?? 1.0
+
         for property in mirror.children {
             if let title = property.label {
                 if title == forVariable {
-                    return property.value as? Double
+                    if let value = property.value as? Double {
+                        return value / combinedValue
+                    }
                 }
             }
         }
-        
+
         return nil
+    }
+
+    
+    public mutating func setValue(value: Double, parameter: String) {
+        
+        print("changing \(parameter) to \(value)")
+        
+        propertyDictionary[parameter] = value
+                
+//        switch parameter {
+//        case "peRatio":
+//            self.peRatio = value
+//        case "retEarningsGrowth":
+//            self.retEarningsGrowth = value
+//        case "lynchScore":
+//            self.lynchScore = value
+//        case "moatScore":
+//            self.moatScore = value
+//        case "epsGrowth":
+//            self.epsGrowth = value
+//        case "capExpendDivEarnings":
+//            self.capExpendDivEarnings = value
+//        case "profitMargin":
+//            self.profitMargin = value
+//        case "ltDebtDivIncome":
+//            self.ltDebtDivIncome = value
+//        case "opCashFlowGrowth":
+//            self.opCashFlowGrowth = value
+//        case "sgaDivProfit":
+//            self.sgaDivProfit = value
+//        case "radDivProfit":
+//            self.radDivProfit = value
+//        case "revenueGrowth":
+//            self.revenueGrowth = value
+//        case "roeGrowth":
+//            self.roeGrowth = value
+//        case "futureEarningsGrowth":
+//            self.futureEarningsGrowth = value
+//        default:
+//            print("Error when setting valuation factors: unrecognised factor \(parameter)")
+//       }
+        
+        propertyDictionary = setPropertyDictionary()
     }
     
     /// ret

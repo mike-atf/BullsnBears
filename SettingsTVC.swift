@@ -46,7 +46,7 @@ class SettingsTVC: UITableViewController {
             accessory = false
         }
         
-        cell.configure(title: title, detail: detail,accessory: accessory)
+        cell.configure(title: title, detail: detail,accessory: accessory, path: indexPath)
 
 
         return cell
@@ -58,6 +58,9 @@ class SettingsTVC: UITableViewController {
         }
     }
 
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 55
+    }
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -96,11 +99,11 @@ class SettingsTVC: UITableViewController {
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-
-        if let destination = segue.destination as? RatingFactorSettingsTVC {
-            
-        }
-    }
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//
+//        if let destination = segue.destination as? RatingFactorSettingsTVC {
+//            
+//        }
+//    }
 
 }

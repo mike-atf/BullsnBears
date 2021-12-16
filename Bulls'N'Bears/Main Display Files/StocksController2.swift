@@ -299,8 +299,6 @@ class StocksController2: NSFetchedResultsController<Share> {
 
     func updateStocksData(singleShare: Share?=nil) throws {
         
-        print("SC2 updating shares...")
-        
         if singleShare == nil {
             Task.init(priority: .background) {
                 treasuryBondYields = try await updateTreasuryBondYields()
@@ -323,7 +321,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         let now = Date()
         let dateForNil = now.addingTimeInterval(-301)
         sharesToUpdate = sharesToUpdate?.filter({ share in
-            if now.timeIntervalSince(share.lastLivePriceDate ?? dateForNil) < 10 { return false }
+            if now.timeIntervalSince(share.lastLivePriceDate ?? dateForNil) < nonRefreshTimeInterval { return false }
             else { return true }
         })
         
@@ -443,7 +441,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         let components: Set<Calendar.Component> = [.day]
         let dateComponents = calendar.dateComponents(components, from: Date())
         
-        if (dateComponents.day ?? 0) > 3 { return }
+        if (dateComponents.day ?? 0) > 3 { return } // routinel update only during first 3 days each month
 
         let valueRatingData = share.wbValuation?.valuesSummaryScores()
         let userRatingData = share.wbValuation?.userEvaluationScore()
@@ -486,10 +484,24 @@ class StocksController2: NSFetchedResultsController<Share> {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
         }
         
-        guard let epsDates = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) }) else {
-            return nil
+        let epsDates = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) })
+        var labelledValues = Labelled_DatedValues(label: shareSymbol, datedValues: epsDates ?? [])
+        
+        guard let components = URLComponents(string: "https://www.nasdaq.com/market-activity/stocks/\(shareSymbol.lowercased())/earnings") else {
+            return labelledValues
         }
-        return Labelled_DatedValues(label: shareSymbol, datedValues: epsDates)
+        
+        if let url = components.url {
+            do {
+                values = try await WebPageScraper2.getHxEPSandPEDataNasdaq(url: url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
+                let nasdaqdValues = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) })
+                labelledValues.datedValues.append(contentsOf: nasdaqdValues ?? [])
+            }  catch let error as DownloadAndAnalysisError {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
+            }
+        }
+        
+        return labelledValues
 
     }
     

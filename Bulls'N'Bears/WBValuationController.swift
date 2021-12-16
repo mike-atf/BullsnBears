@@ -274,7 +274,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 0:
             // PE ratio
                 if share.peRatio != Double() {
-                    value$ = numberFormatterDecimals.string(from: share.peRatio as NSNumber)
+                    value$ = numberFormatter2Decimals.string(from: share.peRatio as NSNumber)
                     color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: share.peRatio, greenCutoff: 10.0, redCutOff: 40.0)
                 }
                 let sixMonthsAgo = Date().addingTimeInterval(-183*24*3600)
@@ -321,7 +321,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 4:
             // beta
                 if share.beta != Double() {
-                    value$ = numberFormatterDecimals.string(from: share.beta as NSNumber)
+                    value$ = numberFormatter2Decimals.string(from: share.beta as NSNumber)
                 }
             case 5:
             // WB intrinsic value

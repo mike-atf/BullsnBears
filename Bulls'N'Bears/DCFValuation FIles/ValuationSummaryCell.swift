@@ -124,7 +124,7 @@ class ValuationSummaryCell: UITableViewCell, UITextFieldDelegate {
                 textField.text = "$ \(numbers)"
             }
             else {
-                textField.text = "$ " + numberFormatterDecimals.string(from: value as NSNumber)!
+                textField.text = "$ " + numberFormatter2Decimals.string(from: value as NSNumber)!
             }
         }
         else
@@ -146,7 +146,7 @@ class ValuationSummaryCell: UITableViewCell, UITextFieldDelegate {
                 textField.text = "\(numbers)"
             }
             else {
-                textField.text = numberFormatterDecimals.string(from: value as NSNumber)!
+                textField.text = numberFormatter2Decimals.string(from: value as NSNumber)!
             }
         }
     }

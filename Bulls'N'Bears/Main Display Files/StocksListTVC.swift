@@ -86,6 +86,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.register(UINib(nibName: "StockListCellTableViewCell", bundle: nil), forCellReuseIdentifier: "stockListCell")
         
         NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(userChangedValuationWeights), name: Notification.Name(rawValue: "userChangedValuationWeights"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "FileDownloadComplete"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateShares), name: Notification.Name(rawValue: "ActivatedFromBackground"), object: nil)
@@ -315,7 +316,11 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Failure to add new share from file \(fileURL)")
             }
-
+    }
+    
+    @objc
+    func userChangedValuationWeights() {
+        tableView.reloadData()
     }
     
     
@@ -689,11 +694,6 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
 extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
     
     func shareUpdateComplete(atPath: IndexPath) {
-        
-//        let share = controller.object(at: atPath)
-//        if let prices = share.getDailyPrices() {
-//            print("updated latest daily price date for \(share.symbol!) = \(prices.last!.tradingDate)")
-//        }
         
         tableView.reloadRows(at: [atPath], with: .none)
         

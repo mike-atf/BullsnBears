@@ -315,7 +315,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             }
             let coefficient = Calculator.correlation(xArray: (valuation.netIncome?.compactMap{ $0 } ?? []), yArray: (valuation.tFCFo?.compactMap{ $0 } ?? []))?.coEfficient
             if let fcf_netIncome_correlation = coefficient {
-                let correlation$ = numberFormatterDecimals.string(from: fcf_netIncome_correlation as NSNumber) ?? ""
+                let correlation$ = numberFormatter2Decimals.string(from: fcf_netIncome_correlation as NSNumber) ?? ""
             
                 if abs(fcf_netIncome_correlation) < 0.75 {
                     if alerts == nil {

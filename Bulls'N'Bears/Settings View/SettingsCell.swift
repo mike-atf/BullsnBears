@@ -28,13 +28,21 @@ class SettingsCell: UITableViewCell {
         self.accessoryType = .none
         self.title.text = " "
         self.detail.text = " "
+        self.inconView.image = nil
     }
     
-    func configure(title: String, detail: String?, accessory: Bool) {
+    func configure(title: String, detail: String?, accessory: Bool, path: IndexPath) {
         self.title.text = title
         self.detail.text = detail
         if accessory {
             self.accessoryType = .disclosureIndicator
+        }
+        
+        if path.section == 0 {
+            inconView.image = UIImage(systemName: "gear.circle")
+        }
+        else if path.section == 1{
+            inconView.image = UIImage(systemName: "slider.horizontal.3")
         }
     }
 }

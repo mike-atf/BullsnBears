@@ -75,6 +75,16 @@ class CitationsManager {
         let jm4 = "Stop losses may be a useful form of pre-commitment that help alleviate the disposition effect in markets that witness momentum."
         let jm5 = "If I have done my homework, and selected stocks that I think represent good value over the long term, why on earth would I want to sit and watch their performance day by day. [...] positions that should perform well in the long term [...] certainly aren't guaranteed to do so without short-term losses."
         let jm6 = "...the Magic Formula portfolio fared poorly relative to the market average in 5 out of every 12 months tested. For full year periods the ... portfolio failed to beat the market average once every four years."
+        let jm7 = "Investing is simple but not easy. That is to say, it should be simple to understand how investing works effectively: You buy assets for less than their intrinsic value and then sell when they are trading at or above their fair value (Warren Buffett)."
+        let jm8 = "Investors should learn to follow the seven P's-: Perfect planning and preparation prevent piss poor performance. That is to say, we should do our investment research when we are in a cold, rational state-and when nothing much is happening in the markets--and then pre-commit to following our own analysis and prepared action steps"
+        let jm9 = "The time of maximum pessimism is the best time to buy, and the time of maximum optimism is the best time to sell. (Sir John Templeton)"
+        let jm10 = "Sir John [Templeton] knew that on the day the market or stock was down say 40% he wouldn't have the discipline to execute a buy. But, by placing buy orders well below the market price, it becomes easier to buy when faced with despondent selling. This is a simple but highly effective way of removing emotion from the situation."
+        let jm11 = "…fear causes people to ignore bargains when they are available in the market, especially if they have previously suffered a loss. The longer they find themselves in this position, the worse their decision-making appears to become."
+        let jm12 = "There is only one cure for terminal paralysis: you absolutely must have a battle plan for reinvestment and stick to it. Since every action must overcome paralysis, what I recommend is a few large steps, not many small ones. A single giant step at the low would be nice, but without holding a signed contract with the devil, several big moves would be safer."
+        let jm13 = "… be aware that the market does not turn when it sees light at the end of the tunnel.  It turns when all looks black, but just a subtle shade less black than the day before. Therefore, an investor should put money to work amidst the throes of a bear market, appreciating that things will likely get worse before they get better."
+        let jm14 = "One of our strategies for maintaining rational thinking at all times is to attempt to avoid the extreme stresses that lead to poor decision-making. We have often described our techniques for accomplishing this: \n * willingness to hold cash in the absence of compelling investment opportunity\n * a strong sell discipline\n* significant hedging activity\n* and avoidance of recourse leverage,among others."
+        let jm15 = "Observation over many years has taught us that the chief losses to investors come from the purchase of low-quality securities at times of favorable business conditions. The purchasers view the current good earnings as equivalent to 'earning power' and assume that prosperity is synonymous with safety."
+        let jm16 = "Indeed, most of the best investors appear to ask themselves a very different default question from the rest of us. Many of these investors generally run concentrated portfolios, with the default question being 'Why should I own this investment?' Whereas for fund managers who are obsessed with tracking error and career risk, the default question changes to 'Why shouldn't I own this stock?' This subtle distinction in default questions can have a dramatic impact upon performance."
         
         let bg1 = "In searching for value and avoiding glamour, it is the cheapest of the cheap you want to embrace and the most expensive you want to avoid."
         let bg2 = "...it is often the firms that ranked lowest on the measures - low returns on capital or narrow profit margins - that have tended to generate the highest future market returns."
@@ -88,7 +98,7 @@ class CitationsManager {
         let plCitations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
         let pl1Citations = [pL1_0, pL1_1, pL1_2, pL1_3, pL1_4, pL1_5]
         let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10,wb11,wb12, wb13, wb14, wb15, wb16, wb17, wb18]
-        let jmCitations = [jm1,jm2, jm3, jm4, jm5, jm6]
+        let jmCitations = [jm1,jm2, jm3, jm4, jm5, jm6, jm7, jm8, jm9, jm10,jm11,jm12,jm13,jm14,jm15]
         let bgCitations = [bg1, bg2, bg3, bg4, bg5, bg6, bg7, bg8]
         
         var allCitations = plCitations

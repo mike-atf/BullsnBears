@@ -50,7 +50,7 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
         
         self.transaction = transaction
         priceField.text = currencyFormatterNoGapWithPence.string(from: transaction.price as NSNumber)
-        numberField.text = numberFormatterDecimals.string(from: transaction.quantity as NSNumber)
+        numberField.text = numberFormatter2Decimals.string(from: transaction.quantity as NSNumber)
         dateField.date = transaction.date ?? Date()
         diaryField.text = transaction.reason
     }
@@ -178,7 +178,7 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
                 var pe$ = "PE: "
                 var minMaxValue$ = ""
                 if let hxPER = wbv.historicPEratio(for: dateField.date) {
-                    pe$ += numberFormatterDecimals.string(from: hxPER as NSNumber) ?? "-"
+                    pe$ += numberFormatter2Decimals.string(from: hxPER as NSNumber) ?? "-"
                 }
                 let sixMonthsAgo = dateField.date.addingTimeInterval(-183*24*3600)
                 let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-365*24*3600)
@@ -241,7 +241,7 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
                 var pe$ = "PE: "
                 var minMaxValue$ = ""
                 if let hxPER = wbv.historicPEratio(for: dateField.date) {
-                    pe$ += numberFormatterDecimals.string(from: hxPER as NSNumber) ?? "-"
+                    pe$ += numberFormatter2Decimals.string(from: hxPER as NSNumber) ?? "-"
                 }
                 let sixMonthsAgo = dateField.date.addingTimeInterval(-183*24*3600)
                 let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-365*24*3600)

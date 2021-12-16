@@ -647,7 +647,7 @@ public class WBValuation: NSManagedObject {
         else { return [] }
 
         /*
-        let weights = ShareFinancialsValueWeights()
+        let weights = Financial_Valuation_Factors()
         
         var allFactorTexts = [String]()
         let emaPeriods = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7

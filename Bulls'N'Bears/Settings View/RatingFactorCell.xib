@@ -32,7 +32,6 @@
                         <rect key="frame" x="124.5" y="5.5" width="135" height="34"/>
                         <connections>
                             <action selector="sliderValueChanged:" destination="KGk-i7-Jjw" eventType="valueChanged" id="Xsr-QR-lZY"/>
-                            <action selector="sliderValueSet:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="fjk-9u-IN8"/>
                         </connections>
                     </slider>
                 </subviews>

@@ -62,7 +62,7 @@ class ValueChart: UIView {
         self.trendlabel = trendLabel
         trendlabel?.numberOfLines = 0
         self.valuesAreGrowth = valuesAreGrowth
-        self.yAxisNumberFormatter = valuesAreGrowth ? percentFormatter0DigitsPositive : numberFormatterDecimals
+        self.yAxisNumberFormatter = valuesAreGrowth ? percentFormatter0DigitsPositive : numberFormatter2Decimals
         if valuesAreProportions ?? false {
             self.yAxisNumberFormatter = percentFormatter0Digits
         }

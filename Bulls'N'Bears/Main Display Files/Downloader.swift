@@ -189,7 +189,8 @@ class Downloader: NSObject {
                     // if so download webpage content with table
                     removeFile(tempURL)
                     
-                    throw DownloadAndAnalysisError.fileFormatNotCSV
+                    ErrorController.addErrorLog(errorLocation: #function, systemError: nil, errorInfo: "downloaded file \(tempURL) is not in required .csv format")
+//                    throw DownloadAndAnalysisError.fileFormatNotCSV
                 }
                 
                 if FileManager.default.fileExists(atPath: targetURL.path) {

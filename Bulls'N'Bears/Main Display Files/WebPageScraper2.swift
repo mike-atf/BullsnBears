@@ -13,6 +13,70 @@ import CoreData
     func awaitingRedirection(notification: Notification)
 }
 
+struct WebPageInfoDelimiters {
+    
+    var htmlText: String!
+    var pageTitle: String?
+    var sectionTitle: String?
+    var rowTitle: String?
+    var pageStartSequence: String?
+    var tableTitle: String?
+    var tableStartSequence: String?
+    var tableEndSequence: String?
+    var rowStartSequence: String?
+    var rowEndSequence: String?
+    var numberStartSequence: String?
+    var numberEndSequence: String?
+    var numberExponent: Double?=nil
+    var textStartSequence: String?
+    var textEndSequence: String?
+    var pageType: Website!
+    
+    let numberEndSequence_Yahoo_default1 = "</span>"
+    let numberStartSequence_Yahoo_default = ">"
+    let numberEndSequence_Yahoo_default2 = "</span></div>"
+    let tableStartSequence_yahoo_default = "<thead "
+    let tableEndSequence_default = "</div></div></div></div>"
+    let tableEndSequence_yahoo_default1 = "</p>"
+    let tableEndSequence_yahoo_default2 = "</tbody><tfoot "
+    let rowEndSequence_default = "</div></div></div>"
+    let rowEndSequence_default2 =  "</span></div></div>"
+    let rowEndSequence_yahoo_default1 = "</span></td>"
+    let rowEndSequence_yahoo_default2 = "</span></td></tr>"
+    let rowStartSequence_MT_default = "class=\"fas fa-chart-bar\"></i></div></div></div><div role="
+    let rowStartSequence_yahoo_default = "Ta(start)"
+
+    let rowEndSequence_Yahoo_default = "\""
+    let textStartSequence_yahoo_default = "\""
+    let textEndSequence_yahoo_default = "\""
+    
+    init(html$: String, pageType: Website,pageTitle:String?=nil, pageStarter:String?=nil, sectionTitle: String?=nil, tableTitle:String?=nil, tableStarter:String?=nil, tableEnd:String?=nil, rowTitle:String?=nil, rowStart:String?=nil, rowEnd:String?=nil, numberStart:String?=nil, numberEnd:String?=nil, exponent: Double?=nil, textStart: String?=nil, textEnd:String?=nil) {
+        
+        self.htmlText = html$
+        self.pageType = pageType
+        self.pageTitle = pageTitle
+        self.pageStartSequence = pageStarter
+        self.sectionTitle = (sectionTitle != nil) ? (">" + sectionTitle!) : nil
+        self.tableTitle = tableTitle
+        self.tableStartSequence = tableStarter
+        self.tableEndSequence = tableEnd ?? tableEndSequence_default
+        self.rowTitle = rowTitle
+        if rowStart != nil {
+            self.rowStartSequence = (pageType == .macrotrends) ? (">" + rowStart! + "<") : rowStart!
+        } else {
+            self.rowStartSequence = (pageType == .macrotrends) ? rowStartSequence_MT_default : nil
+        }
+        self.rowEndSequence = rowEnd ?? rowEndSequence_default
+        self.numberStartSequence = numberStart
+        self.numberEndSequence = numberEnd
+        self.numberExponent = exponent
+        self.textStartSequence = textStart
+        self.textEndSequence = textEnd
+        
+    }
+    
+}
+
 class WebPageScraper2: NSObject {
     
     var progressDelegate: ProgressViewDelegate?
@@ -75,18 +139,74 @@ class WebPageScraper2: NSObject {
 
     }
     
+    /// returns historical pe ratios and eps TTM with dates from macro trends website
+    /// in form of [DatedValues] = (date, epsTTM, peRatio )
+    /// ; optional parameter 'date' returns values back to this date and the first set before.
+    /// ; throws downlad and analysis errors, which need to be caught by cailler
+    class func getHxEPSandPEDataNasdaq(url: URL, companyName: String, until date: Date?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws -> [Dated_EPS_PER_Values]? {
+        
+            var htmlText:String?
+            var tableText = String()
+            var tableHeaderTexts = [String]()
+            var datedValues = [Dated_EPS_PER_Values]()
+//            let title = companyName.capitalized(with: .current)
+            let downloader = Downloader(task: .epsPER)
+        
+            do {
+                // to catch any redirections
+                NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
+                
+                htmlText = try await downloader.downloadDataWithRedirection(url: url)
+            } catch let error as DownloadAndAnalysisError {
+                throw error
+            }
+        
+            guard let validPageText = htmlText else {
+                throw DownloadAndAnalysisError.generalDownloadError // possible result of MT redirection
+//                return nil
+            }
+                
+            do {
+                tableText = try await extractTable(title:"Quarterly Earnings Surprise Amount", html: validPageText) // \(title)
+            } catch let error as DownloadAndAnalysisError {
+                throw error
+            }
+
+            do {
+                tableHeaderTexts = try await extractHeaderTitles(html: tableText)
+            } catch let error as DownloadAndAnalysisError {
+                throw error
+            }
+            
+            if tableHeaderTexts.count > 0 && tableHeaderTexts.contains("Date") {
+                do {
+                    datedValues = try extractTableData(html: validPageText, titles: tableHeaderTexts, untilDate: date)
+                    return datedValues
+                } catch let error as DownloadAndAnalysisError {
+                   throw error
+                }
+            } else {
+                throw DownloadAndAnalysisError.htmTablelHeaderStartNotFound
+            }
+
+    }
+
+    
     class func getCurrentPrice(url: URL) async throws -> Double? {
         
         var htmlText = String()
 
         do {
             htmlText = try await Downloader.downloadData(url: url)
-            if let values = scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: "<span class=\"Trsdu(0.3s) Trsdu(0.3s) " , rowTerminal: "</span>", numberTerminal: "</span>") {
+            if let values = scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: "currentPrice" , rowTerminal: "}",  numberStarter: ":", numberTerminal: "\"") {
+
+//            if let values = scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: "<span class=\"Trsdu(0.3s) Trsdu(0.3s) " , rowTerminal: "</span>", numberTerminal: "</span>") {
                 return values.first
             } else {
                 return nil
             }
         } catch let error as DownloadAndAnalysisError {
+            print("error in WS2.getCurrentPrice \(error.localizedDescription)")
             throw error
         }
 
@@ -711,7 +831,7 @@ class WebPageScraper2: NSObject {
         
         for title in rowTitles {
             var labelledValues = LabelledValues(title, [Double]())
-            if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: title+"</span>" , rowTerminal: "</tr>", numberTerminal: "</td>") {
+            if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: ">" + title+"</span>" , rowTerminal: "</tr>", numberTerminal: "</td>") {
                 labelledValues.values = values
             }
             results.append(labelledValues)
@@ -1171,7 +1291,7 @@ class WebPageScraper2: NSObject {
             for title in ["Revenue","EPS - Earnings Per Share","Net Income"] {
                 var labelledResults1 = LabelledValues(label: title, values: [Double]())
                 
-                if let values = WebPageScraper2.scrapeRowForDoubles(website: .macrotrends, html$: htmlText, sectionHeader: nil, rowTitle: title) {
+                if let values = WebPageScraper2.scrapeRowForDoubles(website: .macrotrends, html$: htmlText, sectionHeader: nil, rowTitle: ">" + title) {
                     labelledResults1.values = values
                     results.append(labelledResults1)
                 }
@@ -1269,7 +1389,7 @@ class WebPageScraper2: NSObject {
             
             for rowTitle in ["Market cap (intra-day)</span>", "Beta (5Y monthly)</span>", "Shares outstanding</span>"] {
                 var labelledValue = LabelledValues(label: rowTitle, values: [Double]())
-                if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: rowTitle , rowTerminal: "</tr>", numberTerminal: "</td>", webpageExponent: 3.0) {
+                if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: ">" + rowTitle , rowTerminal: "</tr>", numberTerminal: "</td>", webpageExponent: 3.0) {
                 
                     labelledValue.values = [values.first ?? Double()]
                 }
@@ -1352,13 +1472,12 @@ class WebPageScraper2: NSObject {
         var pageText = html$
         let sectionTitle: String? = (sectionHeader != nil) ? (">" + sectionHeader!) : nil
         let rowDataStartDelimiter: String? = (website == .macrotrends) ? "class=\"fas fa-chart-bar\"></i></div></div></div><div role=" : nil
-        let rowStart = website == .macrotrends ? ">" + rowTitle + "<" : ">" + rowTitle // "</a></div></div>" // + "</span>"
+        let rowStart = website == .macrotrends ? ">" + rowTitle + "<" : rowTitle
         var rowTerminal2: String = rowTerminal ?? "</div></div></div>" // after ?? is fot MT only
         let tableTerminal = "</div></div></div></div>"
 
         guard pageText != nil else {
             return nil
-//            throw DownloadAndAnalysisError.emptyWebpageText
         }
         
 
@@ -1408,7 +1527,7 @@ class WebPageScraper2: NSObject {
             return values // MT.com rows are time_DESCENDING from left to right, so the valueArray is in time-ASCENDING order deu to backwards row scraping.
         }
         else {
-                let values = yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle,numberTerminal: numberTerminal, exponent: webpageExponent)
+                let values = yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberStarter: numberStarter, numberTerminal: numberTerminal, exponent: webpageExponent)
                 return values
         }
     }
@@ -1445,11 +1564,11 @@ class WebPageScraper2: NSObject {
         return values
     }
 
-    class func yahooRowNumbersExtraction(table$: String, rowTitle: String, numberTerminal: String?=nil, exponent: Double?=nil) -> [Double]? {
+    class func yahooRowNumbersExtraction(table$: String, rowTitle: String, numberStarter: String?=nil, numberTerminal: String?=nil, exponent: Double?=nil) -> [Double]? {
         
         var valueArray = [Double]()
         let numberTerminal = numberTerminal ?? "</span>"
-        let numberStarter = ">"
+        let numberStarter = numberStarter ?? ">"
         var tableText = table$
         
         var labelEndIndex = tableText.range(of: numberTerminal, options: .backwards, range: nil, locale: nil)
@@ -1485,7 +1604,7 @@ class WebPageScraper2: NSObject {
 //        let rowDataStartDelimiter: String? = (website == .macrotrends) ? "class=\"fas fa-chart-bar\"></i></div></div></div><div role=" : nil
         let rowStart = rowTitle
         let rowTerminal = (rowTerminal ?? ",")
-        let paraTerminal = sectionTerminal ?? "</p>"
+        let tableTerminal = sectionTerminal ?? "</p>"
 
         guard pageText != nil else {
             throw DownloadAndAnalysisError.emptyWebpageText
@@ -1509,7 +1628,7 @@ class WebPageScraper2: NSObject {
 // C Find end of row - or if last row end of table - and reduce pageText to this row
         if let rowEndIndex = pageText?.range(of: rowTerminal,options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
             pageText = String(pageText![rowStartIndex!.upperBound..<rowEndIndex.lowerBound])
-        } else if let tableEndIndex = pageText?.range(of: paraTerminal,options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
+        } else if let tableEndIndex = pageText?.range(of: tableTerminal,options: [NSString.CompareOptions.literal], range: rowStartIndex!.upperBound..<pageText!.endIndex, locale: nil) {
             pageText = String(pageText![rowStartIndex!.upperBound..<tableEndIndex.lowerBound])
         }
         else {
@@ -1556,7 +1675,7 @@ class WebPageScraper2: NSObject {
         let tableStart$ = "<thead "
         
         let rowStart$ = "Ta(start)"
-        let columnEnd = "</span></td>"
+        let rowEnd = "</span></td>"
         
         
         let dateFormatter: DateFormatter = {
@@ -1597,7 +1716,7 @@ class WebPageScraper2: NSObject {
             var rowText = pageText[rowStartIndex!.upperBound...]
             
             count = 0
-            var columnEndIndex = rowText.range(of: columnEnd, options: .backwards)
+            var columnEndIndex = rowText.range(of: rowEnd, options: .backwards)
             while columnEndIndex != nil {
                 rowText.removeSubrange(columnEndIndex!.lowerBound...)
                 if let dataIndex = rowText.range(of: ">", options: .backwards) {
@@ -1622,7 +1741,7 @@ class WebPageScraper2: NSObject {
                 else {
                     values.append(Double())
                 }
-                columnEndIndex = rowText.range(of: columnEnd, options: .backwards)
+                columnEndIndex = rowText.range(of: rowEnd, options: .backwards)
                 count += 1
             }
             

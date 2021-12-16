@@ -44,7 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
             // dont use 'fileURL.startAccessingSecurityScopedResource()' on App sandbox /Documents folder as access is always granted and the access request will alwys return false
             if let lastForegroundDate = UserDefaults.standard.value(forKey: "LastForegroundDate") as? Date {
-                if Date().timeIntervalSince(lastForegroundDate) > 10 {
+                if Date().timeIntervalSince(lastForegroundDate) > nonRefreshTimeInterval {
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "ActivatedFromBackground"), object:   nil, userInfo: nil) // send to
                 }
             }
@@ -179,29 +179,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillResignActive(_ scene: UIScene) {
         // Called when the scene will move from an active state to an inactive state.
         // This may occur due to temporary interruptions (ex. an incoming phone call).
-        
-        // updating ratingScore for fast display on next launch
-        let request = NSFetchRequest<Share>(entityName: "Share")
-        request.sortDescriptors = [NSSortDescriptor(key: "symbol", ascending: true)]
-                
-        do {
-//            let shares = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(request)
-            let shares = try request.execute()
-            for share in shares {
-            
-                let valueRatingData = share.wbValuation?.valuesSummaryScores()
-                let userRatingData = share.wbValuation?.userEvaluationScore()
-                
-                if let score = valueRatingData?.ratingScore() {
-                    share.valueScore = score
-                }
-                if let score = userRatingData?.ratingScore() {
-                    share.userEvaluationScore = score
-                }
-            }
-        } catch let error as NSError {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
-        }
 
     }
 
