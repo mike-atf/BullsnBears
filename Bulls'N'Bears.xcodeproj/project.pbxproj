@@ -49,6 +49,7 @@
 		EA20161D2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */; };
 		EA20161E2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */; };
 		EA225B1D25F3DE9700871D7D /* ScoreCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */; };
+		EA2CF5DF277B42BD00FE2FB9 /* Backup Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2CF5DE277B42BD00FE2FB9 /* Backup Manager.swift */; };
 		EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */; };
 		EA3207F125EEA13200A6A6AB /* ValueListRatingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */; };
 		EA3207F225EEA13200A6A6AB /* ValueListRatingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA3207F025EEA13200A6A6AB /* ValueListRatingCell.xib */; };
@@ -266,6 +267,7 @@
 		EAED14FC25A8DA100073C46F /* Bulls'N'BearsUITests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = EAC1906A257641180030B331 /* Bulls'N'BearsUITests.xctest */; };
 		EAF5D73225AE1A8000E7A681 /* CombinedValuationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */; };
 		EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF5D74225B06F2E00E7A681 /* Extensions.swift */; };
+		EAFA8F34277B459E00A12CDE /* Backup Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFA8F33277B459E00A12CDE /* Backup Document.swift */; };
 		EAFCB95F25C5F0240029AA4F /* MTCookies in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB95E25C5F0240029AA4F /* MTCookies */; };
 		EAFCB96025C5F0240029AA4F /* MTCookies in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB95E25C5F0240029AA4F /* MTCookies */; };
 		EAFCB96125C5F0240029AA4F /* MTCookies in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB95E25C5F0240029AA4F /* MTCookies */; };
@@ -321,6 +323,7 @@
 		EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryTransactionCard.swift; sourceTree = "<group>"; };
 		EA20161F272034EB004432EC /* TrendMyStocks 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 11.xcdatamodel"; sourceTree = "<group>"; };
 		EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCircle.swift; sourceTree = "<group>"; };
+		EA2CF5DE277B42BD00FE2FB9 /* Backup Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Backup Manager.swift"; path = "Bulls'N'Bears/Backup Manager.swift"; sourceTree = SOURCE_ROOT; };
 		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueListRatingCell.swift; sourceTree = "<group>"; };
 		EA3207F025EEA13200A6A6AB /* ValueListRatingCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ValueListRatingCell.xib; sourceTree = "<group>"; };
@@ -441,6 +444,7 @@
 		EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsUITests.swift"; path = "TrendMyStocksUITests/Bulls'N'BearsUITests.swift"; sourceTree = SOURCE_ROOT; };
 		EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedValuationController.swift; sourceTree = "<group>"; };
 		EAF5D74225B06F2E00E7A681 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		EAFA8F33277B459E00A12CDE /* Backup Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backup Document.swift"; sourceTree = "<group>"; };
 		EAFCB95E25C5F0240029AA4F /* MTCookies */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = MTCookies; sourceTree = "<group>"; };
 		EAFCB96825C72DDB0029AA4F /* HiddenWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HiddenWebView.swift; path = Unused/HiddenWebView.swift; sourceTree = SOURCE_ROOT; };
 		EAFCB96F25C807A80029AA4F /* ValuationListCellData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationListCellData.swift; sourceTree = SOURCE_ROOT; };
@@ -570,6 +574,8 @@
 		EAC2FCA025A256B80060F387 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				EA2CF5DE277B42BD00FE2FB9 /* Backup Manager.swift */,
+				EAFA8F33277B459E00A12CDE /* Backup Document.swift */,
 				EAA548B82734302F0083808A /* WebPageScraper2.swift */,
 				EAA548B627342FA10083808A /* Downloader.swift */,
 				EAC07B6E25B8950E00B6C898 /* DCFWebDataAnalyser.swift */,
@@ -942,6 +948,7 @@
 				EAC190EA2577E2E20030B331 /* ChartContainerView.swift in Sources */,
 				EA1F86D725DC247C006791BD /* WBValuationController.swift in Sources */,
 				EAD835FB25DC16470015C93A /* WBValuationCell.swift in Sources */,
+				EAFA8F34277B459E00A12CDE /* Backup Document.swift in Sources */,
 				EAFCB97025C807A80029AA4F /* ValuationListCellData.swift in Sources */,
 				EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */,
 				EA0F889E263959D6009C980F /* ComparisonController.swift in Sources */,
@@ -995,6 +1002,7 @@
 				EA6EEF9226165665000FA141 /* ResearchController.swift in Sources */,
 				EA5FDBE325B1EE34008918C8 /* AlertController.swift in Sources */,
 				EAD835E025DC06EC0015C93A /* Calculator.swift in Sources */,
+				EA2CF5DF277B42BD00FE2FB9 /* Backup Manager.swift in Sources */,
 				EA32081B25EF9A1400A6A6AB /* WBVRatingButton.swift in Sources */,
 				EAC190C1257663200030B331 /* PublicVars.swift in Sources */,
 				EA32082825EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift in Sources */,

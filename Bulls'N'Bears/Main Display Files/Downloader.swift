@@ -145,8 +145,8 @@ class Downloader: NSObject {
     }
     
     /// returns the downloaded file in Notification with message  "FileDownloadComplete" with fileURL as object
-    /// or returns with throwing an error
-    class func downloadFile(url: URL, symbol: String) async throws {
+    /// or throws an error if file not in .csv format, sending notification 'FileDownloadedNotCSV'
+    class func downloadFile(url: URL, symbol: String, companyName: String) async {
                 
         let downloadTask = URLSession.shared.downloadTask(with: url) {  [self]
             urlOrNil, response, errorOrNil in
@@ -174,11 +174,15 @@ class Downloader: NSObject {
                                             appropriateFor: nil,
                                             create: true)
                 
+                
                 let tempURL = documentsURL.appendingPathComponent(symbol + "-temp.csv")
                 let targetURL = documentsURL.appendingPathComponent(symbol + ".csv")
                 
                 if FileManager.default.fileExists(atPath: tempURL.path) {
                     removeFile(tempURL)
+                }
+                if FileManager.default.fileExists(atPath: targetURL.path) {
+                    removeFile(targetURL)
                 }
 
                 try FileManager.default.moveItem(at: fileURL, to: tempURL)
@@ -189,12 +193,11 @@ class Downloader: NSObject {
                     // if so download webpage content with table
                     removeFile(tempURL)
                     
-                    ErrorController.addErrorLog(errorLocation: #function, systemError: nil, errorInfo: "downloaded file \(tempURL) is not in required .csv format")
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadNotCSV"), object: symbol, userInfo:  ["CompanyName":companyName]) // send to StocksListVC
+                    }
+                    return
 //                    throw DownloadAndAnalysisError.fileFormatNotCSV
-                }
-                
-                if FileManager.default.fileExists(atPath: targetURL.path) {
-                    removeFile(targetURL)
                 }
 
                 try FileManager.default.moveItem(at: tempURL, to: targetURL)
@@ -202,10 +205,9 @@ class Downloader: NSObject {
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadComplete"), object:   targetURL, userInfo: ["companySymbol": symbol]) // send to StocksListVC
                 }
-//                // the Company profile (industry, sector and employees) is downloaded after this in StocksController called from StocksListVC as delegate of this here download
-//                }
 
             } catch {
+                
                 DispatchQueue.main.async {
                     ErrorController.addErrorLog(errorLocation: #function, systemError: error, errorInfo: "can't move and save downloaded file")
                 }

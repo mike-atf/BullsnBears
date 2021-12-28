@@ -91,14 +91,14 @@ class CitationsManager {
         let bg3 = "Portfolios of ugly, disappointing, obscure (small) and boring (e.g. low growth) stocks repeatedly generated higher returns than both market ... and, more strikingly, portfolios of attractive, highly profitable, well-known (big) and glamorous (e.g. fast growing) stocks."
         let bg4 = "...it is the extremely unappealing portfolios - three years of disappointing returns - that produce the best results."
         let bg5 = "The uglier, more boring, more obscure, more disappointing, and thetefore usually the cheaper the stock, the better the return have been."
-        let bg6 = "...If offered a portfolio of stocks two-thirds of which may go bankrupt, most investors will recoiled in horror before considering the the potentially enormous gains from the on-third that do survive, gains large enough to make the whole investment highly profitable."
+        let bg6 = "...If offered a portfolio of stocks two-thirds of which may go bankrupt, most investors will recoil in horror before considering the potentially enormous gains from the one-third that do survive - gains large enough to make the whole investment highly profitable."
         let bg7 = "The shares of companies too small for big funds are always available on sale."
         let bg8 = "Spin-offs are a wonderful opportunity for investors who are not constrained by questions of market capitalisation."
         
         let plCitations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
         let pl1Citations = [pL1_0, pL1_1, pL1_2, pL1_3, pL1_4, pL1_5]
         let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10,wb11,wb12, wb13, wb14, wb15, wb16, wb17, wb18]
-        let jmCitations = [jm1,jm2, jm3, jm4, jm5, jm6, jm7, jm8, jm9, jm10,jm11,jm12,jm13,jm14,jm15]
+        let jmCitations = [jm1,jm2, jm3, jm4, jm5, jm6, jm7, jm8, jm9, jm10,jm11,jm12,jm13,jm14,jm15, jm16]
         let bgCitations = [bg1, bg2, bg3, bg4, bg5, bg6, bg7, bg8]
         
         var allCitations = plCitations

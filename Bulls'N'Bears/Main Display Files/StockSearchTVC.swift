@@ -29,7 +29,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         searchController?.searchBar.delegate = self
         navigationItem.searchController = searchController
         definesPresentationContext = true
-
+        
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -115,7 +115,8 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
     }
     
-    /// downloads from Yahoo finance either price file or table data
+    /// attempts to download from Yahoo finance either price as file
+    /// if downloaded file not in .csv format Downloader sends notification to start data download insteae
     func newCompanyDataDownload(_ ticker: String?, companyName: String?) {
         
         guard let symbol = ticker else {
@@ -138,40 +139,45 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
             
+            NotificationCenter.default.addObserver(self, selector: #selector(dataDownload(notification:)), name: Notification.Name(rawValue: "FileDownloadNotCSV"), object: nil)
+
 // first try to download historical prices from Yahoo finance as CSV file
             Task.init(priority: .background) {
-                do {
+//                do {
                     // the next functions returns by sending notification 'FileDownloadComplete' with fileURL in object sent
                     // this should be picked up by StocksListTVC
-                    try await Downloader.downloadFile(url: sourceURL, symbol: symbol)
-                } catch let error as DownloadAndAnalysisError {
-                    ErrorController.addErrorLog(errorLocation: "StockSearchTVC.yahooStockDownload", systemError: nil, errorInfo: "dowload failure for \(symbol) - \(error.localizedDescription)")
-                    NotificationCenter.default.removeObserver(self)
-                    
-                    if error == DownloadAndAnalysisError.fileFormatNotCSV {
-                        var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
-                        urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
-
-                        
-// secxond, if file download fails download price page table and extract price data
-                        if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-                            do {
-                                try await downloadWebData(sourceURL, stockName: (companyName ?? ""), task: "priceHistory")
-                            } catch let error {
-                                alertController.showDialog(title: "Dowload failed", alertMessage: "can't find any company data for \(symbol) on Yahoo finance \(error.localizedDescription)")
-                                return
-                            }
-                        }
-                        else {
-                            alertController.showDialog(title: "Download failed", alertMessage: "invalid URL for data download \(symbol) on Yahoo finance")
-                            return
-                        }
-                    }
-                }
+                    await Downloader.downloadFile(url: sourceURL, symbol: symbol, companyName: companyName!)
+//                } catch let error as DownloadAndAnalysisError {
+//                    ErrorController.addErrorLog(errorLocation: "StockSearchTVC.yahooStockDownload", systemError: nil, errorInfo: "dowload failure for \(symbol) - \(error.localizedDescription)")
+//                    NotificationCenter.default.removeObserver(self)
+//
+//                }
             }
         }
     }
     
+    /// called by notification from  Downloader if Yahoo file downloaded is not in .csv format
+    @objc
+    func dataDownload(notification: Notification) async {
+        
+        guard let symbol = notification.object as? String else { return }
+        
+        guard let companyName = notification.userInfo?["companyName"] as? String else { return }
+        
+            var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
+            urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
+            
+            // second, if file download fails download price page table and extract price data
+            if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
+                do {
+                    try await downloadWebData(sourceURL, stockName: companyName, task: "priceHistory")
+                } catch let error {
+                    alertController.showDialog(title: "Dowload failed", alertMessage: "can't find any company data for \(symbol) on Yahoo finance \(error.localizedDescription)")
+                    return
+                }
+            }
+
+    }
 
     
     private func removeFile(_ atURL: URL) {
