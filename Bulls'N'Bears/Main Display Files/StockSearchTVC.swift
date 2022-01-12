@@ -163,19 +163,19 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         guard let symbol = notification.object as? String else { return }
         
         guard let companyName = notification.userInfo?["companyName"] as? String else { return }
+            print(companyName)
+        var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
+        urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
         
-            var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
-            urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
-            
-            // second, if file download fails download price page table and extract price data
-            if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-                do {
-                    try await downloadWebData(sourceURL, stockName: companyName, task: "priceHistory")
-                } catch let error {
-                    alertController.showDialog(title: "Dowload failed", alertMessage: "can't find any company data for \(symbol) on Yahoo finance \(error.localizedDescription)")
-                    return
-                }
+        // second, if file download fails download price page table and extract price data
+        if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
+            do {
+                try await downloadWebData(sourceURL, stockName: companyName, task: "priceHistory")
+            } catch let error {
+                alertController.showDialog(title: "Dowload failed", alertMessage: "can't find any company data for \(symbol) on Yahoo finance \(error.localizedDescription)")
+                return
             }
+        }
 
     }
 

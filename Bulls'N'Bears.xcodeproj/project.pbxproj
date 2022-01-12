@@ -86,6 +86,7 @@
 		EA6AACE026053294002DE9DF /* MACD_View.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACDE26053294002DE9DF /* MACD_View.swift */; };
 		EA6AACE126053294002DE9DF /* MACD_View.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACDE26053294002DE9DF /* MACD_View.swift */; };
 		EA6EEF9226165665000FA141 /* ResearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6EEF9126165665000FA141 /* ResearchController.swift */; };
+		EA73111E278F256200C5370F /* AppIcon Old.appiconset in Resources */ = {isa = PBXBuildFile; fileRef = EA73111D278F256200C5370F /* AppIcon Old.appiconset */; };
 		EA736CCD25D7C8FF007FC981 /* ValuationDataCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */; };
 		EA736CDE25D7E72C007FC981 /* ValuationErrorsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */; };
 		EA79790225E6F24200663644 /* GradientColorFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA79790125E6F24200663644 /* GradientColorFinder.swift */; };
@@ -351,6 +352,7 @@
 		EA6AACD726050457002DE9DF /* MAC_D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MAC_D.swift; sourceTree = SOURCE_ROOT; };
 		EA6AACDE26053294002DE9DF /* MACD_View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MACD_View.swift; path = "Bulls'N'Bears/Model Files/MACD_View.swift"; sourceTree = SOURCE_ROOT; };
 		EA6EEF9126165665000FA141 /* ResearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ResearchController.swift; path = "Bulls'N'Bears/ResearchController.swift"; sourceTree = SOURCE_ROOT; };
+		EA73111D278F256200C5370F /* AppIcon Old.appiconset */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "AppIcon Old.appiconset"; sourceTree = "<group>"; };
 		EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationDataCleaner.swift; sourceTree = "<group>"; };
 		EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationErrorsTVC.swift; sourceTree = SOURCE_ROOT; };
 		EA79790125E6F24200663644 /* GradientColorFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientColorFinder.swift; sourceTree = "<group>"; };
@@ -658,6 +660,7 @@
 				EAC19049257641160030B331 /* AppDelegate.swift */,
 				EAC1904B257641160030B331 /* SceneDelegate.swift */,
 				EAC19055257641180030B331 /* Assets.xcassets */,
+				EA73111D278F256200C5370F /* AppIcon Old.appiconset */,
 				EAC19057257641180030B331 /* LaunchScreen.storyboard */,
 				EAC1905A257641180030B331 /* Info.plist */,
 				EAC2FCA025A256B80060F387 /* Controllers */,
@@ -855,6 +858,7 @@
 				EAC2FC7425A23FFC0060F387 /* ValuationTableViewCell.xib in Resources */,
 				EA7B613925C412860018BA02 /* StockTickerDictionary.csv in Resources */,
 				EAFCB95F25C5F0240029AA4F /* MTCookies in Resources */,
+				EA73111E278F256200C5370F /* AppIcon Old.appiconset in Resources */,
 				EAA69FC0261222AF0067EE1A /* ResearchCell.xib in Resources */,
 				EAD34D5726545785004859A5 /* CategorySelectionCell.xib in Resources */,
 				EAAB7BE62754038A00295DA7 /* RatingFactorCell.xib in Resources */,

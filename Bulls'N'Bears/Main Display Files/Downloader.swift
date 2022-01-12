@@ -144,8 +144,8 @@ class Downloader: NSObject {
         return htmlText
     }
     
-    /// returns the downloaded file in Notification with message  "FileDownloadComplete" with fileURL as object
-    /// or throws an error if file not in .csv format, sending notification 'FileDownloadedNotCSV'
+    /// returns Notification with message  "FileDownloadComplete" with fileURL as object
+    /// or - if file not in .csv format - sends a notification 'FileDownloadedNotCSV' with  'symbol' as object and companyName as userInfo
     class func downloadFile(url: URL, symbol: String, companyName: String) async {
                 
         let downloadTask = URLSession.shared.downloadTask(with: url) {  [self]
@@ -194,7 +194,7 @@ class Downloader: NSObject {
                     removeFile(tempURL)
                     
                     DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadNotCSV"), object: symbol, userInfo:  ["CompanyName":companyName]) // send to StocksListVC
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadNotCSV"), object: symbol, userInfo:  ["companyName":companyName]) // send to StocksListVC
                     }
                     return
 //                    throw DownloadAndAnalysisError.fileFormatNotCSV

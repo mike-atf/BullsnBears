@@ -490,6 +490,7 @@ extension WBValuationTVC: WBValuationCellDelegate { //StockDelegate,
             errorsView.loadViewIfNeeded()
             
             errorsView.errors = errors ?? ["no errors occurred"]
+            errorsView.firstCellHeight = errorsView.preferredContentSize.height
             
             present(errorsView, animated: true, completion:  nil)
         }

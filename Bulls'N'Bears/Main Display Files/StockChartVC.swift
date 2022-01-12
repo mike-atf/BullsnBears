@@ -284,19 +284,18 @@ class StockChartVC: UIViewController {
         let width = self.splitViewController?.view.bounds.width ?? 1180
         let height = self.splitViewController?.view.bounds.height ?? 820
         
-        citationView.view.backgroundColor = UIColor.systemGray
+        citationView.view.backgroundColor = UIColor.label
         citationView.modalPresentationStyle = .popover
         citationView.preferredContentSize = CGSize(width: width * 0.4, height: height * 0.3)
 
         citationView.loadViewIfNeeded()
         if let textView = citationView.view.viewWithTag(10) as? UITextView {
-            textView.backgroundColor = UIColor.systemGray4
+            textView.backgroundColor = UIColor(named: "antiLabel")!
             textView.attributedText = CitationsManager.cite()
         }
 
         let popUpController = citationView.popoverPresentationController
         popUpController!.permittedArrowDirections = UIPopoverArrowDirection.init(rawValue: 0)
-//        popUpController!.permittedArrowDirections = [.down, .right]
         popUpController?.sourceView = view
         popUpController?.sourceRect = CGRect(x: 20, y: view.frame.height-20, width: 5, height: 5)
 

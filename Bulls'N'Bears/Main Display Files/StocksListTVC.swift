@@ -159,45 +159,13 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         guard controller.fetchedObjects?.count ?? 0 > 0 else {
             return
         }
-        
-//        let selectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
-//        let selectedShare = self.controller.object(at: selectedPath)
-        
-//        let updater = SharesUpdater()
-        
-//        Task.init(priority: .background) {
             do {
                 try controller.updateStocksData()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: "StocksListVC - updateShares", systemError: nil, errorInfo: "error when trying to update stock data: \(error)")
             }
             tableView.refreshControl?.endRefreshing()
-//        }
         
-//        DispatchQueue.main.async {
-//            let selectedPath = self.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0)
-//            let selectedShare = self.controller.object(at: selectedPath)
-//            self.controller.updateLivePrices(selectedShare: selectedShare) // uses selectedShare to end refresh process
-//            // also triggers other keyRatioUpdates after livePrice have been udpated
-//        }
-        
-//        DispatchQueue.main.async {
-//            self.controller.updateTreasuryBondYields()
-//        }
-        
-        // jobs to do:
-        // 1. - update prices in controller.updatePrices() downloading all shares csv. files from Yahoo
-        // 2. - update 'Research' data: harmonize competitors and industries
-        // 3. - download keyRatios in share.downloadKeyratios()
-        // 4. - inform the StocksListTVC to update charts and infos displayed
-        // all this needs to be thread-safe as the AppDelegate's viewContext and all fetch objects from it (!) can only be accessed from the main thread!
-        // background tasks - and all downloads are background tasks - that need access to NSManagedObjects and their data need their own private NSMOC as a child of the main viewContext.
-        // the merge happens in the saveContext() function of the AppDelegate
-        // saving an NSManagedObject in it's moc can be done via e.g. .save(self.context?)
-        
-        // the actual call is made in livePriceUpdated() to avoid creating two placeHolders in parallel that prevent updated values being saved
-        
-        // returns to 'updateStocksComplete()' once complete
     }
 
     // MARK: - Shares functions
@@ -218,6 +186,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
     }
     
+    /*
+    moved to StockChartVC
     func showCitation() {
         
         var sourceView: UIView?
@@ -236,13 +206,14 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         let citationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WelcomeViewController")
                     
-        citationView.view.backgroundColor = UIColor.systemGray4
+//        citationView.view.backgroundColor = UIColor.systemGray4
         citationView.modalPresentationStyle = .popover
         citationView.preferredContentSize = CGSize(width: self.view.frame.width / 2.5, height: self.view.frame.height / 3)
+        citationView.view.backgroundColor = UIColor(named: "antiLabel") ?? UIColor.black
 
         citationView.loadViewIfNeeded()
         if let textView = citationView.view.viewWithTag(10) as? UITextView {
-            textView.backgroundColor = UIColor.systemGray4
+            textView.backgroundColor = UIColor(named: "antiLabel") ?? UIColor.black
             textView.attributedText = CitationsManager.cite()
         }
 
@@ -252,9 +223,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         popUpController?.sourceView = detailView
         popUpController?.sourceRect = CGRect(x: detailView.frame.width * 0.8, y: detailView.frame.height * 0.75, width: 5, height: 5)
             
-//        self.splitViewController?.present(citationView, animated: true, completion: nil)
-        
-        
         self.parent?.present(citationView, animated: true, completion: nil)
         
 
@@ -263,7 +231,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         return UIModalPresentationStyle.none
     }
-
+     */
     func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
        
     }
