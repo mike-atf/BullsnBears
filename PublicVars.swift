@@ -701,50 +701,15 @@ struct Financial_Valuation_Factors {
     
     public mutating func setValue(value: Double, parameter: String) {
         
-        print("changing \(parameter) to \(value)")
         
         propertyDictionary[parameter] = value
                 
-//        switch parameter {
-//        case "peRatio":
-//            self.peRatio = value
-//        case "retEarningsGrowth":
-//            self.retEarningsGrowth = value
-//        case "lynchScore":
-//            self.lynchScore = value
-//        case "moatScore":
-//            self.moatScore = value
-//        case "epsGrowth":
-//            self.epsGrowth = value
-//        case "capExpendDivEarnings":
-//            self.capExpendDivEarnings = value
-//        case "profitMargin":
-//            self.profitMargin = value
-//        case "ltDebtDivIncome":
-//            self.ltDebtDivIncome = value
-//        case "opCashFlowGrowth":
-//            self.opCashFlowGrowth = value
-//        case "sgaDivProfit":
-//            self.sgaDivProfit = value
-//        case "radDivProfit":
-//            self.radDivProfit = value
-//        case "revenueGrowth":
-//            self.revenueGrowth = value
-//        case "roeGrowth":
-//            self.roeGrowth = value
-//        case "futureEarningsGrowth":
-//            self.futureEarningsGrowth = value
-//        default:
-//            print("Error when setting valuation factors: unrecognised factor \(parameter)")
-//       }
-        
         propertyDictionary = setPropertyDictionary()
     }
     
     /// ret
     public func financialsScore(forShare: Share) -> ScoreData {
         
-        print("financials score for \(forShare.symbol!)")
         var allFactors = [Double]()
         var allWeights = [Double]()
         var allFactorNames = [String]()
@@ -767,7 +732,7 @@ struct Financial_Valuation_Factors {
                     else {
                         correctedFactor = 0
                     }
-                    print("Future earnings growth \(correctedFactor * futureEarningsGrowth) / \(futureEarningsGrowth)")
+
                     allFactors.append(correctedFactor * futureEarningsGrowth)
                     allWeights.append(futureEarningsGrowth)
                     allFactorNames.append("Future earnings growth")
@@ -779,7 +744,7 @@ struct Financial_Valuation_Factors {
         if let wbv = forShare.wbValuation {
             
             if let valid = valueFactor(values1: wbv.revenue, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-                print("Revenue growth \(valid * revenueGrowth) / \(revenueGrowth)")
+
                 allFactors.append(valid * revenueGrowth)
                 allWeights.append(revenueGrowth)
                 allFactorNames.append("Revenue growth trend")
@@ -787,7 +752,7 @@ struct Financial_Valuation_Factors {
         
 // 3 WBC trailing retained earnings growth
             if let valid = valueFactor(values1: wbv.equityRepurchased, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-                print("Ret. earnings growth \(valid * retEarningsGrowth) / \(retEarningsGrowth)")
+
                 allFactors.append(valid * retEarningsGrowth)
                 allWeights.append(retEarningsGrowth)
                 allFactorNames.append("Ret. earnings growth trend")
@@ -795,7 +760,7 @@ struct Financial_Valuation_Factors {
             
 // 4 WBC trailing EPS growth
             if let valid = valueFactor(values1: wbv.eps, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-                print("EPS growth \(valid * epsGrowth) / \(epsGrowth)")
+
                 allFactors.append(valid * epsGrowth)
                 allWeights.append(epsGrowth)
                 allFactorNames.append("EPS growth trend")
@@ -803,7 +768,7 @@ struct Financial_Valuation_Factors {
 
 // 5 WBV Profit margin growth
             if let valid = valueFactor(values1: wbv.revenue, values2: wbv.grossProfit, maxCutOff: 1, emaPeriod: emaPeriods) {
-                print("Profit margin growth \(valid * profitMargin) / \(profitMargin)")
+
                 allFactors.append(valid * profitMargin)
                 allWeights.append(profitMargin)
                 allFactorNames.append("Growth trend profit margin")
@@ -816,7 +781,7 @@ struct Financial_Valuation_Factors {
                     var value = (denominator / forShare.peRatio) - 1
                     if value > 1 { value = 1 }
                     else if value < 0 { value = 0 }
-                    print("Lynch score \(value * lynchScore) / \(lynchScore)")
+
                     allFactors.append(value * lynchScore)
                     allWeights.append(lynchScore)
                     allFactorNames.append("P Lynch sore")
@@ -830,7 +795,7 @@ struct Financial_Valuation_Factors {
                     let tenYAverages = abs(sumDenom / sumDiv)
                     let maxCutOff = 0.5
                     let factor = (tenYAverages < maxCutOff) ? ((maxCutOff - tenYAverages) / maxCutOff) : 0
-                    print("CapEx / earnings growth \(factor * capExpendDivEarnings) / \(capExpendDivEarnings)")
+
                     allFactors.append(factor * capExpendDivEarnings)
                     allWeights.append(capExpendDivEarnings)
                     allFactorNames.append("Growth trend cap. expenditure / net earnings")
@@ -838,35 +803,35 @@ struct Financial_Valuation_Factors {
             }
             
             if let valid = valueFactor(values1: wbv.roe, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-                print("ROE growth \(valid * roeGrowth) / \(roeGrowth)")
+
                 allFactors.append(valid * roeGrowth)
                 allWeights.append(roeGrowth)
                 allFactorNames.append("ROE growth trend")
             }
 
             if let valid = valueFactor(values1: wbv.opCashFlow, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
-                print("OCF growth \(valid * opCashFlowGrowth) / \(opCashFlowGrowth)")
+
                 allFactors.append(valid * opCashFlowGrowth)
                 allWeights.append(opCashFlowGrowth)
                 allFactorNames.append("Op. cash flow growth trend")
             }
             
             if let valid = inverseValueFactor(values1: wbv.netEarnings, values2: wbv.debtLT ?? [], maxCutOff: 3, emaPeriod: emaPeriods, removeZeroElements: false) {
-                print("LtDebt / Revenue growth \(valid * ltDebtDivIncome) / \(ltDebtDivIncome)")
+
                 allFactors.append(valid * ltDebtDivIncome)
                 allWeights.append(ltDebtDivIncome)
                 allFactorNames.append("Growth trend long-term debt / net earnings")
             }
 
             if let valid = valueFactor(values1: wbv.grossProfit, values2: wbv.sgaExpense ?? [], maxCutOff: 0.4, emaPeriod: emaPeriods) {
-                print("SGA growth \(valid * sgaDivProfit) / \(sgaDivProfit)")
+
                 allFactors.append(valid * sgaDivProfit)
                 allWeights.append(sgaDivProfit)
                 allFactorNames.append("Growth trend SGA expense / profit")
             }
             
             if let valid = valueFactor(values1: wbv.grossProfit, values2: wbv.rAndDexpense ?? [], maxCutOff: 1, emaPeriod: emaPeriods) {
-                print("R&D growth \(valid * radDivProfit) / \(radDivProfit)")
+
                 allFactors.append(valid * radDivProfit)
                 allWeights.append(radDivProfit)
                 allFactorNames.append("Growth trend R&D expense / profit")
@@ -875,7 +840,7 @@ struct Financial_Valuation_Factors {
         }
         
         if let score = forShare.rule1Valuation?.moatScore() {
-            print("Moat \(sqrt(score)*moatScore) / \(moatScore)")
+
             allFactors.append(sqrt(score)*moatScore)
             allWeights.append(moatScore)
             allFactorNames.append("Moat")
@@ -885,8 +850,6 @@ struct Financial_Valuation_Factors {
         let scoreSum = allFactors.reduce(0, +)
         let maximum = allWeights.reduce(0, +)
         
-        print("Total factor sum \(scoreSum) / \(maximum)")
-
         return ScoreData(score: scoreSum, maxScore: maximum, factorArray: allFactorNames)
     }
     

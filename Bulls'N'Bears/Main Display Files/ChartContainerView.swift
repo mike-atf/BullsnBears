@@ -34,6 +34,7 @@ class ChartContainerView: UIView {
     @IBOutlet var button5: CheckButton!
     @IBOutlet var button6: CheckButton!
     @IBOutlet var chartLegendView: ChartLegendView!
+    @IBOutlet var priceUpdateButton: UIButton!
     
     let percentFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -79,7 +80,7 @@ class ChartContainerView: UIView {
         
         if let view = chartView {
             chartsContentViewWidth.isActive = false
-            chartsContentViewWidth.constant = scrollView.bounds.width * 1.1
+            chartsContentViewWidth.constant = scrollView.bounds.width * 1.0
             chartsContentViewWidth.isActive = true
             
             view.configure(stock: with)
@@ -103,7 +104,7 @@ class ChartContainerView: UIView {
         if let scroll = scrollView {
             
             chartsContentViewWidth.isActive = false
-            chartsContentViewWidth.constant = scrollView.bounds.width * 1.1
+            chartsContentViewWidth.constant = scrollView.bounds.width * 1.0
             chartsContentViewWidth.isActive = true
 
 //            scroll.delegate = self

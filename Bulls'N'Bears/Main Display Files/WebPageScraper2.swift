@@ -505,7 +505,7 @@ class WebPageScraper2: NSObject {
         await backgroundMoc.perform {
             do {
                 if let dcfv = backgroundMoc.object(with: valuationID) as? DCFValuation {
-                    print(results)
+
                     do {
                         for result in results {
                             switch result.label {

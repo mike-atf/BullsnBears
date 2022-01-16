@@ -77,6 +77,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         if indexPath.section == 0 {
             cell.accessoryType = .detailButton
+            cell.accessoryView?.bounds = CGRect(x: 0, y: 0, width: 30, height: 30)
             if [1,3,4].contains(indexPath.row) {
                 cell.accessoryView?.isHidden = true
             }

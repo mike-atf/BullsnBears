@@ -251,12 +251,12 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QfP-lA-cgL">
-                                <rect key="frame" x="10" y="80" width="33" height="30.5"/>
+                                <rect key="frame" x="10" y="79.5" width="33" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="QfP-lA-cgL" secondAttribute="height" multiplier="1:1" id="a73-lo-oVN"/>
                                 </constraints>
                                 <color key="tintColor" systemColor="linkColor"/>
-                                <state key="normal" backgroundImage="dollarsign.square.fill" catalog="system"/>
+                                <state key="normal" backgroundImage="dollarsign.circle.fill" catalog="system"/>
                                 <connections>
                                     <action selector="dcfButtonAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="QcI-zI-hwo"/>
                                 </connections>
@@ -273,12 +273,12 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fni-R7-t11">
-                                <rect key="frame" x="10" y="122" width="33" height="30"/>
+                                <rect key="frame" x="10" y="121.5" width="33" height="31.5"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="fni-R7-t11" secondAttribute="height" multiplier="1:1" id="yrz-ly-1Cf"/>
                                 </constraints>
                                 <color key="tintColor" systemColor="linkColor"/>
-                                <state key="normal" backgroundImage="dollarsign.square.fill" catalog="system"/>
+                                <state key="normal" backgroundImage="dollarsign.circle.fill" catalog="system"/>
                                 <connections>
                                     <action selector="r1ButtonAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="9Kw-RA-52T"/>
                                 </connections>
@@ -293,8 +293,21 @@
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZUx-G2-2hE" customClass="ChartPricesView" customModule="Bulls_N_Bears" customModuleProvider="target">
                                 <rect key="frame" x="709.5" y="342.5" width="150" height="407.5"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B1R-fX-BfC">
+                                        <rect key="frame" x="100" y="5" width="45" height="31"/>
+                                        <color key="tintColor" name="AccentColor"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="arrow.clockwise.circle.fill" catalog="system"/>
+                                        <connections>
+                                            <action selector="requestPriceUpdate:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="dzM-Bh-KvF"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
                                 <color key="backgroundColor" systemColor="systemGray2Color"/>
                                 <constraints>
+                                    <constraint firstItem="B1R-fX-BfC" firstAttribute="top" secondItem="ZUx-G2-2hE" secondAttribute="top" constant="5" id="Wfz-EB-6aK"/>
+                                    <constraint firstAttribute="trailing" secondItem="B1R-fX-BfC" secondAttribute="trailing" constant="5" id="sc8-Ji-cdx"/>
                                     <constraint firstAttribute="width" constant="150" id="yN6-bi-8Ct"/>
                                 </constraints>
                             </view>
@@ -463,6 +476,7 @@
                         <outlet property="dcfErrorsButton" destination="PWI-rZ-xja" id="NeJ-xs-n2b"/>
                         <outlet property="dcfValuationLabrl" destination="A2B-RG-uHy" id="MpB-NQ-6aa"/>
                         <outlet property="errorButton" destination="Eh7-4A-Kqm" id="8oy-Nu-S0E"/>
+                        <outlet property="priceUpdateButton" destination="B1R-fX-BfC" id="hyp-Dp-GIP"/>
                         <outlet property="purchaseButton" destination="gXI-FT-krA" id="ceb-Qq-Zkx"/>
                         <outlet property="r1Button" destination="fni-R7-t11" id="fvV-UG-dTt"/>
                         <outlet property="r1ErrorsButton" destination="s3a-vi-G4m" id="lfo-xr-fDb"/>
@@ -720,7 +734,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" tag="10" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" text="Thanks for trying out Bulls 'N' Bears" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="4PW-Qz-h32">
-                                <rect key="frame" x="5" y="5" width="630" height="610"/>
+                                <rect key="frame" x="8" y="8" width="624" height="604"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <accessibility key="accessibilityConfiguration">
                                     <accessibilityTraits key="traits" notEnabled="YES"/>
@@ -733,10 +747,10 @@
                         <viewLayoutGuide key="safeArea" id="xZI-VJ-JUH"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="xZI-VJ-JUH" firstAttribute="trailing" secondItem="4PW-Qz-h32" secondAttribute="trailing" constant="5" id="2kv-0o-m3c"/>
-                            <constraint firstItem="4PW-Qz-h32" firstAttribute="leading" secondItem="xZI-VJ-JUH" secondAttribute="leading" constant="5" id="5Mh-Gb-yhJ"/>
-                            <constraint firstItem="4PW-Qz-h32" firstAttribute="top" secondItem="xZI-VJ-JUH" secondAttribute="top" constant="5" id="NaI-ic-gdH"/>
-                            <constraint firstItem="xZI-VJ-JUH" firstAttribute="bottom" secondItem="4PW-Qz-h32" secondAttribute="bottom" constant="5" id="jxx-ZD-PWv"/>
+                            <constraint firstItem="xZI-VJ-JUH" firstAttribute="trailing" secondItem="4PW-Qz-h32" secondAttribute="trailing" constant="8" id="2kv-0o-m3c"/>
+                            <constraint firstItem="4PW-Qz-h32" firstAttribute="leading" secondItem="xZI-VJ-JUH" secondAttribute="leading" constant="8" id="5Mh-Gb-yhJ"/>
+                            <constraint firstItem="4PW-Qz-h32" firstAttribute="top" secondItem="xZI-VJ-JUH" secondAttribute="top" constant="8" id="NaI-ic-gdH"/>
+                            <constraint firstItem="xZI-VJ-JUH" firstAttribute="bottom" secondItem="4PW-Qz-h32" secondAttribute="bottom" constant="8" id="jxx-ZD-PWv"/>
                         </constraints>
                     </view>
                     <value key="contentSizeForViewInPopover" type="size" width="640" height="620"/>
@@ -1418,17 +1432,21 @@
         <segue reference="mBp-dp-A5V"/>
     </inferredMetricsTieBreakers>
     <resources>
+        <image name="arrow.clockwise.circle.fill" catalog="system" width="128" height="121"/>
         <image name="arrow.up.arrow.down" catalog="system" width="128" height="98"/>
         <image name="arrowtriangle.right.and.line.vertical.and.arrowtriangle.left" catalog="system" width="128" height="89"/>
         <image name="book" catalog="system" width="128" height="99"/>
         <image name="creditcard.circle" catalog="system" width="128" height="121"/>
         <image name="doc.text.magnifyingglass" catalog="system" width="107" height="128"/>
-        <image name="dollarsign.square.fill" catalog="system" width="128" height="114"/>
+        <image name="dollarsign.circle.fill" catalog="system" width="128" height="121"/>
         <image name="exclamationmark.triangle" catalog="system" width="128" height="112"/>
         <image name="exclamationmark.triangle.fill" catalog="system" width="128" height="112"/>
         <image name="info.circle" catalog="system" width="128" height="121"/>
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="xmark.circle" catalog="system" width="128" height="121"/>
+        <namedColor name="AccentColor">
+            <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="Green">
             <color red="0.23199999332427979" green="0.5339999794960022" blue="0.25" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>

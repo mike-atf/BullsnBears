@@ -651,9 +651,8 @@ extension StocksController2: DownloadRedirectionDelegate {
                                             do {
                                                 try self.updateStocksData(singleShare: share)
                                             } catch let error {
-                                                print("StocksController2: error updating \(symbol) after redirect \(error.localizedDescription)")
+                                                ErrorController.addErrorLog(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "error updating \(symbol) after redirect")
                                             }
-                                            print("StocksController2: redirect for \(symbol) epsPER task recevied")
                                         case .test:
                                             print("StocksController2: redirect for \(symbol) test task recevied")
                                         case .wbValuation:

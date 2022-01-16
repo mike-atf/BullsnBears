@@ -68,11 +68,8 @@ public class Share: NSManagedObject {
             context?.perform {
                 do {
                     try context?.save()
-                } catch {
-                    // TODO: - Replace this implementation with code to handle the error appropriately.
-                    // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                    let nserror = error as NSError
-                    fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+                } catch let error {
+                    alertController.showDialog(title: "Fatal error", alertMessage: "The App can't save data due to \(error.localizedDescription)\nPlease quit and re-launch", viewController: nil, delegate: nil)
                 }
 
             }
@@ -138,7 +135,7 @@ public class Share: NSManagedObject {
             if let data = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? Data {
 
                 // the 'setDailyPrices' function ensure PricePoints are stored in date sorted order for faster retrieval without sorting
-                let prices = try PropertyListDecoder().decode([PricePoint].self, from: data)
+                prices = try PropertyListDecoder().decode([PricePoint].self, from: data)
 //once
 //                if symbol == "NVDA" {
 //                    let dateFormatter: DateFormatter = {

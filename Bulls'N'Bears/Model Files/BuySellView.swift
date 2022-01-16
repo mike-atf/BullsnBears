@@ -97,9 +97,9 @@ class BuySellView: UIView {
             }
         }
 
-        readyText = earlierSignalsSame.count == 2 ? "Ready to" : "Wait to"
+        readyText = earlierSignalsSame.count == 2 ? "" : "Wait to"
 
-        if readyText.starts(with: "Ready") {
+        if !readyText.starts(with: "Wait") {
             var date$ = String()
             if let validDate = lastCrossing.date {
                 date$ = dateFormatter.string(from: validDate)

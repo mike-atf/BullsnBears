@@ -194,10 +194,11 @@ class Downloader: NSObject {
                     removeFile(tempURL)
                     
                     DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadNotCSV"), object: symbol, userInfo:  ["companyName":companyName]) // send to StocksListVC
+                        var userDict = [String:String]()
+                        userDict["companyName"] = companyName
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadNotCSV"), object: symbol, userInfo:  userDict) // send to StocksListVC
                     }
                     return
-//                    throw DownloadAndAnalysisError.fileFormatNotCSV
                 }
 
                 try FileManager.default.moveItem(at: tempURL, to: targetURL)

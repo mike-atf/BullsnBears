@@ -124,7 +124,9 @@ class ChartTimeLineView: UIView {
 
     private func getDateLabels() -> [UILabel] {
         
-        let date$ = "31/12/22" //dateFormatter.string(from: Date())
+        let date$ = "31/12/22"
+        dateFormatter.dateFormat = "dd/MM/yy"
+        
         let stdLabel: UILabel = {
             let label = UILabel()
             label.font = UIFont.systemFont(ofSize: 10)
@@ -164,6 +166,7 @@ class ChartTimeLineView: UIView {
             labels.insert(aLabel, at: 0)
         }
 
+        dateFormatter.dateStyle = .short
         return labels
     }
     

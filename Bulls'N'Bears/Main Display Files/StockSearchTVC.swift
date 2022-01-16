@@ -143,15 +143,9 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
 // first try to download historical prices from Yahoo finance as CSV file
             Task.init(priority: .background) {
-//                do {
                     // the next functions returns by sending notification 'FileDownloadComplete' with fileURL in object sent
                     // this should be picked up by StocksListTVC
                     await Downloader.downloadFile(url: sourceURL, symbol: symbol, companyName: companyName!)
-//                } catch let error as DownloadAndAnalysisError {
-//                    ErrorController.addErrorLog(errorLocation: "StockSearchTVC.yahooStockDownload", systemError: nil, errorInfo: "dowload failure for \(symbol) - \(error.localizedDescription)")
-//                    NotificationCenter.default.removeObserver(self)
-//
-//                }
             }
         }
     }
@@ -163,7 +157,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         guard let symbol = notification.object as? String else { return }
         
         guard let companyName = notification.userInfo?["companyName"] as? String else { return }
-            print(companyName)
+
         var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/history?")
         urlComponents?.queryItems = [URLQueryItem(name: "p", value: symbol)]
         
@@ -238,61 +232,6 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             ErrorController.addErrorLog(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
         }
 
-
-        
-        
-// OLD
-        /*
-        let configuration = URLSessionConfiguration.default
-        configuration.httpCookieAcceptPolicy = .always
-        configuration.httpShouldSetCookies = true
-        let session = URLSession(configuration: configuration)
-        var downloadTask: URLSessionDataTask? // URLSessionDataTask stores downloaded data in memory, DownloadTask as File
-
-        downloadTask = session.dataTask(with: url) { [self]
-            data, urlResponse, error in
-            
-            guard error == nil else {
-                DispatchQueue.main.async {
-                    alertController.showDialog(title: "There's a problem", alertMessage: error!.localizedDescription, viewController: nil, delegate: nil)
-                    stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
-                    self.tableView.reloadData()
-                }
-                return
-            }
-            
-            guard urlResponse != nil else {
-                DispatchQueue.main.async {
-                    alertController.showDialog(title: "There's a problem", alertMessage: urlResponse!.description, viewController: self, delegate: nil)
-                    stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
-                    self.tableView.reloadData()
-                }
-                return
-            }
-            
-            guard let validData = data else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
-                stocksDictionary.insert((key: "NotFound", value: "Not found"), at: 0)
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-                return
-            }
-
-            let html$ = String(decoding: validData, as: UTF8.self)
-            if task == "name" {
-                self.nameInWebData(html$: html$, symbol: stockName)
-            }
-            else if task == "priceHistory" {
-                let pricePoints = WebpageScraper.yahooPriceTable(html$: html$)
-                
-                DispatchQueue.main.async {
-                    self.downloadDelegate?.newShare(symbol: stockName,  prices: pricePoints)
-                }
-            }
-        }
-        downloadTask?.resume()
-        */
     }
     
     func nameInWebData(html$: String, symbol: String) {

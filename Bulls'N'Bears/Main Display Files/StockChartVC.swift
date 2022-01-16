@@ -22,6 +22,7 @@ class StockChartVC: UIViewController {
     @IBOutlet var r1ErrorsButton: UIButton!
     @IBOutlet var researchButton: UIBarButtonItem!
     @IBOutlet var purchaseButton: UIBarButtonItem!
+    @IBOutlet var priceUpdateButton: UIButton!
     
     var settingsMenuButton: UIBarButtonItem!
     var dcfErrors = [String]()
@@ -90,6 +91,13 @@ class StockChartVC: UIViewController {
             chart.chartPricesView.currentLabelRefreshTimer?.invalidate() // when changing a stock invalidate current price update timer of any previously displayed share
             if let validShare = share {
                 validChart.configure(with: validShare)
+                if validShare.watchStatus == 2 {
+                    priceUpdateButton.isHidden = false
+                    priceUpdateButton.isEnabled = true
+                } else {
+                    priceUpdateButton.isHidden = true
+                    priceUpdateButton.isEnabled = false
+                }
             }
         }
 
@@ -290,6 +298,8 @@ class StockChartVC: UIViewController {
 
         citationView.loadViewIfNeeded()
         if let textView = citationView.view.viewWithTag(10) as? UITextView {
+            textView.clipsToBounds = true
+            textView.layer.cornerRadius = 8.0
             textView.backgroundColor = UIColor(named: "antiLabel")!
             textView.attributedText = CitationsManager.cite()
         }
@@ -345,7 +355,13 @@ class StockChartVC: UIViewController {
         self.present(dialog, animated: true, completion: nil)
 
     }
-
+    
+    @IBAction func requestPriceUpdate(_ sender: UIButton) {
+        if let validShare = share {
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "SingleShareUpdateRequest"), object: validShare, userInfo: nil)
+        }
+    }
+    
 }
 
 extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate, UIPopoverPresentationControllerDelegate {

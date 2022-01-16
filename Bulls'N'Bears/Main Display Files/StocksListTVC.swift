@@ -90,7 +90,10 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "FileDownloadComplete"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateShares), name: Notification.Name(rawValue: "ActivatedFromBackground"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateSingleShare(notification:)), name: Notification.Name(rawValue: "SingleShareUpdateRequest"), object: nil)
 
+        
+        
         controller.delegate = self
         controller.controllerDelegate = self
         controller.viewController = self
@@ -154,7 +157,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func updateShares() {
                 
         NotificationCenter.default.post(name: Notification.Name(rawValue: "ShowCitation"), object: nil, userInfo: nil)
-
         
         guard controller.fetchedObjects?.count ?? 0 > 0 else {
             return
@@ -166,6 +168,18 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             }
             tableView.refreshControl?.endRefreshing()
         
+    }
+    
+    @objc
+    func updateSingleShare(notification: Notification) {
+        
+        guard let share = notification.object as? Share else { return }
+        
+        do {
+            try controller.updateStocksData(singleShare: share)
+        } catch let error {
+            alertController.showDialog(title: "Update failure", alertMessage: "Couldn't update \(share); \(error.localizedDescription)", viewController: self, delegate: nil)
+        }
     }
 
     // MARK: - Shares functions
@@ -185,53 +199,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         
     }
-    
-    /*
-    moved to StockChartVC
-    func showCitation() {
-        
-        var sourceView: UIView?
-        for nav in self.splitViewController?.children ?? [] {
-            if let navCo = nav as? UINavigationController {
-                if let detailViewC = navCo.topViewController as? StockChartVC {
-                    sourceView = detailViewC.view
-                }
-            }
-        }
 
-        guard let detailView = sourceView else {
-            return
-        }
-
-        
-        let citationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WelcomeViewController")
-                    
-//        citationView.view.backgroundColor = UIColor.systemGray4
-        citationView.modalPresentationStyle = .popover
-        citationView.preferredContentSize = CGSize(width: self.view.frame.width / 2.5, height: self.view.frame.height / 3)
-        citationView.view.backgroundColor = UIColor(named: "antiLabel") ?? UIColor.black
-
-        citationView.loadViewIfNeeded()
-        if let textView = citationView.view.viewWithTag(10) as? UITextView {
-            textView.backgroundColor = UIColor(named: "antiLabel") ?? UIColor.black
-            textView.attributedText = CitationsManager.cite()
-        }
-
-        let popUpController = citationView.popoverPresentationController
-        popUpController!.permittedArrowDirections = UIPopoverArrowDirection.init(rawValue: 0)
-        
-        popUpController?.sourceView = detailView
-        popUpController?.sourceRect = CGRect(x: detailView.frame.width * 0.8, y: detailView.frame.height * 0.75, width: 5, height: 5)
-            
-        self.parent?.present(citationView, animated: true, completion: nil)
-        
-
-    }
-
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-        return UIModalPresentationStyle.none
-    }
-     */
     func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
        
     }
@@ -336,11 +304,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             if !comment.starts(with: "Enter your notes here...") { return true }
             else { return false }
         }).count ?? 0
-        
-//        print("saved scores for \(share.symbol!)")
-//        print("user score: \(share.userEvaluationScore)")
-//        print("valueScore score: \(share.valueScore)")
-//        print()
+
         cell.configureCell(indexPath: indexPath, stock: share, userRatingScore: share.userEvaluationScore, valueRatingScore: share.valueScore, scoreDelegate: self, userCommentCount: evaluationsCount)
         
         return cell
@@ -415,7 +379,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         if !tableView.isEditing {
             performSegue(withIdentifier: "showChartSegue", sender: nil)
-//            tableView.deselectRow(at: indexPath, animated: true)
         }
         else {
             let selectedShare = controller.object(at: indexPath)
@@ -543,19 +506,22 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
      
          let share = controller.object(at: indexPath)
          
-         if let chartView = segue.destination as? StockChartVC {
-            
-             chartView.share = controller.object(at: indexPath)
-             chartView.configure(share: share)
-             
-         }
-         else if let navView = segue.destination as? UINavigationController {
+         if let navView = segue.destination as? UINavigationController {
              if let chartView = navView.topViewController as? StockChartVC {
-                     
                  chartView.share = controller.object(at: indexPath)
                  chartView.configure(share: share)
+                 
+//                 if share.watchStatus == 2 {
+//                     // archived stocks
+//                     do {
+//                         try controller.updateStocksData(singleShare: share)
+//                     } catch let error {
+//                         ErrorController.addErrorLog(errorLocation: "StocksListVC", systemError: error, errorInfo: "error when trying to update data for archived \(share.name_short ?? "missing")")
+//                     }
+//                 }
              }
          }
+
  }
 
     @IBAction func downloadAction(_ sender: Any) {
@@ -666,47 +632,28 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
         tableView.reloadRows(at: [atPath], with: .none)
         
         if tableView.indexPathForSelectedRow == nil {
-            tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .top)
-        } else {
-            performSegue(withIdentifier: "showChartSegue", sender: nil)
-        }
-    }
-    
-    /*
-    func livePriceUpdated(indexPath: IndexPath?) {
-
-//        print()
-        guard indexPath != nil else { // nil is sent if e.g. last refresh of selected share was <300sec ago.
-//            print(#function + " live price update notice without an indexPath. Ending refresh...")
-            tableView.refreshControl?.endRefreshing()
-            return
+            tableView.selectRow(at: atPath, animated: false, scrollPosition: .none)
         }
         
-        if let selectedPath = tableView.indexPathForSelectedRow {
-            if indexPath == selectedPath {
-                tableView.refreshControl?.endRefreshing()
-                performSegue(withIdentifier: "showChartSegue", sender: nil)
-            }
-        }
-        else if let navView = splitViewController?.viewController(for: .secondary) as? UINavigationController {
-            for view in navView.viewControllers {
-                if let chartView = view as? StockChartVC {
-                    if let displayedShare = chartView.share {
-                        if let path = controller.indexPath(forObject: displayedShare) {
-//                            print(#function + " live price update complete for selected share \(displayedShare.symbol!)")
-                            tableView.refreshControl?.endRefreshing()
-                            if tableView.indexPathForSelectedRow == nil {
-                                tableView.selectRow(at: path, animated: false, scrollPosition: .none)
-                            }
-                            self.performSegue(withIdentifier: "showChartSegue", sender: nil)
-                        }
-                    }
+//        if let chartView = self.splitViewController?.navigationController?.topViewController as? StockChartVC {
+//            guard !(((chartView.navigationController?.topViewController as? ResearchTVC) != nil)) else { return }
+//            performSegue(withIdentifier: "showChartSegue", sender: nil)
+//        }
+        
+        var researchViewOpen = false
+        if let nav = self.splitViewController?.navigationController {
+            for vc in nav.viewControllers {
+                if let _ = vc as? ResearchTVC {
+                    researchViewOpen = true
                 }
             }
         }
+        if !researchViewOpen {
+            performSegue(withIdentifier: "showChartSegue", sender: nil)
+        }
         
     }
-    */
+    
     func tap(indexPath: IndexPath, isUserScoreType: Bool, sender: UIView) {
         
         if let evaluationsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {
@@ -841,8 +788,7 @@ extension StocksListTVC: UISearchBarDelegate, UISearchResultsUpdating, UISearchC
         do {
             try controller.performFetch()
         } catch let error as NSError {
-            print(error.localizedDescription)
-            
+            alertController.showDialog(title: "Search failed", alertMessage: "Couldn't fetch symbols: \(error.localizedDescription)", viewController: self, delegate: nil)
         }
 
         self.navigationItem.leftBarButtonItem?.isEnabled = true
