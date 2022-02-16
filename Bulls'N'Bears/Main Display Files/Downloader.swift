@@ -84,7 +84,8 @@ class Downloader: NSObject {
                 }
             }
             else {
-                throw DownloadAndAnalysisError.generalDownloadError
+                ErrorController.addErrorLog(errorLocation: "Downloader.downloadData", systemError: nil, errorInfo: "bad status code response \(response.statusCode) when downloading from \(url)")
+                throw DownloadAndAnalysisError.statusCodeError
             }
         }
         

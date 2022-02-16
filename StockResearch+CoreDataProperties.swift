@@ -33,6 +33,7 @@ extension StockResearch {
     @NSManaged public var businessDescription: String?
     @NSManaged public var nextReportDate: Date?
     @NSManaged public var futureGrowthMean: Double
+    @NSManaged public var targetBuyPrice: Double
 
 }
 

@@ -628,17 +628,16 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
 extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
     
     func shareUpdateComplete(atPath: IndexPath) {
-        
+                
         tableView.reloadRows(at: [atPath], with: .none)
         
         if tableView.indexPathForSelectedRow == nil {
             tableView.selectRow(at: atPath, animated: false, scrollPosition: .none)
         }
         
-//        if let chartView = self.splitViewController?.navigationController?.topViewController as? StockChartVC {
-//            guard !(((chartView.navigationController?.topViewController as? ResearchTVC) != nil)) else { return }
-//            performSegue(withIdentifier: "showChartSegue", sender: nil)
-//        }
+        // only these two steps seem to be able to move changes saved to background moc to mainThread moc
+        let share = controller.object(at: atPath)
+        let _ = share.getDailyPrices(needRecalcDueToNew: true)
         
         var researchViewOpen = false
         if let nav = self.splitViewController?.navigationController {

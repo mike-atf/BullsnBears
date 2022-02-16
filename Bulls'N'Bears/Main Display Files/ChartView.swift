@@ -15,6 +15,8 @@ class ChartView: UIView {
 //    var valuationLabels = [UILabel]()
     var buySellLabel: UILabel?
     var epsLabel: UILabel!
+    var targetBuyPriceLabel: UILabel?
+
     var purchaseButtons: [PurchasedButton]?
 
     var candleBoxes = UIBezierPath()
@@ -86,7 +88,7 @@ class ChartView: UIView {
             label.font = UIFont.systemFont(ofSize: 12)
             label.textColor = UIColor.white
             label.backgroundColor = UIColor(named: "Green")!
-            label.text = " qEPS "
+            label.text = " qEPS(ttm) "
                         
             return label
         }()
@@ -241,6 +243,45 @@ class ChartView: UIView {
       
                 }
                 
+                //MARK: - target buy price line
+                if let targetPrice = share?.targetBuyPrice() {
+                    
+                    if targetPrice > 0 {
+                        
+                        targetBuyPriceLabel = {
+                            let label = UILabel()
+                            label.numberOfLines = 1
+                            label.font = UIFont.systemFont(ofSize: 12)
+                            label.textColor = UIColor.black
+                            label.backgroundColor = UIColor.systemYellow
+                            label.text = " Buy price "
+                                        
+                            return label
+                        }()
+                        addSubview(targetBuyPriceLabel!)
+                        targetBuyPriceLabel?.sizeToFit()
+                        targetBuyPriceLabel?.frame = CGRect(x: 10, y: 0, width: targetBuyPriceLabel!.frame.width, height:  targetBuyPriceLabel!.frame.height)
+
+                        let targetPriceLine = UIBezierPath()
+                        let pp1 = PriceDate(dailyPrices.first!.tradingDate, targetPrice)
+                        let pp2 = PriceDate(dailyPrices.last!.tradingDate, targetPrice)
+                        
+                        let startPoint = plotPricePoint(pricePoint: pp1)
+                        var endPoint = plotPricePoint(pricePoint: pp2)
+                        endPoint.x = rect.maxX // yAxisLabels.first!.frame.maxX + 5
+                        targetPriceLine.move(to: startPoint)
+                        targetPriceLine.addLine(to: endPoint)
+                        
+                        UIColor.systemYellow.setStroke()
+                        targetPriceLine.stroke()
+                    }
+                    else {
+                        targetBuyPriceLabel?.removeFromSuperview()
+                    }
+
+                }
+
+                
                 //MARK: - purchase Price line
                 if let purchasePrice = share?.purchasePrice() {
                     
@@ -307,9 +348,13 @@ class ChartView: UIView {
                 UIColor.systemGreen.setStroke()
                 epsLine.stroke()
                 
-                let lastpoint = plotEPSPoint(datedValue: hxEPSInChartRange.last!, min: minEPS, max: maxEPS)
+//                let lastpoint = plotEPSPoint(datedValue: hxEPSInChartRange.last!, min: minEPS, max: maxEPS)
                 epsLabel.sizeToFit()
-                epsLabel.frame = CGRect(x: lastpoint.x, y: lastpoint.y - epsLabel.frame.height / 2, width: epsLabel.frame.width, height: epsLabel.frame.height)
+                
+                let startX = targetBuyPriceLabel?.frame.maxX ?? 10
+                
+                epsLabel.frame = CGRect(x: startX, y: 0, width: epsLabel.frame.width, height: epsLabel.frame.height)
+//                epsLabel.frame = CGRect(x: lastpoint.x, y: lastpoint.y - epsLabel.frame.height / 2, width: epsLabel.frame.width, height: epsLabel.frame.height)
             }
             
         }

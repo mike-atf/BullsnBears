@@ -50,7 +50,7 @@ class ValueChart: UIView {
     }
 
     
-    func configure(array: [Double]?, biggerIsBetter:Bool?=true,trendLabel: UILabel?, longTitle: Bool?=true ,valuesAreGrowth: Bool, valuesAreProportions:Bool? = false, showXLabels: Bool=true, showYLabels: Bool=true, showsXYearLabel: Bool=false) {
+    func configure(array: [Double]?, biggerIsBetter:Bool?=true,trendLabel: UILabel?, longTitle: Bool?=true ,valuesAreGrowth: Bool, valuesAreProportions:Bool? = false, showXLabels: Bool=true, showYLabels: Bool=true, showsXYearLabel: Bool=false, latestDataDate: Date?, altLatestDate: Date?) {
         
         guard array?.count ?? 0 > 0  else {
             return
@@ -77,10 +77,18 @@ class ValueChart: UIView {
         if minValue1 > 0 { minValue1 = 0 }
         maxValue1 = CGFloat(v1noNaN.max() ?? Double())
         
-        let components: Set<Calendar.Component> = [.year]
-        let newestMTDataDate = UserDefaults.standard.value(forKey: UserDefaultTerms().newestMTDataDate) as? Date
-        let dateComponents = Calendar.current.dateComponents(components, from:  newestMTDataDate ??  Date())
-        let mostRecentYear = dateComponents.year! - 2000
+        var mostRecentYear: Int?
+        if let validDate = latestDataDate {
+            let components: Set<Calendar.Component> = [.year]
+    //        let newestMTDataDate = UserDefaults.standard.value(forKey: UserDefaultTerms().newestMTDataDate) as? Date
+            let dateComponents = Calendar.current.dateComponents(components, from:  validDate)
+            mostRecentYear = dateComponents.year! - 2000
+        } else if let validDate = altLatestDate {
+            let components: Set<Calendar.Component> = [.year]
+    //        let newestMTDataDate = UserDefaults.standard.value(forKey: UserDefaultTerms().newestMTDataDate) as? Date
+            let dateComponents = Calendar.current.dateComponents(components, from:  validDate)
+            mostRecentYear = dateComponents.year! - 2000 - 1
+        }
         
         if showXLabels{
             var count = valueArray?.count ?? 0
@@ -88,7 +96,7 @@ class ValueChart: UIView {
                     let aLabel: UILabel = {
                         let label = UILabel()
                         label.font = UIFont.systemFont(ofSize: 12)
-                        label.text = "\(mostRecentYear-count)"
+                        label.text = mostRecentYear != nil ? "\(mostRecentYear!-count)" : " "
                         label.textAlignment = .center
                         label.sizeToFit()
                         self.addSubview(label)

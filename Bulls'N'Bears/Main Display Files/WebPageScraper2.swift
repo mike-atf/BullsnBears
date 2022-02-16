@@ -200,13 +200,12 @@ class WebPageScraper2: NSObject {
             htmlText = try await Downloader.downloadData(url: url)
             if let values = scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: "currentPrice" , rowTerminal: "}",  numberStarter: ":", numberTerminal: "\"") {
 
-//            if let values = scrapeRowForDoubles(website: .yahoo, html$: htmlText, rowTitle: "<span class=\"Trsdu(0.3s) Trsdu(0.3s) " , rowTerminal: "</span>", numberTerminal: "</span>") {
                 return values.first
             } else {
                 return nil
             }
         } catch let error as DownloadAndAnalysisError {
-            print("error in WS2.getCurrentPrice \(error.localizedDescription)")
+            ErrorController.addErrorLog(errorLocation: "WebScraper2.getCurretnPrice", systemError: error, errorInfo: "error downloading current price data from \(url)")
             throw error
         }
 
@@ -219,6 +218,7 @@ class WebPageScraper2: NSObject {
         do {
             htmlText = try await Downloader.downloadData(url: url)
         } catch let error as DownloadAndAnalysisError {
+            ErrorController.addErrorLog(errorLocation: "WebScraper2.getCurretnPrice", systemError: error, errorInfo: "error downloading current price data from \(url)")
             throw error
         }
 
@@ -488,7 +488,7 @@ class WebPageScraper2: NSObject {
                 htmlText = try await Downloader.downloadData(url: url)
             } catch let error as DownloadAndAnalysisError {
                 progressDelegate?.downloadError(error: "Failed DCF valuation download for \(symbol): \(error.localizedDescription)")
-                throw error
+//                throw error
             }
             
             progressTasks += 1
@@ -635,7 +635,7 @@ class WebPageScraper2: NSObject {
         
     }
 
-    class func downloadAnalyseSaveWBValuationData(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws -> Date? {
+    class func downloadAnalyseSaveWBValuationData(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
         
 //        print("downloadAnalyseSaveWBValuationData for \(shareSymbol ?? "")")
         
@@ -662,8 +662,6 @@ class WebPageScraper2: NSObject {
         let downloader: Downloader? = Downloader(task: .wbValuation)
         for section in webPageNames {
             
-//            print("WPS2.downloading section \(section)")
-        
             if let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(sn)/\(section)")  {
                 if let url = components.url  {
                     
@@ -719,7 +717,7 @@ class WebPageScraper2: NSObject {
                         
                         let info = ["Redirection": "Object"]
                         NotificationCenter.default.post(name: Notification.Name(rawValue: "Redirection"), object: info)
-                        return resultDates.max()
+                        return
                     } else {
                         ErrorController.addErrorLog(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
                     }
@@ -777,6 +775,8 @@ class WebPageScraper2: NSObject {
                             }
                         }
                         
+                    wbv.latestDataDate = resultDates.max()
+                    
                         if let validEPSPER = perAndEPSvalues {
                             let perDates: [DatedValue] = validEPSPER.compactMap{ DatedValue(date: $0.date, value: $0.peRatio) }
                             wbv.savePERWithDateArray(datesValuesArray: perDates, saveInContext: false)
@@ -798,7 +798,6 @@ class WebPageScraper2: NSObject {
             }
         }
         
-        return resultDates.max()
     }
     
     class func keyratioDownloadAndSave(shareSymbol: String?, shortName: String?, shareID: NSManagedObjectID) async throws {
@@ -924,12 +923,15 @@ class WebPageScraper2: NSObject {
         var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(shareSymbol)/history?")
         urlComponents?.queryItems = [URLQueryItem(name: "p", value: shareSymbol)]
         
+        
         guard let sourceURL = urlComponents?.url else {
             throw DownloadAndAnalysisError.urlInvalid
         }
         
-        let dataText = try await Downloader.downloadData(url: sourceURL)
+//        print("downloading daily prices from \(sourceURL)")
         
+        let dataText = try await Downloader.downloadData(url: sourceURL)
+
         let downloadedPricePoints = analyseYahooPriceTable(html$: dataText)
 
         return downloadedPricePoints
@@ -1671,8 +1673,8 @@ class WebPageScraper2: NSObject {
     
     class func analyseYahooPriceTable(html$: String) -> [PricePoint]? {
         
-        let tableEnd$ = "</tbody><tfoot "
-        let tableStart$ = "<thead "
+        let tableEnd$ = "</tbody><tfoot>"
+        let tableStart$ = "<thead>"
         
         let rowStart$ = "Ta(start)"
         let rowEnd = "</span></td>"

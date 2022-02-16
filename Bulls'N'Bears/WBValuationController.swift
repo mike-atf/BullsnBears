@@ -238,6 +238,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     //MARK: - TVC controller functions
     
+    public func latestDataDate() -> Date? {
+        return valuation?.latestDataDate
+    }
+
+    public func valuationDate() -> Date? {
+        return valuation?.date
+    }
+    
     public func rowTitle(path: IndexPath) -> String {
         return rowTitles[path.section][path.row]
     }
@@ -594,12 +602,8 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             
             do {
                 if let validID = valuationID {
-                    let newestDate = try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: validID, downloadRedirectDelegate: self)
-                    
-                    if newestDate != nil {
-                        UserDefaults.standard.set(newestDate, forKey: UserDefaultTerms().newestMTDataDate)
-                    }
-                    
+                    try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: validID, downloadRedirectDelegate: self)
+                                        
                     completedTasks += 1
                     progressDelegate?.progressUpdate(allTasks: allTasks, completedTasks: completedTasks)
                 }

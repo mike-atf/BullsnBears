@@ -35,6 +35,7 @@ enum DownloadAndAnalysisError: Error {
     case fileFormatNotCSV
     case couldNotFindCompanyProfileData
     case generalDownloadError
+    case statusCodeError
     case downloadedFileURLinvalid
 }
 

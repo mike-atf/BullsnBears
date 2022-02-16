@@ -86,7 +86,8 @@ public class Share: NSManagedObject {
             else { return true }
         })
         self.dailyPrices = convertDailyPricesToData(dailyPrices: validPoints)
-        self.prices = pricePoints
+        self.prices = pricePoints // doesn't promote prices to main moc when called from background thread!
+        
         if saveInMOC ?? true {
             save() // saves in the context the wbValuation object was fetched in
         }
@@ -1517,6 +1518,15 @@ public class Share: NSManagedObject {
         return priceSum / quantitySum
         
     }
+    
+    func targetBuyPrice() -> Double? {
+                        
+        guard let research = self.research else { return  nil }
+            
+        return research.targetBuyPrice
+        
+    }
+
 
     func quantityOwned() -> Double? {
         

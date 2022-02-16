@@ -402,7 +402,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                     try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: validID, progressDelegate: self.valuationListViewController)
                     try Task.checkCancellation()
                 } catch let error {
-                    ErrorController.addErrorLog(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                    ErrorController.addErrorLog(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
                 }
                 return nil
             }

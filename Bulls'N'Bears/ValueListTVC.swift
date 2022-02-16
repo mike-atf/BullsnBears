@@ -11,7 +11,7 @@ class ValueListTVC: UITableViewController {
 
     var values: [[Double]?]?
     var higherGrowthIsBetter = true
-    var sectionTitles = ["Your Rating (keep tapping the stars)","Your evaluation notes"]
+    var sectionTitles = ["Your Rating (keep tapping the stars)","Newest available data from"]
     var rowTitles = [String]()
     var formatter: NumberFormatter!
     var controller: WBValuationController!
@@ -41,13 +41,15 @@ class ValueListTVC: UITableViewController {
        proportions = controller.valueListTVCProportions(values: values) // values = time-DESCENDING, proportions come back in same order
    }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        
-        if let textcell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) as? ValueListTextEntryCell {
-            let parameter = textcell.wbvParameter ?? ""
-            controller.userEnteredNotes(notes: textcell.textView.text, parameter: parameter)
-        }
-    }
+    // this cell is used to show latest date of WBValuation Data taken from MacroTrends.
+    // Not used for user comments any longer - consider getting rid of the NSManagedObject
+//    override func viewWillDisappear(_ animated: Bool) {
+//
+//        if let textcell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) as? ValueListTextEntryCell {
+//            let parameter = textcell.wbvParameter ?? ""
+//            controller.userEnteredNotes(notes: textcell.textView.text, parameter: parameter)
+//        }
+//    }
     
     override func viewDidDisappear(_ animated: Bool) {
                  
@@ -71,19 +73,19 @@ class ValueListTVC: UITableViewController {
         
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListRatingCell", for: indexPath) as! ValueListRatingCell
-            let parameter = sectionTitles[2] // ! careful. This assumes the first two sectionsTitles are '["Your Rating (keep tapping the stars)","Your evaluation notes"]' to which the parameter and more are appended in WBValuationController prepareForSegue()
+            let parameter = sectionTitles[2] // ! careful. This assumes the first two sectionsTitles are '["Your Rating (keep tapping the stars)","Newest available data from"]' to which the parameter and more are appended in WBValuationController prepareForSegue()
             let userEvaluation = controller.returnUserEvaluation(for: parameter)
             cell.configure(rating: userEvaluation?.userRating(), ratingUpdateDelegate: controller, parameter: userEvaluation?.wbvParameter ?? "missing", reverseRatingOrder: !higherGrowthIsBetter)
             return cell
         }
         else if indexPath.section == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "valueListTextEntryCell", for: indexPath) as! ValueListTextEntryCell
-            let parameter = sectionTitles[2] // ! careful. This assumes the first two sectionsTitles are '["Your Rating (keep tapping the stars)","Your evaluation notes"]' to which the parameter and more are appended in WBValuationController prepareForSegue()
+            let parameter = sectionTitles[2] // ! careful. This assumes the first two sectionsTitles are '["Your Rating (keep tapping the stars)","Newest available data from"]' to which the parameter and more are appended in WBValuationController prepareForSegue()
             let userEvaluation = controller.returnUserEvaluation(for: parameter)
-            var text: String?
-            if let comment = userEvaluation?.comment {
-                text = comment + " (" + dateFormatter.string(from: userEvaluation?.date ?? Date()) + ")"
-            }
+            let text = controller.latestDataDate() != nil ? dateFormatter.string(from: controller.latestDataDate()!) : "NA"
+//            if let comment = userEvaluation?.comment {
+//                text += "\n" + comment + " (" + dateFormatter.string(from: userEvaluation?.date ?? Date()) + ")"
+//            }
             
             cell.configure(text: text, delegate: controller, wbvParameter: userEvaluation?.wbvParameter ?? "missing")
             
@@ -97,14 +99,14 @@ class ValueListTVC: UITableViewController {
                 let barChartValues = (values?.count ?? 0 > 1) ? proportions : values?[indexPath.section-2]
                 let valuesAreProportions = (values?.count ?? 0 > 1)
                 
-                cell.configure(values: barChartValues, biggerIsBetter: higherGrowthIsBetter ,rightTitle: cellLegendTitles.first, valuesAreGrowth: false, valuesAreProportions: valuesAreProportions)
+                cell.configure(values: barChartValues, biggerIsBetter: higherGrowthIsBetter ,rightTitle: cellLegendTitles.first, valuesAreGrowth: false, valuesAreProportions: valuesAreProportions, latestDataDate: controller.latestDataDate(),altLatestDate: controller.valuationDate())
             }
             else if indexPath.row == 1 {
                 // chart of growth
                 let trendLineChartValues = (values?.count ?? 0 > 1) ? Calculator.compoundGrowthRates(values: proportions) : proportions
                 let rowtitle = "Compound growth rates of " + cellLegendTitles.first!
                 
-                cell.configure(values: trendLineChartValues, biggerIsBetter: higherGrowthIsBetter ,rightTitle: rowtitle, valuesAreGrowth: true)
+                cell.configure(values: trendLineChartValues, biggerIsBetter: higherGrowthIsBetter ,rightTitle: rowtitle, valuesAreGrowth: true, latestDataDate: controller.latestDataDate(), altLatestDate: controller.valuationDate())
             }
 
             return cell
@@ -118,7 +120,7 @@ class ValueListTVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 { return 100 }
-        else if indexPath.section == 1 { return 120 }
+        else if indexPath.section == 1 { return 50 }
         else { return 200 }
     }
 

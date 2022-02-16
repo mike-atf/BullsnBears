@@ -22,6 +22,7 @@ extension WBValuation {
     @NSManaged public var opCashFlow: [Double]?
     @NSManaged public var company: String?
     @NSManaged public var date: Date?
+    @NSManaged public var latestDataDate: Date?
     @NSManaged public var debtLT: [Double]?
     @NSManaged public var eps: [Double]?
     @NSManaged public var equityRepurchased: [Double]?

@@ -358,6 +358,7 @@
 		EA805DC425D54D4E00720E68 /* StockSearchTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockSearchTVC.swift; sourceTree = "<group>"; };
 		EA9D7398264432C300672762 /* TrendIconView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TrendIconView2.swift; path = "Bulls'N'Bears/TrendIconView2.swift"; sourceTree = SOURCE_ROOT; };
 		EAA099C32588020B00DBB93C /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
+		EAA1884827A1A719009AC214 /* TrendMyStocks 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 13.xcdatamodel"; sourceTree = "<group>"; };
 		EAA548B427342D170083808A /* StocksController2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StocksController2.swift; sourceTree = "<group>"; };
 		EAA548B627342FA10083808A /* Downloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Downloader.swift; path = "Bulls'N'Bears/Main Display Files/Downloader.swift"; sourceTree = SOURCE_ROOT; };
 		EAA548B82734302F0083808A /* WebPageScraper2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WebPageScraper2.swift; path = "Bulls'N'Bears/Main Display Files/WebPageScraper2.swift"; sourceTree = SOURCE_ROOT; };
@@ -1340,7 +1341,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7;
+				MARKETING_VERSION = 0.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1361,7 +1362,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7;
+				MARKETING_VERSION = 0.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1498,6 +1499,7 @@
 		EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				EAA1884827A1A719009AC214 /* TrendMyStocks 13.xcdatamodel */,
 				EAAB7BCB2753D71B00295DA7 /* TrendMyStocks 12.xcdatamodel */,
 				EA20161F272034EB004432EC /* TrendMyStocks 11.xcdatamodel */,
 				EADA38F127131A1E00B294E3 /* TrendMyStocks 10.xcdatamodel */,
@@ -1511,7 +1513,7 @@
 				EAD835C225DB02030015C93A /* TrendMyStocks 2.xcdatamodel */,
 				EAC19053257641160030B331 /* TrendMyStocks.xcdatamodel */,
 			);
-			currentVersion = EAAB7BCB2753D71B00295DA7 /* TrendMyStocks 12.xcdatamodel */;
+			currentVersion = EAA1884827A1A719009AC214 /* TrendMyStocks 13.xcdatamodel */;
 			path = TrendMyStocks.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

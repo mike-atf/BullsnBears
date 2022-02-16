@@ -141,6 +141,8 @@ class ResearchController {
                 sectionTitles[name] = "Products or Services" // enum GrowthCategoryNames
             case "nextReportDate":
                 sectionTitles[name] = "Date of next Financial Report"
+            case "targetBuyPrice":
+                sectionTitles[name] = "x - at what price would you buy?"
             default:
                 print("error: default")
             }
@@ -179,6 +181,10 @@ class ResearchController {
             else { return nil }
         case "growthPlan":
             if let valid = share?.research?.growthPlan { return [valid] }
+            else { return nil }
+        case "targetBuyPrice":
+            if let price = share?.research?.intendedBuyPrice() {
+                return [currencyFormatterNoGapWithPence.string(from: price as NSNumber) ?? ""] }
             else { return nil }
         case "futureGrowthMean":
             if let valid = share?.research?.futureGrowthMean {
@@ -337,6 +343,9 @@ extension ResearchController: ResearchCellDelegate {
             share?.growthSubType = notes
         case "businessDescription":
             share?.research?.businessDescription = notes
+        case "targetBuyPrice":
+            let number = notes.filter("-0123456789.".contains)
+            share?.research?.targetBuyPrice = Double(number) ?? 0.0
         default:
             print("error: default")
         }

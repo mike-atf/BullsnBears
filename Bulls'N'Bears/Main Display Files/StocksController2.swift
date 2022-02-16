@@ -325,7 +325,7 @@ class StocksController2: NSFetchedResultsController<Share> {
             else { return true }
         })
         
-        //TODO: - create two methods to reduce non-required sahre data downloads : livePriceupdate() and qEarningsUpdate
+        //TODO: - create two methods to reduce non-required share data downloads : livePriceupdate() and qEarningsUpdate
         // two groups of filtered shares: 1. as here if last live price date < 300sec
         // the other to be passed to qEarningsUpdate filtered by last qEarnigsDate > 3 months
         
@@ -344,8 +344,6 @@ class StocksController2: NSFetchedResultsController<Share> {
             
             updateUserAndValueScores(share: share)
         
-//            print("updating \(share.symbol!)")
-            
             let symbol = share.symbol ?? ""
             let shortName = share.name_short ?? ""
             let existingPricePoints = share.getDailyPrices()
@@ -359,13 +357,8 @@ class StocksController2: NSFetchedResultsController<Share> {
                                         
                 let updatedPricePoints = try await getDailyPricesForUpdate(shareSymbol: symbol, existingDailyPrices: existingPricePoints)
                 
-//                print("downloaded update data for \(symbol)")
-
-                                        
                 await backgroundMoc?.perform({
                     
-//                    print("trying to saveupdate for \(symbol)")
-
                     do {
                         guard let backgroundShare = self.backgroundMoc?.object(with: shareID) as? Share else {
                             throw DownloadAndAnalysisError.noBackgroundShareWithSymbol
@@ -388,9 +381,7 @@ class StocksController2: NSFetchedResultsController<Share> {
                         try backgroundShare.managedObjectContext?.save()
                         
                         DispatchQueue.main.async {
-//                            print("saved update for \(symbol)")
-
-                            self.updateCompleteToDelegate(id: shareID)
+                           self.updateCompleteToDelegate(id: shareID)
                         }
                     } catch let error {
                         ErrorController.addErrorLog(errorLocation: "StocksController2.updateStocksData", systemError: error, errorInfo: "error fetching from and/or saving backgroundMOC")
@@ -509,10 +500,11 @@ class StocksController2: NSFetchedResultsController<Share> {
     /// or nil if there were no new price points
     func getDailyPricesForUpdate(shareSymbol: String, existingDailyPrices: [PricePoint]?) async throws -> [PricePoint]? {
 
-        let weekDay = Calendar.current.component(.weekday, from: Date())
-        guard (weekDay > 1 && weekDay < 7) else {
-            return nil
-        }
+//        let weekDay = Calendar.current.component(.weekday, from: Date())
+//        guard (weekDay > 1 && weekDay < 7) else {
+//            return nil
+//        }
+        
         
         if let lastPriceDate = existingDailyPrices?.last?.tradingDate {
             guard (Date().timeIntervalSince(lastPriceDate) > 12 * 3600) else {
@@ -520,7 +512,10 @@ class StocksController2: NSFetchedResultsController<Share> {
             }
         }
         
+
         let minDate = existingDailyPrices?.last?.tradingDate
+
+//        print("downloading daily prices for \(shareSymbol) last price date \(minDate!)")
 
         if let downloadedDailyPrices = try await WebPageScraper2.downloadAndAnalyseDailyTradingPrices(shareSymbol: shareSymbol, minDate: minDate) {
             
@@ -530,12 +525,16 @@ class StocksController2: NSFetchedResultsController<Share> {
 
             var pricePointsSet = Set<PricePoint>(existingPricePoints)
             pricePointsSet = pricePointsSet.union(downloadedDailyPrices)
-
-            return Array(pricePointsSet).sorted { e0, e1 in
+            
+            let sorted = Array(pricePointsSet).sorted { e0, e1 in
                 if e0.tradingDate < e1.tradingDate { return true }
                 else { return false }
             }
 
+//            print(sorted)
+            
+            
+            return sorted
         }
         
         return nil
@@ -596,18 +595,22 @@ class StocksController2: NSFetchedResultsController<Share> {
                 }
             }
         }
-
     }
     
     @objc
     func backgroundContextDidSave(notification: Notification) {
         
-//        print("moc did save notification received")
         if let _ = notification.object as? NSManagedObjectContext {
             
             DispatchQueue.main.async {
                 (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.perform {
                     (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.mergeChanges(fromContextDidSave: notification)
+                    
+//                    do {
+//                        try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+//                    } catch {
+//                        ErrorController.addErrorLog(errorLocation: "StocksController 2.backgroundContextDidSave", systemError: error, errorInfo: "Can't save main MOC after merging changes from background MOC")
+//                    }
                     
                 }
             }

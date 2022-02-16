@@ -242,7 +242,7 @@ class ComparisonCell: UITableViewCell {
             
             newChart.backgroundColor = UIColor.systemBackground
             let biggerIsBetter = (cellPath.section == 6) ? false : true
-            newChart.configure(array: array, biggerIsBetter: biggerIsBetter ,trendLabel: label, longTitle: false ,valuesAreGrowth: true, showXLabels: false, showYLabels: true)
+            newChart.configure(array: array, biggerIsBetter: biggerIsBetter ,trendLabel: label, longTitle: false ,valuesAreGrowth: true, showXLabels: false, showYLabels: true, latestDataDate: nil, altLatestDate: nil)
             charts?.append(newChart)
             count += 1
         }

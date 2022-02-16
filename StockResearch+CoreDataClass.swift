@@ -14,9 +14,12 @@ public class StockResearch: NSManagedObject {
 
     public override func awakeFromInsert() {
         self.creationDate = Date()
-        
     }
     
+    
+    public func intendedBuyPrice() -> Double? {
+        return (targetBuyPrice != 0.0) ? targetBuyPrice : nil
+    }
     
     func save() {
                

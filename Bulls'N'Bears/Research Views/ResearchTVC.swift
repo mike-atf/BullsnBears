@@ -125,6 +125,9 @@ class ResearchTVC: UITableViewController {
         else if indexPath.section == 16 { // buy story
             return 150
         }
+        else if indexPath.section == 17 { // buy story
+            return 70
+        }
         else {
             return 100
         }

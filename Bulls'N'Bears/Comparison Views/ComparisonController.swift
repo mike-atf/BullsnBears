@@ -545,6 +545,26 @@ class ComparisonController {
         return categoryColor
     }
 
+    func lastestDataDate(forPath: IndexPath) -> Date? {
+        
+        guard forPath.section > 2 else {
+            return nil
+        }
+
+        return shares?[forPath.section].wbValuation?.latestDataDate
+        
+    }
+    
+    func valuationDate(forPath: IndexPath) -> Date? {
+        
+        guard forPath.section > 2 else {
+            return nil
+        }
+
+        return shares?[forPath.section].wbValuation?.date
+        
+    }
+
     
     func fundamentals(forPath: IndexPath) -> ([Correlation?]?, [[Double]?]?) {
         

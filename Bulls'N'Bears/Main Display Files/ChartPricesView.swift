@@ -93,7 +93,6 @@ class ChartPricesView: UIView {
                 label.numberOfLines = 0
                 label.text = " " + currencyFormatterNoGapWithPence.string(from: NSNumber(value: validPrice))! + " "
                 if let date = priceDate { label.text! += "\n " + timeFormatter.localizedString(for: date, relativeTo: Date()) + " " }
-//                if let date = priceDate { label.text! += "\n " + dateTimeFormatter.string(from: date) + " " }
                 label.sizeToFit()
                 label.backgroundColor = UIColor.label
                 label.isHidden = true
