@@ -139,6 +139,39 @@ class WebPageScraper2: NSObject {
 
     }
     
+    /// returns quarterly eps  with dates from macro trends website
+    /// in form of [DatedValues] = (date, eps )
+    /// ; optional parameter 'date' returns values back to this date and the first set before.
+    /// ; throws downlad and analysis errors, which need to be caught by cailler
+    class func getqEPSData(url: URL, companyName: String, until date: Date?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws -> [DatedValue]? {
+        
+            var htmlText:String?
+            var datedValues = [DatedValue]()
+            let downloader = Downloader(task: .qEPS)
+        
+            do {
+                // to catch any redirections
+                NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
+                
+                htmlText = try await downloader.downloadDataWithRedirection(url: url)
+            } catch let error as DownloadAndAnalysisError {
+                throw error
+            }
+        
+            guard let validPageText = htmlText else {
+                throw DownloadAndAnalysisError.generalDownloadError // possible result of MT redirection
+            }
+                
+            do {
+                datedValues = try extractQEPSTableData(html: validPageText, title: "Quarterly EPS", untilDate: date)
+                return datedValues
+            } catch let error as DownloadAndAnalysisError {
+               throw error
+            }
+
+    }
+
+    
     /// returns historical pe ratios and eps TTM with dates from macro trends website
     /// in form of [DatedValues] = (date, epsTTM, peRatio )
     /// ; optional parameter 'date' returns values back to this date and the first set before.
@@ -558,81 +591,17 @@ class WebPageScraper2: NSObject {
         
     }
     
-    class func downloadAndAanalyseTreasuryYields(url: URL) async throws -> [PriceDate]? {
+    
+    /// calls Downloader function with completion handler to return csv file
+    /// returns extracted [DateValue] array through Notification with name ""TBOND csv file downloaded""
+    class func downloadAndAanalyseTreasuryYields(url: URL) async {
         
-        var htmlText = String()
-
-        do {
-            htmlText = try await Downloader.downloadData(url: url)
-        } catch let error as DownloadAndAnalysisError {
-            throw error
-        }
-        
-        var priceDates = [PriceDate]()
-        
-        let tableEnd = "</td></tr></table>\r\n<div class=\"updated\""
-        let columnStart = "</td><td class=\"text_view_data\">"
-        let rowStart = "<td scope=\"row\" class=\"text_view_data\">"
-        let dateFormatter: DateFormatter = {
-            let formatter = DateFormatter()
-            formatter.locale = NSLocale.current
-            formatter.timeZone = NSTimeZone.local
-            formatter.dateFormat = "MM/dd/yy"
-            return formatter
-        }()
-
-        guard let tableStartIndex = htmlText.range(of: rowStart) else {
-            throw DownloadAndAnalysisError.htmlTableRowStartIndexNotFound
-        }
-        
-        htmlText = String(htmlText.suffix(from: tableStartIndex.lowerBound))
-        
-        guard let tableEndIndex = htmlText.range(of: tableEnd) else {
-            throw DownloadAndAnalysisError.htmlTableEndNotFound
-        }
-        
-        htmlText = String(htmlText.prefix(through: tableEndIndex.upperBound))
-        
-        var rows = [String]()
-        var rowStartIndex = htmlText.range(of: rowStart, options: .backwards)
-        guard rowStartIndex != nil else {
-            throw DownloadAndAnalysisError.htmlTableRowStartIndexNotFound
-        }
-        
-        repeat {
-            let row$ = String(htmlText[rowStartIndex!.upperBound...])
-            rows.append(row$)
-            htmlText.removeSubrange(rowStartIndex!.lowerBound...)
-            rowStartIndex = htmlText.range(of: rowStart, options: .backwards)
-        } while rowStartIndex != nil
-        
-        for i in 0..<rows.count {
-            var row = rows[i]
-
-            for _ in 0..<2 {
-                if let columStartIndex = row.range(of: columnStart, options: .backwards) {
-                    row.removeSubrange(columStartIndex.lowerBound...)
-                }
-            }
-            
-            var value: Double?
-            var date: Date?
-            if let columStartIndex = row.range(of: columnStart, options: .backwards) {
-                let value$ = row[columStartIndex.upperBound...]
-                value = Double(value$.filter("-0123456789.".contains))
-            }
-            if let endOfDateIndex = row.range(of: "</td><td ") {
-                let date$ = String(String(row[...endOfDateIndex.lowerBound]).dropLast())
-                date = dateFormatter.date(from: date$)
-            }
-            
-            if value != nil && date != nil {
-                priceDates.append((date:date!, price: value!))
-            }
-        }
-        
-        return priceDates
-        
+       let treasuryCSVHeaderTitles = ["Date","\"1 Mo\"", "\"2 Mo\"","\"3 Mo\"","\"6 Mo\"","\"1 Yr\"","\"2 Yr\"","\"3 Yr\"","\"5 Yr\"","\"7 Yr\"","\"10 Yr\"","\"20 Yr\"","\"30 Yr\""]
+        var datedValues: [DatedValue]?
+        await Downloader.downloadAndReturnCSVFile(url: url, symbol: "TBonds", expectedHeaderTitles: treasuryCSVHeaderTitles, completion: { fileURL in
+            datedValues = CSVImporter.extractTBondRatesFromCSVFile(url: fileURL, expectedHeaderTitles: treasuryCSVHeaderTitles)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "TBOND csv file downloaded"), object: datedValues, userInfo: nil)
+        })
     }
 
     class func downloadAnalyseSaveWBValuationData(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
@@ -781,7 +750,7 @@ class WebPageScraper2: NSObject {
                             let perDates: [DatedValue] = validEPSPER.compactMap{ DatedValue(date: $0.date, value: $0.peRatio) }
                             wbv.savePERWithDateArray(datesValuesArray: perDates, saveInContext: false)
                             let epsDates: [DatedValue] = validEPSPER.compactMap{ DatedValue(date: $0.date, value: $0.epsTTM) }
-                            wbv.saveEPSWithDateArray(datesValuesArray: epsDates, saveToMOC: false)
+                            wbv.saveEPSTTMWithDateArray(datesValuesArray: epsDates, saveToMOC: false)
                         }
                         
                         wbv.avAnStockPrice = hxPriceValues?.reversed()
@@ -1198,6 +1167,85 @@ class WebPageScraper2: NSObject {
 
         return datedValues
     }
+    
+    /// for MT pages such as 'PE-Ratio' with dated rows and table header, to assist 'extractTable' and 'extractTableData' func
+    class func extractQEPSTableData(html: String, title: String, untilDate: Date?=nil) throws -> [DatedValue] {
+        
+        let bodyStartSequence = "<tbody>"
+        let bodyEndSequence = "</tbody>"
+        let rowEndSequence = "</td>"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "y-M-d"
+        
+        var datedValues = [DatedValue]()
+        
+        guard let tableStartIndex = html.range(of: title) else {
+            throw DownloadAndAnalysisError.htmlTableTitleNotFound
+        }
+        
+        var tableText = String(html[tableStartIndex.upperBound..<html.endIndex])
+
+        guard let bodyStartIndex = tableText.range(of: bodyStartSequence) else {
+            throw DownloadAndAnalysisError.htmlTableBodyStartIndexNotFound
+        }
+        
+        guard let bodyEndIndex = tableText.range(of: bodyEndSequence,options: [NSString.CompareOptions.literal], range: bodyStartIndex.upperBound..<tableText.endIndex, locale: nil) else {
+            throw DownloadAndAnalysisError.htmlTableBodyEndIndexNotFound
+        }
+        
+        
+        tableText = String(tableText[bodyStartIndex.upperBound..<bodyEndIndex.lowerBound])
+        var rowStartIndex = tableText.range(of: "<td ", options: [NSString.CompareOptions.literal])
+
+        var columnCount = 0
+        let columnsExpected = 2
+        
+        var date: Date?
+        var epsValue: Double?
+//        var peValue: Double?
+
+        outer: repeat {
+            
+            if let rsi = rowStartIndex {
+                if let rowEndIndex = tableText.range(of: rowEndSequence,options: [NSString.CompareOptions.literal], range: rsi.lowerBound..<tableText.endIndex) {
+                    
+                    let rowText = String(tableText[rsi.upperBound..<rowEndIndex.lowerBound])
+                    
+                    if let valueStartIndex = rowText.range(of: "\">", options: .backwards) {
+                        
+                        let value$ = String(rowText[valueStartIndex.upperBound..<rowText.endIndex])
+
+                        if columnCount%columnsExpected == 0 {
+                            date = dateFormatter.date(from: String(value$))
+                        }
+                        else if (columnCount+1)%columnsExpected == 0 { // EPS value
+                            epsValue = Double(value$.filter("-0123456789.".contains))
+                            if let validDate = date, let validValue = epsValue {
+                                let newDV = DatedValue(date: validDate, value: validValue)
+                                datedValues.append(newDV)
+                                if let minDate = untilDate {
+                                    if minDate > validDate { return datedValues }
+                                }
+                            }
+                        }
+                    }
+                    
+                    tableText = String(tableText[rowEndIndex.lowerBound..<tableText.endIndex])
+                    
+                    rowStartIndex = tableText.range(of: "<td ", options: [NSString.CompareOptions.literal])
+
+                }
+                else { break } // no rowEndIndex
+            }
+            else { break } // no rowStartIndex
+            columnCount += 1
+
+            
+        } while rowStartIndex != nil
+
+        return datedValues
+    }
+
     
     /// macrotrend data are time-DESCENDING from left to right,
     /// so the value arrays - scraped right-to-left  from eadh row - are returned in time_ASCENDING order

@@ -145,7 +145,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             Task.init(priority: .background) {
                     // the next functions returns by sending notification 'FileDownloadComplete' with fileURL in object sent
                     // this should be picked up by StocksListTVC
-                    await Downloader.downloadFile(url: sourceURL, symbol: symbol, companyName: companyName!)
+                await Downloader.downloadCSVFile(url: sourceURL, symbol: symbol, companyName: companyName!, expectedHeaderTitles: ["Date","Open","High","Low","Close","Adj Close","Volume"])
             }
         }
     }

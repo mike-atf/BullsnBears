@@ -1331,6 +1331,8 @@ extension CombinedValuationController: DownloadRedirectionDelegate {
                                         case .r1Valuation:
                                             print("CombinedValuationController: redirect for \(symbol) r1Valuation task recevied")
                                             self.startDataDownload()
+                                        case .qEPS:
+                                            print("WBValuationController: redirect for \(symbol) qEPS task received")
                                         }
                                     }
                                 }

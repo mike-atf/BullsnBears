@@ -16,7 +16,7 @@ protocol StocksController2Delegate {
 
 class StocksController2: NSFetchedResultsController<Share> {
     
-    var treasuryBondYields: [PriceDate]?
+    var treasuryBondYields: [DatedValue]?
     var viewController: StocksListTVC?
     var backgroundMoc: NSManagedObjectContext?
     
@@ -301,10 +301,8 @@ class StocksController2: NSFetchedResultsController<Share> {
         
         if singleShare == nil {
             Task.init(priority: .background) {
-                treasuryBondYields = try await updateTreasuryBondYields()
-                DispatchQueue.main.async {
-                    self.controllerDelegate?.treasuryBondRatesDownloaded()
-                }
+                NotificationCenter.default.addObserver(self, selector: #selector(tBondDownloadAndAnalysisComplete(notification:)), name: Notification.Name(rawValue: "TBOND csv file downloaded"), object: nil)
+                try await updateTreasuryBondYields()
             }
         }
         
@@ -353,7 +351,8 @@ class StocksController2: NSFetchedResultsController<Share> {
             Task.init(priority: .background, operation: {
                 
                 let labelledPrice = try await getCurrentPriceForUpdate(shareSymbol: symbol)
-                let labelled_datedqEarnings = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
+                let labelled_datedqEarningsTTM = try await getQuarterlyEarningsTTMForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
+                let labelled_datedQEPS = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
                                         
                 let updatedPricePoints = try await getDailyPricesForUpdate(shareSymbol: symbol, existingDailyPrices: existingPricePoints)
                 
@@ -369,9 +368,14 @@ class StocksController2: NSFetchedResultsController<Share> {
                             backgroundShare.lastLivePriceDate = Date()
                         }
                                                 
-                        if let valid = labelled_datedqEarnings?.datedValues {
-                            backgroundShare.wbValuation?.saveEPSWithDateArray(datesValuesArray: valid, saveToMOC: false)
+                        if let valid = labelled_datedqEarningsTTM?.datedValues {
+                            backgroundShare.wbValuation?.saveEPSTTMWithDateArray(datesValuesArray: valid, saveToMOC: false)
                         }
+                        
+                        if let valid = labelled_datedQEPS?.datedValues {
+                            backgroundShare.wbValuation?.saveQEPSWithDateArray(datesValuesArray: valid, saveToMOC: false)
+                        }
+
                         
                         if let valid = updatedPricePoints {
                             backgroundShare.setDailyPrices(pricePoints: valid, saveInMOC: false)
@@ -452,7 +456,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         }
     }
     
-    func getQuarterlyEarningsForUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil) async throws -> Labelled_DatedValues? {
+    func getQuarterlyEarningsTTMForUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil) async throws -> Labelled_DatedValues? {
                 
         var sn = shortName
         if sn.contains(" ") {
@@ -496,6 +500,34 @@ class StocksController2: NSFetchedResultsController<Share> {
 
     }
     
+    func getQuarterlyEarningsForUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil) async throws -> Labelled_DatedValues? {
+                
+        var sn = shortName
+        if sn.contains(" ") {
+            sn = sn.replacingOccurrences(of: " ", with: "-").lowercased()
+        }
+        
+        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(shareSymbol)/\(sn)/eps-earnings-per-share-diluted") else {
+            throw DownloadAndAnalysisError.urlInvalid
+        }
+        
+        guard let url = components.url else {
+            throw DownloadAndAnalysisError.urlError
+        }
+        
+        var values: [DatedValue]?
+        
+        do {
+            values = try await WebPageScraper2.getqEPSData(url: url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
+        }  catch let error as DownloadAndAnalysisError {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
+        }
+        
+
+        return Labelled_DatedValues(label: shareSymbol, datedValues: values ?? [])
+
+    }
+
     /// returns [PricePoints] sorted by date  with new daily trading prices added
     /// or nil if there were no new price points
     func getDailyPricesForUpdate(shareSymbol: String, existingDailyPrices: [PricePoint]?) async throws -> [PricePoint]? {
@@ -540,11 +572,13 @@ class StocksController2: NSFetchedResultsController<Share> {
         return nil
     }
 
-    func updateTreasuryBondYields() async throws -> [PriceDate]? {
+    /// requests CSV file download from WebScraper 2, involving Downloaeder with completion handler
+    /// returns Notification with object [DatedValue], with name "TBOND csv file downloaded"
+    func updateTreasuryBondYields() async throws {
         
         if let lastDate = treasuryBondYields?.compactMap({ $0.date }).sorted().last {
             if Date().timeIntervalSince(lastDate) < 14*3600 {
-                return nil
+                return
             }
         }
         
@@ -557,20 +591,34 @@ class StocksController2: NSFetchedResultsController<Share> {
         }()
         let year$ = dateFormatter.string(from: Date())
         
-        var urlComponents = URLComponents(string: "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx")
-        urlComponents?.queryItems = [URLQueryItem(name: "data", value: "yieldYear"),URLQueryItem(name: "year", value: year$)]
+        // to download .html file: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value=2022"
         
-        guard let url = urlComponents?.url else {
+//        var urlComponents = URLComponents(string: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2022/all?type=daily_treasury_yield_curve&field_tdr_date_value=2022&page&_format=csv" )
+//        urlComponents?.queryItems = [URLQueryItem(name: "data", value: "yieldYear"),URLQueryItem(name: "year", value: year$)]
+//        // until 4.2.22: "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx"
+//
+//        guard let url = urlComponents?.url else {
+//            throw DownloadAndAnalysisError.urlError
+//        }
+        
+        guard let url = URL(string: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/"+year$+"/all?type=daily_treasury_yield_curve&field_tdr_date_value="+year$+"&page&_format=csv") else {
             throw DownloadAndAnalysisError.urlError
         }
         
-        do {
-            return try await WebPageScraper2.downloadAndAanalyseTreasuryYields(url: url)
-        } catch let error {
-            throw error
-        }
+        await WebPageScraper2.downloadAndAanalyseTreasuryYields(url: url)
         
+    }
+    
+    @objc
+    func tBondDownloadAndAnalysisComplete(notification: Notification) {
+        if let datedValues = notification.object as? [DatedValue] {
+            self.treasuryBondYields = datedValues
+            
+            DispatchQueue.main.async {
+                self.controllerDelegate?.treasuryBondRatesDownloaded()
+            }
 
+        }
     }
         
     
@@ -662,6 +710,8 @@ extension StocksController2: DownloadRedirectionDelegate {
                                             print("StocksController2: redirect for \(symbol) wbValuation task recevied")
                                         case .r1Valuation:
                                             print("StocksController2: redirect for \(symbol) r1V task recevied")
+                                        case .qEPS:
+                                            print("WBValuationController: redirect for \(symbol) qEPS task received")
                                         }
                                     }
                                 }

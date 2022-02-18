@@ -82,11 +82,11 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
         urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
                 
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-            downLoadWebFile(sourceURL, stockName: name)
+            downLoadCSVFile(sourceURL, stockName: name, expectedHeaderTitles: ["Date","Open","High","Low","Close","Adj Close","Volume"])
         }
     }
         
-    func downLoadWebFile(_ url: URL, stockName: String) {
+    func downLoadCSVFile(_ url: URL, stockName: String, expectedHeaderTitles: [String]) {
         
         let configuration = URLSessionConfiguration.default
         configuration.httpCookieAcceptPolicy = .always
@@ -133,7 +133,7 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
                     try FileManager.default.moveItem(at: fileURL, to: tempURL)
                 
 
-                    guard CSVImporter.matchesExpectedFormat(url: tempURL) else {
+                guard CSVImporter.matchesExpectedFormat(url: tempURL, expectedHeaderTitles: expectedHeaderTitles) else {
                         removeFile(tempURL)
                         return
                     }

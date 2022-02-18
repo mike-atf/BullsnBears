@@ -766,6 +766,8 @@ extension WBValuationController: DownloadRedirectionDelegate {
                                             self.downloadWBValuationData()
                                         case .r1Valuation:
                                             print("WBValuationController: redirect for \(symbol) r1V task recevied")
+                                        case .qEPS:
+                                            print("WBValuationController: redirect for \(symbol) qEPS task received")
                                         }
                                     }
                                 }

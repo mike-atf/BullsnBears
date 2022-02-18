@@ -10,6 +10,7 @@ import Foundation
 enum DownloadTask {
     case test
     case epsPER
+    case qEPS
     case wbValuation
     case r1Valuation
 }
@@ -147,7 +148,7 @@ class Downloader: NSObject {
     
     /// returns Notification with message  "FileDownloadComplete" with fileURL as object
     /// or - if file not in .csv format - sends a notification 'FileDownloadedNotCSV' with  'symbol' as object and companyName as userInfo
-    class func downloadFile(url: URL, symbol: String, companyName: String) async {
+    class func downloadCSVFile(url: URL, symbol: String, companyName: String, expectedHeaderTitles: [String]) async {
                 
         let downloadTask = URLSession.shared.downloadTask(with: url) {  [self]
             urlOrNil, response, errorOrNil in
@@ -189,7 +190,7 @@ class Downloader: NSObject {
                 try FileManager.default.moveItem(at: fileURL, to: tempURL)
             
 
-                if !CSVImporter.matchesExpectedFormat(url: tempURL) {
+                if !CSVImporter.matchesExpectedFormat(url: tempURL, expectedHeaderTitles: expectedHeaderTitles) {
                     // this may be due to 'invalid cookie' error
                     // if so download webpage content with table
                     removeFile(tempURL)
@@ -221,7 +222,7 @@ class Downloader: NSObject {
     
     /// returns the downloaded file in Notification with message  "FileDownloadComplete" with fileURL as object
     /// or returns with throwing an error
-    class func downloadAndReturnFile(url: URL, symbol: String, completion: @escaping (URL?) -> Void) async -> Void {
+    class func downloadAndReturnCSVFile(url: URL, symbol: String, expectedHeaderTitles: [String], completion: @escaping (URL?) -> Void) async -> Void {
         
         let downloadTask = URLSession.shared.downloadTask(with: url) {  [self]
             urlOrNil, response, errorOrNil in
@@ -259,7 +260,7 @@ class Downloader: NSObject {
                 try FileManager.default.moveItem(at: fileURL, to: tempURL)
             
 
-                if !CSVImporter.matchesExpectedFormat(url: tempURL) {
+                if !CSVImporter.matchesExpectedFormat(url: tempURL, expectedHeaderTitles: expectedHeaderTitles) {
                     // this may be due to 'invalid cookie' error
                     // if so download webpage content with table
                     removeFile(tempURL)

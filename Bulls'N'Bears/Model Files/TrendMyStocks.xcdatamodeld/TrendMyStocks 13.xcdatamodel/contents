@@ -121,6 +121,7 @@
         <attribute name="debtLT" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="eps" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="epsDates" optional="YES" attributeType="Binary"/>
+        <attribute name="epsDatesq" optional="YES" attributeType="Binary"/>
         <attribute name="equityRepurchased" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="grossProfit" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="interestExpense" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
@@ -147,6 +148,6 @@
         <element name="ShareTransaction" positionX="-234" positionY="-99" width="128" height="134"/>
         <element name="StockResearch" positionX="-380.44580078125" positionY="-85.78861999511719" width="128" height="299"/>
         <element name="UserEvaluation" positionX="187.350341796875" positionY="352.4636840820313" width="128" height="148"/>
-        <element name="WBValuation" positionX="-37.604248046875" positionY="-7.48974609375" width="128" height="404"/>
+        <element name="WBValuation" positionX="-37.604248046875" positionY="-7.48974609375" width="128" height="419"/>
     </elements>
 </model>

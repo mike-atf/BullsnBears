@@ -317,10 +317,10 @@ class ChartView: UIView {
             }
         }
         
-        //MARK: - eps line
+        //MARK: - epsTTM line
         // uses different vertical scale!
         
-        if let historicEPSWithDates = share?.wbValuation?.epsWithDates() {
+        if let historicEPSWithDates = share?.wbValuation?.epsqTTMWithDates() {
             let hxEPSInChartRange = historicEPSWithDates.filter { dv in
                 if dv.date > (dateRange?.min()?.addingTimeInterval(-180*24*3600) ?? Date()) {
                     return true
@@ -358,6 +358,50 @@ class ChartView: UIView {
             }
             
         }
+        
+        //MARK: - qEPS line
+        // uses different vertical scale!
+        
+        if let historicEPSWithDates = share?.wbValuation?.epsQWithDates(){
+            let qEPSInChartRange = historicEPSWithDates.filter { dv in
+                if dv.date > (dateRange?.min()?.addingTimeInterval(-180*24*3600) ?? Date()) {
+                    return true
+                }
+                else { return false }
+            }
+            
+            if qEPSInChartRange.count > 1 {
+                let minEPS = (qEPSInChartRange.compactMap{ $0.value }.min()! * 0.9)
+                let maxEPS = (qEPSInChartRange.compactMap{ $0.value }.max()! * 1.1) + 1
+
+                let epsLine = UIBezierPath()
+
+                var point = plotEPSPoint(datedValue: qEPSInChartRange[0], min: minEPS, max: maxEPS)
+                
+                epsLine.move(to: point)
+                for i in 1..<qEPSInChartRange.count {
+                    if qEPSInChartRange[i].value > 0 {
+                        point = plotEPSPoint(datedValue: qEPSInChartRange[i], min: minEPS, max: maxEPS)
+                        epsLine.addLine(to: point)
+                    }
+                }
+                
+                epsLine.lineWidth = 1.5
+                UIColor.systemGreen.setStroke()
+                epsLine.setLineDash([3,7], count: 2, phase: 0)
+                epsLine.stroke()
+                
+//                let lastpoint = plotEPSPoint(datedValue: hxEPSInChartRange.last!, min: minEPS, max: maxEPS)
+                epsLabel.sizeToFit()
+                
+                let startX = targetBuyPriceLabel?.frame.maxX ?? 10
+                
+                epsLabel.frame = CGRect(x: startX, y: 0, width: epsLabel.frame.width, height: epsLabel.frame.height)
+//                epsLabel.frame = CGRect(x: lastpoint.x, y: lastpoint.y - epsLabel.frame.height / 2, width: epsLabel.frame.width, height: epsLabel.frame.height)
+            }
+            
+        }
+
 
                 
         trendLabels.forEach { (label) in

@@ -55,8 +55,8 @@ public class WBValuation: NSManagedObject {
         return nil
     }
     
-    /// returns sorted date-value pairs ascending by date
-    func epsWithDates() -> [DatedValue]? {
+    /// qEPS_TTM, returns sorted date-value pairs ascending by date
+    func epsqTTMWithDates() -> [DatedValue]? {
         
         if let valid = epsDates {
             do {
@@ -80,6 +80,30 @@ public class WBValuation: NSManagedObject {
         return nil
     }
 
+    /// qEPS, returns sorted date-value pairs ascending by date
+    func epsQWithDates() -> [DatedValue]? {
+        
+        if let valid = epsDatesq {
+            do {
+                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
+                    var datedValues = [DatedValue]()
+                    for element in dictionary {
+                        if element.value != 0 {
+                            datedValues.append(DatedValue(date: element.key, value: element.value))
+                        }
+                    }
+                    return datedValues.sorted { dv0, dv1 in
+                        if dv1.date < dv0.date { return false }
+                        else { return true}
+                    }
+                }
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+            }
+        }
+        
+        return nil
+    }
     
     
     /// returns past PE ratios in date descending order
@@ -128,7 +152,7 @@ public class WBValuation: NSManagedObject {
         
     }
     
-    func saveEPSWithDateArray(datesValuesArray: [DatedValue]?, saveToMOC: Bool?=true) {
+    func saveEPSTTMWithDateArray(datesValuesArray: [DatedValue]?, saveToMOC: Bool?=true) {
         
         guard let datedValues = datesValuesArray else { return }
         
@@ -141,6 +165,28 @@ public class WBValuation: NSManagedObject {
         do {
             let data = try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
             epsDates = data
+            if saveToMOC ?? true {
+                try self.managedObjectContext?.save()
+            }
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
+        }
+        
+    }
+    
+    func saveQEPSWithDateArray(datesValuesArray: [DatedValue]?, saveToMOC: Bool?=true) {
+        
+        guard let datedValues = datesValuesArray else { return }
+        
+        var array = [Date: Double]()
+
+        for element in datedValues {
+            array[element.date] = element.value
+        }
+
+        do {
+            let data = try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
+            epsDatesq = data
             if saveToMOC ?? true {
                 try self.managedObjectContext?.save()
             }
@@ -168,7 +214,7 @@ public class WBValuation: NSManagedObject {
     
     func historicEPSratio(for date: Date) -> Double? {
         
-        guard let datedValues = epsWithDates() else {
+        guard let datedValues = epsqTTMWithDates() else {
             return nil
         }
         

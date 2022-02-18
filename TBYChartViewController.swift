@@ -12,12 +12,12 @@ class TBYChartViewController: UIViewController {
     @IBOutlet var chartView: ValueChart!
     @IBOutlet var datesLabel: UILabel!
     
-    var tbrPriceDates: [PriceDate]? // time-DESCENDING
+    var tbrPriceDates: [DatedValue]? // time-DESCENDING
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let rates = tbrPriceDates?.compactMap{ $0.price }
+        let rates = tbrPriceDates?.compactMap{ $0.value }
         if let lastDate = tbrPriceDates?.first?.date {
             if let firstDate = tbrPriceDates?.last?.date {
                 let fdate$ = dateFormatter.string(from: firstDate)

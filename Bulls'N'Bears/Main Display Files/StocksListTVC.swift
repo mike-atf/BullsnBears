@@ -689,7 +689,7 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
     func treasuryBondRatesDownloaded() {
         
         if let yieldDates = controller.treasuryBondYields {
-            let yields = yieldDates.compactMap{ $0.price }
+            let yields = yieldDates.compactMap{ $0.value }
             if let ema = yields.ema(periods: 10) {
                 treasuryBondYieldsButton.isEnabled = true
                 let latest = yields.first!

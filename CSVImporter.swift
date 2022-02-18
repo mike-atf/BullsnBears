@@ -123,6 +123,69 @@ class CSVImporter: NSObject {
         return stockPrices
     }
     
+    class func extractTBondRatesFromCSVFile(url: URL? = nil, expectedHeaderTitles: [String]) -> [DatedValue]? {
+        
+        guard let validURL = url else {
+            ErrorController.addErrorLog(errorLocation: "CSVImporter.extractTBondRatesFromCSVFile", systemError: nil, errorInfo: "wrong/ missing url when trying to extract CSV")
+            return nil
+        }
+        
+        guard let lastPathComponent = validURL.lastPathComponent.split(separator: ".").first else {
+            return nil
+        }
+        
+        var datedValues = [DatedValue]()
+        var fileContent$: String?
+        var rows = [String]()
+        
+        fileContent$ = openCSVFile(url: validURL, fileName: "nono")
+
+        rows = fileContent$?.components(separatedBy: NSMutableCharacterSet.newlines) ?? []
+        
+        if rows.count < 1 {
+            ErrorController.addErrorLog(errorLocation: "CSVImporter.extractTBondRatesFromCSVFile", systemError: nil, errorInfo: "csvExtraction error - no file content")
+            return nil
+        }
+
+        let expectedOrder = expectedHeaderTitles
+        var headerError = false
+        if let headerArray = rows.first?.components(separatedBy: ",") {
+            var count = 0
+            headerArray.forEach { (header) in
+                if header != expectedOrder[count] {
+                    ErrorController.addErrorLog(errorLocation: "CSVImporter.extractTBondRatesFromCSVFile", systemError: nil, errorInfo: " trying to read .csv file - header not in required format \(expectedOrder).\nInstead is \(headerArray) " )
+                    headerError = true
+                }
+                count += 1
+            }
+        }
+        
+        if headerError { return nil }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM-dd-yyyy"
+        for index in 1..<rows.count { // first line has header titles
+            let array = rows[index].components(separatedBy: ",")
+            let date$ = array[0]
+            guard let date = dateFormatter.date(from: date$) else {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "error converting to 'date' \(array[0])")
+                continue
+            }
+            guard let tenYrate = Double(array[10]) else {
+                ErrorController.addErrorLog(errorLocation: "CSVImporter.extractTBondRatesFromCSVFile", systemError: nil, errorInfo: "error converting to 10 year rate \(array[10])")
+                continue
+            }
+
+            
+            let newObject = DatedValue(date: date, value: tenYrate)
+            datedValues.append(newObject)
+        }
+        
+
+        return datedValues
+    }
+
+    
     class func extractPriceData(url: URL?, symbol: String) -> [PricePoint]? {
         
         guard let validURL = url else {
@@ -205,7 +268,7 @@ class CSVImporter: NSObject {
     }
     
     /// checks that first row if csv files has the expected header elements
-    class func matchesExpectedFormat(url: URL?) -> Bool {
+    class func matchesExpectedFormat(url: URL?, expectedHeaderTitles:[String]) -> Bool {
         
         guard let validURL = url else {
             return false
@@ -222,7 +285,7 @@ class CSVImporter: NSObject {
             return false
         }
 
-        let expectedOrder = ["Date","Open","High","Low","Close","Adj Close","Volume"]
+        let expectedOrder = expectedHeaderTitles
         var headerError = false
 
         if let headerArray = rows.first?.components(separatedBy: ",") {
