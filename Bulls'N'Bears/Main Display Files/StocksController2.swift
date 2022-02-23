@@ -346,14 +346,14 @@ class StocksController2: NSFetchedResultsController<Share> {
             let shortName = share.name_short ?? ""
             let existingPricePoints = share.getDailyPrices()
             let shareID = share.objectID
-            let minDate = share.priceDateRange()?.first
+            let minDate = share.priceDateRange()?.first?.addingTimeInterval(-365*24*3600)
             
             Task.init(priority: .background, operation: {
                 
                 let labelledPrice = try await getCurrentPriceForUpdate(shareSymbol: symbol)
-                let labelled_datedqEarningsTTM = try await getQuarterlyEarningsTTMForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
+//                let labelled_datedqEarningsTTM = try await getQuarterlyEarningsTTMForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
                 let labelled_datedQEPS = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
-                                        
+                
                 let updatedPricePoints = try await getDailyPricesForUpdate(shareSymbol: symbol, existingDailyPrices: existingPricePoints)
                 
                 await backgroundMoc?.perform({
@@ -368,15 +368,18 @@ class StocksController2: NSFetchedResultsController<Share> {
                             backgroundShare.lastLivePriceDate = Date()
                         }
                                                 
-                        if let valid = labelled_datedqEarningsTTM?.datedValues {
-                            backgroundShare.wbValuation?.saveEPSTTMWithDateArray(datesValuesArray: valid, saveToMOC: false)
-                        }
+//                        if let valid = labelled_datedqEarningsTTM?.datedValues {
+//                            backgroundShare.wbValuation?.saveEPSTTMWithDateArray(datesValuesArray: valid, saveToMOC: false)
+//                        }
                         
                         if let valid = labelled_datedQEPS?.datedValues {
                             backgroundShare.wbValuation?.saveQEPSWithDateArray(datesValuesArray: valid, saveToMOC: false)
                         }
 
-                        
+                        if let valid = backgroundShare.wbValuation?.epsTTMFromQEPSArray(datedValues:labelled_datedQEPS?.datedValues) {
+                            backgroundShare.wbValuation?.saveEPSTTMWithDateArray(datesValuesArray: valid, saveToMOC: false)
+                        }
+
                         if let valid = updatedPricePoints {
                             backgroundShare.setDailyPrices(pricePoints: valid, saveInMOC: false)
                             backgroundShare.reCalculateMACDs(newPricePoints: valid, shortPeriod: 8, longPeriod: 17)
@@ -480,21 +483,21 @@ class StocksController2: NSFetchedResultsController<Share> {
         }
         
         let epsDates = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) })
-        var labelledValues = Labelled_DatedValues(label: shareSymbol, datedValues: epsDates ?? [])
+        let labelledValues = Labelled_DatedValues(label: shareSymbol, datedValues: epsDates ?? [])
         
-        guard let components = URLComponents(string: "https://www.nasdaq.com/market-activity/stocks/\(shareSymbol.lowercased())/earnings") else {
-            return labelledValues
-        }
+//        guard let components = URLComponents(string: "https://www.nasdaq.com/market-activity/stocks/\(shareSymbol.lowercased())/earnings") else {
+//            return labelledValues
+//        }
         
-        if let url = components.url {
-            do {
-                values = try await WebPageScraper2.getHxEPSandPEDataNasdaq(url: url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
-                let nasdaqdValues = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) })
-                labelledValues.datedValues.append(contentsOf: nasdaqdValues ?? [])
-            }  catch let error as DownloadAndAnalysisError {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
-            }
-        }
+//        if let url = components.url {
+//            do {
+//                values = try await WebPageScraper2.getqEPSDataFromMacrotrends(url: url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
+//                let nasdaqdValues = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) })
+//                labelledValues.datedValues.append(contentsOf: nasdaqdValues ?? [])
+//            }  catch let error as DownloadAndAnalysisError {
+//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
+//            }
+//        }
         
         return labelledValues
 
@@ -511,14 +514,27 @@ class StocksController2: NSFetchedResultsController<Share> {
             throw DownloadAndAnalysisError.urlInvalid
         }
         
-        guard let url = components.url else {
+        guard let ycharts_url = URL(string: ("https://ycharts.com/companies/" + shareSymbol.uppercased() + "/eps")) else {
             throw DownloadAndAnalysisError.urlError
         }
+        
+//        guard let macrotrends_url = components.url else {
+//            throw DownloadAndAnalysisError.urlError
+//        }
+        
+//        do {
+//        guard let marketwatch_url = URL(string: ("https://www.marketwatch.com/investing/stock/" + shareSymbol + "/financials/income/quarter")) else {
+//            throw DownloadAndAnalysisError.urlError
+//        }
+//        } catch {
+//            print("StocksController2.getQuarterlyEarningsForUpdate marketwatch url error \(error)")
+//        }
         
         var values: [DatedValue]?
         
         do {
-            values = try await WebPageScraper2.getqEPSData(url: url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
+//            values = try await WebPageScraper2.getqEPSDataFromMacrotrends(url: macrotrends_url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
+            values = try await WebPageScraper2.getqEPSDataFromYCharts(url: ycharts_url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
         }  catch let error as DownloadAndAnalysisError {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
         }

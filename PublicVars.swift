@@ -47,6 +47,12 @@ enum InternalErrors: Error {
     case mocReadError
 }
 
+enum WebPageExtractionCodeOptions {
+    case macroTrends
+    case yahoo
+    case yCharts
+}
+
 typealias ShareID_Symbol_sName = (id: NSManagedObjectID, symbol: String?, shortName: String?)
 typealias ShareID_Value = (id: NSManagedObjectID, value: Double?)
 typealias Dated_EPS_PER_Values = (date: Date, epsTTM: Double, peRatio: Double)
@@ -71,7 +77,66 @@ let gradientBar = UIImage(named: "GradientBar")
 let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
 var valuationWeightsSingleton = Financial_Valuation_Factors()
-let nonRefreshTimeInterval: TimeInterval  = 1
+let nonRefreshTimeInterval: TimeInterval  = 300
+
+
+struct WebpageExtractionCodes {
+    var tableTitle:String?
+    var tableStartSequence = "<table>"
+    var tableEndSequence = "</table>"
+    var bodyStartSequence = "<tbody>"
+    var bodyEndSequence = "</tbody>"
+    var rowStartSequence = "<tr>"
+    var rowEndSequence = "</tr>"
+    var dataCellStartSequence = "<td>"
+    var dataCellEndSequence = "</td>"
+    var dateFormatter: DateFormatter!
+    var option: WebPageExtractionCodeOptions!
+    
+    init(tableTitle: String?, option: WebPageExtractionCodeOptions?=nil,tableStartSequence: String?=nil, tableEndSequence: String?=nil, bodyStartSequence: String?=nil, bodyEndSequence: String?=nil ,rowStartSequence: String?=nil, rowEndSequence: String?=nil, dataCellStartSequence: String?=nil, dataCellEndSequence: String?=nil, dateFormatter: DateFormatter) {
+        
+        self.tableTitle = tableTitle
+        self.dateFormatter = dateFormatter
+        self.option = option
+
+//        if let option = option {
+//            switch option {
+//            case .macroTrends:
+//                self.option = option
+//            case .yahoo:
+//                return
+//            case .yCharts:
+//                return
+//            }
+//        }
+//
+        if let valid = tableStartSequence {
+            self.tableStartSequence = valid
+        }
+        if let valid = tableEndSequence {
+            self.tableEndSequence = valid
+        }
+        if let valid = bodyStartSequence {
+            self.bodyStartSequence = valid
+        }
+        if let valid = bodyEndSequence {
+            self.bodyEndSequence = valid
+        }
+        if let valid = rowStartSequence {
+            self.rowStartSequence = valid
+        }
+        if let valid = rowEndSequence {
+            self.rowEndSequence = valid
+        }
+        if let valid = dataCellStartSequence {
+            self.dataCellStartSequence = valid
+        }
+        if let valid = dataCellEndSequence {
+            self.dataCellEndSequence = valid
+        }
+    }
+    
+}
 
 var yahooRefDate: Date = {
     let calendar = Calendar.current

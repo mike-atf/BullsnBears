@@ -16,7 +16,6 @@ protocol ChartButtonDelegate {
 class ChartContainerView: UIView {
 
     var shareToShow: Share?
-    @IBOutlet var titleLabel: UILabel!
     @IBOutlet var chartsContentView: UIView!
     @IBOutlet var chartsContentViewWidth: NSLayoutConstraint!
     @IBOutlet var scrollView: UIScrollView!
@@ -68,21 +67,13 @@ class ChartContainerView: UIView {
         button5.configureTrendTime(title: "3", color: UIColor.systemGray2, trendTime: .quarter)
         button6.configureTrendTime(title: "1", color: UIColor.systemGray3, trendTime: .month)
         
-// button presets
-        
+        //MARK:- button presets
         button6.active = true
         button6.setNeedsDisplay()
-//
+
         shareToShow = with
-        if let validLabel = titleLabel {
-            validLabel.text = shareToShow?.name_long
-        }
         
         if let view = chartView {
-            chartsContentViewWidth.isActive = false
-            chartsContentViewWidth.constant = scrollView.bounds.width * 1.0
-            chartsContentViewWidth.isActive = true
-            
             view.configure(stock: with)
         }
         
@@ -103,16 +94,10 @@ class ChartContainerView: UIView {
         }
         if let scroll = scrollView {
             
-            chartsContentViewWidth.isActive = false
-            chartsContentViewWidth.constant = scrollView.bounds.width * 1.0
-            chartsContentViewWidth.isActive = true
-
-//            scroll.delegate = self
             scroll.minimumZoomScale = 0.2
             scroll.maximumZoomScale = 2.0
             scroll.zoomScale = 1.0
             scroll.pinchGestureRecognizer?.addTarget(self, action: #selector(customZoom(pinchGesture:)))
-//            scroll.delegate = self
 
             scroll.contentSize = chartView.bounds.size
             let offset = scroll.contentSize.width

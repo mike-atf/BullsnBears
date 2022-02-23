@@ -14,7 +14,10 @@ class ChartView: UIView {
     var trendLabels = [UILabel]()
 //    var valuationLabels = [UILabel]()
     var buySellLabel: UILabel?
-    var epsLabel: UILabel!
+    var epsTTMLabel: UILabel!
+    var epsQLabel: UILabel!
+    var sma10Label: UILabel!
+    var sma50Label: UILabel!
     var targetBuyPriceLabel: UILabel?
 
     var purchaseButtons: [PurchasedButton]?
@@ -82,17 +85,52 @@ class ChartView: UIView {
 
         addPurchaseButtons()
         
-        epsLabel = {
+        epsTTMLabel = {
             let label = UILabel()
             label.numberOfLines = 1
             label.font = UIFont.systemFont(ofSize: 12)
             label.textColor = UIColor.white
             label.backgroundColor = UIColor(named: "Green")!
-            label.text = " qEPS(ttm) "
+            label.text = " aEPS(ttm) "
                         
             return label
         }()
-        addSubview(epsLabel)
+        addSubview(epsTTMLabel)
+        
+        epsQLabel = {
+            let label = UILabel()
+            label.numberOfLines = 1
+            label.font = UIFont.systemFont(ofSize: 12)
+            label.textColor = UIColor.white
+            label.text = "   qEPS  "
+                        
+            return label
+        }()
+        addSubview(epsQLabel)
+        
+        sma10Label = {
+            let label = UILabel()
+            label.numberOfLines = 1
+            label.font = UIFont.systemFont(ofSize: 12)
+            label.textColor = UIColor.white
+            label.text = " SMA 10 "
+            label.backgroundColor = UIColor.systemBlue
+
+            return label
+        }()
+        addSubview(sma10Label)
+        
+        sma50Label = {
+            let label = UILabel()
+            label.numberOfLines = 1
+            label.font = UIFont.systemFont(ofSize: 12)
+            label.textColor = UIColor.white
+            label.text = " SMA 50 "
+            label.backgroundColor = UIColor.systemRed
+
+            return label
+        }()
+        addSubview(sma50Label)
         
         self.setNeedsDisplay()
     }
@@ -348,13 +386,11 @@ class ChartView: UIView {
                 UIColor.systemGreen.setStroke()
                 epsLine.stroke()
                 
-//                let lastpoint = plotEPSPoint(datedValue: hxEPSInChartRange.last!, min: minEPS, max: maxEPS)
-                epsLabel.sizeToFit()
+                epsTTMLabel.sizeToFit()
                 
                 let startX = targetBuyPriceLabel?.frame.maxX ?? 10
                 
-                epsLabel.frame = CGRect(x: startX, y: 0, width: epsLabel.frame.width, height: epsLabel.frame.height)
-//                epsLabel.frame = CGRect(x: lastpoint.x, y: lastpoint.y - epsLabel.frame.height / 2, width: epsLabel.frame.width, height: epsLabel.frame.height)
+                epsTTMLabel.frame = CGRect(x: startX, y: 0, width: epsTTMLabel.frame.width, height: epsTTMLabel.frame.height)
             }
             
         }
@@ -391,16 +427,30 @@ class ChartView: UIView {
                 epsLine.setLineDash([3,7], count: 2, phase: 0)
                 epsLine.stroke()
                 
-//                let lastpoint = plotEPSPoint(datedValue: hxEPSInChartRange.last!, min: minEPS, max: maxEPS)
-                epsLabel.sizeToFit()
+                epsQLabel.sizeToFit()
                 
-                let startX = targetBuyPriceLabel?.frame.maxX ?? 10
+                let startX = epsTTMLabel?.frame.maxX ?? 10
                 
-                epsLabel.frame = CGRect(x: startX, y: 0, width: epsLabel.frame.width, height: epsLabel.frame.height)
-//                epsLabel.frame = CGRect(x: lastpoint.x, y: lastpoint.y - epsLabel.frame.height / 2, width: epsLabel.frame.width, height: epsLabel.frame.height)
+                epsQLabel.frame = CGRect(x: startX, y: 0, width: epsQLabel.frame.width, height: epsQLabel.frame.height)
+
+                let labelPath = UIBezierPath(rect: epsQLabel.frame)
+                labelPath.lineWidth = 1.5
+                labelPath.setLineDash([3,7], count: 2, phase: 0)
+                labelPath.stroke()
             }
             
+        } else {
+            // error break option here
+            print("\(share?.symbol ?? "") wbValuation has got no qEPS data")
         }
+
+        //MARK: - SMA Labels
+        sma10Label.sizeToFit()
+        sma50Label.sizeToFit()
+        
+        let startX = epsQLabel?.frame.maxX ?? 10
+        sma10Label.frame = CGRect(x: startX, y: 0, width: sma10Label.frame.width, height: sma10Label.frame.height)
+        sma50Label.frame = CGRect(x: sma10Label.frame.maxX, y: 0, width: sma50Label.frame.width, height: sma50Label.frame.height)
 
 
                 

@@ -128,11 +128,11 @@
             <objects>
                 <viewController id="GS7-IZ-4uD" customClass="StockChartVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DMz-IK-SGN" customClass="ChartContainerView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="859.5" height="820"/>
+                        <rect key="frame" x="0.0" y="0.0" width="704" height="740"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MVz-dh-kgA" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="726" y="79" width="33" height="33"/>
+                                <rect key="frame" x="580" y="61" width="30" height="29.5"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="MVz-dh-kgA" secondAttribute="height" multiplier="1:1" id="5gW-w3-Pb5"/>
@@ -142,7 +142,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pyF-an-nSb" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="769" y="79" width="32.5" height="33"/>
+                                <rect key="frame" x="620" y="61" width="29.5" height="29.5"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="pyF-an-nSb" secondAttribute="height" multiplier="1:1" id="gaw-0U-0y7"/>
@@ -152,7 +152,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vMW-cw-G3E" userLabel="Button3" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="811.5" y="79" width="33" height="33"/>
+                                <rect key="frame" x="659.5" y="61" width="29.5" height="29.5"/>
                                 <color key="backgroundColor" red="0.40593238040000001" green="0.59361329880000002" blue="0.50057085479999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="vMW-cw-G3E" secondAttribute="height" multiplier="1:1" id="r58-tf-wky"/>
@@ -162,28 +162,28 @@
                                 </connections>
                             </button>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doh-lM-a4B">
-                                <rect key="frame" x="10" y="165.5" width="699.5" height="584.5"/>
+                                <rect key="frame" x="10" y="141" width="544" height="549"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cg7-eQ-58P">
-                                        <rect key="frame" x="0.0" y="0.0" width="1000" height="584.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="1000" height="549"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Dm-Pf-iwX" customClass="StochastikOscillatorView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="58.5" width="1000" height="58.5"/>
+                                                <rect key="frame" x="0.0" y="55" width="1000" height="55"/>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uEG-z0-RcJ" customClass="MACD_View" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="1000" height="58.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="1000" height="55"/>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gGa-pp-Cwa" customClass="ChartTimeLineView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="117" width="1000" height="60"/>
+                                                <rect key="frame" x="0.0" y="110" width="1000" height="60"/>
                                                 <color key="backgroundColor" systemColor="systemOrangeColor"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="60" id="9DG-qj-Bjr"/>
                                                 </constraints>
                                             </view>
                                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B5Z-ih-tAD" customClass="ChartView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="177" width="1000" height="407.5"/>
+                                                <rect key="frame" x="0.0" y="170" width="1000" height="379"/>
                                                 <color key="backgroundColor" systemColor="tertiarySystemBackgroundColor"/>
                                             </view>
                                         </subviews>
@@ -217,7 +217,7 @@
                                 </constraints>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="28E-NM-pCT" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="812" y="121" width="32.5" height="32.5"/>
+                                <rect key="frame" x="659.5" y="99.5" width="29.5" height="29.5"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="28E-NM-pCT" secondAttribute="height" multiplier="1:1" id="vRr-eX-9QY"/>
@@ -227,31 +227,31 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hAd-Vi-f51" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="769" y="121" width="32.5" height="32.5"/>
+                                <rect key="frame" x="620" y="99.5" width="29.5" height="29.5"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="yGM-Sn-b0n"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hrq-ff-sUC" customClass="CheckButton" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="726.5" y="121" width="32.5" height="32.5"/>
+                                <rect key="frame" x="580.5" y="99.5" width="29" height="29.5"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="g4A-rZ-Kbq"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DCF Valuation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A2B-RG-uHy">
-                                <rect key="frame" x="53" y="87" width="91.5" height="17"/>
+                                <rect key="frame" x="49.5" y="67.5" width="91.5" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Growth-based Valuation" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miC-j2-Brw">
-                                <rect key="frame" x="53" y="128.5" width="156.5" height="17"/>
+                                <rect key="frame" x="49.5" y="106" width="156.5" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QfP-lA-cgL">
-                                <rect key="frame" x="10" y="79.5" width="33" height="32"/>
+                                <rect key="frame" x="10" y="61.5" width="29.5" height="28.5"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="QfP-lA-cgL" secondAttribute="height" multiplier="1:1" id="a73-lo-oVN"/>
                                 </constraints>
@@ -262,7 +262,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PWI-rZ-xja">
-                                <rect key="frame" x="152" y="85" width="20" height="18"/>
+                                <rect key="frame" x="148.5" y="65.5" width="20" height="18"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="PWI-rZ-xja" secondAttribute="height" multiplier="1:1" id="5sA-qP-vWN"/>
                                 </constraints>
@@ -273,7 +273,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fni-R7-t11">
-                                <rect key="frame" x="10" y="121.5" width="33" height="31.5"/>
+                                <rect key="frame" x="10" y="100" width="29.5" height="28.5"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="fni-R7-t11" secondAttribute="height" multiplier="1:1" id="yrz-ly-1Cf"/>
                                 </constraints>
@@ -284,7 +284,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s3a-vi-G4m">
-                                <rect key="frame" x="217.5" y="126.5" width="20" height="18"/>
+                                <rect key="frame" x="214" y="104" width="20" height="18"/>
                                 <color key="tintColor" systemColor="systemYellowColor"/>
                                 <state key="normal" backgroundImage="exclamationmark.triangle" catalog="system"/>
                                 <connections>
@@ -292,7 +292,7 @@
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZUx-G2-2hE" customClass="ChartPricesView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="709.5" y="342.5" width="150" height="407.5"/>
+                                <rect key="frame" x="554" y="311" width="150" height="379"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B1R-fX-BfC">
                                         <rect key="frame" x="100" y="5" width="45" height="31"/>
@@ -307,39 +307,40 @@
                                 <color key="backgroundColor" systemColor="systemGray2Color"/>
                                 <constraints>
                                     <constraint firstItem="B1R-fX-BfC" firstAttribute="top" secondItem="ZUx-G2-2hE" secondAttribute="top" constant="5" id="Wfz-EB-6aK"/>
+                                    <constraint firstItem="B1R-fX-BfC" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ZUx-G2-2hE" secondAttribute="leading" constant="15" id="h0o-3M-JoG"/>
                                     <constraint firstAttribute="trailing" secondItem="B1R-fX-BfC" secondAttribute="trailing" constant="5" id="sc8-Ji-cdx"/>
                                     <constraint firstAttribute="width" constant="150" id="yN6-bi-8Ct"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4v4-Xi-Ewh" customClass="ChartLegendView" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="709.5" y="165.5" width="150" height="177"/>
+                                <rect key="frame" x="554" y="141" width="150" height="170"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mac D " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="roV-AV-Ii6">
-                                        <rect key="frame" x="5" y="20.5" width="45" height="17"/>
+                                        <rect key="frame" x="5" y="19" width="45" height="17"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(8/17/9)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="laM-o4-Csj">
-                                        <rect key="frame" x="5" y="38.5" width="44" height="15"/>
+                                        <rect key="frame" x="5" y="37" width="44" height="15"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Slow Stoch Oscillator" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="itd-Fz-tR8">
-                                        <rect key="frame" x="5" y="79" width="137.5" height="17"/>
+                                        <rect key="frame" x="5" y="74" width="137.5" height="17"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(5/14)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rA8-Yp-xLD">
-                                        <rect key="frame" x="5" y="97" width="34" height="15"/>
+                                        <rect key="frame" x="5" y="92" width="34" height="15"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eBK-Hm-dX3">
-                                        <rect key="frame" x="40" y="140" width="31" height="14.5"/>
+                                        <rect key="frame" x="40" y="133" width="31" height="14.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                         <color key="textColor" systemColor="systemOrangeColor"/>
                                         <nil key="highlightedColor"/>
@@ -1230,46 +1231,46 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transaction Dialog" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oVF-zN-Rij">
-                                <rect key="frame" x="48" y="38" width="304" height="37"/>
+                                <rect key="frame" x="47" y="38" width="306" height="37"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" tag="10" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="S0.00" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="j3p-Tm-wHB">
-                                <rect key="frame" x="254" y="79" width="98" height="22"/>
+                                <rect key="frame" x="253" y="79" width="100" height="22"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Purchase / sale price" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b9N-B1-vFV">
-                                <rect key="frame" x="53" y="80" width="158" height="21"/>
+                                <rect key="frame" x="52" y="80" width="158" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Number bought / sold" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n52-f0-09J">
-                                <rect key="frame" x="53" y="104.5" width="166" height="21"/>
+                                <rect key="frame" x="52" y="104.5" width="166" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transaction date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="B8a-JQ-Y7N">
-                                <rect key="frame" x="53" y="141" width="128" height="21"/>
+                                <rect key="frame" x="52" y="141" width="128" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <datePicker contentMode="right" contentHorizontalAlignment="left" contentVerticalAlignment="center" datePickerMode="date" style="compact" translatesAutoresizingMaskIntoConstraints="NO" id="mfW-UM-yoU">
-                                <rect key="frame" x="244" y="133" width="108" height="31"/>
+                                <rect key="frame" x="243" y="133" width="110" height="31"/>
                             </datePicker>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" text="Situation and rationale for learning from your investment diary" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="1ks-fC-xwe">
-                                <rect key="frame" x="53" y="220" width="299" height="324"/>
+                                <rect key="frame" x="52" y="220" width="301" height="324"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Why did you buy / sell?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wfc-g0-i4Z">
-                                <rect key="frame" x="53" y="202" width="299" height="23"/>
+                                <rect key="frame" x="52" y="202" width="301" height="23"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -1292,7 +1293,7 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" tag="20" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="000" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="t7J-sh-06s">
-                                <rect key="frame" x="254" y="103.5" width="31" height="22"/>
+                                <rect key="frame" x="253" y="103.5" width="31" height="22"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
                             </textField>
@@ -1429,7 +1430,7 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="HCm-I9-2PD"/>
-        <segue reference="mBp-dp-A5V"/>
+        <segue reference="IOb-p8-cQu"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.clockwise.circle.fill" catalog="system" width="128" height="121"/>

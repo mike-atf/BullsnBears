@@ -141,7 +141,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             
             NotificationCenter.default.addObserver(self, selector: #selector(dataDownload(notification:)), name: Notification.Name(rawValue: "FileDownloadNotCSV"), object: nil)
 
-// first try to download historical prices from Yahoo finance as CSV file
+            // first try to download historical prices from Yahoo finance as CSV file
             Task.init(priority: .background) {
                     // the next functions returns by sending notification 'FileDownloadComplete' with fileURL in object sent
                     // this should be picked up by StocksListTVC

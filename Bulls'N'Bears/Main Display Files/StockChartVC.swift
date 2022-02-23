@@ -77,6 +77,10 @@ class StockChartVC: UIViewController {
     }
     
     override func viewWillLayoutSubviews() {
+    
+        chart.chartsContentViewWidth.isActive = false
+        chart.chartsContentViewWidth.constant = chart.scrollView.bounds.width * 1.0
+        chart.chartsContentViewWidth.isActive = true
         
         chart.chartView.setNeedsDisplay()
         chart.macdView.setNeedsDisplay()

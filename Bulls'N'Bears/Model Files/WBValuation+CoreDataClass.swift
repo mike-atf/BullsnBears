@@ -152,6 +152,29 @@ public class WBValuation: NSManagedObject {
         
     }
     
+    func epsTTMFromQEPSArray(datedValues: [DatedValue]?, saveToMOC: Bool?=true) -> [DatedValue]? {
+        
+        guard var validArray = datedValues else { return nil }
+        
+        // sort date descending
+        validArray = validArray.sorted(by: { e0, e1 in
+            if e0.date < e1.date { return false }
+            else { return true }
+        })
+        
+        var ttmDatedValues = [DatedValue]()
+        let availableQEPS = validArray.count
+        for i in 0..<availableQEPS {
+            if availableQEPS > i+3 {
+                let sum = validArray[i...i+3].compactMap{ $0.value }.reduce( 0, +)
+                let newDV = DatedValue(date: validArray[i].date, value: sum)
+                ttmDatedValues.append(newDV)
+            }
+        }
+        
+        return ttmDatedValues
+    }
+    
     func saveEPSTTMWithDateArray(datesValuesArray: [DatedValue]?, saveToMOC: Bool?=true) {
         
         guard let datedValues = datesValuesArray else { return }

@@ -40,10 +40,12 @@ class Downloader: NSObject {
                   return String(data: data, encoding: .utf8) ?? ""
                 }
                 else {
+                    print(response.mimeType ?? "no response.mimeType")
                     throw DownloadAndAnalysisError.mimeType
                 }
             }
             else {
+                print(response.statusCode)
                 throw DownloadAndAnalysisError.generalDownloadError
             }
         }

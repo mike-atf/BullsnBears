@@ -511,14 +511,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                  chartView.share = controller.object(at: indexPath)
                  chartView.configure(share: share)
                  
-//                 if share.watchStatus == 2 {
-//                     // archived stocks
-//                     do {
-//                         try controller.updateStocksData(singleShare: share)
-//                     } catch let error {
-//                         ErrorController.addErrorLog(errorLocation: "StocksListVC", systemError: error, errorInfo: "error when trying to update data for archived \(share.name_short ?? "missing")")
-//                     }
-//                 }
              }
          }
 
@@ -629,15 +621,18 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
     
     func shareUpdateComplete(atPath: IndexPath) {
                 
+        // only these two steps seem to be able to move changes saved to background moc to mainThread moc
+        let share = controller.object(at: atPath)
+        let _ = share.getDailyPrices(needRecalcDueToNew: true)
+        let _ = share.wbValuation?.epsQWithDates()
+
         tableView.reloadRows(at: [atPath], with: .none)
         
         if tableView.indexPathForSelectedRow == nil {
             tableView.selectRow(at: atPath, animated: false, scrollPosition: .none)
+            return
         }
         
-        // only these two steps seem to be able to move changes saved to background moc to mainThread moc
-        let share = controller.object(at: atPath)
-        let _ = share.getDailyPrices(needRecalcDueToNew: true)
         
         var researchViewOpen = false
         if let nav = self.splitViewController?.navigationController {
