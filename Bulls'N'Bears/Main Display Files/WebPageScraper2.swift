@@ -1230,7 +1230,8 @@ class WebPageScraper2: NSObject {
 //                                print(value$)
 
                                 if columnCount%columnsExpected == 0 {
-                                    date = extractionCodes.dateFormatter.date(from: String(value$.dropFirst()))
+                                    let date$ = String(value$.dropFirst())
+                                    date = extractionCodes.dateFormatter.date(from: date$)
 //                                    print(date)
                                 }
                                 else if (columnCount+1)%columnsExpected == 0 { // EPS value
@@ -1869,7 +1870,9 @@ class WebPageScraper2: NSObject {
             do {
 //                let yChartsTableTitle = "Historical EPS Diluted (Quarterly) Data"
                 let formatter = DateFormatter()
-                formatter.dateStyle = .long
+                formatter.locale = Locale(identifier: "en_US")
+                formatter.setLocalizedDateFormatFromTemplate("MMMMd, yyyy")
+//                formatter.dateStyle = .long
                 let codes = WebpageExtractionCodes(tableTitle: "Historical EPS Diluted (Quarterly) Data", option: .yCharts, dataCellStartSequence: "<td", dateFormatter: formatter) // "\">"
                 datedValues = try extractQEPSTableData(html: validPageText, extractionCodes: codes, untilDate: date)
                 return datedValues

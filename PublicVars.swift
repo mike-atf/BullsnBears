@@ -77,7 +77,7 @@ let gradientBar = UIImage(named: "GradientBar")
 let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
 var valuationWeightsSingleton = Financial_Valuation_Factors()
-let nonRefreshTimeInterval: TimeInterval  = 300
+let nonRefreshTimeInterval: TimeInterval  = 1
 
 
 struct WebpageExtractionCodes {

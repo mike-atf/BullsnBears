@@ -260,6 +260,7 @@ class ChartView: UIView {
 
         
         let nonNullLivePrice = (share?.lastLivePrice != 0.0) ? share?.lastLivePrice : nil
+        var legendLabelStartX: CGFloat = 0
         if let dailyPrices = share?.getDailyPrices() {
             if dailyPrices.count > 0 {
                 
@@ -299,6 +300,7 @@ class ChartView: UIView {
                         addSubview(targetBuyPriceLabel!)
                         targetBuyPriceLabel?.sizeToFit()
                         targetBuyPriceLabel?.frame = CGRect(x: 10, y: 0, width: targetBuyPriceLabel!.frame.width, height:  targetBuyPriceLabel!.frame.height)
+                        legendLabelStartX = targetBuyPriceLabel?.frame.maxX ?? 0
 
                         let targetPriceLine = UIBezierPath()
                         let pp1 = PriceDate(dailyPrices.first!.tradingDate, targetPrice)
@@ -388,17 +390,21 @@ class ChartView: UIView {
                 
                 epsTTMLabel.sizeToFit()
                 
-                let startX = targetBuyPriceLabel?.frame.maxX ?? 10
-                
-                epsTTMLabel.frame = CGRect(x: startX, y: 0, width: epsTTMLabel.frame.width, height: epsTTMLabel.frame.height)
+                epsTTMLabel.frame = CGRect(x: legendLabelStartX, y: 0, width: epsTTMLabel.frame.width, height: epsTTMLabel.frame.height)
+                legendLabelStartX = epsTTMLabel.frame.maxX
             }
             
+        }
+        else {
+            print("\(share!.symbol!) has no eps ttm data")
+            print()
         }
         
         //MARK: - qEPS line
         // uses different vertical scale!
         
         if let historicEPSWithDates = share?.wbValuation?.epsQWithDates(){
+
             let qEPSInChartRange = historicEPSWithDates.filter { dv in
                 if dv.date > (dateRange?.min()?.addingTimeInterval(-180*24*3600) ?? Date()) {
                     return true
@@ -429,9 +435,9 @@ class ChartView: UIView {
                 
                 epsQLabel.sizeToFit()
                 
-                let startX = epsTTMLabel?.frame.maxX ?? 10
+                epsQLabel.frame = CGRect(x: legendLabelStartX, y: 0, width: epsQLabel.frame.width, height: epsQLabel.frame.height)
                 
-                epsQLabel.frame = CGRect(x: startX, y: 0, width: epsQLabel.frame.width, height: epsQLabel.frame.height)
+                legendLabelStartX = epsQLabel.frame.maxX
 
                 let labelPath = UIBezierPath(rect: epsQLabel.frame)
                 labelPath.lineWidth = 1.5
@@ -440,16 +446,15 @@ class ChartView: UIView {
             }
             
         } else {
-            // error break option here
-            print("\(share?.symbol ?? "") wbValuation has got no qEPS data")
+            print("\(share!.symbol!) has no q eps data")
+            print()
         }
 
         //MARK: - SMA Labels
         sma10Label.sizeToFit()
         sma50Label.sizeToFit()
         
-        let startX = epsQLabel?.frame.maxX ?? 10
-        sma10Label.frame = CGRect(x: startX, y: 0, width: sma10Label.frame.width, height: sma10Label.frame.height)
+        sma10Label.frame = CGRect(x: legendLabelStartX, y: 0, width: sma10Label.frame.width, height: sma10Label.frame.height)
         sma50Label.frame = CGRect(x: sma10Label.frame.maxX, y: 0, width: sma50Label.frame.width, height: sma50Label.frame.height)
 
 

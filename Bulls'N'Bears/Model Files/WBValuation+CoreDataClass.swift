@@ -198,7 +198,7 @@ public class WBValuation: NSManagedObject {
     }
     
     func saveQEPSWithDateArray(datesValuesArray: [DatedValue]?, saveToMOC: Bool?=true) {
-        
+                
         guard let datedValues = datesValuesArray else { return }
         
         var array = [Date: Double]()
@@ -210,6 +210,7 @@ public class WBValuation: NSManagedObject {
         do {
             let data = try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
             epsDatesq = data
+            
             if saveToMOC ?? true {
                 try self.managedObjectContext?.save()
             }

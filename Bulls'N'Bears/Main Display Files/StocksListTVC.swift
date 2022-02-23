@@ -625,7 +625,7 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
         let share = controller.object(at: atPath)
         let _ = share.getDailyPrices(needRecalcDueToNew: true)
         let _ = share.wbValuation?.epsQWithDates()
-
+        
         tableView.reloadRows(at: [atPath], with: .none)
         
         if tableView.indexPathForSelectedRow == nil {

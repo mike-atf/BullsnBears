@@ -353,6 +353,9 @@ class StocksController2: NSFetchedResultsController<Share> {
                 let labelledPrice = try await getCurrentPriceForUpdate(shareSymbol: symbol)
 //                let labelled_datedqEarningsTTM = try await getQuarterlyEarningsTTMForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
                 let labelled_datedQEPS = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
+                if share.symbol! == "AMD" {
+                    print("\(share.symbol!) updated with \((labelled_datedQEPS?.datedValues ?? []).count) dateValues")
+                }
                 
                 let updatedPricePoints = try await getDailyPricesForUpdate(shareSymbol: symbol, existingDailyPrices: existingPricePoints)
                 
