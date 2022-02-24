@@ -77,7 +77,7 @@ let gradientBar = UIImage(named: "GradientBar")
 let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
 var valuationWeightsSingleton = Financial_Valuation_Factors()
-let nonRefreshTimeInterval: TimeInterval  = 1
+let nonRefreshTimeInterval: TimeInterval  = 300
 
 
 struct WebpageExtractionCodes {
@@ -93,23 +93,38 @@ struct WebpageExtractionCodes {
     var dateFormatter: DateFormatter!
     var option: WebPageExtractionCodeOptions!
     
-    init(tableTitle: String?, option: WebPageExtractionCodeOptions?=nil,tableStartSequence: String?=nil, tableEndSequence: String?=nil, bodyStartSequence: String?=nil, bodyEndSequence: String?=nil ,rowStartSequence: String?=nil, rowEndSequence: String?=nil, dataCellStartSequence: String?=nil, dataCellEndSequence: String?=nil, dateFormatter: DateFormatter) {
+    init(tableTitle: String?, option: WebPageExtractionCodeOptions?=nil,tableStartSequence: String?=nil, tableEndSequence: String?=nil, bodyStartSequence: String?=nil, bodyEndSequence: String?=nil ,rowStartSequence: String?=nil, rowEndSequence: String?=nil, dataCellStartSequence: String?=nil, dataCellEndSequence: String?=nil, dateFormatter: DateFormatter?=nil) {
         
         self.tableTitle = tableTitle
         self.dateFormatter = dateFormatter
         self.option = option
 
-//        if let option = option {
-//            switch option {
-//            case .macroTrends:
-//                self.option = option
-//            case .yahoo:
-//                return
-//            case .yCharts:
-//                return
-//            }
-//        }
-//
+        if let option = option {
+            switch option {
+            case .macroTrends:
+                self.dateFormatter = DateFormatter()
+                self.dateFormatter.locale = Locale(identifier: "en_US")
+                self.dateFormatter.setLocalizedDateFormatFromTemplate("MMMMd, yyyy")
+                if let valid = dateFormatter {
+                    self.dateFormatter = valid
+                }
+            case .yahoo:
+                self.dateFormatter = DateFormatter()
+                self.dateFormatter.locale = Locale(identifier: "en_US")
+                self.dateFormatter.setLocalizedDateFormatFromTemplate("MMMMd, yyyy")
+                if let valid = dateFormatter {
+                    self.dateFormatter = valid
+                }
+            case .yCharts:
+                self.dateFormatter = DateFormatter()
+                self.dateFormatter.locale = Locale(identifier: "en_US")
+                self.dateFormatter.setLocalizedDateFormatFromTemplate("MMMMd, yyyy")
+                if let valid = dateFormatter {
+                    self.dateFormatter = valid
+                }
+            }
+        }
+
         if let valid = tableStartSequence {
             self.tableStartSequence = valid
         }

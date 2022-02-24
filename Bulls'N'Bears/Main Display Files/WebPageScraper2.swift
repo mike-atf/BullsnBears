@@ -1868,12 +1868,8 @@ class WebPageScraper2: NSObject {
             }
                 
             do {
-//                let yChartsTableTitle = "Historical EPS Diluted (Quarterly) Data"
-                let formatter = DateFormatter()
-                formatter.locale = Locale(identifier: "en_US")
-                formatter.setLocalizedDateFormatFromTemplate("MMMMd, yyyy")
-//                formatter.dateStyle = .long
-                let codes = WebpageExtractionCodes(tableTitle: "Historical EPS Diluted (Quarterly) Data", option: .yCharts, dataCellStartSequence: "<td", dateFormatter: formatter) // "\">"
+
+                let codes = WebpageExtractionCodes(tableTitle: "Historical EPS Diluted (Quarterly) Data", option: .yCharts, dataCellStartSequence: "<td") // "\">"
                 datedValues = try extractQEPSTableData(html: validPageText, extractionCodes: codes, untilDate: date)
                 return datedValues
             } catch let error {
