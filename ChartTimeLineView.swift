@@ -13,6 +13,7 @@ class ChartTimeLineView: UIView {
     var sma10Label: UILabel?
     var macdLabel: UILabel?
     var oscLabel: UILabel?
+    var share: Share?
     
     var dateRange = [Date(), Date()]
     var stdLabelWidth: CGFloat!
@@ -40,9 +41,26 @@ class ChartTimeLineView: UIView {
             return
         }
 
+        self.share = share
         dateRange = validShare.priceDateRangeWorkWeeksForCharts(withForecastTime: true)
         
-        dateLabels = getDateLabels()
+        setCrossingsLabels(share: share)
+        
+        let date$ = "31/12/22"
+        dateFormatter.dateFormat = "dd/MM/yy"
+        
+        let stdLabel: UILabel = {
+            let label = UILabel()
+            label.font = UIFont.systemFont(ofSize: 10)
+            label.text = date$
+            label.sizeToFit()
+            return label
+        }()
+        stdLabelWidth = stdLabel.bounds.width * 1.75
+
+    }
+    
+    private func setCrossingsLabels(share: Share?) {
         
         if let crossings = share?.latest3Crossings() {
             sma10Crossing = crossings.filter({ (crossing) -> Bool in
@@ -122,23 +140,11 @@ class ChartTimeLineView: UIView {
         }
     }
 
-    private func getDateLabels() -> [UILabel] {
-        
-        let date$ = "31/12/22"
-        dateFormatter.dateFormat = "dd/MM/yy"
-        
-        let stdLabel: UILabel = {
-            let label = UILabel()
-            label.font = UIFont.systemFont(ofSize: 10)
-            label.text = date$
-            label.sizeToFit()
-            return label
-        }()
-        let stdLabelWidth = stdLabel.bounds.width * 1.75
-        
+    private func getDateLabels(width: CGFloat) -> [UILabel] {
+                
         var labels = [UILabel]()
-        let maxLabelCount = Int(self.bounds.width / stdLabelWidth)
-        let labelTimeIntervalOptions:[TimeInterval] = [24*3600, 7*24*3600,14*24*3600,28*24*3600,(365/12)*24*3600,(365/4*24*3600)]
+        let maxLabelCount = Int(width / stdLabelWidth)
+        let labelTimeIntervalOptions:[TimeInterval] = [24*3600,7*24*3600,14*24*3600,28*24*3600,(365/12)*24*3600,(365/4*24*3600)]
         let totalChartTime = dateRange.last!.timeIntervalSince(dateRange.first!)
         
         var labelCount = 0
@@ -174,12 +180,13 @@ class ChartTimeLineView: UIView {
         for label in dateLabels {
             label.removeFromSuperview()
         }
-        dateLabels = getDateLabels()
+        setCrossingsLabels(share: self.share)
         setNeedsDisplay()
     }
 
     override func draw(_ rect: CGRect) {
         
+        dateLabels = getDateLabels(width: rect.width)
         let daysWidth = rect.width / CGFloat(dateRange.last!.timeIntervalSince(dateRange.first!) / (24*3600))
     
         let xAxis = UIBezierPath()

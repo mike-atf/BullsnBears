@@ -347,15 +347,14 @@ class StocksController2: NSFetchedResultsController<Share> {
             let existingPricePoints = share.getDailyPrices()
             let shareID = share.objectID
             let minDate = share.priceDateRange()?.first?.addingTimeInterval(-365*24*3600)
+            let latestQEPSDate = share.wbValuation?.epsQWithDates()?.last?.date
             
             Task.init(priority: .background, operation: {
                 
                 let labelledPrice = try await getCurrentPriceForUpdate(shareSymbol: symbol)
 //                let labelled_datedqEarningsTTM = try await getQuarterlyEarningsTTMForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
-                let labelled_datedQEPS = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
-                if share.symbol! == "AMD" {
-                    print("\(share.symbol!) updated with \((labelled_datedQEPS?.datedValues ?? []).count) dateValues")
-                }
+                
+                let labelled_datedQEPS = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate, latestQEPSDate: latestQEPSDate)
                 
                 let updatedPricePoints = try await getDailyPricesForUpdate(shareSymbol: symbol, existingDailyPrices: existingPricePoints)
                 
@@ -506,16 +505,22 @@ class StocksController2: NSFetchedResultsController<Share> {
 
     }
     
-    func getQuarterlyEarningsForUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil) async throws -> Labelled_DatedValues? {
+    func getQuarterlyEarningsForUpdate(shareSymbol: String, shortName: String, minDate: Date?=nil, latestQEPSDate: Date?) async throws -> Labelled_DatedValues? {
                 
+        if let valid = latestQEPSDate {
+            if Date().timeIntervalSince(valid) < 80*24*3600 {
+                return nil
+            }
+        }
+        
         var sn = shortName
         if sn.contains(" ") {
             sn = sn.replacingOccurrences(of: " ", with: "-").lowercased()
         }
         
-        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(shareSymbol)/\(sn)/eps-earnings-per-share-diluted") else {
-            throw DownloadAndAnalysisError.urlInvalid
-        }
+//        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(shareSymbol)/\(sn)/eps-earnings-per-share-diluted") else {
+//            throw DownloadAndAnalysisError.urlInvalid
+//        }
         
         guard let ycharts_url = URL(string: ("https://ycharts.com/companies/" + shareSymbol.uppercased() + "/eps")) else {
             throw DownloadAndAnalysisError.urlError

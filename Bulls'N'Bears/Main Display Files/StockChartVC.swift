@@ -37,7 +37,6 @@ class StockChartVC: UIViewController {
         
         barTitleButton.title = share?.name_long
 
-//        buildLabel = UIBarButtonItem(title: "Build " + appBuild, style: .plain, target: nil, action: nil)
         settingsMenuButton = UIBarButtonItem(image: UIImage(systemName: "slider.horizontal.3"), style: .plain, target: self, action: #selector(settingsMenu))
 
         let fixedSizeItem = UIBarButtonItem.fixedSpace(100)
@@ -77,9 +76,10 @@ class StockChartVC: UIViewController {
     }
     
     override func viewWillLayoutSubviews() {
-    
+        
+
         chart.chartsContentViewWidth.isActive = false
-        chart.chartsContentViewWidth.constant = chart.scrollView.bounds.width * 1.0
+        chart.chartsContentViewWidth.constant = chart.scrollView.bounds.width * chart.zoomScale
         chart.chartsContentViewWidth.isActive = true
         
         chart.chartView.setNeedsDisplay()
