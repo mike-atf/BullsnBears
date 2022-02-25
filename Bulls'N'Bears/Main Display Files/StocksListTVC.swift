@@ -399,7 +399,32 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         
+        showWBValuationView(indexPath: indexPath,chartViewSegue: true)
+//        DispatchQueue.main.async {
+//            self.wbValuationView?.share = self.controller.object(at: indexPath)
+//            self.wbValuationView?.fromIndexPath = indexPath
+//
+//            if self.wbValuationView != nil  {
+//                self.navigationController?.pushViewController(self.wbValuationView!, animated: true)
+//            }
+//        }
+//
+//        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+//
+//        performSegue(withIdentifier: "showChartSegue", sender: nil)
+    }
+    
+    func showWBValuationView(indexPath: IndexPath, chartViewSegue: Bool) {
+        
+        for vc in self.navigationController?.children ?? [] {
+            if let _ = vc as? WBValuationTVC {
+                // WBV already open
+                return
+            }
+        }
+
         DispatchQueue.main.async {
+                        
             self.wbValuationView?.share = self.controller.object(at: indexPath)
             self.wbValuationView?.fromIndexPath = indexPath
 
@@ -410,8 +435,9 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
 
-        performSegue(withIdentifier: "showChartSegue", sender: nil)
-//        tableView.deselectRow(at: indexPath, animated: true)
+        if chartViewSegue {
+            performSegue(withIdentifier: "showChartSegue", sender: nil)
+        }
 
     }
     
@@ -510,7 +536,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
              if let chartView = navView.topViewController as? StockChartVC {
                  chartView.share = controller.object(at: indexPath)
                  chartView.configure(share: share)
-                 
+                 chartView.stocksListVC = self // unowned var to avoid retention cycle
              }
          }
 
@@ -629,7 +655,7 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
         tableView.reloadRows(at: [atPath], with: .none)
         
         if tableView.indexPathForSelectedRow == nil {
-            tableView.selectRow(at: atPath, animated: false, scrollPosition: .none)
+            tableView.selectRow(at: atPath, animated: false, scrollPosition: .none) // does not trigger segue
             return
         }
         

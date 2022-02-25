@@ -323,9 +323,6 @@ class StocksController2: NSFetchedResultsController<Share> {
             else { return true }
         })
         
-        //TODO: - create two methods to reduce non-required share data downloads : livePriceupdate() and qEarningsUpdate
-        // two groups of filtered shares: 1. as here if last live price date < 300sec
-        // the other to be passed to qEarningsUpdate filtered by last qEarnigsDate > 3 months
         
         let compDate = Date()
         sharesToUpdate = sharesToUpdate?.sorted(by: { s0, s1 in
@@ -352,7 +349,6 @@ class StocksController2: NSFetchedResultsController<Share> {
             Task.init(priority: .background, operation: {
                 
                 let labelledPrice = try await getCurrentPriceForUpdate(shareSymbol: symbol)
-//                let labelled_datedqEarningsTTM = try await getQuarterlyEarningsTTMForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate)
                 
                 let labelled_datedQEPS = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate, latestQEPSDate: latestQEPSDate)
                 
@@ -370,10 +366,6 @@ class StocksController2: NSFetchedResultsController<Share> {
                             backgroundShare.lastLivePriceDate = Date()
                         }
                                                 
-//                        if let valid = labelled_datedqEarningsTTM?.datedValues {
-//                            backgroundShare.wbValuation?.saveEPSTTMWithDateArray(datesValuesArray: valid, saveToMOC: false)
-//                        }
-                        
                         if let valid = labelled_datedQEPS?.datedValues {
                             backgroundShare.wbValuation?.saveQEPSWithDateArray(datesValuesArray: valid, saveToMOC: false)
                         }

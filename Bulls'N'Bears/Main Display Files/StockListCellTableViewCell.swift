@@ -50,7 +50,7 @@ class StockListCellTableViewCell: UITableViewCell {
         if stock.peRatio != Double() {
             title.textColor = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: stock.peRatio, greenCutoff: 10.0, redCutOff: 40.0)
         }
-        title.text = stock.symbol //! + "(" + value$ + ")"
+        title.text = stock.symbol
 
         if let lastPrice = stock.getDailyPrices()?.last {
             detail.text = timeFormatter.localizedString(for: lastPrice.tradingDate, relativeTo: Date())

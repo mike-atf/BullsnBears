@@ -33,8 +33,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-//        controller?.deallocate()
-//        controller = nil
     }
     
     override func viewWillDisappear(_ animated: Bool) {

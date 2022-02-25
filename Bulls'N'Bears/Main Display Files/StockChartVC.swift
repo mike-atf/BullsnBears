@@ -27,6 +27,7 @@ class StockChartVC: UIViewController {
     var settingsMenuButton: UIBarButtonItem!
     var dcfErrors = [String]()
     var r1Errors: [String]?
+    unowned var stocksListVC: StocksListTVC!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -189,8 +190,16 @@ class StockChartVC: UIViewController {
             researchVC.share = share
             
             self.navigationController?.pushViewController(researchVC, animated: true)
-        
+            
+            // also show WBvaluationView for financial details
+            if let valid = share {
+                if let path = stocksListVC.controller.indexPath(forObject: valid) {
+                    stocksListVC.showWBValuationView(indexPath: path, chartViewSegue: false)
+                }
+            }
+
         }
+        
     }
     
     
