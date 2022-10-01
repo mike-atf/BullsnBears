@@ -42,7 +42,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                 self.valuation = valuation
             }
             else if let valuation = CombinedValuationController.returnR1Valuations(company: share.symbol!) {
-                // any orphan valuation belonging to this compnay  left after deleting share
+                // any orphan valuation belonging to this company left after deleting share
                 share.rule1Valuation = valuation
                 self.valuation = valuation
             }
@@ -58,7 +58,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                 self.valuation = valuation
             }
             else if let valuation = CombinedValuationController.returnDCFValuations(company: share.symbol!) {
-                // any orphan valuation belonging to this compnay left after deleting share
+                // any orphan valuation belonging to this company left after deleting share
                 self.valuation = valuation
                 share.dcfValuation = valuation
             }
@@ -75,20 +75,6 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         }
     }
     
-    /*
-    public func removeObjectsFromMemory() {
-        if let analyser = webAnalyser as? DCFWebDataAnalyser {
-            analyser.downloader.webView = nil
-            analyser.downloader.delegate = nil
-            analyser.downloader = nil
-        }
-        else if let analyser = webAnalyser as? R1WebDataAnalyser {
-            analyser.downloader.webView = nil
-            analyser.downloader.delegate = nil
-            analyser.downloader = nil
-        }
-    }
-    */
     //MARK: - Class functions
     
     static func createR1Valuation(company: String) -> Rule1Valuation? {
@@ -193,25 +179,25 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         
         var titles = [String]()
         
-        var valuationDate$ = "missing date"
-        if let dcf = valuation as? DCFValuation {
-            valuationDate$ = dateFormatter.string(from: dcf.creationDate ?? Date())
-        } else if let r1 = valuation as? Rule1Valuation {
-            valuationDate$ = dateFormatter.string(from: r1.creationDate ?? Date())
-        }
+//        var valuationDate$ = "missing date"
+//        if let dcf = valuation as? DCFValuation {
+//            valuationDate$ = dateFormatter.string(from: dcf.creationDate ?? Date())
+//        } else if let r1 = valuation as? Rule1Valuation {
+//            valuationDate$ = dateFormatter.string(from: r1.creationDate ?? Date())
+//        }
         
         if method == .dcf {
-            titles = ["\(share.symbol!) DCF Valuation (\(valuationDate$))","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
+            titles = ["\(share.symbol!) DCF Valuation","Key Statistics", "Income Statement", "", "", "Balance Sheet", "Cash Flow", "", "Revenue & Growth prediction","","Adjusted future growth"]
         } else
         if method == .rule1 {
-            titles = ["\(share.symbol!) growth-based Valuation (\(valuationDate$))",
-            "Moat parameters: Values 5-10 years back",
+            titles = ["\(share.symbol!) R1 Valuation", "Predictions",
+            "Moat parameters",
             "", "", "", "",
             "PE Ratios", "Growth predictions",
-            "Adj. growth prediction (Optional)",
-            "Debt (Optional)",
-            "Insider Trading (Optional)",
-            "CEO Rating (Optional)"
+            "Adj. growth prediction",
+            "Debt",
+            "Insider Trading",
+            "CEO Rating"
             ]
         }
         
@@ -226,7 +212,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             subtitles = ["Download, or enter data","Yahoo Summary > Key Statistics", "Details > Financials > Income Statement", "", "", "Details > Financials > Balance Sheet", "Details > Financials > Cash Flow", "values entered will be converted to negative","Details > Analysis > Revenue estimate", "", ""]
         } else
         if method == .rule1 {
-            subtitles = ["Download, or enter data","1. Book Value per Share", "2. Earnings per Share", "3. Sales/ Revenue", "4. OP. Free Cash Flow Per Share", "5. Return on Invested Capital", "min and max last 5-10 years", "Analysts min and max predictions","Adjust predicted growth rates", "", "last 6 months", "Between 0 - 10"]
+            subtitles = ["Download, or enter data", "Adjust" ,"1. Book Value per Share", "2. Earnings per Share", "3. Revenue", "4. Op.Free Cash Flow Per Share", "5. Return on Invested Capital", "min and max last 5-10 years", "Analysts min and max predictions","Adjust the predicted growth rates", "", "last 6 months", "Optional, between 0 - 10"]
         }
         
         return subtitles
@@ -254,6 +240,30 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         return nil
     }
     
+    func getValueString(indexPath: IndexPath) -> String {
+        
+        var valuesArray = [[String]]()
+        
+        if method == .dcf {
+            valuesArray = getDCFValueStrings()
+        }
+        else if method == .rule1 {
+            valuesArray = getR1ValueStrings()
+        }
+        
+        if indexPath.section < valuesArray.count {
+            if indexPath.row < (valuesArray[indexPath.section].count) {
+                return valuesArray[indexPath.section][indexPath.row]
+            }
+        }
+        else {
+            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in Valuation.getDCFValue")
+        }
+        
+        return String()
+    }
+
+    
     func userEnteredText(sender: UITextField, indexPath: IndexPath) {
         
         guard let validtext = sender.text else {
@@ -279,8 +289,8 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
 
     func cellInfo(indexPath: IndexPath) -> ValuationListCellInfo {
         
-        let value = getValue(indexPath: indexPath)
-        let value$ = valueText(value: value, indexPath: indexPath)
+//        let value = getValue(indexPath: indexPath)
+        let value$ = getValueString(indexPath: indexPath) // valueText(value: value, indexPath: indexPath)
         let title = (rowtitles ?? rowTitles())[indexPath.section][indexPath.row]
         let format = valueFormat(indexPath: indexPath)
         
@@ -324,6 +334,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                     alerts?.append("Free cash flow and net income are not well aligned (correlation: \(correlation$))")
                 }
             }
+            valuation.alerts = alerts
             return alerts
         }
         else if let valuation = self.valuation as? Rule1Valuation  {
@@ -348,9 +359,81 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             if (valuation.insiderSalesProportion() ?? 0) > 0.1 {
                 alerts?.append("More than 10% of insider stocks sold in last 6 months!")
             }
+            valuation.alerts = alerts
             return alerts
         }
         return nil
+    }
+    
+    class func checkDCFR1Valuation(valuationID: NSManagedObjectID?) -> [String]? {
+        
+        guard let validID = valuationID else {
+            return ["no valid valuation ID sent for check"]
+        }
+        
+        var alerts: [String]?
+        
+//        guard
+        let valuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID))
+//        else
+//        {
+//            return ["no valuation for checking can be fetched from MOC"]
+//        }
+    
+        if let dcfValuation = valuation as? DCFValuation {
+            
+            for income in dcfValuation.netIncome ?? [] {
+                if income < 0 {
+                    alerts = [String]()
+                    alerts?.append("Non-profitable at some point in the last 3 years.")
+                }
+            }
+            let coefficient = Calculator.correlation(xArray: (dcfValuation.netIncome?.compactMap{ $0 } ?? []), yArray: (dcfValuation.tFCFo?.compactMap{ $0 } ?? []))?.coEfficient
+            if let fcf_netIncome_correlation = coefficient {
+                let correlation$ = numberFormatter2Decimals.string(from: fcf_netIncome_correlation as NSNumber) ?? ""
+                
+                if abs(fcf_netIncome_correlation) < 0.75 {
+                    if alerts == nil {
+                        alerts = [String]()
+                    }
+                    alerts?.append("Free cash flow and net income are not well aligned (correlation: \(correlation$))")
+                }
+            }
+            dcfValuation.alerts = alerts
+        }
+        else if let r1Valuation = valuation as? Rule1Valuation {
+            
+            let arrays = [r1Valuation.bvps, r1Valuation.eps, r1Valuation.revenue, r1Valuation.opcs, r1Valuation.roic]
+            var moatCount = 0
+            for array in arrays {
+                moatCount += array?.compactMap{ $0 }.filter({ (value) -> Bool in
+                    if value != 0 { return true }
+                    else { return false }
+                }).count ?? 0
+            }
+
+            if moatCount < 25 {
+                if alerts == nil {
+                    alerts = [String]()
+                }
+                alerts?.append("There are \(moatCount) of 50 possible moat values.\nThe moat score and sticker price may not be very reliable")
+            }
+            
+            if (r1Valuation.debtProportion() ?? 0) > 0.3 {
+                alerts?.append("High long-term debt!")
+            }
+            
+            if (r1Valuation.insiderSalesProportion() ?? 0) > 0.1 {
+                alerts?.append("More than 10% of insider stocks sold in last 6 months!")
+            }
+            r1Valuation.alerts = alerts
+        } else {
+            alerts = ["DCF or R1 Valuation check: objectID fetched from MOC does not match DCF- or R1 Valuation"]
+        }
+
+        
+        return alerts
+        
     }
     
     func updateData() {
@@ -374,7 +457,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
     
     public func startDataDownload() {
         
-        // accessing share propoerties must happen on main thread!
+        // accessing share properties must happen on main thread!
         let symbol =  share.symbol
         let shortName = share.name_short
         
@@ -535,35 +618,42 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             // 'General
             return
         case 1:
+            // 'Predictions
+            if indexPath.row == 0 {
+                valuation.adjGrowthEstimates = [value/100, value/100]
+            } else {
+                valuation.adjFuturePE = value
+            }
+        case 2:
             // 'Moat parameters - BVPS
             valuation.bvps?.add(value: value, index: indexPath.row)
-        case 2:
+        case 3:
             // 'Moat parameters - EPS
             valuation.eps?.add(value: value, index: indexPath.row)
-        case 3:
+        case 4:
             // 'Moat parameters - Revenue
             valuation.revenue?.add(value: value, index: indexPath.row)
-        case 4:
+        case 5:
             // 'Moat parameters - FCF
             valuation.opcs?.add(value: value, index: indexPath.row)
-        case 5:
+        case 6:
             // 'Moat parameters - ROIC
             valuation.roic?.add(value: value / 100, index: indexPath.row)
-        case 6:
+        case 7:
             // 'Historical min /max PER
             valuation.hxPE?.add(value: value, index: indexPath.row)
-        case 7:
+        case 8:
             // 'Growth predictions
             valuation.growthEstimates?.add(value: value / 100, index: indexPath.row)
-        case 8:
+        case 9:
             // 'Adjusted Growth predictions
             valuation.adjGrowthEstimates?.add(value: value / 100, index: indexPath.row)
-       case 9:
+       case 10:
             // 'Debt
             if indexPath.row == 0 {
                 valuation.debt = value
             }
-        case 10:
+        case 11:
             // 'Insider Stocks'
             if indexPath.row == 0 {
                 valuation.insiderStocks = value
@@ -574,7 +664,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             else if indexPath.row == 2 {
                 valuation.insiderStockSells = value
             }
-        case 11:
+        case 12:
             valuation.ceoRating = value
         default:
             ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
@@ -681,7 +771,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         
         var section3$ = ""
         if indexPath.row < (valuation.tRevenueActual?.count ?? 0) - 1 {
-            if let growth = calculateGrowthDCF(valuation.tRevenueActual, element:indexPath.row) {
+            if let growth = calculateGrowthDCF(valuation.tRevenueActual?.reversed(), element:indexPath.row) {
                 section3$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
             }
         }
@@ -696,7 +786,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         }
         var section4$ = ""
         if valuation.netIncome?.count ?? 0 > indexPath.row {
-                if let growth = calculateGrowthDCF(valuation.netIncome, element:indexPath.row) {
+            if let growth = calculateGrowthDCF(valuation.netIncome?.reversed(), element:indexPath.row) {
                     section4$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
                 }
         }
@@ -716,7 +806,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             taxProportion = ((valuation.expenseIncomeTax) / valuation.incomePreTax)
             taxProportion$ = percentFormatter0Digits.string(from: taxProportion! as NSNumber)
         }
-        var section5$: String? // = [nil, nil, taxProportion$]
+        var section5$: String?
         if indexPath.row < 2 {
             section5$ = nil
         } else if indexPath.row == 2 {
@@ -728,13 +818,13 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         var stDebtPorportion$: String?
         if (valuation.marketCap) > 0 {
             stDebtProportion = (valuation.debtST) / ((valuation.debtST) + valuation.marketCap)
-            stDebtPorportion$ = percentFormatter0Digits.string(from: stDebtProportion! as NSNumber)
+            stDebtPorportion$ = percentFormatter2Digits.string(from: stDebtProportion! as NSNumber)
         }
         var ltDebtProportion: Double?
         var ltDebtPorportion$: String?
         if (valuation.marketCap) > 0 {
             ltDebtProportion =  (valuation.debtLT) / ((valuation.debtLT) + valuation.marketCap)
-            ltDebtPorportion$ = percentFormatter0Digits.string(from: ltDebtProportion! as NSNumber)
+            ltDebtPorportion$ = percentFormatter2Digits.string(from: ltDebtProportion! as NSNumber)
         }
         var section6$: String?
         if indexPath.row == 0 {
@@ -746,14 +836,14 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
 //section 6
         var section7$ = ""
         if indexPath.row < (valuation.tFCFo?.count ?? 0) - 1 {
-            if let growth = calculateGrowthDCF(valuation.tFCFo, element:indexPath.row) {
+            if let growth = calculateGrowthDCF(valuation.tFCFo?.reversed(), element:indexPath.row) {
                 section7$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
             }
         }
 
         var section8$ = ""
         if indexPath.row < (valuation.capExpend?.count ?? 0) - 1 {
-            if let growth = calculateGrowthDCF(valuation.capExpend, element:indexPath.row) {
+            if let growth = calculateGrowthDCF(valuation.capExpend?.reversed(), element:indexPath.row) {
                 section8$ = percentFormatter0Digits.string(from: growth as NSNumber) ?? ""
             }
         }
@@ -777,6 +867,27 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             // 'General
             return (nil, nil)
         case 1:
+            // 'Predictions
+            if indexPath.row == 0 {
+                guard let adjSalesGrowthPrediction = valuation.adjGrowthEstimates?.mean() else {
+                    return ("-", UIColor.label)
+                }
+                let prediction$ = percentFormatter2Digits.string(from: adjSalesGrowthPrediction as NSNumber) ?? "-"
+                return (prediction$, UIColor.label)
+            }
+            else if indexPath.row == 1 {
+                guard let min = valuation.hxPE?.min(), let max = valuation.hxPE?.max() else {
+                    return ("-", UIColor.label)
+                }
+                let color = UIColor.label
+                
+                let peRange$ = numberFormatterNoFraction.string(from: min as NSNumber)! + "-"+numberFormatterNoFraction.string(from: max as NSNumber)!
+                return (peRange$, color)
+            } else {
+                return (nil, nil)
+            }
+
+        case 2:
             // 'Moat parameters - BVPS
             if indexPath.row == 9 { return (nil, nil) }
             else if let growth = calculateGrowthR1(valueArray: valuation.bvps, element: indexPath.row) {
@@ -784,7 +895,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                 return (percentFormatter0Digits.string(from: growth as NSNumber), color)
             }
             return (nil, nil)
-        case 2:
+        case 3:
             // 'Moat parameters - EPS
             if indexPath.row == 9 { return (nil, nil) }
             else if let growth = calculateGrowthR1(valueArray: valuation.eps, element: indexPath.row) {
@@ -793,7 +904,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             }
             return (nil, nil)
 
-        case 3:
+        case 4:
             // 'Moat parameters - Revenue
             if indexPath.row == 9 { return (nil, nil) }
             else if let growth = calculateGrowthR1(valueArray: valuation.revenue, element: indexPath.row) {
@@ -802,7 +913,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             }
             return (nil, nil)
 
-        case 4:
+        case 5:
             // 'Moat parameters - FCF
             if indexPath.row == 9 { return (nil, nil) }
             else if let growth = calculateGrowthR1(valueArray: valuation.opcs, element: indexPath.row) {
@@ -811,7 +922,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             }
             return (nil, nil)
 
-        case 5:
+        case 6:
             // 'Moat parameters - ROIC
             if indexPath.row == 9 { return (nil, nil) }
             else if (valuation.roic?.count ?? 0) > indexPath.row {
@@ -819,21 +930,21 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                 return (percentFormatter0Digits.string(from: valuation.roic![indexPath.row] as NSNumber), color)
             }
             else { return (nil, nil) }
-        case 6:
+        case 7:
             // 'Historical min /max PER
             return (nil, nil)
 
-        case 7:
+        case 8:
             // 'Growth predictions
             return (nil, nil)
 
-        case 8:
+        case 9:
             // 'Adjusted Growth predictions
             if let growth = averageGrowthPrediction() {
                 return ((percentFormatter0Digits.string(from: growth as NSNumber) ?? "%"), nil)
             }
 
-       case 9:
+       case 10:
             // 'Debt / percent of FCF shown in TextField
             if indexPath.row == 0 { return (nil, nil) }
             else if valuation.insiderStocks != Double() {
@@ -849,7 +960,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             else {
                 return (nil, nil)
             }
-        case 10:
+        case 11:
             // 'Insider Stocks'
             if valuation.insiderStocks == 0.0 { return (nil, nil) }
             
@@ -869,7 +980,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                 }
             }
             else { return (nil, nil) }
-        case 11:
+        case 12:
             // 'CEO'
             return ("0-10", nil)
         default:
@@ -897,12 +1008,12 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         var section1Titles = ["Net income"]
         var section2Titles = ["op. Cash flow"]
         var section3Titles = ["Capital expend."]
-        var section4Titles = ["Revenue estimate"]
-        var section5Titles = ["Sales growth"]
+        var section4Titles = ["Revenue est."]
+        var section5Titles = ["Revenue growth"]
         var section6Titles = ["Adj. sales growth"]
         
         let generalSectionTitles = ["Date", "US 10y Treasure Bond rate", "Perpetual growth rate", "Exp. LT Market return"]
-        let keyStatsTitles = ["Market cap", "beta", "Shares outstdg.(tds)"]
+        let keyStatsTitles = ["Market cap", "beta", "Shares outstdg."]
         let singleIncomeSectionTitles = ["Interest expense","Pre-Tax income","Income tax expend."]
         let balanceSheetSectionTitles = ["Current debt","Long term debt"]
 
@@ -992,7 +1103,8 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             return formatter
         }()
         
-        let generalSectionTitles = ["Date"]
+        let generalSectionTitles = ["Latest Date"]
+        let predictionTitles = ["Pred. growth", "Pred. PE ratio"]
         var bvpsTitles = ["BVPS"]
         var epsTitles = ["EPS"]
         var revenueTitles = ["Revenue"]
@@ -1035,7 +1147,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         roicTitles.removeFirst()
         fcfTitles.removeFirst()
         
-        rowtitles = [generalSectionTitles ,bvpsTitles, epsTitles, revenueTitles, fcfTitles, roicTitles, hxPERTitles, growthPredTitles, adjGrowthPredTitles, debtRowTitles, insideTradingRowTitles, ceoRatingRowTitle]
+        rowtitles = [generalSectionTitles , predictionTitles ,bvpsTitles,epsTitles, revenueTitles, fcfTitles, roicTitles, hxPERTitles, growthPredTitles, adjGrowthPredTitles, debtRowTitles, insideTradingRowTitles, ceoRatingRowTitle]
 
         return rowtitles
 
@@ -1107,7 +1219,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                                                        [.percent,.percent],
                                                        [.percent,.percent]]
                                                        
-        let r1Formats:[[ValuationCellValueFormat]] = [[.date],
+        let r1Formats:[[ValuationCellValueFormat]] = [[.date], [.percent, .numberNoDecimals],
                                                       [.currency,.currency, .currency, .currency, .currency, .currency,.currency, .currency, .currency, .currency],
                                                       [.currency,.currency, .currency, .currency, .currency, .currency,.currency, .currency, .currency, .currency],
                                                       [.currency,.currency, .currency, .currency, .currency, .currency,.currency, .currency, .currency, .currency],
@@ -1154,6 +1266,45 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         
     }
     
+    internal func getDCFValueStrings() -> [[String]] {
+        
+        
+        guard let valuation = (self.valuation as? DCFValuation) else { return [[String()]] }
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = NSLocale.current
+            formatter.timeZone = NSTimeZone.local
+            formatter.dateStyle = .short
+            return formatter
+        }()
+
+        let creationDate = dateFormatter.string(from: valuation.creationDate!)
+        let tBondRate = UserDefaults.standard.value(forKey: "10YUSTreasuryBondRate") as! Double
+        let pGrowthRate = UserDefaults.standard.value(forKey: "PerpetualGrowthRate") as! Double
+        let ltReturn =  UserDefaults.standard.value(forKey: "LongTermMarketReturn") as! Double
+        
+        let section1 = [creationDate,
+                              tBondRate.shortString(decimals: 1, formatter: percentFormatter2Digits),
+                        pGrowthRate.shortString(decimals: 1, formatter: percentFormatter2Digits),
+                        ltReturn.shortString(decimals: 1,formatter: percentFormatter2Digits)]
+        let section2 = [valuation.marketCap.shortString(decimals: 2), valuation.beta.shortString(decimals: 1, formatter: numberFormatter2Decimals), valuation.sharesOutstanding.shortString(decimals: 2, formatter: numberFormatterWith1Digit)]
+        let section3 = valuation.tRevenueActual?.reversed().shortStrings(decimals: 2)  ?? [String]()
+        let section4 = valuation.netIncome?.reversed().shortStrings(decimals: 2)  ?? [String]()
+        let section5 = [valuation.expenseInterest.shortString(decimals: 1), valuation.incomePreTax.shortString(decimals: 1), valuation.expenseIncomeTax.shortString(decimals: 1)]
+        let section6 = [valuation.debtST.shortString(decimals: 1), valuation.debtLT.shortString(decimals: 1)]
+        let section7 = valuation.tFCFo?.reversed().shortStrings(decimals: 2)  ?? [String]()
+        let section8 = valuation.capExpend?.reversed().shortStrings(decimals: 2)  ?? [String]()
+        let section9 = valuation.tRevenuePred?.shortStrings(decimals: 2)  ?? [String]()
+        let section10 = valuation.revGrowthPred?.shortStrings(decimals: 1, formatter: percentFormatter2Digits)  ?? [String]()
+        let prediction = averageGrowthPrediction()?.shortString(decimals: 1, formatter: percentFormatter2Digits)  ?? String()
+        let section11 = [prediction, prediction]
+        
+        return [section1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11]
+        
+    }
+
+    
     internal func getR1Values() -> [[Any?]]  {
         
         guard let valuation = (self.valuation as? Rule1Valuation) else { return [[nil]] }
@@ -1181,6 +1332,54 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         return [section1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11, section12]
 
     }
+    
+    internal func getR1ValueStrings() -> [[String]]  {
+        
+        guard let valuation = (self.valuation as? Rule1Valuation) else { return [[String()]] }
+        
+        let creationDate = dateFormatter.string(from: valuation.creationDate!)
+        let section1 = [creationDate]
+        
+        let (cleanedBVPS, _) = ValuationDataCleaner.cleanValuationData(dataArrays: [valuation.bvps ?? [], valuation.eps ?? []], method: .rule1)
+        let futureGrowth = valuation.futureGrowthEstimate(cleanedBVPS: cleanedBVPS.first!)!
+        let predictedGrowth = valuation.adjGrowthEstimates?.mean() ?? valuation.growthEstimates?.mean()
+        var futurePER$ = ""
+        if let futurePER = valuation.futurePER(futureGrowth: futureGrowth) {
+            futurePER$ = futurePER.shortString(decimals: 1, formatter: numberFormatterNoFraction)
+        } else {
+            futurePER$ = "\(valuation.hxPE?.min() ?? 0) - \(valuation.hxPE?.max() ?? 0)"
+        }
+        let section1New1 = [(predictedGrowth ?? 0).shortString(decimals: 1, formatter: percentFormatter2Digits), futurePER$]
+        
+        let section2 = valuation.bvps?.shortStrings(decimals: 2) ?? [String]()
+        let section3 = valuation.eps?.shortStrings(decimals: 2) ?? [String]()
+        let section4 = valuation.revenue?.shortStrings(decimals: 2)  ?? [String]()
+        let section5 = valuation.opcs?.shortStrings(decimals: 2) ?? [String]()
+        let section6 = valuation.roic?.shortStrings(decimals: 1, formatter: percentFormatter2Digits) ?? [String]()
+        let section7 = valuation.hxPE?.shortStrings(decimals: 0, formatter: numberFormatterNoFraction) ?? [String]()
+        
+        var averageGrowth = [Double?]()
+        if let growth = averageGrowthPrediction() {
+            averageGrowth = [growth, growth]
+        }
+        let section8 = (valuation.growthEstimates ?? averageGrowth).shortStrings(decimals: 1, formatter: percentFormatter2Digits)
+        
+        let prediction = averageGrowthPrediction()
+        let section9Values = [valuation.adjGrowthEstimates?.first ?? prediction, valuation.adjGrowthEstimates?.last ?? prediction]
+        let section10Values = [valuation.debt, valuation.debtProportion()]
+        let section11Values = [valuation.insiderStocks, valuation.insiderStockBuys, valuation.insiderStockSells]
+        let section12Value = [valuation.ceoRating]
+        
+        let section9 = section9Values.shortStrings(decimals: 2, formatter: percentFormatter2Digits)
+        let section10 = section10Values.shortStrings(decimals: 1)
+        let section11 = section11Values.shortStrings(decimals: 2, formatter: numberFormatterNoFraction)
+        let section12 = section12Value.shortStrings(decimals: 0, formatter: numberFormatterNoFraction)
+
+
+        return [section1, section1New1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11, section12]
+
+    }
+
     
     internal func averageGrowthPrediction() -> Double? {
         
@@ -1224,6 +1423,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
     }
     
     /// returns detail value for the SAME row based on any existing later elements
+    /// expects array in TIME DESCENDING order
     internal func calculateGrowthDCF(_ array: [Double]?, element: Int) -> Double? {
         guard let numbers = array else {
             return nil
@@ -1244,7 +1444,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
     /// the element number is interpreted as 'years' backwards since date of first element
     internal func calculateGrowthR1(valueArray: [Double]?, element: Int) -> Double? {
         
-        guard element > 0 && element < (valueArray?.count ?? 0) else {
+        guard element > 1 && element < (valueArray?.count ?? 0) else {
             return nil
         }
         

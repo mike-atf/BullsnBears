@@ -36,7 +36,17 @@ class StockChartVC: UIViewController {
             configure(share: share)
         }
         
-        barTitleButton.title = share?.name_long
+        let newLabel: UILabel = {
+            let label = UILabel()
+            label.font = UIFont.preferredFont(forTextStyle: .title3)
+            label.text = share?.name_long
+            label.adjustsFontSizeToFitWidth = true
+            label.preferredMaxLayoutWidth = self.view.frame.width * 0.5
+            return label
+        }()
+
+        barTitleButton = UIBarButtonItem(customView: newLabel)
+//        barTitleButton.title = share?.name_long
 
         settingsMenuButton = UIBarButtonItem(image: UIImage(systemName: "slider.horizontal.3"), style: .plain, target: self, action: #selector(settingsMenu))
 
@@ -120,6 +130,14 @@ class StockChartVC: UIViewController {
             dcfErrorsButton.isHidden = (errors.count == 0)
             dcfErrors = errors
             
+            if let creationDate = validValuation.ageOfValuation() {
+                if creationDate > 365*24*3600/2  {
+                    dcfButton.tintColor = UIColor.systemRed
+                } else if creationDate > 365*24*3600/4 {
+                    dcfButton.tintColor = UIColor.systemYellow
+                }
+            }
+            
             if let intrinsicValue = value {
                 dcfValuationLabrl.text = "DCF :"
                 if intrinsicValue > 0 {
@@ -145,6 +163,14 @@ class StockChartVC: UIViewController {
             r1ErrorsButton.isHidden = (errors == nil)
             r1Errors = errors
             
+            if let creationDate = validValuation.ageOfValuation() {
+                if creationDate > 365*24*3600/2  {
+                    r1Button.tintColor = UIColor.systemRed
+                } else if creationDate > 365*24*3600/4 {
+                    r1Button.tintColor = UIColor.systemYellow
+                }
+            }
+
             if let stickerPrice = value {
                 if stickerPrice > 0 {
                     r1Title += (currencyFormatterNoGapNoPence.string(from: stickerPrice as NSNumber) ?? "--")

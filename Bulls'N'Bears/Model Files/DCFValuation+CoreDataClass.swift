@@ -67,6 +67,15 @@ public class DCFValuation: NSManagedObject {
         creationDate = Date()
     }
     
+    public func ageOfValuation() -> TimeInterval? {
+        
+        if let date = creationDate {
+            return Date().timeIntervalSince(date)
+        }
+        
+        return nil
+    }
+    
 //    static func create(company: String, in managedObjectContext: NSManagedObjectContext) {
 //        let newValuation = self.init(context: managedObjectContext)
 //        newValuation.company = company
@@ -91,10 +100,11 @@ public class DCFValuation: NSManagedObject {
     
     func delete() {
        
-        (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.delete(self)
+//        (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.delete(self)
+        managedObjectContext?.delete(self)
  
         do {
-            try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+            try managedObjectContext?.save()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
@@ -181,6 +191,12 @@ public class DCFValuation: NSManagedObject {
             count += 1
         }
 // 4 + 5
+        guard tRevenuePred?.count ?? 0 < 5 else {
+            errors.append("too many DCFValuation.rRevenuePred data (\(tRevenuePred?.count ?? 0)")
+            tRevenuePred?.removeAll()
+            self.save()
+            return (nil, errors)
+        }
         predictedRevenue = tRevenuePred ?? []
         
         guard predictedRevenue.last != nil && predictedRevenue.last != nil && revGrowthPredAdj?.first != nil && revGrowthPredAdj?.last != nil else {
@@ -282,5 +298,6 @@ public class DCFValuation: NSManagedObject {
         errors.append("data gaps - can't calculate last predicted FCF")
         return (nil, errors)
     }
+    
     
 }

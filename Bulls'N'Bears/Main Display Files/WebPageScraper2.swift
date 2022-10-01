@@ -347,7 +347,6 @@ class WebPageScraper2: NSObject {
                 NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
                 
                 htmlText = try await downloader.downloadDataWithRedirection(url: url)
-//                htmlText = try await Downloader.downloadData(url: url)
             } catch let error as DownloadAndAnalysisError {
                 progressDelegate?.downloadError(error: error.localizedDescription)
                 throw error
@@ -483,8 +482,21 @@ class WebPageScraper2: NSObject {
                         
                         r1v.creationDate = Date()
                         try backgroundMoc.save()
+                    
+                    // save new value with date in a share trend
+                    if let vShare = r1v.share {
+                        if let moat = r1v.moatScore() {
+                            let dv = DatedValue(date: r1v.creationDate!, value: moat)
+                            vShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .moatScore)
+                        }
+                        let (price,_) = r1v.stickerPrice()
+                        if price != nil {
+                            let dv = DatedValue(date: r1v.creationDate!, value: price!)
+                            vShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .stickerPrice)
+                        }
+                    }
 
-                        progressDelegate?.downloadComplete()
+                    progressDelegate?.downloadComplete()
                 }
             } catch let error {
                 progressDelegate?.downloadError(error: error.localizedDescription)
@@ -506,8 +518,6 @@ class WebPageScraper2: NSObject {
         let allTasks = 6
         var progressTasks = 0
         
-//        let rowTitles = [["Market cap (intra-day)</span>", "Beta (5Y monthly)</span>", "Shares outstanding</span>"],["Total revenue</span>", "Net income</span>", "Interest expense</span>","Income before tax</span>","Income tax expense</span>"],["Current debt</span>","Long-term debt</span>", "Total Debt</span>"],["Operating cash flow</span>","Capital expenditure</span>"],["Avg. Estimate</span>", "Sales growth (year/est)</span>"]]
-
         for title in ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"] {
             var components: URLComponents?
                     
@@ -524,7 +534,6 @@ class WebPageScraper2: NSObject {
                 htmlText = try await Downloader.downloadData(url: url)
             } catch let error as DownloadAndAnalysisError {
                 progressDelegate?.downloadError(error: "Failed DCF valuation download for \(symbol): \(error.localizedDescription)")
-//                throw error
             }
             
             progressTasks += 1
@@ -582,6 +591,14 @@ class WebPageScraper2: NSObject {
                         
                         dcfv.creationDate = Date()
                         try backgroundMoc.save()
+                        
+                        let (dcfValue, _) = dcfv.returnIValue()
+                        if dcfValue != nil {
+                            let trendValue = DatedValue(date: dcfv.creationDate!, value: dcfValue!)
+                            dcfv.share?.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .dCFValue)
+                            print("added new DCFValue trend to share \(dcfv.share?.name_short)")
+                        }
+
                         progressDelegate?.downloadComplete()
                         
                     } catch let error {
@@ -758,12 +775,24 @@ class WebPageScraper2: NSObject {
                         
                         wbv.avAnStockPrice = hxPriceValues?.reversed()
                         wbv.date = Date()
-
+                    
+                    if let vShare = wbv.share {
+                        if let lynch = wbv.lynchRatio() {
+                            let dv = DatedValue(date:wbv.date!, value: lynch)
+                            vShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .lynchScore)
+                        }
+                        let (ivalue,_) = wbv.ivalue()
+                        if ivalue != nil {
+                            let dv = DatedValue(date:wbv.date!, value: ivalue!)
+                            vShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .intrinsicValue)
+                        }
+                    }
                 }
                 try backgroundMoc.save()
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "couldn't save background MOC")
             }
+            
             
             if (downloadErrors ?? []).contains(DownloadAndAnalysisError.generalDownloadError) {
                 throw DownloadAndAnalysisError.generalDownloadError
@@ -1534,7 +1563,7 @@ class WebPageScraper2: NSObject {
             
             for title in rowTitles {
                 var labelledValue = LabelledValues(label: title, values: [Double]())
-                if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo,html$: htmlText, sectionHeader: "Revenue estimate</span>" ,rowTitle: title, webpageExponent: 3.0) {
+                if let values = WebPageScraper2.scrapeRowForDoubles(website: .yahoo,html$: htmlText, sectionHeader: "Revenue estimate</span>" ,rowTitle: title, rowTerminal: "</td></tr>", numberTerminal: "</td>" , webpageExponent: 3.0) {
 
                     let a1 = values.dropLast()
                     let a2 = a1.dropLast()
@@ -1608,6 +1637,8 @@ class WebPageScraper2: NSObject {
             return values // MT.com rows are time_DESCENDING from left to right, so the valueArray is in time-ASCENDING order deu to backwards row scraping.
         }
         else {
+//                let numberTerminal = "</td>"
+//                let rowTerminal = "</td></tr>"
                 let values = yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberStarter: numberStarter, numberTerminal: numberTerminal, exponent: webpageExponent)
                 return values
         }
@@ -1645,6 +1676,7 @@ class WebPageScraper2: NSObject {
         return values
     }
 
+    /// expect one table row of html text
     class func yahooRowNumbersExtraction(table$: String, rowTitle: String, numberStarter: String?=nil, numberTerminal: String?=nil, exponent: Double?=nil) -> [Double]? {
         
         var valueArray = [Double]()
@@ -1656,6 +1688,8 @@ class WebPageScraper2: NSObject {
         if let index = labelEndIndex {
             tableText.removeSubrange(index.lowerBound...)
         }
+        
+        guard labelEndIndex != nil else { return nil }
 
         repeat {
             guard let labelStartIndex = tableText.range(of: numberStarter, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil) else {

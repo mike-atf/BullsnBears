@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="0XX-RQ-AUp">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="0XX-RQ-AUp">
     <device id="ipad10_9rounded" orientation="landscape" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -31,7 +32,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TYZ-9r-P6z">
-                                        <rect key="frame" x="86" y="11.5" width="37" height="17"/>
+                                        <rect key="frame" x="86" y="10" width="43.5" height="20"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -58,7 +59,7 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="stockListCell" id="Ojn-WU-g5N" customClass="StockListCellTableViewCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="44.5" width="428" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="50" width="428" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Ojn-WU-g5N" id="aao-1Z-q1H">
                                             <rect key="frame" x="100" y="0.0" width="328" height="43.5"/>
@@ -259,7 +260,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Growth-based Valuation" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miC-j2-Brw">
-                                <rect key="frame" x="227" y="67.5" width="156.5" height="17"/>
+                                <rect key="frame" x="228" y="67.5" width="156.5" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -275,7 +276,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PWI-rZ-xja">
-                                <rect key="frame" x="146" y="65.5" width="20" height="18"/>
+                                <rect key="frame" x="146" y="64.5" width="21" height="19"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="PWI-rZ-xja" secondAttribute="height" multiplier="1:1" id="5sA-qP-vWN"/>
                                 </constraints>
@@ -286,7 +287,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fni-R7-t11">
-                                <rect key="frame" x="190" y="61.5" width="29.5" height="28.5"/>
+                                <rect key="frame" x="191" y="61.5" width="29.5" height="28.5"/>
                                 <color key="tintColor" systemColor="linkColor"/>
                                 <state key="normal" backgroundImage="dollarsign.circle.fill" catalog="system"/>
                                 <connections>
@@ -294,7 +295,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s3a-vi-G4m">
-                                <rect key="frame" x="388.5" y="65.5" width="20" height="18"/>
+                                <rect key="frame" x="389.5" y="64.5" width="21" height="19"/>
                                 <color key="tintColor" systemColor="systemYellowColor"/>
                                 <state key="normal" backgroundImage="exclamationmark.triangle" catalog="system"/>
                                 <connections>
@@ -305,7 +306,7 @@
                                 <rect key="frame" x="554" y="311" width="150" height="379"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B1R-fX-BfC">
-                                        <rect key="frame" x="100" y="5" width="45" height="31"/>
+                                        <rect key="frame" x="95" y="5" width="50" height="34"/>
                                         <color key="tintColor" name="AccentColor"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" image="arrow.clockwise.circle.fill" catalog="system"/>
@@ -326,31 +327,31 @@
                                 <rect key="frame" x="554" y="141" width="150" height="170"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mac D " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="roV-AV-Ii6">
-                                        <rect key="frame" x="5" y="19" width="45" height="17"/>
+                                        <rect key="frame" x="5" y="17" width="53.5" height="20.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(8/17/9)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="laM-o4-Csj">
-                                        <rect key="frame" x="5" y="37" width="44" height="15"/>
+                                        <rect key="frame" x="5" y="37.5" width="44" height="15"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Slow Stoch Oscillator" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="itd-Fz-tR8">
-                                        <rect key="frame" x="5" y="74" width="137.5" height="17"/>
+                                        <rect key="frame" x="5" y="61" width="89.5" height="42.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(5/14)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rA8-Yp-xLD">
-                                        <rect key="frame" x="5" y="92" width="34" height="15"/>
+                                        <rect key="frame" x="5" y="103.5" width="34" height="15"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eBK-Hm-dX3">
-                                        <rect key="frame" x="40" y="133" width="31" height="14.5"/>
+                                        <rect key="frame" x="40" y="132" width="33" height="16"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                         <color key="textColor" systemColor="systemOrangeColor"/>
                                         <nil key="highlightedColor"/>
@@ -510,16 +511,16 @@
         <scene sceneID="esG-QI-hKZ">
             <objects>
                 <tableViewController storyboardIdentifier="ValuationListViewController" title="Revenue" extendedLayoutIncludesOpaqueBars="YES" modalTransitionStyle="crossDissolve" modalPresentationStyle="formSheet" id="44u-xA-fyj" customClass="ValuationListViewController" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="9kl-Gg-cku">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="9kl-Gg-cku">
                         <rect key="frame" x="0.0" y="0.0" width="550" height="660"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valuationListCell" id="e9i-LB-o3D" customClass="ValuationTableViewCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="20" y="49.5" width="510" height="43.5"/>
+                                <rect key="frame" x="0.0" y="55.5" width="550" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="e9i-LB-o3D" id="Ie0-Ok-DJG">
-                                    <rect key="frame" x="0.0" y="0.0" width="510" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="550" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -529,6 +530,7 @@
                             <outlet property="delegate" destination="44u-xA-fyj" id="TfP-2x-DjM"/>
                         </connections>
                     </tableView>
+                    <navigationItem key="navigationItem" id="S8f-nz-S91"/>
                     <value key="contentSizeForViewInPopover" type="size" width="550" height="660"/>
                     <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                 </tableViewController>
@@ -546,7 +548,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valuationSummaryCell" rowHeight="50" id="Y8f-CK-70c" customClass="ValuationSummaryCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="20" y="49.5" width="460" height="50"/>
+                                <rect key="frame" x="20" y="55.5" width="460" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Y8f-CK-70c" id="z2q-yM-EwP">
                                     <rect key="frame" x="0.0" y="0.0" width="460" height="50"/>
@@ -645,7 +647,7 @@
                                 <rect key="frame" x="0.0" y="44" width="1180" height="100"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Compare shares" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e21-RP-5wh">
-                                        <rect key="frame" x="481" y="5" width="218" height="37"/>
+                                        <rect key="frame" x="471" y="5" width="238" height="41"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -676,14 +678,14 @@
                                         </constraints>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="comparisonCell" id="nS7-fZ-dZE" customClass="ComparisonCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                                <rect key="frame" x="16" y="49.5" width="1382" height="43.5"/>
+                                                <rect key="frame" x="16" y="55.5" width="1382" height="43.5"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="nS7-fZ-dZE" id="Jh3-ol-v6n">
                                                     <rect key="frame" x="0.0" y="0.0" width="1382" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="RowTitle" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rVo-cM-nLe">
-                                                            <rect key="frame" x="16" y="13.5" width="58" height="17"/>
+                                                            <rect key="frame" x="16" y="11.5" width="68.5" height="20.5"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
@@ -971,7 +973,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="errorLogListCell" id="hdh-zQ-MGT" customClass="ErrorLogListCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="20" y="49.5" width="360" height="43.5"/>
+                                <rect key="frame" x="20" y="55.5" width="360" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hdh-zQ-MGT" id="Grs-NJ-EEn">
                                     <rect key="frame" x="0.0" y="0.0" width="360" height="43.5"/>
@@ -1003,7 +1005,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="stockSearchCell" textLabel="J2a-bd-0Yk" detailTextLabel="yLG-DM-w9P" style="IBUITableViewCellStyleValue1" id="Ppu-HE-cWz">
-                                <rect key="frame" x="0.0" y="44.5" width="1180" height="43.5"/>
+                                <rect key="frame" x="0.0" y="50" width="1180" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Ppu-HE-cWz" id="pnq-iT-bB7">
                                     <rect key="frame" x="0.0" y="0.0" width="1180" height="43.5"/>
@@ -1046,19 +1048,19 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Add a company manually" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bPc-6X-Iqp">
-                                <rect key="frame" x="15" y="113" width="270" height="30"/>
+                                <rect key="frame" x="15" y="114" width="303" height="33.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Symbol:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AUp-Bh-PDH">
-                                <rect key="frame" x="15" y="160" width="62" height="20.5"/>
+                                <rect key="frame" x="15" y="162.5" width="71" height="24"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter symbol" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Cc1-Rg-cUZ">
-                                <rect key="frame" x="87" y="153" width="198" height="34"/>
+                                <rect key="frame" x="96" y="157.5" width="222" height="34"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <textInputTraits key="textInputTraits"/>
                                 <connections>
@@ -1066,13 +1068,13 @@
                                 </connections>
                             </textField>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bKk-5H-8E7">
-                                <rect key="frame" x="293.5" y="160" width="20.5" height="20.5"/>
+                                <rect key="frame" x="326.5" y="162.5" width="24" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="bKk-5H-8E7" secondAttribute="height" multiplier="1:1" id="cIQ-Uf-KOU"/>
                                 </constraints>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Auy-kd-vDo">
-                                <rect key="frame" x="293.5" y="200.5" width="20.5" height="20.5"/>
+                                <rect key="frame" x="326.5" y="204.5" width="24" height="24"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Auy-kd-vDo" secondAttribute="height" multiplier="1:1" id="pGl-pc-78z"/>
                                 </constraints>
@@ -1084,7 +1086,7 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Company name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dB2-J1-KdT">
-                                <rect key="frame" x="15" y="200" width="119" height="21"/>
+                                <rect key="frame" x="15" y="204.5" width="138" height="24"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -1136,7 +1138,7 @@
                         <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="wbValuationCell" id="r18-9v-cRb" customClass="WBValuationCell" customModule="Bulls_N_Bears" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="49.5" width="859.5" height="43.5"/>
+                                <rect key="frame" x="0.0" y="55.5" width="859.5" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="r18-9v-cRb" id="omy-jA-CVr">
                                     <rect key="frame" x="0.0" y="0.0" width="859.5" height="43.5"/>
@@ -1152,6 +1154,9 @@
                             <outlet property="delegate" destination="ZSB-xG-Tlv" id="GQX-yM-KFI"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <segue destination="44u-xA-fyj" kind="show" identifier="showDCFR1DetailsSegue" id="Ovk-Gg-FrU"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2b0-Yc-vx3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -1167,7 +1172,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="sortTVCCell" textLabel="EQi-CA-zbM" style="IBUITableViewCellStyleDefault" id="kHt-aY-gpA">
-                                <rect key="frame" x="0.0" y="44.5" width="1180" height="43.5"/>
+                                <rect key="frame" x="0.0" y="50" width="1180" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="kHt-aY-gpA" id="SRO-dJ-uYb">
                                     <rect key="frame" x="0.0" y="0.0" width="1180" height="43.5"/>
@@ -1204,7 +1209,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valueListCell1" textLabel="hWX-za-Pgf" detailTextLabel="kij-3M-93L" style="IBUITableViewCellStyleValue1" id="O30-oB-vcb">
-                                <rect key="frame" x="0.0" y="44.5" width="704" height="43.5"/>
+                                <rect key="frame" x="0.0" y="50" width="704" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="O30-oB-vcb" id="TXc-cn-z1H">
                                     <rect key="frame" x="0.0" y="0.0" width="704" height="43.5"/>
@@ -1248,52 +1253,52 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transaction Dialog" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oVF-zN-Rij">
-                                <rect key="frame" x="47" y="38" width="306" height="37"/>
+                                <rect key="frame" x="26" y="38" width="348" height="41"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" tag="10" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="S0.00" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="j3p-Tm-wHB">
-                                <rect key="frame" x="253" y="79" width="100" height="22"/>
+                                <rect key="frame" x="257" y="82.5" width="117" height="25.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Purchase / sale price" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b9N-B1-vFV">
-                                <rect key="frame" x="52" y="80" width="158" height="21"/>
+                                <rect key="frame" x="31" y="84" width="181" height="24"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Number bought / sold" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n52-f0-09J">
-                                <rect key="frame" x="52" y="104.5" width="166" height="21"/>
+                                <rect key="frame" x="31" y="108" width="191" height="24"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transaction date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="B8a-JQ-Y7N">
-                                <rect key="frame" x="52" y="141" width="128" height="21"/>
+                                <rect key="frame" x="31" y="144.5" width="146" height="24"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <datePicker contentMode="right" contentHorizontalAlignment="left" contentVerticalAlignment="center" datePickerMode="date" style="compact" translatesAutoresizingMaskIntoConstraints="NO" id="mfW-UM-yoU">
-                                <rect key="frame" x="243" y="133" width="110" height="31"/>
+                                <rect key="frame" x="247" y="140" width="127" height="34.5"/>
                             </datePicker>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsVerticalScrollIndicator="NO" text="Situation and rationale for learning from your investment diary" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="1ks-fC-xwe">
-                                <rect key="frame" x="52" y="220" width="301" height="324"/>
+                                <rect key="frame" x="31" y="230" width="343" height="308.5"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Why did you buy / sell?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wfc-g0-i4Z">
-                                <rect key="frame" x="52" y="202" width="301" height="23"/>
+                                <rect key="frame" x="31" y="208.5" width="343" height="26.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="F8B-kX-8ET">
-                                <rect key="frame" x="272.5" y="555" width="49" height="31"/>
+                                <rect key="frame" x="272.5" y="551.5" width="53.5" height="34.5"/>
                                 <color key="tintColor" name="Green"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Buy"/>
@@ -1302,7 +1307,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V31-cF-uPp">
-                                <rect key="frame" x="168.5" y="555" width="68.5" height="31"/>
+                                <rect key="frame" x="164" y="551.5" width="77" height="34.5"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="gray" title="Cancel"/>
                                 <connections>
@@ -1310,12 +1315,12 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" tag="20" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="000" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="t7J-sh-06s">
-                                <rect key="frame" x="253" y="103.5" width="31" height="22"/>
+                                <rect key="frame" x="257" y="106.5" width="36" height="25.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yfd-KA-CcY">
-                                <rect key="frame" x="82" y="555" width="48" height="31"/>
+                                <rect key="frame" x="78.5" y="551.5" width="51.5" height="34.5"/>
                                 <color key="tintColor" name="Red"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Sell"/>
@@ -1392,7 +1397,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="valuationErrorListCell" textLabel="10b-EV-brU" detailTextLabel="urX-qu-eAc" rowHeight="75" style="IBUITableViewCellStyleValue1" id="v1F-ZF-qJ1">
-                                <rect key="frame" x="0.0" y="49.5" width="1180" height="75"/>
+                                <rect key="frame" x="0.0" y="55.5" width="1180" height="75"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="v1F-ZF-qJ1" id="UuH-kF-J6m">
                                     <rect key="frame" x="0.0" y="0.0" width="1180" height="75"/>
@@ -1450,18 +1455,18 @@
         <segue reference="IOb-p8-cQu"/>
     </inferredMetricsTieBreakers>
     <resources>
-        <image name="arrow.clockwise.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="arrow.up.arrow.down" catalog="system" width="128" height="98"/>
-        <image name="arrowtriangle.right.and.line.vertical.and.arrowtriangle.left" catalog="system" width="128" height="89"/>
+        <image name="arrow.clockwise.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="arrow.up.arrow.down" catalog="system" width="128" height="97"/>
+        <image name="arrowtriangle.right.and.line.vertical.and.arrowtriangle.left" catalog="system" width="128" height="88"/>
         <image name="book" catalog="system" width="128" height="99"/>
-        <image name="creditcard.circle" catalog="system" width="128" height="121"/>
-        <image name="doc.text.magnifyingglass" catalog="system" width="107" height="128"/>
-        <image name="dollarsign.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="exclamationmark.triangle" catalog="system" width="128" height="112"/>
-        <image name="exclamationmark.triangle.fill" catalog="system" width="128" height="112"/>
-        <image name="info.circle" catalog="system" width="128" height="121"/>
+        <image name="creditcard.circle" catalog="system" width="128" height="123"/>
+        <image name="doc.text.magnifyingglass" catalog="system" width="110" height="128"/>
+        <image name="dollarsign.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="exclamationmark.triangle" catalog="system" width="128" height="109"/>
+        <image name="exclamationmark.triangle.fill" catalog="system" width="128" height="109"/>
+        <image name="info.circle" catalog="system" width="128" height="123"/>
         <image name="plus" catalog="system" width="128" height="113"/>
-        <image name="xmark.circle" catalog="system" width="128" height="121"/>
+        <image name="xmark.circle" catalog="system" width="128" height="123"/>
         <namedColor name="AccentColor">
             <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
@@ -1472,7 +1477,7 @@
             <color red="0.8970000147819519" green="0.24400000274181366" blue="0.1120000034570694" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="linkColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

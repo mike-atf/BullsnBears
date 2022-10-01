@@ -58,16 +58,23 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             secondSortParameter = sharesListSortParameter.userEvaluationScore
             thirdSortParameter = sharesListSortParameter.valueScore
         }
+        else if userSortChoice == sharesListSortParameter.moat {
+            firstSortAscending = true
+            firstSortParameter = "moatCategory"
+            secondSortParameter = sharesListSortParameter.moat
+            thirdSortParameter = sharesListSortParameter.valueScore
+        }
 
 
         let request = NSFetchRequest<Share>(entityName: "Share")
-
+        
         request.sortDescriptors = [ NSSortDescriptor(key: firstSortParameter, ascending: firstSortAscending), NSSortDescriptor(key: secondSortParameter, ascending: secondSortAscending), NSSortDescriptor(key: thirdSortParameter, ascending: thirdSortAscending)]
         
         let sL = StocksController2(fetchRequest: request, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: firstSortParameter, cacheName: nil)
         
         do {
             try sL.performFetch()
+                        
         } catch let error as NSError {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
         }
@@ -152,7 +159,30 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC
     }
     
-    /// called when App activated from background
+
+    func deleteOldDCFValuations() {
+        
+        print("delete old DCFVs")
+    
+        let fetchRequest = NSFetchRequest<DCFValuation>(entityName: "DCFValuation")
+        fetchRequest.sortDescriptors = [ NSSortDescriptor(key: "creationDate", ascending: true)]
+        
+        let dcfvcs = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        do {
+            try dcfvcs.performFetch()
+            print("\(dcfvcs.fetchedObjects?.count ?? 0) DCFVals retrieved")
+            
+            for object in dcfvcs.fetchedObjects ?? [DCFValuation]() {
+                object.delete()
+            }
+
+        } catch let error as NSError {
+            print("error fetching old DCFV \(error)")
+        }
+        
+    }
+
     @objc
     func updateShares() {
                 
@@ -400,18 +430,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         
         showWBValuationView(indexPath: indexPath,chartViewSegue: true)
-//        DispatchQueue.main.async {
-//            self.wbValuationView?.share = self.controller.object(at: indexPath)
-//            self.wbValuationView?.fromIndexPath = indexPath
-//
-//            if self.wbValuationView != nil  {
-//                self.navigationController?.pushViewController(self.wbValuationView!, animated: true)
-//            }
-//        }
-//
-//        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-//
-//        performSegue(withIdentifier: "showChartSegue", sender: nil)
     }
     
     func showWBValuationView(indexPath: IndexPath, chartViewSegue: Bool) {
@@ -619,7 +637,12 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
                 secondSortParameter = sharesListSortParameter.userEvaluationScore
                 thirdSortParameter = sharesListSortParameter.valueScore
             }
-
+            else if userSortChoice == sharesListSortParameter.moat {
+                firstSortAscending = true
+                firstSortParameter = "moatCategory"
+                secondSortParameter = sharesListSortParameter.moat
+                thirdSortParameter = sharesListSortParameter.valueScore
+            }
 
             let request = NSFetchRequest<Share>(entityName: "Share")
 
@@ -658,7 +681,6 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
             tableView.selectRow(at: atPath, animated: false, scrollPosition: .none) // does not trigger segue
             return
         }
-        
         
         var researchViewOpen = false
         if let nav = self.splitViewController?.navigationController {
@@ -724,7 +746,6 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
             treasuryBondYieldsButton.isEnabled = false
         }
     }
-        
 }
 
 

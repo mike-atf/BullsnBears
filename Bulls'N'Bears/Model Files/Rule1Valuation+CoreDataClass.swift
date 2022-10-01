@@ -9,6 +9,22 @@
 import UIKit
 import CoreData
 
+//enum R1ValuationParameters {
+//    case bvps
+//    case eps
+//    case revenue
+//    case opcs
+//    case debt
+//    case insiderStockBuys
+//    case insiderStockSells
+//    case insiderStocks
+//    case opCashFlow
+//    case netIncome
+//    case roic
+//    case hxPE
+//
+//}
+
 @objc(Rule1Valuation)
 public class Rule1Valuation: NSManagedObject {
     
@@ -71,6 +87,15 @@ public class Rule1Valuation: NSManagedObject {
         }
     }
     
+    public func ageOfValuation() -> TimeInterval? {
+        
+        if let date = creationDate {
+            return Date().timeIntervalSince(date)
+        }
+        
+        return nil
+    }
+    
     func historicalYearsCompleted() -> Int {
         var years = [0]
         years.append(eps?.count ?? 0)
@@ -82,37 +107,63 @@ public class Rule1Valuation: NSManagedObject {
         return years.min() ?? 0
     }
     
-//    func getDataFromDCFValuation(dcfValuation: DCFValuation?) {
+//    func shortNumberText(parameter: R1ValuationParameters) -> [String] {
 //
-//        guard let valuation = dcfValuation else {
-//            return
+//        var shortNumberStrings = [String]()
+//        var values:[Double]?
+//        var formatter = currencyFormatterNoGapWithPence
+//
+//        switch parameter {
+//        case .bvps:
+//            values = bvps
+//        case .debt:
+//            values = [debt]
+//        case .eps:
+//            values = eps
+//        case .netIncome:
+//            values = [netIncome]
+//        case .insiderStockBuys:
+//            values = [insiderStockBuys]
+//            formatter = numberFormatter2Decimals
+//        case .insiderStockSells:
+//            values = [insiderStockSells]
+//            formatter = numberFormatter2Decimals
+//        case .opCashFlow:
+//            values = [opCashFlow]
+//        case .opcs:
+//            values = opcs
+//        case .revenue:
+//            values = revenue
+//        case .insiderStocks:
+//            values = [insiderStocks]
+//            formatter = numberFormatter2Decimals
+//        case .roic:
+//            values = roic
+//            formatter = numberFormatter2Decimals
+//        case .hxPE:
+//            values = hxPE
+//            formatter = numberFormatter2Decimals
 //        }
 //
-//        var count = 0
-//        for sales in valuation.tRevenueActual ?? [] {
-//            self.revenue?.insert(sales, at: count)
-//            count += 1
+//        for element in values ?? [] {
+//            var value$ = "-"
+//            if element/1000000000 > 1 {
+//                let shortValue = element/1000000000
+//                let value$ = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "B"
+//            } else if element/1000000 > 1 {
+//                let shortValue = element/1000000
+//                let value$ = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "M"
+//            }
+//            else if element/1000 > 1 {
+//                let shortValue = element/1000
+//                let value$ = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "K"
+//            } else {
+//                value$ = (formatter.string(from: element  as NSNumber) ?? "-") + "K"
+//            }
+//            shortNumberStrings.append(value$)
 //        }
 //
-//        count = 0
-//        for sales in valuation.tFCFo ?? [] {
-//            self.opcs?.insert(sales, at: count)
-//            count += 1
-//        }
-//    }
-
-    
-//    internal func compoundGrowthRate(endValue: Double, startValue: Double, years: Double) -> Double {
-//
-//        return (pow((endValue / startValue) , (1/years)) - 1)
-//    }
-//
-//    internal func futureValue(present: Double, growth: Double, years: Double) -> Double {
-//        return present * pow((1+growth), years)
-//    }
-//
-//    internal func presentValue(growth: Double, years: Double, endValue: Double) -> Double {
-//        return endValue * (1 / pow(1+growth, years))
+//        return shortNumberStrings
 //    }
     
     func debtProportion() -> Double? {
@@ -137,18 +188,16 @@ public class Rule1Valuation: NSManagedObject {
         }
         return nil
     }
-
-
     
     /// 0-1
     func moatScore() -> Double? {
         
         let moatArrays = [bvps, eps, revenue, opcs]
         var moatGrowthRates = [[Double]]()
-        
+        self.share?.moatCategory = "NA"
+
         var sumValidRates = 0
         for moatArray in moatArrays {
-//            var moatGrowthArray = [Double]()
             if let compoundRates = Calculator.compoundGrowthRates(values: moatArray) {
                 moatGrowthRates.append(compoundRates)
                 sumValidRates += compoundRates.filter({ element in
@@ -159,18 +208,6 @@ public class Rule1Valuation: NSManagedObject {
             else {
                 moatGrowthRates.append([Double]())
             }
-            
-//            if let endValue = moatArray?.first {
-//                for yearBack in 1..<(moatArray?.count ?? 0) {
-//                    if let startValue = moatArray?[yearBack] {
-//                        moatGrowthArray.append(Calculator.compoundGrowthRate(endValue: endValue, startValue: startValue, years: Double(yearBack)) ?? Double())
-//                        sumValidRates += 1
-//                    }
-//                    else {
-//                        moatGrowthArray.append(Double())
-//                    }
-//                }
-//            }
         }
         
         sumValidRates += roic?.compactMap{ $0 }.count ?? 0
@@ -192,7 +229,22 @@ public class Rule1Valuation: NSManagedObject {
             else { return true }
         }).count ?? 0
         
-        return Double(ratesHigher10) / Double(sumValidRates)
+        let moat = Double(ratesHigher10) / Double(sumValidRates)
+        
+        self.share?.moat = moat
+        let categories = ["Good (>75%)","Intermediate (50-75%)","Low (<50%)"]
+        var category = String()
+        if moat > 0.75 {
+            category = categories[0]
+        } else if moat > 0.49 {
+            category = categories[1]
+        } else {
+            category = categories[2]
+        }
+        
+        self.share?.moatCategory = category
+        
+        return moat
     }
     
     func futureGrowthEstimate(cleanedBVPS: [Double]) -> Double? {

@@ -20,7 +20,105 @@ extension UIView {
 }
 
 
+extension Double? {
+    
+    /// returns fraction number  with 'B', 'M', 'K' or no letter at the end
+    /// for nil value returns empty String element
+    func shortString(decimals: Int, formatter: NumberFormatter?=nil ,nilString: String? = "-") -> String {
+                
+        let defaultFormatter: NumberFormatter = {
+            if decimals == 0 {
+                return currencyFormatterNoGapNoPence
+            }
+            else  {
+                return currencyFormatterNoGapWithPence
+            }
+        }()
+
+        let formatter = formatter ?? defaultFormatter
+        
+        var shortString = nilString ?? String()
+        
+        guard let element = self else { return  shortString }
+        
+        if abs(element)/1000000000000 > 1 {
+            let shortValue = element/1000000000000
+            shortString = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "T"
+        }
+        else if abs(element)/1000000000 > 1 {
+            let shortValue = element/1000000000
+            shortString = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "B"
+        } else if abs(element)/1000000 > 1 {
+            let shortValue = element/1000000
+            shortString = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "M"
+        }
+        else if abs(element)/1000 > 1 {
+            let shortValue = element/1000
+            shortString = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "K"
+        } else {
+            shortString = (formatter.string(from: element  as NSNumber) ?? "-")
+        }
+        
+        return shortString
+    }
+
+}
+
+extension Double {
+    
+    /// returns fraction number  with 'B', 'M', 'K' or no letter at the end
+    func shortString(decimals: Int, formatter: NumberFormatter?=nil) -> String {
+        
+        let defaultFormatter: NumberFormatter = {
+            if decimals == 0 {
+                return currencyFormatterNoGapNoPence
+            }
+            else  {
+                return currencyFormatterNoGapWithPence
+            }
+        }()
+
+        let formatter = formatter ?? defaultFormatter
+        var shortString = String()
+        
+        if abs(self)/1000000000000 > 1 {
+            let shortValue = self/1000000000000
+            shortString = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "T"
+        }
+        else if abs(self)/1000000000 > 1 {
+            let shortValue = self/1000000000
+            shortString = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "B"
+        } else if abs(self)/1000000 > 1 {
+            let shortValue = self/1000000
+            shortString = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "M"
+        }
+        else if abs(self)/1000 > 1 {
+            let shortValue = self/1000
+            shortString = (formatter.string(from: shortValue  as NSNumber) ?? "-") + "K"
+        } else {
+            shortString = (formatter.string(from: self  as NSNumber) ?? "-")
+        }
+        
+        return shortString
+    }
+
+}
+
 extension Array where Element == Double {
+    
+    /// returns fraction number  with 'B', 'M', 'K' or no letter at the end
+    func shortStrings(decimals: Int, formatter: NumberFormatter?=nil, nilString: String? = "-") -> [String] {
+                
+        var shortStrings = [String]()
+        
+        for element in self {
+            
+            shortStrings.append(element.shortString(decimals: decimals, formatter: formatter))
+            
+        }
+        
+        return shortStrings
+    }
     
     mutating func add(value: Double, index: Int) {
                 
@@ -279,6 +377,21 @@ extension Array where Element == Double {
 
 extension Array where Element == Double? {
     
+    /// returns fraction number  with 'B', 'M', 'K' or no letter at the end
+    /// for nil values returns empty String element
+    func shortStrings(decimals: Int, formatter: NumberFormatter?=nil ,nilString: String? = "-") -> [String] {
+                
+        var shortStrings = [String]()
+        
+        for element in self {
+            
+            shortStrings.append(element.shortString(decimals: decimals, formatter: formatter))
+            
+        }
+        
+        return shortStrings
+    }
+
     /// calculates growth rates from current to next element
     /// should have elemetns in descending order!
     /// i.e. the following element is younger/ usually smaller

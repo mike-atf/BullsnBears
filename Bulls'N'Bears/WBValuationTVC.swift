@@ -16,6 +16,8 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     var progressView: DownloadProgressView?
     var fromIndexPath: IndexPath!
     var movingToValueListTVC = false
+    var r1DataReload = false
+    var dcfDataReload = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,8 +29,18 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         tableView.register(UINib(nibName: "WBValuationCell", bundle: nil), forCellReuseIdentifier: "wbValuationCell")
         
         NotificationCenter.default.addObserver(self, selector: #selector(refreshRow(notification:)), name: NSNotification.Name(rawValue: "refreshWBValuationTVCRow"), object: nil)
-        
+
         controller = WBValuationController(share: share, progressDelegate: self)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if r1DataReload {
+            r1DataReload = false
+            tableView.reloadRows(at: [IndexPath(row: 0, section: 0),IndexPath(row: 6, section: 0) ], with: .automatic)
+        } else if dcfDataReload {
+            dcfDataReload = false
+            tableView.reloadRows(at: [IndexPath(row: 0, section: 7)], with: .automatic)
+        }
     }
     
     deinit {
@@ -73,19 +85,21 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         cell.configure(title: controller!.rowTitle(path: indexPath), detail: value$, detailColor: color,errors: errors, delegate: self, userEvaluation: evaluation, correlation: correlation,correlationValues: arrays?[0])
         
-        if indexPath.section == 0 {
-            cell.accessoryType = .detailButton
-            cell.accessoryView?.bounds = CGRect(x: 0, y: 0, width: 30, height: 30)
-            if [1,3,4].contains(indexPath.row) {
-                cell.accessoryView?.isHidden = true
-            }
-            else {
-                cell.accessoryView?.isHidden = false
-            }
-        }
-        else {
-            cell.accessoryType = .disclosureIndicator
-        }
+        cell.accessoryType = .disclosureIndicator
+
+//        if indexPath.section == 0 {
+//            cell.accessoryType = .detailButton
+//            cell.accessoryView?.bounds = CGRect(x: 0, y: 0, width: 30, height: 30)
+//            if [1,3,4].contains(indexPath.row) {
+//                cell.accessoryView?.isHidden = true
+//            }
+//            else {
+//                cell.accessoryView?.isHidden = false
+//            }
+//        }
+//        else {
+//            cell.accessoryType = .disclosureIndicator
+//        }
 
         return cell
     }
@@ -187,11 +201,11 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        guard indexPath.section > 0 else {
-            return
+        if indexPath.section == 0 {
+            performSegue(withIdentifier: "showDCFR1DetailsSegue", sender: nil)
+        } else {
+            performSegue(withIdentifier: "valueListSegue", sender: nil)
         }
-        
-        performSegue(withIdentifier: "valueListSegue", sender: nil)
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -229,13 +243,8 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         guard let selectedPath = self.tableView.indexPathForSelectedRow else {
             return
         }
-        
-        // section one has P/E, EPS and beta - no details to show
-        guard selectedPath.section > 0 else {
-            return
-        }
-        
-        guard let wbVal = controller?.valuation else {
+                
+        guard let wbVal = controller?.wbValuation else {
             return
         }
         
@@ -269,13 +278,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapWithPence
                 }
-//                else if selectedPath.row == 2 {
-//                // Net income / Revenue
-//                    destination.values = arrays
-//                    destination.formatter = currencyFormatterGapNoPence
-//                    let (margins, _) = validController.valuation!.netIncomeProportion()
-//                    destination.proportions = margins
-//                }
                 else if selectedPath.row == 2 {
                 // Ret earnings
                     destination.values = arrays
@@ -290,7 +292,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 // Profit margin
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = validController.valuation!.grossProfitMargins()
+                    let (margins, _) = validController.wbValuation!.grossProfitMargins()
                     destination.proportions = margins
                 
                 }
@@ -298,7 +300,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 // Op. cash flow
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = validController.valuation!.longtermDebtProportion()
+                    let (margins, _) = validController.wbValuation!.longtermDebtProportion()
                     destination.proportions = margins
                 }
 
@@ -314,26 +316,20 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     destination.values = arrays
                     destination.formatter = percentFormatter0Digits
                 }
-//                else if selectedPath.row == 2 {
-//                // Lt debt / adj shareholder equity
-//                    destination.values = arrays
-//                    destination.formatter = percentFormatter0Digits
-//                    destination.higherGrowthIsBetter = false
-//                }
             }
             else if selectedPath.section == 3 {
                 if selectedPath.row == 0 {
                 // CapEx / earnings
                     destination.values = arrays
                     destination.formatter = percentFormatter0Digits
-                    let (prop, _) = validController.valuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
+                    let (prop, _) = validController.wbValuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
                     destination.proportions = prop
                     destination.higherGrowthIsBetter = false
                 }
                 else if selectedPath.row == 1 {
                 // Lt debt / net income
                     destination.values = arrays
-                    let (margins, _) = validController.valuation!.longtermDebtProportion()
+                    let (margins, _) = validController.wbValuation!.longtermDebtProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                 }
@@ -341,7 +337,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 // SGA / profit
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = validController.valuation!.sgaProportion()
+                    let (margins, _) = validController.wbValuation!.sgaProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                 }
@@ -349,11 +345,21 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 // R&D / profit
                     destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = validController.valuation!.rAndDProportion()
+                    let (margins, _) = validController.wbValuation!.rAndDProportion()
                     destination.proportions = margins
                     destination.higherGrowthIsBetter = false
                 }
             }
+        }
+        else if let destination = segue.destination as? ValuationListViewController {
+            if ([0,5].contains(selectedPath.row)) {
+                destination.valuationMethod = .rule1
+                r1DataReload = true
+            } else {
+                destination.valuationMethod = .dcf
+                dcfDataReload = true
+            }
+            destination.share = share
         }
         
     }
@@ -365,66 +371,55 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         if indexPath.section == 1 {
             if indexPath.row == 0 {
             // Revenue
-                arrays = [controller?.valuation?.revenue ?? []]
+                arrays = [controller?.wbValuation?.revenue ?? []]
             }
             else if indexPath.row == 1 {
             // net income
-                arrays = [controller?.valuation?.netEarnings ?? []]
+                arrays = [controller?.wbValuation?.netEarnings ?? []]
             }
-//            else if indexPath.row == 2 {
-//            // net income / revenue
-//                arrays = [controller?.valuation?.netEarnings ?? [], controller?.valuation?.revenue ?? []]
-//            }
             else if indexPath.row == 2 {
             // Ret. earnings
-                arrays = [controller?.valuation?.equityRepurchased ?? []]
+                arrays = [controller?.wbValuation?.equityRepurchased ?? []]
             }
             else if indexPath.row == 3 {
             // EPS
-                arrays = [controller?.valuation?.eps ?? []]
+                arrays = [controller?.wbValuation?.eps ?? []]
             }
             else if indexPath.row == 4 {
             // Profit margin
-                arrays = [controller?.valuation?.grossProfit ?? [], controller?.valuation?.revenue ?? []]
+                arrays = [controller?.wbValuation?.grossProfit ?? [], controller?.wbValuation?.revenue ?? []]
             }
             else if indexPath.row == 5 {
             // op. cash flow
-                arrays = [controller?.valuation?.opCashFlow ?? []]
+                arrays = [controller?.wbValuation?.opCashFlow ?? []]
             }
         }
         else if indexPath.section == 2 {
             if indexPath.row == 0 {
             // ROE
-                arrays = [controller?.valuation?.roe ?? []]
+                arrays = [controller?.wbValuation?.roe ?? []]
             }
             else if indexPath.row == 1 {
             // ROA
-                arrays = [controller?.valuation?.roa ?? []]
+                arrays = [controller?.wbValuation?.roa ?? []]
             }
-//            else if indexPath.row == 2 {
-//            // Lt debt / adj. shareholder equity
-//                if let validController = controller {
-//                    let (shEquityWithRetEarnings, _) = validController.valuation!.addElements(array1: validController.valuation?.shareholdersEquity ?? [], array2: validController.valuation!.equityRepurchased ?? [])
-//                    arrays = [validController.valuation?.debtLT ?? [], shEquityWithRetEarnings]
-//                }
-//            }
         }
         else if indexPath.section == 3 {
             if indexPath.row == 0 {
             // capEx / net income
-                arrays = [controller?.valuation?.capExpend ?? [], controller?.valuation?.netEarnings ?? []]
+                arrays = [controller?.wbValuation?.capExpend ?? [], controller?.wbValuation?.netEarnings ?? []]
             }
             else if indexPath.row == 1 {
             // Lt debt / net income
-                arrays = [controller?.valuation?.debtLT ?? [], controller?.valuation?.netEarnings ?? []]
+                arrays = [controller?.wbValuation?.debtLT ?? [], controller?.wbValuation?.netEarnings ?? []]
             }
             else if indexPath.row == 2 {
             // sga / profit
-                arrays = [controller?.valuation?.sgaExpense ?? [], controller?.valuation?.grossProfit ?? []]
+                arrays = [controller?.wbValuation?.sgaExpense ?? [], controller?.wbValuation?.grossProfit ?? []]
             }
             else if indexPath.row == 3 {
             // R&D / profit
-                arrays = [controller?.valuation?.rAndDexpense ?? [], controller?.valuation?.grossProfit ?? []]
+                arrays = [controller?.wbValuation?.rAndDexpense ?? [], controller?.wbValuation?.grossProfit ?? []]
             }
         }
 
@@ -471,10 +466,9 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
     }
 
-
 }
 
-extension WBValuationTVC: WBValuationCellDelegate { //StockDelegate,
+extension WBValuationTVC: WBValuationCellDelegate {
         
     func infoButtonAction(errors: [String]?, sender: UIView) {
         
@@ -497,4 +491,13 @@ extension WBValuationTVC: WBValuationCellDelegate { //StockDelegate,
 
     
 }
+
+//extension WBValuationTVC: ValuationListDelegate {
+//    func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?) {
+//
+//        print("valuation delegTE: COMPLETE")
+//    }
+//
+//
+//}
 

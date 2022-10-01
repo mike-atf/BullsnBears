@@ -35,6 +35,8 @@ extension Rule1Valuation {
     @NSManaged public var insiderStocks: Double
     @NSManaged public var ceoRating: Double
     @NSManaged public var share: Share?
+    @NSManaged public var alerts: [String]?
+
 
 }
 

@@ -15,7 +15,6 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     
     var delegate: ValuationListDelegate?
     var sourceIndexPath: IndexPath!
-//    var stock: Stock!
     var share: Share!
     var valuationMethod: ValuationMethods!
     var sectionSubtitles: [String]?
@@ -24,6 +23,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
     var controller: CombinedValuationController!
     var progressView: DownloadProgressView?
+    var newDataDownloaded = false
     
     var showDownloadCompleteMessage = false // used because asking alertConotrller to show message in 'dataUpdated' right after reloadData causes 'table view or one of its superviews has not been added to a window' error, assuming that reloading rows still takes place while the alertView is in front. so instead show this when the viewDidLayouSubviews, using this bool
     
@@ -98,9 +98,9 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
             else if [7].contains(section) { return 40 }
             else { return (UIDevice().userInterfaceIdiom == .pad) ? 70 : 60 }
         } else {
-            if [0,1,6,7,8,9,10,11].contains(section) { return 70 }
-            else {  return (UIDevice().userInterfaceIdiom == .pad) ? 40 : 60 }
-
+//            if [0,2,7,8,9,10,11,12].contains(section) { return 70 }
+//            else {  return (UIDevice().userInterfaceIdiom == .pad) ? 40 : 60 }
+            return 50
         }
        
     }
@@ -146,7 +146,6 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         
         header.addSubview(subTitle)
         
-        
         let margins = header.layoutMarginsGuide
         
         titleLabel.setContentHuggingPriority(.required, for: .vertical)
@@ -159,30 +158,44 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
         
         if section == 0 {
-        
             var config = UIButton.Configuration.borderedTinted()
-            config.title = "Download"
+            if newDataDownloaded {
+                config.image = UIImage(systemName: "square.and.arrow.down.fill")
+            } else {
+                config.image = UIImage(systemName: "arrow.down.square")
+            }
+//            config.title = "Download"
             let donwloadButton = UIButton(configuration: config, primaryAction: nil)
-            donwloadButton.addTarget(self, action: #selector(downloadValuationData), for: .touchUpInside)
+            if newDataDownloaded {
+                donwloadButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
+            } else {
+                donwloadButton.addTarget(self, action: #selector(downloadValuationData), for: .touchUpInside)
+            }
             donwloadButton.translatesAutoresizingMaskIntoConstraints = false
             header.addSubview(donwloadButton)
 
             donwloadButton.topAnchor.constraint(equalTo: titleLabel.topAnchor,constant: 5).isActive = true
-            donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
+            donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor,constant: -5).isActive = true
         }
         
-        if section == (sectionTitles?.count ?? 0) - 1 {
-            var config = UIButton.Configuration.borderedTinted()
-            config.title = "Save"
-
-            let saveButton = UIButton(configuration: config, primaryAction: nil)
-            saveButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
-            saveButton.translatesAutoresizingMaskIntoConstraints = false
-            header.addSubview(saveButton)
-
-            saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-            saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-        }
+//        var saveButtonTargetSection = (sectionTitles?.count ?? 0) - 1
+//        if valuationMethod == .rule1 {
+//            saveButtonTargetSection = (sectionTitles?.count ?? 0) - 4
+//        }
+//
+//        if section == saveButtonTargetSection {
+//            var config = UIButton.Configuration.borderedTinted()
+////            config.title = "Save"
+//            config.image = UIImage(systemName: "square.and.arrow.down.fill")
+//
+//            let saveButton = UIButton(configuration: config, primaryAction: nil)
+//            saveButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
+//            saveButton.translatesAutoresizingMaskIntoConstraints = false
+//            header.addSubview(saveButton)
+//
+//            saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+//            saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor,constant: -5).isActive = true
+//        }
 
         return header
         
@@ -206,13 +219,18 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
                 NotificationCenter.default.removeObserver(self)
             }
 
-//            self.valuationController.removeObjectsFromMemory()
-            
             if valuationMethod == .rule1 {
-                delegate?.valuationComplete(listView: self, r1Valuation: share.rule1Valuation)
+                
+                if let validDelegate = delegate {
+                    // separate mid-screen window
+                    validDelegate.valuationComplete(listView: self, r1Valuation: share.rule1Valuation)
+                }
             }
             else {
-                delegate?.valuationComplete(listView: self, r1Valuation: nil)
+                if let validDelegate = delegate {
+                    // separate mid-screen window
+                    validDelegate.valuationComplete(listView: self, r1Valuation: nil)
+                }
             }
         }
     }
@@ -266,7 +284,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
                 
         controller.updateData()
                 
-        self.sectionSubtitles?[0] = "Scroll down to save"
+        self.sectionSubtitles?[0] = "Adjust pred. growth, then tap to save"
 
         if (sectionTitles?.count ?? 0) > 0 {
             tableView.reloadData()
@@ -290,6 +308,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
             }
         }
     }
+    
 }
 
 
@@ -317,9 +336,9 @@ extension ValuationListViewController: ProgressViewDelegate {
     func downloadComplete() {
         
         // progressView calls this on it's own once completedTasks >= tasks
-        
+        newDataDownloaded = true
+//        sectionSubtitles![0] = "Adjust, then tap to save"
         DispatchQueue.main.async {
-            
             NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil)
         }
     }

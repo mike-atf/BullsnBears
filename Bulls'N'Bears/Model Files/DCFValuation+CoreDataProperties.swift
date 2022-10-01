@@ -34,6 +34,7 @@ extension DCFValuation {
     @NSManaged public var company: String?
     @NSManaged public var creationDate: Date?
     @NSManaged public var share: Share?
+    @NSManaged public var alerts: [String]?
 
 }
 

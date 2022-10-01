@@ -19,7 +19,7 @@ class StocksController2: NSFetchedResultsController<Share> {
     var treasuryBondYields: [DatedValue]?
     var viewController: StocksListTVC?
     var backgroundMoc: NSManagedObjectContext?
-    
+    var sharesAwaitingUpdateDownload: [Share]? // to check if/when all share update download are complete
     var controllerDelegate: StocksController2Delegate?
     
     // MARK: - FRC functions
@@ -297,6 +297,8 @@ class StocksController2: NSFetchedResultsController<Share> {
 
     // MARK: - update functions
 
+    /// downloads daily prices, EPS/ qEPS, PER, live prices and tBond data
+    /// updates MAC-Ds
     func updateStocksData(singleShare: Share?=nil) throws {
         
         if singleShare == nil {
@@ -315,6 +317,8 @@ class StocksController2: NSFetchedResultsController<Share> {
                 else { return false }
             })
         }
+        
+        sharesAwaitingUpdateDownload = sharesToUpdate
         
         let now = Date()
         let dateForNil = now.addingTimeInterval(-301)
@@ -393,12 +397,137 @@ class StocksController2: NSFetchedResultsController<Share> {
         }
     }
     
+    /// checks up-to-date status of, and downloads DCF-, R1- and WB-Valuation data
+    /// updates trends
+    func updateStockInformation(singleShare: Share?=nil) {
+        
+        print("beginning to update share background infos...")
+        
+        var sharesToUpdate: [Share]?
+        if let validShare = singleShare {
+            sharesToUpdate = [validShare]
+        } else {
+            sharesToUpdate = fetchedObjects?.filter({ share in
+                if share.watchStatus < 2 { return true }
+                else { return false }
+            })
+        }
+
+        for share in sharesToUpdate ?? [] {
+            
+            let symbol = share.symbol
+            
+            if (share.dcfValuation?.creationDate ?? Date()).timeIntervalSince(Date()) > 365*24*3600/12 {
+                // refresh dcf valuation
+                // save new dcfvalue as trend
+                
+                if let dcfValuationID = share.dcfValuation?.objectID {
+                    let dcfv = managedObjectContext.object(with: dcfValuationID) as! DCFValuation
+                    let (value,_) = dcfv.returnIValue()
+                    if value != nil {
+                        let trendValue = DatedValue(date: dcfv.creationDate!, value: value!)
+                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .dCFValue)
+                    }
+
+                    Task(priority: .background) {
+                        do {
+                            try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: dcfValuationID, progressDelegate: nil)
+                            //                        try Task.checkCancellation()
+                        } catch let error {
+                            ErrorController.addErrorLog(errorLocation: "StocksController2.updateStockInformation.dcfValuation", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
+                        }
+                    }
+                }
+            }
+            
+            if (share.rule1Valuation?.creationDate ?? Date()).timeIntervalSince(Date()) > 365*24*3600/12 {
+                // refresh rule 1 valuation
+                // save new r1 moat and sticker price as trend
+                
+                let shortName = share.name_short
+                if let r1ValuationID = share.rule1Valuation?.objectID {
+                    
+                    // save existing values if necessary
+                    let r1v = managedObjectContext.object(with: r1ValuationID) as! Rule1Valuation
+                    if let moat = r1v.moatScore() {
+                        let trendValue = DatedValue(date: r1v.creationDate!, value: moat)
+                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .moatScore)
+                    }
+                    let (value2, _) = r1v.stickerPrice()
+                    if value2 != nil {
+                        let trendValue = DatedValue(date: r1v.creationDate!, value: value2!)
+                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .stickerPrice)
+                    }
+                    
+                    Task(priority: .background) {
+                        
+                        do {
+                            let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: r1ValuationID, progressDelegate: nil, downloadRedirectDelegate: self)
+                            try Task.checkCancellation()
+                        } catch let error {
+                            ErrorController.addErrorLog(errorLocation: "StocksController2.updateSharesInfo.r1Valuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                        }
+                        
+                    }
+                }
+            }
+            
+            if (share.wbValuation?.date ?? Date()).timeIntervalSince(Date()) > 365*24*3600/12 {
+                // refresh WB valuation 
+                // save intrinsic value as trend in Share
+                
+                let shortName = share.name_short
+                let shareID = share.objectID
+                if let wbValuationID = share.wbValuation?.objectID {
+                    
+                    let wbv = managedObjectContext.object(with: wbValuationID) as! WBValuation
+                    if let lynch = wbv.lynchRatio() {
+                        let trendValue = DatedValue(date: wbv.date!, value: lynch)
+                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .lynchScore)
+                    }
+                    let (value2, _) = wbv.ivalue()
+                    if value2 != nil {
+                        let trendValue = DatedValue(date: wbv.date!, value: value2!)
+                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .intrinsicValue)
+                    }
+
+                    Task(priority: .background) {
+                        do {
+                            try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: wbValuationID, downloadRedirectDelegate: self)
+                            try await WebPageScraper2.keyratioDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID)
+                        } catch let error {
+                            ErrorController.addErrorLog(errorLocation: "StocksController2.updateSharesInfo.wbValuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                        }
+
+                    }
+                }
+            }
+
+            
+        }
+        
+        
+    }
+    
     /// must be called on main thread
     func updateCompleteToDelegate(id: NSManagedObjectID) {
         
         let updatedShare = managedObjectContext.object(with: id) as! Share
+        
+        if let sau = sharesAwaitingUpdateDownload {
+            for i in 0..<sau.count {
+                if sau[i].isEqual(updatedShare) {
+                    sharesAwaitingUpdateDownload?.remove(at: i)
+                }
+            }
+        }
+        
         if let path = self.indexPath(forObject: updatedShare) {
             controllerDelegate?.shareUpdateComplete(atPath: path)
+        }
+        
+        if (sharesAwaitingUpdateDownload?.count ?? 0) == 0 {
+            updateStockInformation()
         }
     }
     

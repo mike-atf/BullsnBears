@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -350,6 +350,7 @@
 		EA641C282642BCD4002FE8C1 /* TBYChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TBYChartViewController.swift; sourceTree = SOURCE_ROOT; };
 		EA6AACD726050457002DE9DF /* MAC_D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MAC_D.swift; sourceTree = SOURCE_ROOT; };
 		EA6AACDE26053294002DE9DF /* MACD_View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MACD_View.swift; path = "Bulls'N'Bears/Model Files/MACD_View.swift"; sourceTree = SOURCE_ROOT; };
+		EA6B9E8D27D0F9F2002A55AD /* TrendMyStocks 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 14.xcdatamodel"; sourceTree = "<group>"; };
 		EA6EEF9126165665000FA141 /* ResearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ResearchController.swift; path = "Bulls'N'Bears/ResearchController.swift"; sourceTree = SOURCE_ROOT; };
 		EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationDataCleaner.swift; sourceTree = "<group>"; };
 		EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationErrorsTVC.swift; sourceTree = SOURCE_ROOT; };
@@ -916,6 +917,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		EAC07D5325ACE4430045D83B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -1261,7 +1263,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1317,7 +1319,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1337,11 +1339,14 @@
 				CURRENT_PROJECT_VERSION = 1867;
 				DEVELOPMENT_TEAM = 9T25ACNCQ7;
 				INFOPLIST_FILE = "Bulls'N'Bears/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bulls N Bears";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7.4;
+				MARKETING_VERSION = 0.7.5;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1358,11 +1363,14 @@
 				CURRENT_PROJECT_VERSION = 1867;
 				DEVELOPMENT_TEAM = 9T25ACNCQ7;
 				INFOPLIST_FILE = "Bulls'N'Bears/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bulls N Bears";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7.4;
+				MARKETING_VERSION = 0.7.5;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1499,6 +1507,7 @@
 		EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				EA6B9E8D27D0F9F2002A55AD /* TrendMyStocks 14.xcdatamodel */,
 				EAA1884827A1A719009AC214 /* TrendMyStocks 13.xcdatamodel */,
 				EAAB7BCB2753D71B00295DA7 /* TrendMyStocks 12.xcdatamodel */,
 				EA20161F272034EB004432EC /* TrendMyStocks 11.xcdatamodel */,
@@ -1513,7 +1522,7 @@
 				EAD835C225DB02030015C93A /* TrendMyStocks 2.xcdatamodel */,
 				EAC19053257641160030B331 /* TrendMyStocks.xcdatamodel */,
 			);
-			currentVersion = EAA1884827A1A719009AC214 /* TrendMyStocks 13.xcdatamodel */;
+			currentVersion = EA6B9E8D27D0F9F2002A55AD /* TrendMyStocks 14.xcdatamodel */;
 			path = TrendMyStocks.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

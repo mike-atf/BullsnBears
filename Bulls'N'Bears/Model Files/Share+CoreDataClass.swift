@@ -44,6 +44,10 @@ public class Share: NSManagedObject {
             growthSubType = "Unknown"
         }
         
+        if moatCategory == nil {
+            moatCategory = "NA"
+        }
+        
         if let date = self.research?.nextReportDate {
             if date < Date() {
                 self.research?.nextReportDate = nil
@@ -57,7 +61,7 @@ public class Share: NSManagedObject {
         if self.valueScore.isNaN {
             self.valueScore = Double()
         }
-
+                
     }
     
     
@@ -75,6 +79,117 @@ public class Share: NSManagedObject {
             }
         }
     }
+    
+    /// returns trend values with dates in date descending order
+    func trendValues(trendName: ShareTrendNames) -> [DatedValue]? {
+        
+        var data: Data?
+        
+        switch trendName {
+        case .moatScore:
+            data = trend_MoatScore
+        case .stickerPrice:
+            data = trend_StickerPrice
+        case .dCFValue:
+            data = trend_DCFValue
+        case .lynchScore:
+            data = trend_LynchScore
+        case .caRatio:
+            data = trend_caRatio
+        case .pcRatio:
+            data = trend_pcRatio
+        case .intrinsicValue:
+            data = trend_intrinsicValue
+        }
+
+       
+        if let valid = data {
+            do {
+                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
+                    var datedValues = [DatedValue]()
+                    for element in dictionary {
+                        datedValues.append(DatedValue(date: element.key, value: element.value))
+                    }
+                    return datedValues.sorted { (e0, e1) -> Bool in
+                        if e0.date > e1.date { return true }
+                        else { return false }
+                    }
+                }
+            } catch let error {
+                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+            }
+        }
+        
+        return nil
+    }
+    
+    /// adds new data to existing trend Data
+    func saveTrendsData(datedValuesToAdd: [DatedValue]?, trendName: ShareTrendNames, saveInContext:Bool?=true) {
+        
+        var existingValues = trendValues(trendName: trendName) ?? [DatedValue]()
+        // check if there's a value for the sent date already
+        let existingValueDates = existingValues.compactMap{ $0.date}
+        if let values = datedValuesToAdd {
+            for value in values {
+                if !existingValueDates.contains(value.date) {
+                    existingValues.append(value)
+                }
+            }
+        }
+                
+        if let validData = datedValuesToData(datedValues: existingValues) {
+
+
+            switch trendName {
+            case .moatScore:
+                trend_MoatScore = validData
+            case .stickerPrice:
+                trend_StickerPrice = validData
+            case .dCFValue:
+                trend_DCFValue = validData
+            case .lynchScore:
+                trend_LynchScore = validData
+            case .caRatio:
+                trend_caRatio = validData
+            case .pcRatio:
+                trend_pcRatio = validData
+            case .intrinsicValue:
+                trend_intrinsicValue = validData
+            }
+            
+            if saveInContext ?? true {
+                do {
+                    try self.managedObjectContext?.save()
+                }
+                catch let error {
+                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing share trend data \(trendName)")
+                }
+            }
+        }
+        
+    }
+    
+    func datedValuesToData(datedValues: [DatedValue]?) -> Data? {
+        
+        guard let validValues = datedValues else {
+            return nil
+        }
+        
+        var array = [Date: Double]()
+
+        for element in validValues {
+            array[element.date] = element.value
+        }
+
+        do {
+            return try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
+        } catch let error {
+            ErrorController.addErrorLog(errorLocation: "datedValuesToData function", systemError: error, errorInfo: "error converting DatedValues to Data")
+        }
+
+        return nil
+    }
+
     
     /// stores prices in date sorted order.
     func setDailyPrices(pricePoints: [PricePoint]?, saveInMOC: Bool?=true) {

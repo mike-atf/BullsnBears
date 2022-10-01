@@ -42,6 +42,18 @@ extension Share {
     @NSManaged public var research: StockResearch?
     @NSManaged public var rule1Valuation: Rule1Valuation?
     @NSManaged public var wbValuation: WBValuation?
+    @NSManaged public var moatCategory: String?
+    @NSManaged public var moat: Double // transferred to this stored value from rule1Valuation.moatScore() for the purpose of sorting the shares list on fetching
+    @NSManaged public var trend_MoatScore: Data?
+    @NSManaged public var trend_DCFValue: Data?
+    @NSManaged public var trend_LynchScore: Data?
+    @NSManaged public var trend_StickerPrice: Data?
+    @NSManaged public var trend_pcRatio: Data?
+    @NSManaged public var trend_caRatio: Data?
+    @NSManaged public var trend_intrinsicValue: Data?
+    @NSManaged public var capitalAssetRatio: Double
+    @NSManaged public var pcRatio: Double
+
 
 }
 

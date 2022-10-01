@@ -16,7 +16,7 @@ class ChartTimeLineView: UIView {
     var share: Share?
     
     var dateRange = [Date(), Date()]
-    var stdLabelWidth: CGFloat!
+    var stdLabelWidth: CGFloat = 30
     var timeIntervalBetweenLabels: TimeInterval!
     
     var sma10Crossing: LineCrossing?

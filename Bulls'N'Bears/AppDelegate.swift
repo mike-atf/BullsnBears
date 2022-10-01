@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("app folder path is \(NSHomeDirectory())")
         return true
     }
+    
 
     // MARK: UISceneSession Lifecycle
 

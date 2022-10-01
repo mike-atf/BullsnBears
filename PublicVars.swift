@@ -8,6 +8,16 @@
 import UIKit
 import CoreData
 
+enum ShareTrendNames {
+    case moatScore
+    case dCFValue
+    case stickerPrice
+    case lynchScore
+    case pcRatio
+    case caRatio
+    case intrinsicValue
+}
+
 enum DownloadAndAnalysisError: Error {
     case mimeType
     case urlError
@@ -318,10 +328,11 @@ struct SharesListSortParameter {
     let userEvaluationScore = "userEvaluationScore"
     let valueScore = "valueScore"
     let industry = "industry"
+    let moat = "moat"
     let sector = "sector"
     let growthType = "growthType"
     let symbol = "symbol"
-    
+
     func options() -> [String] {
         
         var properties = [String]()
@@ -340,6 +351,7 @@ struct SharesListSortParameter {
         if term == userEvaluationScore { return "User rating" }
         else if term == valueScore { return "Financials score" }
         else if term == growthType { return "Growth type" }
+
         else { return term.capitalized }
     }
     

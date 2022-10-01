@@ -40,25 +40,23 @@ struct WBVParameters {
     func firstSection() -> [[String]] {
         return [[revenueGrowth],
                 [earnigsGrowth],
-//                [incomeOfRevenueGrowth], //, "Revenue"
                 [retEarningsGrowth],
                 [epsGrowth],
-                [profitOfRevenueGrowth], //, "Revenue"
+                [profitOfRevenueGrowth],
                 [opCashFlowGrowth]]
     }
     
     func secondSection() -> [[String]] {
         return [[roeGrowth],
                 [roaGrowth],
-//                [debtOfEqAndRtEarningsGrowth]
-        ] // , "equity + ret. earnings"
+        ]
     }
     
     func thirdSection() -> [[String]] {
-        return [[capExpendOfEarningsGrowth], //, "Net income"
-                [debtOfIncomeGrowth], //, "Net income"
-                [sgaOfProfitGrowth], // , "Profit"
-                [rAdOfProfitGrowth]] // , "Profit"]
+        return [[capExpendOfEarningsGrowth],
+                [debtOfIncomeGrowth],
+                [sgaOfProfitGrowth],
+                [rAdOfProfitGrowth]]
     }
 
     /// all other WBVParameters have highIsBetter
@@ -86,17 +84,15 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     var sectionSubTitles: [String?] = [nil,"Trend & growth EMA","Trend & growth EMA","Trend & Ratio"]
     var rowTitles: [[String]]!
     var share: Share!
-    var valuation: WBValuation?
+    var wbValuation: WBValuation?
     var valuationID: NSManagedObjectID?
     var progressDelegate: ProgressViewDelegate?
     var downloadTasks = 0
     var downloadTasksCompleted = 0
     var downloadErrors = [String]()
-//    var downloader: WebDataDownloader?
     var valueListChartLegendTitles = [
         [["Revenue"],
          ["Net income"],
-//         ["net income / revenue"],
          ["Ret. earnings"],
          ["EPS"],
          ["Profit margin"],
@@ -105,7 +101,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         [
          ["ROE"],
          ["ROA"],
-//         ["lt debt / adj. equity"]
         ],
         [["capExpend/earnings"],
          ["LT debt/earnings"],
@@ -114,6 +109,9 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         ]]
     var wbvParameters = WBVParameters()
     var downloadTask: Task<Any?,Error>?
+    
+    var dcfValuation: DCFValuation?
+    var r1Valuation: Rule1Valuation?
     
     //MARK: - init
 
@@ -124,31 +122,62 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         self.share = share
         self.progressDelegate = progressDelegate
         
+        // 1 WBValuation
         if let valuation = share.wbValuation {
-            self.valuation = valuation
+            self.wbValuation = valuation
             self.valuationID = valuation.objectID
         }
         else if let valuation = WBValuationController.returnWBValuations(share: share) {
             // find old disconnected valutions persisted after share was deleted
-            self.valuation = valuation
+            self.wbValuation = valuation
             self.valuationID = valuation.objectID
 
         }
         else {
-            self.valuation = WBValuationController.createWBValuation(share: share)
+            self.wbValuation = WBValuationController.createWBValuation(share: share)
             // when deleting a WBValuation this doe NOT delete related UserEvaluations
             // these are linked to a company (symbol) as well as wbValuation parameters
             // when (re-)creating a WBValuation check whether there are any old userEvaluations
             // and if so re-add the relationships to this WBValuation via parameters
-            self.valuationID = valuation?.objectID
+            self.valuationID = wbValuation?.objectID
 
             if let ratings = WBValuationController.allUserRatings(for: share.symbol!) {
                 if ratings.count > 0 {
                     let set = NSSet(array: ratings)
-                    valuation?.addToUserEvaluations(set)
+                    wbValuation?.addToUserEvaluations(set)
                 }
             }
         }
+        
+        // 2 DCF Valuation
+        if let valuation = share.dcfValuation {
+            self.dcfValuation = valuation
+        }
+        else if let valuation = CombinedValuationController.returnDCFValuations(company: share.symbol!) {
+            // any orphan valuation belonging to this company left after deleting share
+            self.dcfValuation = valuation
+            share.dcfValuation = dcfValuation
+        }
+        else {
+            self.dcfValuation = CombinedValuationController.createDCFValuation(company: share.symbol!)
+            share.dcfValuation = self.dcfValuation
+        }
+
+        // 3 Rule1 Valuation
+        
+        if let valuation = share.rule1Valuation {
+            self.r1Valuation = valuation
+        }
+        else if let valuation = CombinedValuationController.returnR1Valuations(company: share.symbol!) {
+            // any orphan valuation belonging to this company left after deleting share
+            share.rule1Valuation = valuation
+            self.r1Valuation = valuation
+        }
+        else {
+            self.r1Valuation = CombinedValuationController.createR1Valuation(company: share.symbol!)
+            share.rule1Valuation = self.r1Valuation
+        }
+
                 
         rowTitles = returnRowTitles()
     }
@@ -232,18 +261,18 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             return
         }
         
-        self.valuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? WBValuation)!
+        self.wbValuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? WBValuation)!
     }
 
     
     //MARK: - TVC controller functions
     
     public func latestDataDate() -> Date? {
-        return valuation?.latestDataDate
+        return wbValuation?.latestDataDate
     }
 
     public func valuationDate() -> Date? {
-        return valuation?.date
+        return wbValuation?.date
     }
     
     public func rowTitle(path: IndexPath) -> String {
@@ -258,7 +287,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     public func sectionSubHeaderText(section: Int) -> String? {
         
-        if let date = valuation?.date {
+        if let date = wbValuation?.date {
             sectionSubTitles[0] =  "Valuation figures from " + dateFormatter.string(from: date)
         }
         return sectionSubTitles[section]
@@ -267,7 +296,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
     public func value$(path: IndexPath) -> (String, UIColor?, [String]?) {
         
-        guard valuation != nil else {
+        guard wbValuation != nil else {
             return ("--", nil, ["no valuation"])
         }
         
@@ -280,6 +309,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
             switch path.row {
             case 0:
+            //Moat
+                if let r1v = share.rule1Valuation {
+                    if let moat = r1v.moatScore() {
+                        value$ = percentFormatter0Digits.string(from: moat as NSNumber)
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: moat, greenCutoff: 0.7, redCutOff: 0.5)
+                    }
+                }
+            case 1:
             // PE ratio
                 if share.peRatio != Double() {
                     value$ = numberFormatter2Decimals.string(from: share.peRatio as NSNumber)
@@ -287,20 +324,20 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
                 let sixMonthsAgo = Date().addingTimeInterval(-183*24*3600)
                 let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-2*365*24*3600)
-                if let (min, _, max) = valuation?.minMeanMaxPER(from: twoYearsAgo, to: sixMonthsAgo) {
+                if let (min, _, max) = wbValuation?.minMeanMaxPER(from: twoYearsAgo, to: sixMonthsAgo) {
                     let minMAxValue$ = " (" + numberFormatterNoFraction.string(from: min as NSNumber)! + " - " + numberFormatterNoFraction.string(from: max as NSNumber)! + ")"
                     value$?.append(minMAxValue$)
                 }
                 
-            case 1:
-            // EPS
-                if share.eps != Double() {
-                    value$ = currencyFormatterGapWithPence.string(from: share.eps as NSNumber)
-                    color = share.eps > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
-                }
+//            case 2:
+//            // EPS
+//                if share.eps != Double() {
+//                    value$ = currencyFormatterGapWithPence.string(from: share.eps as NSNumber)
+//                    color = share.eps > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
+//                }
             case 2:
             // BVPSP
-                if let values = valuation!.bookValuePerPrice() {
+                if let values = wbValuation!.bookValuePerPrice() {
                     value$ = "-"
                     var t1$:String?
                     var t2$:String?
@@ -322,7 +359,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
             case 3:
             // Lynch ratio
-                if let ratio = valuation!.lynchRatio() {
+                if let ratio = wbValuation!.lynchRatio() {
                     value$ = numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: ratio, greenCutoff: 2.0, redCutOff: 1.0)
                 }
@@ -332,10 +369,28 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     value$ = numberFormatter2Decimals.string(from: share.beta as NSNumber)
                 }
             case 5:
+            // R1 Price
+                if let r1v = share.rule1Valuation {
+                    let (stickerprice, es) = r1v.stickerPrice()
+                    if let sp =  stickerprice {
+                        value$ = currencyFormatterNoGapNoPence.string(from: sp as NSNumber)
+                        errors = es
+                    }
+                }
+            case 6:
+            // DCF Price
+                if let dcfv = share.dcfValuation {
+                    let (price,es) = dcfv.returnIValue()
+                    if let iv = price {
+                        value$ = currencyFormatterNoGapNoPence.string(from: iv as NSNumber)
+                        errors = es
+                    }
+                }
+            case 7:
             // WB intrinsic value
                 if share.peRatio != Double() {
 
-                    let (valid, es$) = valuation!.ivalue()
+                    let (valid, es$) = wbValuation!.ivalue()
                     errors = es$
                     if valid != nil {
                         value$ = currencyFormatterGapWithPence.string(from: valid! as NSNumber)
@@ -358,7 +413,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 //                    if element != 0.0 { return true }
 //                    else { return false }
 //                })
-                let sales = valuation?.revenue
+                let sales = wbValuation?.revenue
                 if let growth = Calculator.compoundGrowthRates(values: sales) { //sales?.growthRates()
                     if let growthEMA = growth.ema(periods: emaPeriod) {
                         value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
@@ -375,7 +430,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 //                    if element != 0.0 { return true }
 //                    else { return false }
 //                })
-                let netIncome = valuation?.netEarnings
+                let netIncome = wbValuation?.netEarnings
                 if let growth = Calculator.compoundGrowthRates(values: netIncome) {
                     if let growthEMA = growth.ema(periods: emaPeriod) {
                         value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
@@ -396,7 +451,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 //                return (value$, color, errors)
             case 2:
             // Ret. earnings
-                let retEarningsGrowths = Calculator.compoundGrowthRates(values: valuation?.equityRepurchased)// valuation?.equityRepurchased?.growthRates()
+                let retEarningsGrowths = Calculator.compoundGrowthRates(values: wbValuation?.equityRepurchased)// valuation?.equityRepurchased?.growthRates()
                 
                 if let meanGrowth = retEarningsGrowths?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
@@ -407,7 +462,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
             case 3:
                 // EPS
-                if let growthRatesMean = Calculator.compoundGrowthRates(values: valuation!.eps)?.ema(periods: emaPeriod) {
+                if let growthRatesMean = Calculator.compoundGrowthRates(values: wbValuation!.eps)?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
                     color = growthRatesMean > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
                 }
@@ -416,7 +471,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
            case 4:
             // profit margin
-                let (margins, es$) = valuation!.grossProfitMargins()
+                let (margins, es$) = wbValuation!.grossProfitMargins()
                 errors = es$
                 if let averageMargin = margins.ema(periods: emaPeriod) { //weightedMean()
                     value$ = percentFormatter0Digits.string(from: averageMargin as NSNumber) ?? "-"
@@ -425,7 +480,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 return (value$,color,errors)
             case 5:
             // op. cash flow
-                let fcfGrowth = Calculator.compoundGrowthRates(values: valuation!.opCashFlow)
+                let fcfGrowth = Calculator.compoundGrowthRates(values: wbValuation!.opCashFlow)
                 if let meanGrowth = fcfGrowth?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: meanGrowth, greenCutoff: 0.15, redCutOff: 0.0)
@@ -441,7 +496,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             switch path.row {
             case 0:
             // ROE
-                let roeGrowths = Calculator.compoundGrowthRates(values: valuation!.roe)
+                let roeGrowths = Calculator.compoundGrowthRates(values: wbValuation!.roe)
                 if let meanGrowth = roeGrowths?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.3, redCutOff: 0.1)
@@ -456,7 +511,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 //                    if element != 0.0 { return true }
 //                    else { return false }
 //                }).growthRates()
-                let roaGrowths = Calculator.compoundGrowthRates(values: valuation!.roa)
+                let roaGrowths = Calculator.compoundGrowthRates(values: wbValuation!.roa)
 
                 if let meanGrowth = roaGrowths?.ema(periods: emaPeriod) {
                     value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
@@ -506,9 +561,9 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 0:
             // cap expend / earnings
             
-                if let sumDiv = valuation!.netEarnings?.reduce(0, +) {
+                if let sumDiv = wbValuation!.netEarnings?.reduce(0, +) {
                     // use 10 y sums / averages, not ema according to Book Ch 51
-                    if let sumDenom = valuation!.capExpend?.reduce(0, +) {
+                    if let sumDenom = wbValuation!.capExpend?.reduce(0, +) {
                         let tenYAverages = abs(sumDenom / sumDiv)
                         value$ = percentFormatter0Digits.string(from: tenYAverages as NSNumber) ?? "-"
                         color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 1, value: tenYAverages, greenCutoff: 0.25, redCutOff: 0.5)
@@ -519,7 +574,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
             case 1:
             // Lt debt / net income
-                let (proportions, es$) = valuation!.longtermDebtProportion()
+                let (proportions, es$) = wbValuation!.longtermDebtProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
@@ -530,7 +585,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
  
             case 2:
             // SGA / profit
-                let (proportions, es$) = valuation!.sgaProportion()
+                let (proportions, es$) = wbValuation!.sgaProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
@@ -540,7 +595,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
             case 3:
             // R&D / profit
-                let (proportions, es$) = valuation!.rAndDProportion()
+                let (proportions, es$) = wbValuation!.rAndDProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
@@ -579,7 +634,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     private func returnRowTitles() -> [[String]] {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
-        return [["P/E ratio", "EPS", "BVPS/price","Lynch ratio","beta", "intr. value (10y)"],
+        return [["Moat", "P/E ratio", "BVPS/price","Lynch ratio","beta", "R1 price","DCF Price", "intr. value (10y)"],
                 ["Revenue", "Net income", "Ret. earnings", "EPS", "Profit margin", "OpCash flow"],
                 ["ROE", "ROA"],
                 ["CapEx/earnings", "LT Debt/earnings", "SGA /profit", "R&D /profit"]
@@ -593,23 +648,34 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                      
         let symbol = share.symbol
         let shortName = share.name_short
-        let valuationID = valuation?.objectID
+        let wbValuationID = wbValuation?.objectID
+        let dcfValuationID = dcfValuation?.objectID
+        let r1ValuationID = r1Valuation?.objectID
         let shareID = share.objectID
         
         downloadTask = Task.init(priority: .background) {
-            let allTasks = 2
+            var allTasks = 2
             var completedTasks = 0
             
             do {
-                if let validID = valuationID {
+                if let validID = wbValuationID {
                     try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: validID, downloadRedirectDelegate: self)
                                         
                     completedTasks += 1
                     progressDelegate?.progressUpdate(allTasks: allTasks, completedTasks: completedTasks)
                 }
                 
-                try Task.checkCancellation()
                 try await WebPageScraper2.keyratioDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID)
+                if dcfValuationID != nil {
+                    try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: dcfValuationID!, progressDelegate: nil)
+                    allTasks += 1
+                }
+                if r1ValuationID != nil {
+                    try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: r1ValuationID!, progressDelegate: nil, downloadRedirectDelegate: self)
+                    allTasks += 1
+                }
+                try Task.checkCancellation()
+
             } catch let error {
                 progressDelegate?.downloadError(error: error.localizedDescription)
             }
@@ -629,7 +695,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     /// if none is found it returns a new UserEvaluation object linked to the controller.wbvValuation with specified wbvParameter
     func returnUserEvaluation(for parameter: String) -> UserEvaluation? {
         
-        let storedEvaluations = valuation?.userEvaluations
+        let storedEvaluations = wbValuation?.userEvaluations
         if storedEvaluations?.count ?? 0 != 0 {
             
             for element in storedEvaluations! {
@@ -657,7 +723,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         
         let parameter = parameters[indexPath.section-1][indexPath.row].first!
         
-        let storedEvaluations = valuation?.userEvaluations
+        let storedEvaluations = wbValuation?.userEvaluations
         if storedEvaluations?.count ?? 0 != 0 {
             
             for element in storedEvaluations! {
@@ -678,7 +744,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
          
         newValuation.stock = share.symbol
         newValuation.wbvParameter = parameter
-        valuation?.addToUserEvaluations(newValuation)
+        wbValuation?.addToUserEvaluations(newValuation)
         
         do {
             try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
@@ -702,7 +768,7 @@ extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
                 return
             }
             
-            for element in valuation?.userEvaluations ?? [] {
+            for element in wbValuation?.userEvaluations ?? [] {
                 if let evaluation = element as? UserEvaluation {
                     if evaluation.wbvParameter == parameter {
                         evaluation.comment = valid
@@ -716,7 +782,7 @@ extension WBValuationController: RatingButtonDelegate, TextEntryCellDelegate {
         
     func updateRating(rating: Int, parameter: String) {
         
-        for element in valuation?.userEvaluations ?? [] {
+        for element in wbValuation?.userEvaluations ?? [] {
             if let evaluation = element as? UserEvaluation {
                 if evaluation.wbvParameter == parameter {
                     evaluation.rating = Int16(rating)

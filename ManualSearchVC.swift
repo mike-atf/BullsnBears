@@ -99,16 +99,16 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
             
             guard errorOrNil == nil else {
                 DispatchQueue.main.async {
-                    symbolFoundImage.image = UIImage(systemName: "x.circle.fill")
-                    symbolFoundImage.tintColor = UIColor.systemRed
+                    self.symbolFoundImage.image = UIImage(systemName: "x.circle.fill")
+                    self.symbolFoundImage.tintColor = UIColor.systemRed
                 }
                 return
             }
             
             guard responseOrNil != nil else {
                 DispatchQueue.main.async {
-                    symbolFoundImage.image = UIImage(systemName: "x.circle.fill")
-                    symbolFoundImage.tintColor = UIColor.systemRed
+                    self.symbolFoundImage.image = UIImage(systemName: "x.circle.fill")
+                    self.symbolFoundImage.tintColor = UIColor.systemRed
                 }
 
                 return
@@ -176,16 +176,16 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
             
             guard error == nil else {
                 DispatchQueue.main.async {
-                    nameFoundImage.image = UIImage(systemName: "x.circle.fill")
-                    nameFoundImage.tintColor = UIColor.systemRed
+                    self.nameFoundImage.image = UIImage(systemName: "x.circle.fill")
+                    self.nameFoundImage.tintColor = UIColor.systemRed
                 }
                 return
             }
             
             guard urlResponse != nil else {
                 DispatchQueue.main.async {
-                    nameFoundImage.image = UIImage(systemName: "x.circle.fill")
-                    nameFoundImage.tintColor = UIColor.systemRed
+                    self.nameFoundImage.image = UIImage(systemName: "x.circle.fill")
+                    self.nameFoundImage.tintColor = UIColor.systemRed
                 }
                 return
             }
