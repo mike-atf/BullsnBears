@@ -162,8 +162,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
     func deleteOldDCFValuations() {
         
-        print("delete old DCFVs")
-    
         let fetchRequest = NSFetchRequest<DCFValuation>(entityName: "DCFValuation")
         fetchRequest.sortDescriptors = [ NSSortDescriptor(key: "creationDate", ascending: true)]
         
