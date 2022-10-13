@@ -312,8 +312,19 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             //Moat
                 if let r1v = share.rule1Valuation {
                     if let moat = r1v.moatScore() {
-                        value$ = percentFormatter0Digits.string(from: moat as NSNumber)
+                        value$ = percentFormatter0Digits.string(from: moat as NSNumber) ?? "-"
                         color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: moat, greenCutoff: 0.7, redCutOff: 0.5)
+                        
+                        if let trendData = share.trendValues(trendName: .moatScore) {
+                            let pastData = trendData.filter { datedValue in
+                                if datedValue.date < r1v.creationDate! { return true }
+                                else { return false }
+                            }
+                            if let mostRecent = pastData.first {
+                                value$! += " (" + percentFormatter0Digits.string(from: mostRecent.value as NSNumber)! + ")"
+                            }
+                        }
+
                     }
                 }
             case 1:
@@ -329,12 +340,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     value$?.append(minMAxValue$)
                 }
                 
-//            case 2:
-//            // EPS
-//                if share.eps != Double() {
-//                    value$ = currencyFormatterGapWithPence.string(from: share.eps as NSNumber)
-//                    color = share.eps > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
-//                }
             case 2:
             // BVPSP
                 if let values = wbValuation!.bookValuePerPrice() {
@@ -362,6 +367,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 if let ratio = wbValuation!.lynchRatio() {
                     value$ = numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: ratio, greenCutoff: 2.0, redCutOff: 1.0)
+                    
+                    if let trendData = share.trendValues(trendName: .lynchScore) {
+                        let pastData = trendData.filter { datedValue in
+                            if datedValue.date < wbValuation!.date! { return true }
+                            else { return false }
+                        }
+                        if let mostRecent = pastData.first {
+                            value$! += " (" + numberFormatterWith1Digit.string(from: mostRecent.value as NSNumber)! + ")"
+                        }
+                    }
+
                 }
             case 4:
             // beta
@@ -373,18 +389,40 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 if let r1v = share.rule1Valuation {
                     let (stickerprice, es) = r1v.stickerPrice()
                     if let sp =  stickerprice {
-                        value$ = currencyFormatterNoGapNoPence.string(from: sp as NSNumber)
+                        value$ = currencyFormatterNoGapWithPence.string(from: sp as NSNumber)
                         errors = es
                     }
+                    
+                    if let trendData = share.trendValues(trendName: .stickerPrice) {
+                        let pastData = trendData.filter { datedValue in
+                            if datedValue.date < r1v.creationDate! { return true }
+                            else { return false }
+                        }
+                        if let mostRecent = pastData.first {
+                            value$! += " (" + currencyFormatterNoGapWithPence.string(from: mostRecent.value as NSNumber)! + ")"
+                        }
+                    }
+
                 }
             case 6:
             // DCF Price
                 if let dcfv = share.dcfValuation {
                     let (price,es) = dcfv.returnIValue()
                     if let iv = price {
-                        value$ = currencyFormatterNoGapNoPence.string(from: iv as NSNumber)
+                        value$ = currencyFormatterGapWithPence.string(from: iv as NSNumber)
                         errors = es
                     }
+                    
+                    if let trendData = share.trendValues(trendName: .dCFValue) {
+                        let pastData = trendData.filter { datedValue in
+                            if datedValue.date < dcfv.creationDate! { return true }
+                            else { return false }
+                        }
+                        if let mostRecent = pastData.first {
+                            value$! += " (" + currencyFormatterNoGapWithPence.string(from: mostRecent.value as NSNumber)! + ")"
+                        }
+                    }
+
                 }
             case 7:
             // WB intrinsic value
@@ -395,6 +433,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     if valid != nil {
                         value$ = currencyFormatterGapWithPence.string(from: valid! as NSNumber)
                     }
+                    
+                    if let trendData = share.trendValues(trendName: .intrinsicValue) {
+                        let pastData = trendData.filter { datedValue in
+                            if datedValue.date < wbValuation!.date! { return true }
+                            else { return false }
+                        }
+                        if let mostRecent = pastData.first {
+                            value$! += " (" + currencyFormatterNoGapWithPence.string(from: mostRecent.value as NSNumber)! + ")"
+                        }
+                    }
+
                 }
             default:
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")

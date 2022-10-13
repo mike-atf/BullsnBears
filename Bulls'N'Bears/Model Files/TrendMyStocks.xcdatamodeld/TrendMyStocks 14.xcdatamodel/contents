@@ -6,7 +6,7 @@
         <relationship name="research" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="StockResearch" inverseName="news" inverseEntity="StockResearch"/>
     </entity>
     <entity name="DCFValuation" representedClassName="DCFValuation" syncable="YES">
-        <attribute name="alerts" optional="YES" attributeType="Transformable" valueTransformerName="[String]"/>
+        <attribute name="alerts" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
         <attribute name="beta" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="capExpend" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Double]"/>
         <attribute name="company" optional="YES" attributeType="String"/>

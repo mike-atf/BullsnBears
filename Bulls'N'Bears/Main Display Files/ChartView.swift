@@ -12,7 +12,6 @@ class ChartView: UIView {
     @IBOutlet var widthConstraint: NSLayoutConstraint!
     
     var trendLabels = [UILabel]()
-//    var valuationLabels = [UILabel]()
     var buySellLabel: UILabel?
     var epsTTMLabel: UILabel!
     var epsQLabel: UILabel!

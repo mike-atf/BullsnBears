@@ -86,6 +86,7 @@
 		EA6AACE026053294002DE9DF /* MACD_View.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACDE26053294002DE9DF /* MACD_View.swift */; };
 		EA6AACE126053294002DE9DF /* MACD_View.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6AACDE26053294002DE9DF /* MACD_View.swift */; };
 		EA6EEF9226165665000FA141 /* ResearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6EEF9126165665000FA141 /* ResearchController.swift */; };
+		EA7023CC28F8317100048679 /* FinHealthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA7023CB28F8317100048679 /* FinHealthController.swift */; };
 		EA736CCD25D7C8FF007FC981 /* ValuationDataCleaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */; };
 		EA736CDE25D7E72C007FC981 /* ValuationErrorsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */; };
 		EA79790225E6F24200663644 /* GradientColorFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA79790125E6F24200663644 /* GradientColorFinder.swift */; };
@@ -213,6 +214,11 @@
 		EAC61A2726FB74AC000FAC81 /* DateSelectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAC61A2226FB74AC000FAC81 /* DateSelectionCell.xib */; };
 		EAC61A2826FB74AC000FAC81 /* DateSelectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAC61A2226FB74AC000FAC81 /* DateSelectionCell.xib */; };
 		EAC9890225F146E1007AE6F6 /* TrendIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC9890125F146E1007AE6F6 /* TrendIconView.swift */; };
+		EACBFD5628E9F4740066D36B /* FinHealthTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACBFD5528E9F4740066D36B /* FinHealthTVC.swift */; };
+		EACBFD5928E9F4980066D36B /* FinHealthCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACBFD5728E9F4980066D36B /* FinHealthCell.swift */; };
+		EACBFD5A28E9F4980066D36B /* FinHealthCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EACBFD5828E9F4980066D36B /* FinHealthCell.xib */; };
+		EACBFD5C28E9FB4D0066D36B /* FinHealthChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACBFD5B28E9FB4D0066D36B /* FinHealthChart.swift */; };
+		EACBFD5E28E9FFB80066D36B /* ATFChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACBFD5D28E9FFB80066D36B /* ATFChart.swift */; };
 		EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */; };
 		EAD34D5626545785004859A5 /* CategorySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD34D5426545785004859A5 /* CategorySelectionCell.swift */; };
 		EAD34D5726545785004859A5 /* CategorySelectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAD34D5526545785004859A5 /* CategorySelectionCell.xib */; };
@@ -265,6 +271,7 @@
 		EAED14DF25A8D78C0073C46F /* Bulls'N'BearsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */; };
 		EAED14FB25A8DA090073C46F /* Bulls'N'BearsTests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = EAC1905F257641180030B331 /* Bulls'N'BearsTests.xctest */; };
 		EAED14FC25A8DA100073C46F /* Bulls'N'BearsUITests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = EAC1906A257641180030B331 /* Bulls'N'BearsUITests.xctest */; };
+		EAEF8D2928EC447200102DC8 /* DatesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF8D2828EC447200102DC8 /* DatesManager.swift */; };
 		EAF5D73225AE1A8000E7A681 /* CombinedValuationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */; };
 		EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF5D74225B06F2E00E7A681 /* Extensions.swift */; };
 		EAFA8F34277B459E00A12CDE /* Backup Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFA8F33277B459E00A12CDE /* Backup Document.swift */; };
@@ -352,6 +359,7 @@
 		EA6AACDE26053294002DE9DF /* MACD_View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MACD_View.swift; path = "Bulls'N'Bears/Model Files/MACD_View.swift"; sourceTree = SOURCE_ROOT; };
 		EA6B9E8D27D0F9F2002A55AD /* TrendMyStocks 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 14.xcdatamodel"; sourceTree = "<group>"; };
 		EA6EEF9126165665000FA141 /* ResearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ResearchController.swift; path = "Bulls'N'Bears/ResearchController.swift"; sourceTree = SOURCE_ROOT; };
+		EA7023CB28F8317100048679 /* FinHealthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinHealthController.swift; sourceTree = "<group>"; };
 		EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationDataCleaner.swift; sourceTree = "<group>"; };
 		EA736CDD25D7E72C007FC981 /* ValuationErrorsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationErrorsTVC.swift; sourceTree = SOURCE_ROOT; };
 		EA79790125E6F24200663644 /* GradientColorFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientColorFinder.swift; sourceTree = "<group>"; };
@@ -419,6 +427,11 @@
 		EAC61A2126FB74AC000FAC81 /* DateSelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateSelectionCell.swift; sourceTree = "<group>"; };
 		EAC61A2226FB74AC000FAC81 /* DateSelectionCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DateSelectionCell.xib; sourceTree = "<group>"; };
 		EAC9890125F146E1007AE6F6 /* TrendIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendIconView.swift; sourceTree = "<group>"; };
+		EACBFD5528E9F4740066D36B /* FinHealthTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinHealthTVC.swift; sourceTree = "<group>"; };
+		EACBFD5728E9F4980066D36B /* FinHealthCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinHealthCell.swift; sourceTree = "<group>"; };
+		EACBFD5828E9F4980066D36B /* FinHealthCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FinHealthCell.xib; sourceTree = "<group>"; };
+		EACBFD5B28E9FB4D0066D36B /* FinHealthChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinHealthChart.swift; sourceTree = "<group>"; };
+		EACBFD5D28E9FFB80066D36B /* ATFChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATFChart.swift; sourceTree = "<group>"; };
 		EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
 		EAD34D5426545785004859A5 /* CategorySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionCell.swift; sourceTree = "<group>"; };
 		EAD34D5526545785004859A5 /* CategorySelectionCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategorySelectionCell.xib; sourceTree = "<group>"; };
@@ -444,6 +457,7 @@
 		EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ErrorLogListCell.xib; sourceTree = "<group>"; };
 		EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsTests.swift"; path = "TrendMyStocksTests/Bulls'N'BearsTests.swift"; sourceTree = SOURCE_ROOT; };
 		EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsUITests.swift"; path = "TrendMyStocksUITests/Bulls'N'BearsUITests.swift"; sourceTree = SOURCE_ROOT; };
+		EAEF8D2828EC447200102DC8 /* DatesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatesManager.swift; sourceTree = "<group>"; };
 		EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedValuationController.swift; sourceTree = "<group>"; };
 		EAF5D74225B06F2E00E7A681 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		EAFA8F33277B459E00A12CDE /* Backup Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Backup Document.swift"; sourceTree = "<group>"; };
@@ -576,6 +590,7 @@
 		EAC2FCA025A256B80060F387 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				EAEF8D2828EC447200102DC8 /* DatesManager.swift */,
 				EA2CF5DE277B42BD00FE2FB9 /* Backup Manager.swift */,
 				EAFA8F33277B459E00A12CDE /* Backup Document.swift */,
 				EAA548B82734302F0083808A /* WebPageScraper2.swift */,
@@ -730,6 +745,12 @@
 				EAD921672607D980008312E0 /* StochastikOscillatorView.swift */,
 				EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */,
 				EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */,
+				EACBFD5528E9F4740066D36B /* FinHealthTVC.swift */,
+				EA7023CB28F8317100048679 /* FinHealthController.swift */,
+				EACBFD5728E9F4980066D36B /* FinHealthCell.swift */,
+				EACBFD5828E9F4980066D36B /* FinHealthCell.xib */,
+				EACBFD5B28E9FB4D0066D36B /* FinHealthChart.swift */,
+				EACBFD5D28E9FFB80066D36B /* ATFChart.swift */,
 			);
 			path = "Main Display Files";
 			sourceTree = "<group>";
@@ -859,6 +880,7 @@
 				EAFCB95F25C5F0240029AA4F /* MTCookies in Resources */,
 				EAA69FC0261222AF0067EE1A /* ResearchCell.xib in Resources */,
 				EAD34D5726545785004859A5 /* CategorySelectionCell.xib in Resources */,
+				EACBFD5A28E9F4980066D36B /* FinHealthCell.xib in Resources */,
 				EAAB7BE62754038A00295DA7 /* RatingFactorCell.xib in Resources */,
 				EA3207F925EEA15900A6A6AB /* ValueListTextEntryCell.xib in Resources */,
 			);
@@ -958,6 +980,7 @@
 				EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */,
 				EAAB7BD22753E88B00295DA7 /* SettingsTVC.swift in Sources */,
 				EAD921682607D980008312E0 /* StochastikOscillatorView.swift in Sources */,
+				EACBFD5E28E9FFB80066D36B /* ATFChart.swift in Sources */,
 				EA32080A25EED93A00A6A6AB /* UserEvaluation+CoreDataClass.swift in Sources */,
 				EAFCB96925C72DDB0029AA4F /* HiddenWebView.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
@@ -966,6 +989,7 @@
 				EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */,
 				EA0F889A26395745009C980F /* ComparisonVC.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
+				EA7023CC28F8317100048679 /* FinHealthController.swift in Sources */,
 				EA163F77258BA85E000974AB /* StockTrend.swift in Sources */,
 				EA79790225E6F24200663644 /* GradientColorFinder.swift in Sources */,
 				EADA38F727131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift in Sources */,
@@ -986,6 +1010,7 @@
 				EA3207F825EEA15900A6A6AB /* ValueListTextEntryCell.swift in Sources */,
 				EADA38E52710AE9E00B294E3 /* PurchasedButton.swift in Sources */,
 				EA5639E1262C47F700010964 /* ChartTimeLineView.swift in Sources */,
+				EACBFD5C28E9FB4D0066D36B /* FinHealthChart.swift in Sources */,
 				EAC61A2326FB74AC000FAC81 /* DateSelectionCell.swift in Sources */,
 				EAC9890225F146E1007AE6F6 /* TrendIconView.swift in Sources */,
 				EAA69F9226121CA30067EE1A /* StockResearch+CoreDataClass.swift in Sources */,
@@ -998,6 +1023,7 @@
 				EA0E2F302625E32500602BEE /* RimmedLabel.swift in Sources */,
 				EA0E2F222625CBD500602BEE /* StocksListTVC.swift in Sources */,
 				EA2016142715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
+				EACBFD5628E9F4740066D36B /* FinHealthTVC.swift in Sources */,
 				EAA69F9526121CA30067EE1A /* StockResearch+CoreDataProperties.swift in Sources */,
 				EAC2FC7125A23FFC0060F387 /* ValuationTableViewCell.swift in Sources */,
 				EA6AACD826050457002DE9DF /* MAC_D.swift in Sources */,
@@ -1009,6 +1035,7 @@
 				EA32081B25EF9A1400A6A6AB /* WBVRatingButton.swift in Sources */,
 				EAC190C1257663200030B331 /* PublicVars.swift in Sources */,
 				EA32082825EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift in Sources */,
+				EAEF8D2928EC447200102DC8 /* DatesManager.swift in Sources */,
 				EAF5D73225AE1A8000E7A681 /* CombinedValuationController.swift in Sources */,
 				EA39A44725C5BF5300DE0FF9 /* R1WebDataAnalyser.swift in Sources */,
 				EA0E2F1B2624E4AA00602BEE /* SortSelectorTVC.swift in Sources */,
@@ -1036,6 +1063,7 @@
 				EADA38EE2713179C00B294E3 /* Diary_StocksListVC.swift in Sources */,
 				EADA38F427131AA100B294E3 /* ShareTransaction+CoreDataClass.swift in Sources */,
 				EAAB7BE32754038A00295DA7 /* RatingFactorCell.swift in Sources */,
+				EACBFD5928E9F4980066D36B /* FinHealthCell.swift in Sources */,
 				EAAB7BDE2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift in Sources */,
 				EAD835BC25DA9BA40015C93A /* WBValuationTVC.swift in Sources */,
 				EA805DC525D54D4E00720E68 /* StockSearchTVC.swift in Sources */,

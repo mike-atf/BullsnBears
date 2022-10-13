@@ -130,7 +130,7 @@ class CSVImporter: NSObject {
             return nil
         }
         
-        guard let lastPathComponent = validURL.lastPathComponent.split(separator: ".").first else {
+        guard validURL.lastPathComponent.split(separator: ".").first != nil else {
             return nil
         }
         
