@@ -217,7 +217,6 @@
 		EACBFD5628E9F4740066D36B /* FinHealthTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACBFD5528E9F4740066D36B /* FinHealthTVC.swift */; };
 		EACBFD5928E9F4980066D36B /* FinHealthCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACBFD5728E9F4980066D36B /* FinHealthCell.swift */; };
 		EACBFD5A28E9F4980066D36B /* FinHealthCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EACBFD5828E9F4980066D36B /* FinHealthCell.xib */; };
-		EACBFD5C28E9FB4D0066D36B /* FinHealthChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACBFD5B28E9FB4D0066D36B /* FinHealthChart.swift */; };
 		EACBFD5E28E9FFB80066D36B /* ATFChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACBFD5D28E9FFB80066D36B /* ATFChart.swift */; };
 		EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */; };
 		EAD34D5626545785004859A5 /* CategorySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD34D5426545785004859A5 /* CategorySelectionCell.swift */; };
@@ -430,7 +429,6 @@
 		EACBFD5528E9F4740066D36B /* FinHealthTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinHealthTVC.swift; sourceTree = "<group>"; };
 		EACBFD5728E9F4980066D36B /* FinHealthCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinHealthCell.swift; sourceTree = "<group>"; };
 		EACBFD5828E9F4980066D36B /* FinHealthCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FinHealthCell.xib; sourceTree = "<group>"; };
-		EACBFD5B28E9FB4D0066D36B /* FinHealthChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinHealthChart.swift; sourceTree = "<group>"; };
 		EACBFD5D28E9FFB80066D36B /* ATFChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATFChart.swift; sourceTree = "<group>"; };
 		EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
 		EAD34D5426545785004859A5 /* CategorySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionCell.swift; sourceTree = "<group>"; };
@@ -749,7 +747,6 @@
 				EA7023CB28F8317100048679 /* FinHealthController.swift */,
 				EACBFD5728E9F4980066D36B /* FinHealthCell.swift */,
 				EACBFD5828E9F4980066D36B /* FinHealthCell.xib */,
-				EACBFD5B28E9FB4D0066D36B /* FinHealthChart.swift */,
 				EACBFD5D28E9FFB80066D36B /* ATFChart.swift */,
 			);
 			path = "Main Display Files";
@@ -1010,7 +1007,6 @@
 				EA3207F825EEA15900A6A6AB /* ValueListTextEntryCell.swift in Sources */,
 				EADA38E52710AE9E00B294E3 /* PurchasedButton.swift in Sources */,
 				EA5639E1262C47F700010964 /* ChartTimeLineView.swift in Sources */,
-				EACBFD5C28E9FB4D0066D36B /* FinHealthChart.swift in Sources */,
 				EAC61A2326FB74AC000FAC81 /* DateSelectionCell.swift in Sources */,
 				EAC9890225F146E1007AE6F6 /* TrendIconView.swift in Sources */,
 				EAA69F9226121CA30067EE1A /* StockResearch+CoreDataClass.swift in Sources */,

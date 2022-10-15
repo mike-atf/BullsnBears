@@ -459,6 +459,7 @@ class StocksController2: NSFetchedResultsController<Share> {
                         share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .stickerPrice)
                     }
                     
+                    
                     Task(priority: .background) {
                         
                         do {
@@ -607,21 +608,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         
         let epsDates = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) })
         let labelledValues = Labelled_DatedValues(label: shareSymbol, datedValues: epsDates ?? [])
-        
-//        guard let components = URLComponents(string: "https://www.nasdaq.com/market-activity/stocks/\(shareSymbol.lowercased())/earnings") else {
-//            return labelledValues
-//        }
-        
-//        if let url = components.url {
-//            do {
-//                values = try await WebPageScraper2.getqEPSDataFromMacrotrends(url: url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
-//                let nasdaqdValues = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) })
-//                labelledValues.datedValues.append(contentsOf: nasdaqdValues ?? [])
-//            }  catch let error as DownloadAndAnalysisError {
-//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
-//            }
-//        }
-        
+                
         return labelledValues
 
     }
@@ -646,23 +633,10 @@ class StocksController2: NSFetchedResultsController<Share> {
         guard let ycharts_url = URL(string: ("https://ycharts.com/companies/" + shareSymbol.uppercased() + "/eps")) else {
             throw DownloadAndAnalysisError.urlError
         }
-        
-//        guard let macrotrends_url = components.url else {
-//            throw DownloadAndAnalysisError.urlError
-//        }
-        
-//        do {
-//        guard let marketwatch_url = URL(string: ("https://www.marketwatch.com/investing/stock/" + shareSymbol + "/financials/income/quarter")) else {
-//            throw DownloadAndAnalysisError.urlError
-//        }
-//        } catch {
-//            print("StocksController2.getQuarterlyEarningsForUpdate marketwatch url error \(error)")
-//        }
-        
+                
         var values: [DatedValue]?
         
         do {
-//            values = try await WebPageScraper2.getqEPSDataFromMacrotrends(url: macrotrends_url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
             values = try await WebPageScraper2.getqEPSDataFromYCharts(url: ycharts_url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
         }  catch let error as DownloadAndAnalysisError {
             ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
@@ -857,6 +831,8 @@ extension StocksController2: DownloadRedirectionDelegate {
                                             print("StocksController2: redirect for \(symbol) r1V task recevied")
                                         case .qEPS:
                                             print("WBValuationController: redirect for \(symbol) qEPS task received")
+                                        case .healthData:
+                                            print("FinHealthController: redirect for \(symbol) healthData task received")
                                         }
                                     }
                                 }

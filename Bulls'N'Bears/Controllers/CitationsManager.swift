@@ -90,7 +90,7 @@ class CitationsManager {
         let bg2 = "...it is often the firms that ranked lowest on the measures - low returns on capital or narrow profit margins - that have tended to generate the highest future market returns."
         let bg3 = "Portfolios of ugly, disappointing, obscure (small) and boring (e.g. low growth) stocks repeatedly generated higher returns than both market ... and, more strikingly, portfolios of attractive, highly profitable, well-known (big) and glamorous (e.g. fast growing) stocks."
         let bg4 = "...it is the extremely unappealing portfolios - three years of disappointing returns - that produce the best results."
-        let bg5 = "The uglier, more boring, more obscure, more disappointing, and thetefore usually the cheaper the stock, the better the return have been."
+        let bg5 = "The uglier, more boring, more obscure, more disappointing, and thetefore usually the cheaper the stock, the better the returns have been."
         let bg6 = "...If offered a portfolio of stocks two-thirds of which may go bankrupt, most investors will recoil in horror before considering the potentially enormous gains from the one-third that do survive - gains large enough to make the whole investment highly profitable."
         let bg7 = "The shares of companies too small for big funds are always available on sale."
         let bg8 = "Spin-offs are a wonderful opportunity for investors who are not constrained by questions of market capitalisation."

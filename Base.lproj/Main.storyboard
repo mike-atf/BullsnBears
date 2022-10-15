@@ -254,52 +254,40 @@
                                     <action selector="chartButtonAction:" destination="DMz-IK-SGN" eventType="touchUpInside" id="g4A-rZ-Kbq"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DCF Valuation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A2B-RG-uHy">
-                                <rect key="frame" x="53" y="87" width="91.5" height="17"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Growth-based Valuation" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miC-j2-Brw">
-                                <rect key="frame" x="234.5" y="87" width="156.5" height="17"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QfP-lA-cgL">
-                                <rect key="frame" x="10" y="79.5" width="33" height="32"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="QfP-lA-cgL" secondAttribute="height" multiplier="1:1" id="a73-lo-oVN"/>
-                                </constraints>
+                                <rect key="frame" x="10" y="79" width="67.5" height="33"/>
                                 <color key="tintColor" systemColor="linkColor"/>
-                                <state key="normal" backgroundImage="dollarsign.circle.fill" catalog="system"/>
+                                <state key="normal" title="DCF"/>
+                                <buttonConfiguration key="configuration" style="filled" title="$DCF"/>
                                 <connections>
                                     <action selector="dcfButtonAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="QcI-zI-hwo"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PWI-rZ-xja">
-                                <rect key="frame" x="149.5" y="84" width="21" height="19"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="PWI-rZ-xja" secondAttribute="height" multiplier="1:1" id="5sA-qP-vWN"/>
-                                </constraints>
-                                <color key="tintColor" systemColor="systemYellowColor"/>
-                                <state key="normal" backgroundImage="exclamationmark.triangle" catalog="system"/>
-                                <connections>
-                                    <action selector="dcfErrorsButtonAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="hY9-sg-drp"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fni-R7-t11">
-                                <rect key="frame" x="194.5" y="79.5" width="32.5" height="32"/>
+                                <rect key="frame" x="92.5" y="79" width="67.5" height="33"/>
                                 <color key="tintColor" systemColor="linkColor"/>
-                                <state key="normal" backgroundImage="dollarsign.circle.fill" catalog="system"/>
+                                <state key="normal" title="R1"/>
+                                <buttonConfiguration key="configuration" style="filled" title="$R1"/>
                                 <connections>
                                     <action selector="r1ButtonAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="9Kw-RA-52T"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s3a-vi-G4m">
-                                <rect key="frame" x="396" y="84" width="21" height="19"/>
-                                <color key="tintColor" systemColor="systemYellowColor"/>
-                                <state key="normal" backgroundImage="exclamationmark.triangle" catalog="system"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NTy-LW-kaQ">
+                                <rect key="frame" x="175" y="78" width="95" height="34.5"/>
+                                <color key="tintColor" systemColor="linkColor"/>
+                                <state key="normal" title="R1"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Research"/>
                                 <connections>
-                                    <action selector="r1ErrorsButtonAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="EEC-0s-4nz"/>
+                                    <action selector="researchAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="rgJ-38-MZ5"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q2h-bq-EN8">
+                                <rect key="frame" x="285" y="78" width="113" height="35"/>
+                                <color key="tintColor" systemColor="linkColor"/>
+                                <state key="normal" title="R1"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Transaction"/>
+                                <connections>
+                                    <action selector="purchaseAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="UUg-gq-6BL"/>
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZUx-G2-2hE" customClass="ChartPricesView" customModule="Bulls_N_Bears" customModuleProvider="target">
@@ -377,6 +365,15 @@
                                     <outlet property="ownedLabel" destination="eBK-Hm-dX3" id="b9Z-6M-Ero"/>
                                 </connections>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uqD-bc-3eA">
+                                <rect key="frame" x="413" y="78" width="74" height="35"/>
+                                <color key="tintColor" systemColor="linkColor"/>
+                                <state key="normal" title="R1"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Health"/>
+                                <connections>
+                                    <action selector="healthAction:" destination="GS7-IZ-4uD" eventType="touchUpInside" id="xui-P2-JLl"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="HJZ-h8-yHo"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -384,36 +381,34 @@
                             <constraint firstItem="28E-NM-pCT" firstAttribute="centerY" secondItem="hAd-Vi-f51" secondAttribute="centerY" id="0Va-7Y-5Pf"/>
                             <constraint firstItem="Doh-lM-a4B" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="10" id="19E-A6-fxS"/>
                             <constraint firstItem="Hrq-ff-sUC" firstAttribute="top" secondItem="MVz-dh-kgA" secondAttribute="bottom" constant="9" id="1FK-Of-x3d"/>
+                            <constraint firstItem="uqD-bc-3eA" firstAttribute="centerY" secondItem="Q2h-bq-EN8" secondAttribute="centerY" id="5Nj-Sw-o1K"/>
                             <constraint firstItem="4v4-Xi-Ewh" firstAttribute="leading" secondItem="ZUx-G2-2hE" secondAttribute="leading" id="5xb-qF-YHA"/>
                             <constraint firstItem="HJZ-h8-yHo" firstAttribute="bottom" secondItem="Doh-lM-a4B" secondAttribute="bottom" id="7TE-1M-Zc0"/>
                             <constraint firstItem="28E-NM-pCT" firstAttribute="height" secondItem="DMz-IK-SGN" secondAttribute="height" multiplier="0.04" constant="-0.29999999999999716" id="7l0-A4-FeV"/>
                             <constraint firstItem="pyF-an-nSb" firstAttribute="leading" secondItem="MVz-dh-kgA" secondAttribute="trailing" constant="10" id="886-U6-eXb"/>
                             <constraint firstItem="hAd-Vi-f51" firstAttribute="centerY" secondItem="28E-NM-pCT" secondAttribute="centerY" id="8yK-ME-WDe"/>
                             <constraint firstItem="Doh-lM-a4B" firstAttribute="top" secondItem="Hrq-ff-sUC" secondAttribute="bottom" constant="12" id="94w-JU-8ro"/>
+                            <constraint firstItem="fni-R7-t11" firstAttribute="leading" secondItem="QfP-lA-cgL" secondAttribute="trailing" constant="15" id="ANr-Ww-rxE"/>
                             <constraint firstItem="vMW-cw-G3E" firstAttribute="height" secondItem="pyF-an-nSb" secondAttribute="height" id="B3d-Z0-YSd"/>
                             <constraint firstItem="QfP-lA-cgL" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="10" id="CMb-Q6-T79"/>
                             <constraint firstItem="Doh-lM-a4B" firstAttribute="top" secondItem="9qa-kZ-o1k" secondAttribute="bottom" constant="13" id="D9e-Ih-ojL"/>
-                            <constraint firstItem="MVz-dh-kgA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="PWI-rZ-xja" secondAttribute="trailing" constant="10" id="EkQ-nh-wSg"/>
-                            <constraint firstItem="s3a-vi-G4m" firstAttribute="centerY" secondItem="PWI-rZ-xja" secondAttribute="centerY" id="GKd-xd-eMg"/>
+                            <constraint firstItem="NTy-LW-kaQ" firstAttribute="centerY" secondItem="fni-R7-t11" secondAttribute="centerY" id="GLq-RQ-vU3"/>
                             <constraint firstItem="ZUx-G2-2hE" firstAttribute="leading" secondItem="Doh-lM-a4B" secondAttribute="trailing" id="HCg-mc-dNx"/>
-                            <constraint firstItem="s3a-vi-G4m" firstAttribute="leading" secondItem="miC-j2-Brw" secondAttribute="trailing" constant="5" id="HnU-Dh-3UU"/>
                             <constraint firstItem="fni-R7-t11" firstAttribute="height" secondItem="QfP-lA-cgL" secondAttribute="height" id="Jyy-sN-yDW"/>
                             <constraint firstItem="28E-NM-pCT" firstAttribute="centerX" secondItem="vMW-cw-G3E" secondAttribute="centerX" id="Kcg-bN-TxM"/>
                             <constraint firstItem="hAd-Vi-f51" firstAttribute="centerX" secondItem="pyF-an-nSb" secondAttribute="centerX" id="LB6-lX-FJR"/>
                             <constraint firstItem="Hrq-ff-sUC" firstAttribute="width" secondItem="Hrq-ff-sUC" secondAttribute="height" multiplier="1:1" id="LRo-0g-h00"/>
+                            <constraint firstItem="uqD-bc-3eA" firstAttribute="leading" secondItem="Q2h-bq-EN8" secondAttribute="trailing" constant="15" id="LSN-5g-p0C"/>
+                            <constraint firstItem="Q2h-bq-EN8" firstAttribute="centerY" secondItem="NTy-LW-kaQ" secondAttribute="centerY" id="LYb-CN-itd"/>
+                            <constraint firstItem="fni-R7-t11" firstAttribute="width" secondItem="QfP-lA-cgL" secondAttribute="width" id="M9j-Lw-CG8"/>
                             <constraint firstItem="Hrq-ff-sUC" firstAttribute="centerY" secondItem="28E-NM-pCT" secondAttribute="centerY" id="MP8-dR-Lai"/>
                             <constraint firstItem="hAd-Vi-f51" firstAttribute="width" secondItem="hAd-Vi-f51" secondAttribute="height" multiplier="1:1" id="OQ0-Q1-4DP"/>
-                            <constraint firstItem="fni-R7-t11" firstAttribute="width" secondItem="QfP-lA-cgL" secondAttribute="width" id="Q1V-yQ-0lr"/>
                             <constraint firstItem="pyF-an-nSb" firstAttribute="height" secondItem="MVz-dh-kgA" secondAttribute="height" id="QXf-MA-k0p"/>
                             <constraint firstItem="vMW-cw-G3E" firstAttribute="leading" secondItem="pyF-an-nSb" secondAttribute="trailing" constant="10" id="QwG-G3-Ppu"/>
-                            <constraint firstItem="miC-j2-Brw" firstAttribute="leading" secondItem="fni-R7-t11" secondAttribute="trailing" constant="7.5" id="RCu-xO-b3R"/>
-                            <constraint firstItem="Hrq-ff-sUC" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="s3a-vi-G4m" secondAttribute="trailing" constant="10" id="VAw-gi-lr8"/>
+                            <constraint firstItem="Q2h-bq-EN8" firstAttribute="leading" secondItem="NTy-LW-kaQ" secondAttribute="trailing" constant="15" id="TgC-NV-bEj"/>
                             <constraint firstItem="MVz-dh-kgA" firstAttribute="top" secondItem="HJZ-h8-yHo" secondAttribute="top" constant="5" id="VSM-dg-lDx"/>
-                            <constraint firstItem="A2B-RG-uHy" firstAttribute="centerY" secondItem="QfP-lA-cgL" secondAttribute="centerY" id="Vz6-mJ-ds4"/>
-                            <constraint firstItem="miC-j2-Brw" firstAttribute="firstBaseline" secondItem="A2B-RG-uHy" secondAttribute="firstBaseline" id="X4x-Q1-z0L"/>
                             <constraint firstItem="Hrq-ff-sUC" firstAttribute="height" secondItem="hAd-Vi-f51" secondAttribute="height" id="YmY-Ex-1yf"/>
                             <constraint firstItem="pyF-an-nSb" firstAttribute="centerY" secondItem="MVz-dh-kgA" secondAttribute="centerY" id="aLh-YQ-GEb"/>
-                            <constraint firstItem="PWI-rZ-xja" firstAttribute="bottom" secondItem="A2B-RG-uHy" secondAttribute="bottom" id="af7-EF-COx"/>
                             <constraint firstItem="QfP-lA-cgL" firstAttribute="top" secondItem="MVz-dh-kgA" secondAttribute="top" id="bM0-of-rWn"/>
                             <constraint firstItem="4v4-Xi-Ewh" firstAttribute="leading" secondItem="9qa-kZ-o1k" secondAttribute="trailing" id="bz4-za-UoB"/>
                             <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="vMW-cw-G3E" secondAttribute="trailing" constant="15" id="cAM-CS-hJx"/>
@@ -427,18 +422,13 @@
                             <constraint firstItem="hAd-Vi-f51" firstAttribute="centerY" secondItem="Hrq-ff-sUC" secondAttribute="centerY" id="kfg-Y6-wvT"/>
                             <constraint firstItem="QfP-lA-cgL" firstAttribute="height" secondItem="MVz-dh-kgA" secondAttribute="height" id="njA-Rj-Zxh"/>
                             <constraint firstItem="fni-R7-t11" firstAttribute="centerY" secondItem="QfP-lA-cgL" secondAttribute="centerY" id="o9H-0l-Ty1"/>
-                            <constraint firstItem="s3a-vi-G4m" firstAttribute="width" secondItem="s3a-vi-G4m" secondAttribute="height" multiplier="1:1" id="p8n-wB-17W"/>
-                            <constraint firstItem="PWI-rZ-xja" firstAttribute="leading" secondItem="A2B-RG-uHy" secondAttribute="trailing" constant="5" id="pgM-IR-mUf"/>
                             <constraint firstItem="MVz-dh-kgA" firstAttribute="height" secondItem="DMz-IK-SGN" secondAttribute="height" multiplier="0.04" id="svt-8A-0ag"/>
                             <constraint firstItem="eBK-Hm-dX3" firstAttribute="centerY" secondItem="gGa-pp-Cwa" secondAttribute="centerY" id="t8V-FP-eqd"/>
-                            <constraint firstItem="fni-R7-t11" firstAttribute="leading" secondItem="PWI-rZ-xja" secondAttribute="trailing" constant="24" id="to3-Ni-NVB"/>
                             <constraint firstItem="9qa-kZ-o1k" firstAttribute="leading" secondItem="HJZ-h8-yHo" secondAttribute="leading" constant="10" id="uBw-Dc-64T"/>
-                            <constraint firstItem="s3a-vi-G4m" firstAttribute="width" secondItem="PWI-rZ-xja" secondAttribute="width" id="uOi-52-RCy"/>
-                            <constraint firstItem="A2B-RG-uHy" firstAttribute="leading" secondItem="QfP-lA-cgL" secondAttribute="trailing" constant="10" id="usb-bS-8Sc"/>
-                            <constraint firstItem="s3a-vi-G4m" firstAttribute="height" secondItem="PWI-rZ-xja" secondAttribute="height" id="vyj-Mw-JmX"/>
                             <constraint firstItem="4v4-Xi-Ewh" firstAttribute="top" secondItem="Cg7-eQ-58P" secondAttribute="top" id="wxk-ah-z1V"/>
                             <constraint firstItem="HJZ-h8-yHo" firstAttribute="bottom" secondItem="ZUx-G2-2hE" secondAttribute="bottom" id="xo2-ZE-GqP"/>
                             <constraint firstItem="HJZ-h8-yHo" firstAttribute="trailing" secondItem="4v4-Xi-Ewh" secondAttribute="trailing" id="xpz-ea-iiT"/>
+                            <constraint firstItem="NTy-LW-kaQ" firstAttribute="leading" secondItem="fni-R7-t11" secondAttribute="trailing" constant="15" id="yF2-cX-xqH"/>
                             <constraint firstItem="roV-AV-Ii6" firstAttribute="centerY" secondItem="uEG-z0-RcJ" secondAttribute="centerY" id="yu2-q0-0Wq"/>
                         </constraints>
                         <connections>
@@ -473,18 +463,6 @@
                                     <action selector="errorButtonAction:" destination="GS7-IZ-4uD" id="d2h-RN-d78"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="doc.text.magnifyingglass" catalog="system" id="ift-0I-bW6">
-                                <color key="tintColor" systemColor="linkColor"/>
-                                <connections>
-                                    <action selector="researchAction:" destination="GS7-IZ-4uD" id="FZ1-kz-8id"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem image="creditcard.circle" catalog="system" id="gXI-FT-krA">
-                                <color key="tintColor" systemColor="linkColor"/>
-                                <connections>
-                                    <action selector="purchaseAction:" destination="GS7-IZ-4uD" id="Zdc-Sy-slw"/>
-                                </connections>
-                            </barButtonItem>
                         </leftBarButtonItems>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
@@ -492,15 +470,12 @@
                         <outlet property="barTitleButton" destination="xuq-K8-rjS" id="55X-Rh-Ac2"/>
                         <outlet property="chart" destination="DMz-IK-SGN" id="oYm-P0-xbE"/>
                         <outlet property="dcfButton" destination="QfP-lA-cgL" id="cdS-r8-ar8"/>
-                        <outlet property="dcfErrorsButton" destination="PWI-rZ-xja" id="NeJ-xs-n2b"/>
-                        <outlet property="dcfValuationLabrl" destination="A2B-RG-uHy" id="MpB-NQ-6aa"/>
                         <outlet property="errorButton" destination="Eh7-4A-Kqm" id="8oy-Nu-S0E"/>
+                        <outlet property="healthButton" destination="uqD-bc-3eA" id="9Kv-7r-Zbf"/>
                         <outlet property="priceUpdateButton" destination="B1R-fX-BfC" id="hyp-Dp-GIP"/>
-                        <outlet property="purchaseButton" destination="gXI-FT-krA" id="ceb-Qq-Zkx"/>
                         <outlet property="r1Button" destination="fni-R7-t11" id="fvV-UG-dTt"/>
-                        <outlet property="r1ErrorsButton" destination="s3a-vi-G4m" id="lfo-xr-fDb"/>
-                        <outlet property="r1ValuationLabel" destination="miC-j2-Brw" id="9JR-jq-c4e"/>
-                        <outlet property="researchButton" destination="ift-0I-bW6" id="DNs-ts-B0j"/>
+                        <outlet property="researchButton" destination="NTy-LW-kaQ" id="qMr-Wk-inG"/>
+                        <outlet property="transactionButton" destination="Q2h-bq-EN8" id="Sr1-JE-yep"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="R1G-6f-cB6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1199,17 +1174,17 @@
             </objects>
             <point key="canvasLocation" x="2855" y="485"/>
         </scene>
-        <!--Table View Controller-->
+        <!--Fin HealthTVC-->
         <scene sceneID="KGa-Ue-BGJ">
             <objects>
-                <tableViewController id="PTV-AO-RdA" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="h96-hh-Yw0">
+                <tableViewController storyboardIdentifier="FinHealthTVC" id="PTV-AO-RdA" customClass="FinHealthTVC" customModule="Bulls_N_Bears" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="h96-hh-Yw0">
                         <rect key="frame" x="0.0" y="0.0" width="1180" height="820"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="ZOV-jR-7Hi">
-                                <rect key="frame" x="0.0" y="50" width="1180" height="43.5"/>
+                                <rect key="frame" x="0.0" y="55.5" width="1180" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ZOV-jR-7Hi" id="Yl6-6O-3cb">
                                     <rect key="frame" x="0.0" y="0.0" width="1180" height="43.5"/>
@@ -1454,6 +1429,8 @@
                             <outlet property="delegate" destination="bZx-HW-3ny" id="t5a-mn-lJD"/>
                         </connections>
                     </tableView>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="chK-E4-IkS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -1487,10 +1464,6 @@
         <image name="arrow.up.arrow.down" catalog="system" width="128" height="97"/>
         <image name="arrowtriangle.right.and.line.vertical.and.arrowtriangle.left" catalog="system" width="128" height="88"/>
         <image name="book" catalog="system" width="128" height="99"/>
-        <image name="creditcard.circle" catalog="system" width="128" height="123"/>
-        <image name="doc.text.magnifyingglass" catalog="system" width="110" height="128"/>
-        <image name="dollarsign.circle.fill" catalog="system" width="128" height="123"/>
-        <image name="exclamationmark.triangle" catalog="system" width="128" height="109"/>
         <image name="exclamationmark.triangle.fill" catalog="system" width="128" height="109"/>
         <image name="info.circle" catalog="system" width="128" height="123"/>
         <image name="plus" catalog="system" width="128" height="113"/>

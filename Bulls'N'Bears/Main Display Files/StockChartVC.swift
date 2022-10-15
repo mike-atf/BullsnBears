@@ -14,15 +14,13 @@ class StockChartVC: UIViewController {
     @IBOutlet var chart: ChartContainerView!
     @IBOutlet var errorButton: UIBarButtonItem!
     @IBOutlet var barTitleButton: UIBarButtonItem!
-    @IBOutlet var dcfValuationLabrl: UILabel!
-    @IBOutlet var r1ValuationLabel: UILabel!
     @IBOutlet var dcfButton: UIButton!
     @IBOutlet var r1Button: UIButton!
-    @IBOutlet var dcfErrorsButton: UIButton!
-    @IBOutlet var r1ErrorsButton: UIButton!
-    @IBOutlet var researchButton: UIBarButtonItem!
-    @IBOutlet var purchaseButton: UIBarButtonItem!
     @IBOutlet var priceUpdateButton: UIButton!
+    
+    @IBOutlet var healthButton: UIButton!
+    @IBOutlet var transactionButton: UIButton!
+    @IBOutlet var researchButton: UIButton!
     
     var settingsMenuButton: UIBarButtonItem!
     var dcfErrors = [String]()
@@ -46,19 +44,16 @@ class StockChartVC: UIViewController {
         }()
 
         barTitleButton = UIBarButtonItem(customView: newLabel)
-//        barTitleButton.title = share?.name_long
 
         settingsMenuButton = UIBarButtonItem(image: UIImage(systemName: "slider.horizontal.3"), style: .plain, target: self, action: #selector(settingsMenu))
 
         let fixedSizeItem = UIBarButtonItem.fixedSpace(100)
-        self.navigationItem.leftBarButtonItems = [barTitleButton,researchButton, purchaseButton, fixedSizeItem]
+        self.navigationItem.leftBarButtonItems = [barTitleButton]
         self.navigationItem.rightBarButtonItem = settingsMenuButton
         
         NotificationCenter.default.addObserver(self, selector: #selector(activateErrorButton), name: Notification.Name(rawValue: "NewErrorLogged"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showCitation), name: Notification.Name(rawValue: "ShowCitation"), object: nil)
         
-        dcfErrorsButton.isHidden = true
-        r1ErrorsButton.isHidden = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -126,9 +121,9 @@ class StockChartVC: UIViewController {
     
     func refreshDCFLabel() {
         if let validValuation = share?.dcfValuation {
-            let (value, errors) = validValuation.returnIValue()
-            dcfErrorsButton.isHidden = (errors.count == 0)
-            dcfErrors = errors
+//            let (value, errors) = validValuation.returnIValue()
+//            dcfErrorsButton.isHidden = (errors.count == 0)
+//            dcfErrors = errors
             
             if let creationDate = validValuation.ageOfValuation() {
                 if creationDate > 365*24*3600/2  {
@@ -138,19 +133,19 @@ class StockChartVC: UIViewController {
                 }
             }
             
-            if let intrinsicValue = value {
-                dcfValuationLabrl.text = "DCF :"
-                if intrinsicValue > 0 {
-                    let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber) ?? "--"
-                    dcfValuationLabrl.text = "DCF : " + iv$
-                }
-                else {
-                    dcfValuationLabrl.text = "DCF : negative"
-                }
-            }
-            else {
-                dcfValuationLabrl.text = "DCF : invalid"
-            }
+//            if let intrinsicValue = value {
+//                dcfValuationLabrl.text = "DCF :"
+//                if intrinsicValue > 0 {
+//                    let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber) ?? "--"
+//                    dcfValuationLabrl.text = "DCF : " + iv$
+//                }
+//                else {
+//                    dcfValuationLabrl.text = "DCF : negative"
+//                }
+//            }
+//            else {
+//                dcfValuationLabrl.text = "DCF : invalid"
+//            }
         }
     }
     
@@ -158,11 +153,11 @@ class StockChartVC: UIViewController {
         
         if let validValuation = share?.rule1Valuation {
             
-            var r1Title = "GBV: "
-            let (value, errors) = validValuation.stickerPrice()
-            r1ErrorsButton.isHidden = (errors == nil)
-            r1Errors = errors
-            
+//            var r1Title = "GBV: "
+//            let (value, errors) = validValuation.stickerPrice()
+//            r1ErrorsButton.isHidden = (errors == nil)
+//            r1Errors = errors
+//
             if let creationDate = validValuation.ageOfValuation() {
                 if creationDate > 365*24*3600/2  {
                     r1Button.tintColor = UIColor.systemRed
@@ -171,33 +166,33 @@ class StockChartVC: UIViewController {
                 }
             }
 
-            if let stickerPrice = value {
-                if stickerPrice > 0 {
-                    r1Title += (currencyFormatterNoGapNoPence.string(from: stickerPrice as NSNumber) ?? "--")
-                }
-                else { r1Title += " negative"}
-
-                if let score = validValuation.moatScore() {
-                    if !score.isNaN {
-                        let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
-                        r1Title = r1Title + " (Moat: " + n$ + ")"
-                    }
-                }
-                
-                if let proportion = validValuation.debtProportion() {
-                    if proportion > 3.0 {
-                        r1Title += ", debt: " + (percentFormatter0Digits.string(from: proportion as NSNumber) ?? "-")
-                    }
-                }
-
-                if let proportion = validValuation.insiderSalesProportion() {
-                    if proportion > 0.1 {
-                        r1Title += ", insider sales: " + (percentFormatter0Digits.string(from: proportion as NSNumber) ?? "-")
-                    }
-                }
-
-                r1ValuationLabel.text = r1Title
-            }
+//            if let stickerPrice = value {
+//                if stickerPrice > 0 {
+//                    r1Title += (currencyFormatterNoGapNoPence.string(from: stickerPrice as NSNumber) ?? "--")
+//                }
+//                else { r1Title += " negative"}
+//
+//                if let score = validValuation.moatScore() {
+//                    if !score.isNaN {
+//                        let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
+//                        r1Title = r1Title + " (Moat: " + n$ + ")"
+//                    }
+//                }
+//
+//                if let proportion = validValuation.debtProportion() {
+//                    if proportion > 3.0 {
+//                        r1Title += ", debt: " + (percentFormatter0Digits.string(from: proportion as NSNumber) ?? "-")
+//                    }
+//                }
+//
+//                if let proportion = validValuation.insiderSalesProportion() {
+//                    if proportion > 0.1 {
+//                        r1Title += ", insider sales: " + (percentFormatter0Digits.string(from: proportion as NSNumber) ?? "-")
+//                    }
+//                }
+//
+//                r1ValuationLabel.text = r1Title
+//            }
         }
     }
     
@@ -210,7 +205,7 @@ class StockChartVC: UIViewController {
         }
     }
     
-    @IBAction func researchAction(_ sender: UIBarButtonItem) {
+    @IBAction func researchAction(_ sender: UIButton) {
         
         if let researchVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ResearchTVC") as? ResearchTVC {
             researchVC.share = share
@@ -233,7 +228,7 @@ class StockChartVC: UIViewController {
     func activateErrorButton() {
         
         DispatchQueue.main.async {
-            self.navigationItem.leftBarButtonItems = [self.barTitleButton,self.researchButton, self.purchaseButton ,self.errorButton]
+            self.navigationItem.leftBarButtonItems = [self.barTitleButton,self.errorButton]
             self.view.setNeedsLayout()
         }
 
@@ -241,6 +236,7 @@ class StockChartVC: UIViewController {
 
     @IBAction func dcfButtonAction(_ sender: UIButton) {
         
+        // TODO: - redirect to list vierw controller, not modal
         guard let validShare = share else {
             return
         }
@@ -265,6 +261,7 @@ class StockChartVC: UIViewController {
     
     @IBAction func r1ButtonAction(_ sender: UIButton) {
         
+        // TODO: - redirect to list vierw controller, not modal
         guard let validShare = share else {
             return
         }
@@ -287,6 +284,7 @@ class StockChartVC: UIViewController {
         }
     }
 
+    /*
     @IBAction func dcfErrorsButtonAction(_ sender: UIButton) {
         
         if let errorsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {
@@ -322,6 +320,7 @@ class StockChartVC: UIViewController {
             present(errorsView, animated: true, completion:  nil)
         }
     }
+    */
     
     @objc
     func showCitation() {
@@ -352,7 +351,7 @@ class StockChartVC: UIViewController {
 
     }
         
-    @IBAction func purchaseAction(_ sender: UIBarButtonItem) {
+    @IBAction func purchaseAction(_ sender: UIButton) {
         
         guard let dialog = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SharePurchaseDialog") as? ShareTransactionDialog else {
             return
@@ -363,7 +362,7 @@ class StockChartVC: UIViewController {
 
         let popUpController = dialog.popoverPresentationController
         popUpController!.permittedArrowDirections = .up
-        popUpController?.barButtonItem = sender
+        popUpController?.sourceView = transactionButton
 
         dialog.share = share
         dialog.presentingVC = self
@@ -371,6 +370,13 @@ class StockChartVC: UIViewController {
         self.present(dialog, animated: true, completion: nil)
 
     }
+    
+    @IBAction func healthAction(_ sender: UIButton) {
+        
+        stocksListVC.showFinHealthView(share: share!)
+        
+    }
+    
     
     func displayPurchaseInfo(button: PurchasedButton) {
         

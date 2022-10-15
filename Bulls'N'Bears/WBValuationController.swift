@@ -883,6 +883,9 @@ extension WBValuationController: DownloadRedirectionDelegate {
                                             print("WBValuationController: redirect for \(symbol) r1V task recevied")
                                         case .qEPS:
                                             print("WBValuationController: redirect for \(symbol) qEPS task received")
+                                        case .healthData:
+                                            print("FinHealthController: redirect for \(symbol) healthData task received")
+
                                         }
                                     }
                                 }

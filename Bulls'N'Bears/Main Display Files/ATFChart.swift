@@ -59,7 +59,7 @@ typealias Inset = (position: Position, inset: CGFloat)
 typealias ChartLabelInfo = (position: Position, text: String, font: UIFont?, color: UIColor?, alignment: NSTextAlignment?)
 typealias ChartDataSet = (x: Date?, y: Double?)
 typealias AxisParameters = (min: Double, max: Double, noOfTicks: Int, scale: ChartAxisScale)
-typealias LabelledChartDataSet = (title: String, chartData: [ChartDataSet])
+typealias LabelledChartDataSet = (title: String, chartData: [ChartDataSet], format: ValuationCellValueFormat)
 
 
 /// NOT rotation safe
@@ -83,6 +83,8 @@ class ATFChart: UIView {
     // axis data
     var axisParameters = [ChartAxis : AxisParameters]()
     var minimumTimeAxisTimeSpan: TimeInterval = 365*24*3600/12 // default one month
+    var maximumYAxisValue: Double?
+    var minimumYAxisValue: Double?
     var timeAxisStartDate = DatesManager.beginningOfFirstWeekDay(ofDate: Date())
     var timeAxisEndDate = DatesManager.endOflastWeekDay(ofDate: Date())
     var timeAxisStepInterval = day
@@ -92,7 +94,9 @@ class ATFChart: UIView {
     
     var allLabels = [UILabel]()
     
-    let dataColors = [UIColor.systemBlue, UIColor.systemOrange]
+    var dataColors = [UIColor.systemBlue, UIColor.systemOrange]
+    /// set the thresholds for ratio reduction (1-last value / first value). If exceeding the first value (concern) then the line fill or bar color will change to red, if the second (caution) then to orange
+    var thresholdsForColorChange_decline: [Double]?
 
     
     // formatters
@@ -114,6 +118,7 @@ class ATFChart: UIView {
         formatter.setLocalizedDateFormatFromTemplate("dMM")
         return formatter
     }()
+    var yAxisFormat = ValuationCellValueFormat.currency
 
 
 
@@ -127,12 +132,15 @@ class ATFChart: UIView {
         
     }
 
-    func configureChart(primaryData: LabelledChartDataSet?, secondaryData: LabelledChartDataSet?=nil, types: [ChartType], chartLabelsData:[ChartLabelInfo]?) {
+    /// declineThresholdsForColorChange is an optional  array of 1-2 Doubles between 0-1, indicating decline thresholds from last primaryData value to last primaryDats value the first is the concern threshold for changing color to red, the second (optional) is the caution alert changing color to orange
+    func configureChart(primaryData: LabelledChartDataSet?, secondaryData: LabelledChartDataSet?=nil, types: [ChartType], chartLabelsData:[ChartLabelInfo]?, declineThresholdsForColorChange: [Double]?=nil) {
         
         self.primaryData = primaryData
         self.secondaryData = secondaryData
         self.chartTypes = types
         self.chartLabelData = chartLabelsData
+        self.yAxisFormat = primaryData?.format ?? .currency
+        self.thresholdsForColorChange_decline = declineThresholdsForColorChange
         
         createSurroundingLabels()
         
@@ -142,6 +150,33 @@ class ATFChart: UIView {
         createAxisLabels()
                 
         layoutIfNeeded()
+        
+    }
+    
+    func prepareForReuse() {
+        for label in allLabels {
+            label.removeFromSuperview()
+        }
+        allLabels = [UILabel]()
+        axisLabels[.vertical] = nil
+        axisLabels[.horizontal] = nil
+        
+        chartLabels[.top] = nil
+        chartLabels[.bottom] = nil
+        chartLabels[.left] = nil
+        chartLabels[.right] = nil
+        chartLabels[.legend1] = nil
+        chartLabels[.legend2] = nil
+
+        chartLabelData = nil
+        
+        primaryData = nil
+        secondaryData = nil
+        
+        insets = [.top: 5, .bottom : 5, .left : 5.0, .right: 5.0]
+        
+        setNeedsLayout()
+        setNeedsDisplay()
         
     }
     
@@ -286,6 +321,7 @@ class ATFChart: UIView {
             for lineData in lineGraphs {
                 
                 guard let validDataSet = lineData?.chartData else { continue }
+                guard validDataSet.count > 0 else { continue }
                 
                 let lineColor = dataColors[lineCount]
                 let linePath = UIBezierPath()
@@ -297,6 +333,7 @@ class ATFChart: UIView {
                     startPoint = plotDataPoint(dataPoint: start, frame: rect)
                     linePath.move(to: startPoint)
                     linePathPoints.append(startPoint)
+                    endPoint = startPoint
                 }
                 if validDataSet.count > 1 {
                     for i in 1..<(lineData?.chartData.count ?? 0) {
@@ -311,8 +348,20 @@ class ATFChart: UIView {
                     filledLinePath.addLine(to: CGPoint(x: endPoint.x, y: rect.height - insets[.bottom]!))
                     filledLinePath.addLine(to: CGPoint(x: startPoint.x, y: rect.height - insets[.bottom]!))
                     filledLinePath.addLine(to: startPoint)
-
-                    lineColor.withAlphaComponent(0.5).setFill()
+                    
+                    if let threshold = thresholdsForColorChange_decline {
+                        let changeFromLastToFirstRatio = 1 - (validDataSet.last!.y! / validDataSet.first!.y!)
+                        if changeFromLastToFirstRatio > threshold.first! {
+                            UIColor.systemRed.withAlphaComponent(0.5).setFill()
+                        } else if changeFromLastToFirstRatio > threshold.last! {
+                            UIColor.systemOrange.withAlphaComponent(0.5).setFill()
+                        } else {
+                            lineColor.withAlphaComponent(0.5).setFill()
+                        }
+                    }
+                    else {
+                        lineColor.withAlphaComponent(0.5).setFill()
+                    }
                     filledLinePath.fill()
 
                 }
@@ -353,12 +402,24 @@ class ATFChart: UIView {
                 guard let validDataSet = barData?.chartData else { continue }
                 for data in validDataSet {
                     let horizontalOffset = CGFloat(barGraphCount) * multipleBarGraphOffset
-                    let barColor = dataColors[barGraphCount].withAlphaComponent(0.6)
+                    var barColor = dataColors[barGraphCount].withAlphaComponent(0.6)
                     let barTopPoint = plotDataPoint(dataPoint: data, frame: rect)
                     let barRect = CGRect(x: horizontalOffset + barTopPoint.x - barWidth / 2, y: barTopPoint.y, width: barWidth, height: barBottom - barTopPoint.y)
                     let barPath = UIBezierPath(roundedRect: barRect, cornerRadius: 1)
                     
-                    barColor.setFill()
+                    if let thresholds = thresholdsForColorChange_decline {
+                        let changeFromLastToFirstRatio = 1 - validDataSet.last!.y! / (validDataSet.first!.y!)
+                        if changeFromLastToFirstRatio > thresholds.first! {
+                            UIColor.systemRed.withAlphaComponent(0.5).setFill()
+                        }
+                        else if changeFromLastToFirstRatio > thresholds.last! {
+                            UIColor.systemOrange.withAlphaComponent(0.5).setFill()
+                        }
+                        else {
+                            barColor.setFill()
+                        }
+                    }
+                    
                     barPath.fill()
                     
                 }
@@ -545,10 +606,16 @@ class ATFChart: UIView {
 
         }
         
-        return [axisMin, axisMax]
+        return [minimumYAxisValue ?? axisMin, maximumYAxisValue ?? axisMax]
     }
     
     internal func createSurroundingLabels() {
+        
+//        for key in chartLabels.keys {
+//
+//            chartLabels[key]?.removeFromSuperview()
+//            chartLabels[key] = UILabel()
+//        }
         
         for labelData in chartLabelData ?? [] {
                         
@@ -563,6 +630,7 @@ class ATFChart: UIView {
             
             newLabel.translatesAutoresizingMaskIntoConstraints = false
             addSubview(newLabel)
+            allLabels.append(newLabel)
             
             switch labelData.position {
             case .top:
@@ -576,11 +644,13 @@ class ATFChart: UIView {
                 insets[.bottom] = newLabel.frame.height + 5
                 chartLabels[.bottom] = newLabel
             case .left:
+                newLabel.numberOfLines = 0
                 newLabel.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
                 newLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
                 insets[.left] = newLabel.frame.width + 5
                 chartLabels[.left] = newLabel
             case .right:
+                newLabel.numberOfLines = 0
                 newLabel.text = labelData.text
                 newLabel.textColor = labelData.color
                 newLabel.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
@@ -588,6 +658,7 @@ class ATFChart: UIView {
                 insets[.right] = newLabel.frame.width + 5
                 chartLabels[.right] = newLabel
             case .legend1:
+                newLabel.numberOfLines = 0
                 newLabel.font = UIFont.systemFont(ofSize: 12)
                 newLabel.text = primaryData?.title
                 newLabel.textColor = dataColors.first!
@@ -597,6 +668,7 @@ class ATFChart: UIView {
                 newLabel.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
                 chartLabels[.legend1] = newLabel
             case .legend2:
+                newLabel.numberOfLines = 0
                 newLabel.font = UIFont.systemFont(ofSize: 12)
                 newLabel.text = secondaryData?.title
                 newLabel.textColor = dataColors[1]
@@ -605,7 +677,6 @@ class ATFChart: UIView {
                 newLabel.topAnchor.constraint(equalTo: chartLabels[.legend1]!.bottomAnchor).isActive = true
                 newLabel.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
                 chartLabels[.legend2] = newLabel
-
             }
             
         }
@@ -617,6 +688,23 @@ class ATFChart: UIView {
         // the positions/ constraints for these labels need to be set in the 'draw' function
         
         if showVerticalAxisLabels {
+                        
+            var yAxisFormatter = NumberFormatter()
+            switch yAxisFormat {
+            case .percent:
+                yAxisFormatter = percentFormatter0Digits
+                if axisParameters[.vertical]!.max < 0.1 {
+                    yAxisFormatter = percentFormatter2Digits
+                }
+            case .numberWithDecimals:
+                yAxisFormatter = numberFormatterWith1Digit
+            default:
+                yAxisFormatter = currencyFormatterNoGapWithPence
+                if axisParameters[.vertical]!.max > 10 {
+                    yAxisFormatter = currencyFormatterGapNoPence
+                }
+            }
+            
             let range = axisParameters[.vertical]!.max - axisParameters[.vertical]!.min
             let step = range / Double(axisParameters[.vertical]!.noOfTicks)
             var vAxisLabels = [UILabel]()
@@ -624,10 +712,15 @@ class ATFChart: UIView {
                 
                 let value = axisParameters[.vertical]!.min + Double(i) * step
                 
+                var shortCurrency$: String?
+                if yAxisFormat == .currency && value > 1000 {
+                    shortCurrency$ = value.shortString(decimals: 0)
+                }
+                
                 let newLabel: UILabel = {
                     let defaultLabel = UILabel()
                     defaultLabel.font = UIFont.systemFont(ofSize: 11)
-                    defaultLabel.text = currencyFormatter.string(from: value as NSNumber)
+                    defaultLabel.text = shortCurrency$ ?? yAxisFormatter.string(from: value as NSNumber)
                     defaultLabel.textColor = UIColor.label
                     return defaultLabel
                 }()
@@ -640,10 +733,11 @@ class ATFChart: UIView {
                 vAxisLabels.append(newLabel)
             }
             axisLabels[.vertical] = vAxisLabels
+            allLabels.append(contentsOf: vAxisLabels)
         }
         
         if showHorizontalAxisLabels {
-            
+                        
             let dateRangeStep = timeAxisEndDate.timeIntervalSince(timeAxisStartDate) / Double(axisParameters[.horizontal]!.noOfTicks)
             var hAxisLabels = [UILabel]()
             
@@ -672,6 +766,7 @@ class ATFChart: UIView {
                 hAxisLabels.append(newLabel)
             }
             axisLabels[.horizontal] = hAxisLabels
+            allLabels.append(contentsOf: hAxisLabels)
             
         }
         

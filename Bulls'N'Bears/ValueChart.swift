@@ -160,7 +160,6 @@ class ValueChart: UIView {
         xAxisLabels.forEach { (label) in
             let labelCentreX = chartOrigin.x + labelSlotWidth * step + labelSlotWidth / 2
             label.frame.origin = CGPoint(x: labelCentreX - label.frame.width / 2, y: rect.maxY - label.frame.height)
-//            label.center.x = labelCentreX
            step += 1
         }
         

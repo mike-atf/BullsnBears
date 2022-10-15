@@ -173,6 +173,33 @@ class WebPageScraper2: NSObject {
             }
 
     }
+    
+    /// default for MacroTrends table
+    /// should have caller be Download Redirefction delegate as NotificationCenter observer
+    class func getqColumnTableData(url: URL, companyName: String, tableHeader: String , dateColumn: Int, valueColumn: Int, until date: Date?=nil) async throws -> [DatedValue]? {
+        
+            var htmlText:String?
+            var datedValues: [DatedValue]?
+            let downloader = Downloader(task: .healthData)
+        
+           do {
+               htmlText = try await downloader.downloadDataWithRedirection(url: url)
+            } catch let error as DownloadAndAnalysisError {
+                throw error
+            }
+        
+            guard let validPageText = htmlText else {
+                throw DownloadAndAnalysisError.generalDownloadError // possible result of MT redirection
+            }
+                
+            do {
+                datedValues = try extractColumnsValuesFromTable(html$: validPageText, tableHeader: tableHeader, dateColumn: dateColumn, valueColumn: valueColumn, until: date)
+                return datedValues
+            } catch let error as DownloadAndAnalysisError {
+               throw error
+            }
+
+    }
 
     
     /// returns historical pe ratios and eps TTM with dates from macro trends website
@@ -1385,6 +1412,101 @@ class WebPageScraper2: NSObject {
         return valueArray
 
     }
+    
+    /// returns a date (assuming format yyyy-MM-dd) from default column 0 and a value from another column (%, T,B,M,K)
+    /// columns count begins with 0...,check the website table in question
+    /// send webpage html and the Title/Header identifying the start of the table
+    /// default html tags are for MacroTrends table, with tableStart <tbody><tr>'  tableTerminal "</tr></tbody>", columnTerminal "</td>", rowTerminal and start "</tr>"
+    /// check html and send other values for these if the table text differs
+    class func extractColumnsValuesFromTable(html$: String?, tableHeader: String, tableTerminal: String? = nil, columnTerminal: String? = nil, dateColumn: Int?=0, valueColumn: Int, until: Date?=nil) throws -> [DatedValue]? {
+        
+        let tableHeader = tableHeader
+        let tableStart = "<tbody><tr>"
+        let tableTerminal =  tableTerminal ?? "</tr></tbody>"
+        let localColumnTerminal = columnTerminal ?? "</td>"
+//        let labelStart = ">"
+        let rowTerminal = "</tr>"
+//        let rowStarter = "</tr>"
+        
+        let websiteDateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            formatter.calendar.timeZone = TimeZone(identifier: "UTC")!
+            return formatter
+        }()
+
+        guard let validHtml = html$ else {
+            throw DownloadAndAnalysisError.emptyWebpageText
+        }
+        
+        let pageText = String(validHtml)
+        
+        guard let titleIndex = pageText.range(of: tableHeader) else {
+            throw DownloadAndAnalysisError.htmlTableHeaderEndNotFound
+        }
+
+        guard let tableEndIndex = pageText.range(of: tableTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<pageText.endIndex, locale: nil) else {
+            throw DownloadAndAnalysisError.htmlTableEndNotFound
+        }
+                
+        guard let tableStartIndex = pageText.range(of: tableStart, range: titleIndex.upperBound..<pageText.endIndex) else {
+            throw DownloadAndAnalysisError.htmlTableBodyStartIndexNotFound
+        }
+        
+        let tableText = String(pageText[tableStartIndex.upperBound..<tableEndIndex.lowerBound])
+        
+        var valueArray = [DatedValue]()
+        
+        let rows$ = tableText.components(separatedBy: rowTerminal)
+        for row in rows$ {
+            let columns$ = row.components(separatedBy: localColumnTerminal)
+            var value: Double?
+            var date: Date?
+            guard columns$.count > valueColumn else { continue }
+            
+            let date$ = columns$[0]
+            let value$ = columns$[valueColumn]
+            
+            for column$ in [date$, value$] {
+                let data = Data(column$.utf8)
+                if let content$ = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil).string {
+                    
+                    if let dateValue = websiteDateFormatter.date(from: content$) {
+                        date = dateValue
+                    } else if let validValue = Double(content$.filter("-0123456789.".contains)) {
+                        value = validValue
+                        switch value$.last! {
+                        case "%":
+                            value! /= 100
+                        case "T":
+                            value! *= 1000000000000
+                        case "B":
+                            value! *= 1000000000
+                        case "M":
+                            value! *= 1000000
+                        case "K":
+                            value! *= 1000
+                        default:
+                            value = validValue
+                        }
+                    }
+                }
+            }
+            
+            if date != nil && value != nil {
+                valueArray.append(DatedValue(date: date!, value: value!))
+                
+                if let stopDate = until {
+                    if date! < stopDate { break }
+                }
+            }
+
+        }
+        
+        return valueArray
+
+    }
+
     
     class func rule1DataExtraction(htmlText: String, section: String) -> [LabelledValues]? {
         

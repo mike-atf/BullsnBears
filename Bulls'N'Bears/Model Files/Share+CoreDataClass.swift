@@ -118,6 +118,60 @@ public class Share: NSManagedObject {
             } catch let error {
                 ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
             }
+        } else {
+            
+            var datedValue: DatedValue?
+            
+            switch trendName {
+            case  .moatScore:
+                if let r1v = self.rule1Valuation {
+                    if let moat = r1v.moatScore() {
+                        let date = r1v.creationDate!
+                        datedValue = DatedValue(date:date, value: moat)
+                    }
+                }
+            case .stickerPrice:
+                if let r1v = self.rule1Valuation {
+                    let (sp, _) = r1v.stickerPrice()
+                    if sp != nil {
+                        let date = r1v.creationDate!
+                        datedValue = DatedValue(date:date, value: sp!)
+                    }
+                }
+            case .dCFValue:
+                if let dcfv = self.dcfValuation {
+                    let (sp, _) = dcfv.returnIValue()
+                    if sp != nil {
+                        let date = dcfv.creationDate!
+                        datedValue = DatedValue(date:date, value: sp!)
+                    }
+                }
+            case .lynchScore:
+                if let wbv = self.wbValuation {
+                    if let sp = wbv.lynchRatio() {
+                        let date = wbv.date!
+                        datedValue = DatedValue(date:date, value: sp)
+                    }
+                }
+            case .caRatio:
+                data = trend_caRatio
+            case .pcRatio:
+                data = trend_pcRatio
+            case .intrinsicValue:
+                if let wbv = self.wbValuation {
+                    let (sp, _) = wbv.ivalue()
+                    if sp != nil {
+                        let date = wbv.date!
+                        datedValue = DatedValue(date:date, value: sp!)
+                    }
+                }
+            }
+
+            if let valid = datedValue {
+//                saveTrendsData(datedValuesToAdd: [valid], trendName: trendName)
+                return [valid]
+            }
+
         }
         
         return nil

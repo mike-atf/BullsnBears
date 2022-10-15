@@ -371,6 +371,7 @@ let currencyFormatterGapNoPence: NumberFormatter = {
     formatter.numberStyle = NumberFormatter.Style.currency
     formatter.maximumFractionDigits = 0
     formatter.usesGroupingSeparator = true
+    formatter.groupingSize = 3
     return formatter
 }()
 
@@ -380,6 +381,7 @@ let currencyFormatterNoGapNoPence: NumberFormatter = {
     formatter.numberStyle = NumberFormatter.Style.currency
     formatter.maximumFractionDigits = 0
     formatter.usesGroupingSeparator = true
+    formatter.groupingSize = 3
     return formatter
 }()
 
@@ -391,6 +393,7 @@ let currencyFormatterNoGapWithPence: NumberFormatter = {
     formatter.minimumFractionDigits = 2
     formatter.maximumFractionDigits = 2
     formatter.usesGroupingSeparator = true
+    formatter.groupingSize = 3
     return formatter
 }()
 
@@ -401,6 +404,7 @@ let currencyFormatterGapWithPence: NumberFormatter = {
     formatter.minimumFractionDigits = 2
     formatter.maximumFractionDigits = 2
     formatter.usesGroupingSeparator = true
+    formatter.groupingSize = 3
     return formatter
 }()
 
@@ -410,6 +414,7 @@ let currencyFormatterGapWithOptionalPence: NumberFormatter = {
     formatter.numberStyle = NumberFormatter.Style.currency
     formatter.maximumFractionDigits = 2
     formatter.usesGroupingSeparator = true
+    formatter.groupingSize = 3
     return formatter
 }()
 
@@ -435,7 +440,6 @@ let percentFormatter2DigitsPositive: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.numberStyle = .percent
     formatter.positivePrefix = "+"
-//    formatter.positiveFormat =
     formatter.maximumFractionDigits = 2
     formatter.minimumIntegerDigits = 1
     return formatter

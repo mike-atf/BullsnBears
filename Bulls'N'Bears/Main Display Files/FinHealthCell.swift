@@ -12,23 +12,28 @@ class FinHealthCell: UITableViewCell {
     
     @IBOutlet var title: UILabel!
     @IBOutlet var chart: ATFChart!
+    var cellPath: IndexPath!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        isUserInteractionEnabled = false
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+    override func prepareForReuse() {
+        cellPath = IndexPath()
+        title.text = ""
+        chart.prepareForReuse()
     }
     
-    public func configure(primaryData: LabelledChartDataSet, secondaryData: LabelledChartDataSet?=nil) {
+    public func configure(path: IndexPath,primaryData: LabelledChartDataSet, secondaryData: LabelledChartDataSet?=nil, chartMinimumTime: TimeInterval?=nil) {
         
+        self.cellPath = path
         title.text = primaryData.title
-        let labelInfo = ChartLabelInfo(position: .left, text: "%", font: nil, color: nil, alignment: nil)
-        chart.configureChart(primaryData: primaryData, secondaryData: secondaryData ,types: [.lineWithFill], chartLabelsData: [labelInfo])
+        
+        chart.minimumTimeAxisTimeSpan = chartMinimumTime ?? year
+//        let titleInfo = ChartLabelInfo(position: .left, text: primaryData.title, font: UIFont.systemFont(ofSize: 14), color: nil, alignment: .left)
+        chart.configureChart(primaryData: primaryData, secondaryData: secondaryData ,types: [.lineWithFill], chartLabelsData: nil, declineThresholdsForColorChange: [0.2, 0.1])
     }
     
 }

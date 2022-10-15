@@ -457,6 +457,24 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
     }
     
+    func showFinHealthView(share: Share) {
+        
+        for vc in self.navigationController?.children ?? [] {
+            if let _ = vc as? FinHealthTVC {
+                // FHV already open
+                return
+            }
+        }
+        
+        guard let finHealthTVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FinHealthTVC") as? FinHealthTVC else { return }
+        
+        finHealthTVC.share = share
+        
+        self.navigationController?.pushViewController(finHealthTVC, animated: true)
+
+    }
+
+    
     func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
         return true
     }

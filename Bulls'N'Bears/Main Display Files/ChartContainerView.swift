@@ -45,7 +45,6 @@ class ChartContainerView: UIView {
     }()
     
     var buttonDelegate: ChartButtonDelegate?
-//    var zoomFactor: CGFloat!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -121,16 +120,10 @@ class ChartContainerView: UIView {
             let allDaysAvailable = shareToShow?.getDailyPrices()?.count ?? 1
             let daysToDisplay = [30,91,182,365,allDaysAvailable][control.selectedSegmentIndex]
             
-//            print()
-//            print("display days set to \(daysToDisplay)")
-//            print("previous zoomScale \(zoomScale)")
-//            print("previous width.constant = \(chartsContentViewWidth.constant)")
             zoomScale = CGFloat(allDaysAvailable) / CGFloat(daysToDisplay)
             chartsContentViewWidth.isActive = false
             chartsContentViewWidth.constant = scrollView.bounds.width * zoomScale
             chartsContentViewWidth.isActive = true
-//            print("new zoomScale \(zoomScale)")
-//            print("new width.constant = \(chartsContentViewWidth.constant)")
             
             var foreCastTimeArea: CGFloat = 0
             if control.selectedSegmentIndex < 4 {
@@ -138,9 +131,6 @@ class ChartContainerView: UIView {
                 foreCastTimeArea = chartsContentViewWidth.constant * (CGFloat(forecastDays) / CGFloat(allDaysAvailable))
             }
             
-//            print("new foreCastTimeArea \(foreCastTimeArea)")
-//            print("new contentOffset = \(scrollView.contentOffset.x)")
-
             stochOscView.setNeedsDisplay()
             macdView.setNeedsDisplay()
             chartView.setNeedsDisplay()

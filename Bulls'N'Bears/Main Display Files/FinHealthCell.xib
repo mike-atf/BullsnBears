@@ -18,24 +18,24 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hv5-u1-Zj9">
-                        <rect key="frame" x="7" y="12" width="32" height="20"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hv5-u1-Zj9">
+                        <rect key="frame" x="5" y="5" width="30" height="18"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="87k-q5-Eg1" customClass="ATFChart" customModule="Bulls_N_Bears" customModuleProvider="target">
-                        <rect key="frame" x="106" y="4" width="192" height="36"/>
+                        <rect key="frame" x="81" y="4" width="224" height="36"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                 </subviews>
                 <constraints>
                     <constraint firstItem="87k-q5-Eg1" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="4" id="BnT-cg-s6e"/>
-                    <constraint firstItem="Hv5-u1-Zj9" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="Dx5-vo-g89"/>
                     <constraint firstItem="87k-q5-Eg1" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Hv5-u1-Zj9" secondAttribute="trailing" constant="5" id="H3A-ir-WZO"/>
-                    <constraint firstAttribute="trailing" secondItem="87k-q5-Eg1" secondAttribute="trailing" constant="22" id="RUQ-Zz-6Aw"/>
-                    <constraint firstItem="Hv5-u1-Zj9" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="7" id="ZyN-Vf-uRK"/>
-                    <constraint firstItem="87k-q5-Eg1" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.6" id="lcU-Gh-R7M"/>
+                    <constraint firstAttribute="trailing" secondItem="87k-q5-Eg1" secondAttribute="trailing" constant="15" id="RUQ-Zz-6Aw"/>
+                    <constraint firstItem="Hv5-u1-Zj9" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="5" id="ZyN-Vf-uRK"/>
+                    <constraint firstItem="Hv5-u1-Zj9" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="hsW-mj-etJ"/>
+                    <constraint firstItem="87k-q5-Eg1" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.7" id="lcU-Gh-R7M"/>
                     <constraint firstAttribute="bottom" secondItem="87k-q5-Eg1" secondAttribute="bottom" constant="4" id="p4g-bn-G7l"/>
                 </constraints>
             </tableViewCellContentView>
@@ -44,7 +44,7 @@
                 <outlet property="chart" destination="87k-q5-Eg1" id="hrN-VF-a0c"/>
                 <outlet property="title" destination="Hv5-u1-Zj9" id="FLP-mw-h19"/>
             </connections>
-            <point key="canvasLocation" x="80.46875" y="19.921875"/>
+            <point key="canvasLocation" x="-6" y="19"/>
         </tableViewCell>
     </objects>
     <resources>

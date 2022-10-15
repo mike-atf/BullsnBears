@@ -1533,6 +1533,8 @@ extension CombinedValuationController: DownloadRedirectionDelegate {
                                             self.startDataDownload()
                                         case .qEPS:
                                             print("WBValuationController: redirect for \(symbol) qEPS task received")
+                                        case .healthData:
+                                            print("FinHealthController: redirect for \(symbol) healthData task received")
                                         }
                                     }
                                 }
