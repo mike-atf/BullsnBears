@@ -40,7 +40,7 @@ class AlertController: NSObject {
             }
             
             if self.alertViewOpen {
-                ErrorController.addErrorLog(errorLocation: "AlertController.showDialog can't show alert as another alert is displayed", systemError: nil, errorInfo: "alert: \(alertMessage)")
+                ErrorController.addInternalError(errorLocation: "AlertController.showDialog can't show alert as another alert is displayed", systemError: nil, errorInfo: "alert: \(alertMessage)")
                 return
             } else {
                 self.alertViewOpen = true

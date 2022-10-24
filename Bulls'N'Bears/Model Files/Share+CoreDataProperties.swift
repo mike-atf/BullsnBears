@@ -51,7 +51,8 @@ extension Share {
     @NSManaged public var trend_pcRatio: Data?
     @NSManaged public var trend_caRatio: Data?
     @NSManaged public var trend_intrinsicValue: Data?
-    @NSManaged public var capitalAssetRatio: Double
+    @NSManaged public var trend_healthScore: Data?
+   @NSManaged public var capitalAssetRatio: Double
     @NSManaged public var pcRatio: Double
 
 

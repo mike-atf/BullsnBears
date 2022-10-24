@@ -100,6 +100,8 @@ public class Share: NSManagedObject {
             data = trend_pcRatio
         case .intrinsicValue:
             data = trend_intrinsicValue
+        case .healthScore:
+            data = trend_healthScore
         }
 
        
@@ -116,7 +118,7 @@ public class Share: NSManagedObject {
                     }
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
             }
         } else {
             
@@ -165,10 +167,11 @@ public class Share: NSManagedObject {
                         datedValue = DatedValue(date:date, value: sp!)
                     }
                 }
+            case .healthScore:
+                data = trend_healthScore
             }
 
             if let valid = datedValue {
-//                saveTrendsData(datedValuesToAdd: [valid], trendName: trendName)
                 return [valid]
             }
 
@@ -176,6 +179,106 @@ public class Share: NSManagedObject {
         
         return nil
     }
+    
+    func trendChartData(trendName: ShareTrendNames) -> [ChartDataSet]? {
+        
+        var data: Data?
+        
+        switch trendName {
+        case .moatScore:
+            data = trend_MoatScore
+        case .stickerPrice:
+            data = trend_StickerPrice
+        case .dCFValue:
+            data = trend_DCFValue
+        case .lynchScore:
+            data = trend_LynchScore
+        case .caRatio:
+            data = trend_caRatio
+        case .pcRatio:
+            data = trend_pcRatio
+        case .intrinsicValue:
+            data = trend_intrinsicValue
+        case .healthScore:
+            data = trend_healthScore
+        }
+
+       
+        if let valid = data {
+            do {
+                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
+                    var dataSet = [ChartDataSet]()
+                    for element in dictionary {
+                        dataSet.append(ChartDataSet(x: element.key, y: element.value))
+                    }
+                    return dataSet.sorted { (e0, e1) -> Bool in
+                        if e0.x! > e1.x! { return true }
+                        else { return false }
+                    }
+                }
+            } catch let error {
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+            }
+        } else {
+            
+            var dataSet: ChartDataSet?
+            
+            switch trendName {
+            case  .moatScore:
+                if let r1v = self.rule1Valuation {
+                    if let moat = r1v.moatScore() {
+                        let date = r1v.creationDate!
+                        dataSet = ChartDataSet(x:date, y: moat)
+                    }
+                }
+            case .stickerPrice:
+                if let r1v = self.rule1Valuation {
+                    let (sp, _) = r1v.stickerPrice()
+                    if sp != nil {
+                        let date = r1v.creationDate!
+                        dataSet = ChartDataSet(x:date, y: sp)
+                    }
+                }
+            case .dCFValue:
+                if let dcfv = self.dcfValuation {
+                    let (sp, _) = dcfv.returnIValue()
+                    if sp != nil {
+                        let date = dcfv.creationDate!
+                        dataSet = ChartDataSet(x:date, y: sp)
+                    }
+                }
+            case .lynchScore:
+                if let wbv = self.wbValuation {
+                    if let sp = wbv.lynchRatio() {
+                        let date = wbv.date!
+                        dataSet = ChartDataSet(x:date, y: sp)
+                    }
+                }
+            case .caRatio:
+                data = trend_caRatio
+            case .pcRatio:
+                data = trend_pcRatio
+            case .intrinsicValue:
+                if let wbv = self.wbValuation {
+                    let (sp, _) = wbv.ivalue()
+                    if sp != nil {
+                        let date = wbv.date!
+                        dataSet = ChartDataSet(x:date, y: sp)
+                    }
+                }
+            case .healthScore:
+                data = trend_healthScore
+            }
+
+            if let valid = dataSet {
+                return [valid]
+            }
+
+        }
+        
+        return nil
+    }
+
     
     /// adds new data to existing trend Data
     func saveTrendsData(datedValuesToAdd: [DatedValue]?, trendName: ShareTrendNames, saveInContext:Bool?=true) {
@@ -209,6 +312,8 @@ public class Share: NSManagedObject {
                 trend_pcRatio = validData
             case .intrinsicValue:
                 trend_intrinsicValue = validData
+            case .healthScore:
+                trend_healthScore = validData
             }
             
             if saveInContext ?? true {
@@ -216,7 +321,7 @@ public class Share: NSManagedObject {
                     try self.managedObjectContext?.save()
                 }
                 catch let error {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing share trend data \(trendName)")
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing share trend data \(trendName)")
                 }
             }
         }
@@ -238,7 +343,7 @@ public class Share: NSManagedObject {
         do {
             return try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "datedValuesToData function", systemError: error, errorInfo: "error converting DatedValues to Data")
+            ErrorController.addInternalError(errorLocation: "datedValuesToData function", systemError: error, errorInfo: "error converting DatedValues to Data")
         }
 
         return nil
@@ -271,7 +376,7 @@ public class Share: NSManagedObject {
             let data2 = try NSKeyedArchiver.archivedData(withRootObject: data1, requiringSecureCoding: false)
             return data2
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing historical price data")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing historical price data")
         }
 
         return nil
@@ -286,7 +391,7 @@ public class Share: NSManagedObject {
             let data2 = try NSKeyedArchiver.archivedData(withRootObject: data1, requiringSecureCoding: false)
             return data2
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing MCD data")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing MCD data")
         }
 
         return nil
@@ -334,7 +439,7 @@ public class Share: NSManagedObject {
                 return prices
             }
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
         }
         
         return nil
@@ -359,7 +464,7 @@ public class Share: NSManagedObject {
                     return macds
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored MACD data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored MACD data")
             }
         }
         else { return calculateMACDs(shortPeriod: 8, longPeriod: 17) }
@@ -948,7 +1053,7 @@ public class Share: NSManagedObject {
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }

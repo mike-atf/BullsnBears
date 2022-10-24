@@ -101,7 +101,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
                         return (mtCookies.count > 0) ? mtCookies : nil
                     }
                 } catch let error {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't convert stored MT cookies back to usable format.")
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't convert stored MT cookies back to usable format.")
                 }
             }
             return nil
@@ -151,7 +151,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
     //                            }
     //                        }
     //                    } catch let error {
-    //                        ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't convert stored MT cookies back to usable format.")
+    //                        ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't convert stored MT cookies back to usable format.")
     //                    }
     //                }
     //            }
@@ -165,7 +165,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
             webView?.load(validRequest)
         }
         else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Invzlid download request (url \(String(describing: url)) for symbol: \(stock.symbol!) with shortName \(stockShortname)")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "Invzlid download request (url \(String(describing: url)) for symbol: \(stock.symbol!) with shortName \(stockShortname)")
 //            mtDownloadTasks = [String]()
             self.mtDownloadCompleted(section: nil)
         }
@@ -186,7 +186,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
 //                let fileData = try NSKeyedArchiver.archivedData(withRootObject: dataArray, requiringSecureCoding: false)
 //                try fileData.write(to: URL(fileURLWithPath: appSupportDirectoryPath! + "/" + "MTCookies"))
 //            } catch let error {
-//                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into storage object for re-use")
+//                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into storage object for re-use")
 //            }
 //        }
 
@@ -198,7 +198,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
 
             }
             else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error cpaturing html string from website: \(String(describing: webView.url))")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error cpaturing html string from website: \(String(describing: webView.url))")
             }
         })
     }
@@ -230,7 +230,7 @@ class WebDataDownloader: NSObject, WKUIDelegate, WKNavigationDelegate {
                     let fileData = try NSKeyedArchiver.archivedData(withRootObject: dataArray, requiringSecureCoding: false)
                     try fileData.write(to: URL(fileURLWithPath: appSupportDirectoryPath! + "/" + "MTCookies"))
                 } catch let error {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into storage object for re-use")
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into storage object for re-use")
                 }
             }
             

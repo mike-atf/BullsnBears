@@ -105,24 +105,24 @@ class WebPageScraper2: NSObject {
                 NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
                 
                 htmlText = try await downloader.downloadDataWithRedirection(url: url)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 throw error
             }
         
             guard let validPageText = htmlText else {
-                throw DownloadAndAnalysisError.generalDownloadError // possible result of MT redirection
+                throw InternalErrorType.generalDownloadError // possible result of MT redirection
 //                return nil
             }
                 
             do {
                 tableText = try await extractTable(title:"PE Ratio Historical Data", html: validPageText) // \(title)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 throw error
             }
 
             do {
                 tableHeaderTexts = try await extractHeaderTitles(html: tableText)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 throw error
             }
             
@@ -130,11 +130,11 @@ class WebPageScraper2: NSObject {
                 do {
                     datedValues = try extractTableData(html: validPageText, titles: tableHeaderTexts, untilDate: date)
                     return datedValues
-                } catch let error as DownloadAndAnalysisError {
+                } catch let error as InternalErrorType {
                    throw error
                 }
             } else {
-                throw DownloadAndAnalysisError.htmTablelHeaderStartNotFound
+                throw InternalErrorType.htmTablelHeaderStartNotFound
             }
 
     }
@@ -154,12 +154,12 @@ class WebPageScraper2: NSObject {
                 NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
                 
                 htmlText = try await downloader.downloadDataWithRedirection(url: url)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 throw error
             }
         
             guard let validPageText = htmlText else {
-                throw DownloadAndAnalysisError.generalDownloadError // possible result of MT redirection
+                throw InternalErrorType.generalDownloadError // possible result of MT redirection
             }
                 
             do {
@@ -168,7 +168,7 @@ class WebPageScraper2: NSObject {
                 let extractionCodes = WebpageExtractionCodes(tableTitle: "Quarterly EPS", option: .macroTrends, rowStartSequence: "\">", dateFormatter: formatter)
                 datedValues = try extractQEPSTableData(html: validPageText, extractionCodes: extractionCodes,untilDate: date)
                 return datedValues
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                throw error
             }
 
@@ -184,18 +184,18 @@ class WebPageScraper2: NSObject {
         
            do {
                htmlText = try await downloader.downloadDataWithRedirection(url: url)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 throw error
             }
         
             guard let validPageText = htmlText else {
-                throw DownloadAndAnalysisError.generalDownloadError // possible result of MT redirection
+                throw InternalErrorType.generalDownloadError // possible result of MT redirection
             }
                 
             do {
                 datedValues = try extractColumnsValuesFromTable(html$: validPageText, tableHeader: tableHeader, dateColumn: dateColumn, valueColumn: valueColumn, until: date)
                 return datedValues
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                throw error
             }
 
@@ -220,24 +220,24 @@ class WebPageScraper2: NSObject {
                 NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
                 
                 htmlText = try await downloader.downloadDataWithRedirection(url: url)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 throw error
             }
         
             guard let validPageText = htmlText else {
-                throw DownloadAndAnalysisError.generalDownloadError // possible result of MT redirection
+                throw InternalErrorType.generalDownloadError // possible result of MT redirection
 //                return nil
             }
                 
             do {
                 tableText = try await extractTable(title:"Quarterly Earnings Surprise Amount", html: validPageText) // \(title)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 throw error
             }
 
             do {
                 tableHeaderTexts = try await extractHeaderTitles(html: tableText)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 throw error
             }
             
@@ -245,11 +245,11 @@ class WebPageScraper2: NSObject {
                 do {
                     datedValues = try extractTableData(html: validPageText, titles: tableHeaderTexts, untilDate: date)
                     return datedValues
-                } catch let error as DownloadAndAnalysisError {
+                } catch let error as InternalErrorType {
                    throw error
                 }
             } else {
-                throw DownloadAndAnalysisError.htmTablelHeaderStartNotFound
+                throw InternalErrorType.htmTablelHeaderStartNotFound
             }
 
     }
@@ -267,8 +267,8 @@ class WebPageScraper2: NSObject {
             } else {
                 return nil
             }
-        } catch let error as DownloadAndAnalysisError {
-            ErrorController.addErrorLog(errorLocation: "WebScraper2.getCurretnPrice", systemError: error, errorInfo: "error downloading current price data from \(url)")
+        } catch let error as InternalErrorType {
+            ErrorController.addInternalError(errorLocation: "WebScraper2.getCurretnPrice", systemError: error, errorInfo: "error downloading current price data from \(url)")
             throw error
         }
 
@@ -280,8 +280,8 @@ class WebPageScraper2: NSObject {
 
         do {
             htmlText = try await Downloader.downloadData(url: url)
-        } catch let error as DownloadAndAnalysisError {
-            ErrorController.addErrorLog(errorLocation: "WebScraper2.getCurretnPrice", systemError: error, errorInfo: "error downloading current price data from \(url)")
+        } catch let error as InternalErrorType {
+            ErrorController.addInternalError(errorLocation: "WebScraper2.getCurretnPrice", systemError: error, errorInfo: "error downloading current price data from \(url)")
             throw error
         }
 
@@ -326,21 +326,21 @@ class WebPageScraper2: NSObject {
     class func r1DataDownloadAndSave(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
         
         guard let symbol = shareSymbol else {
-            progressDelegate?.downloadError(error: DownloadAndAnalysisError.shareSymbolMissing.localizedDescription)
-            throw DownloadAndAnalysisError.shareSymbolMissing
+            progressDelegate?.downloadError(error: InternalErrorType.shareSymbolMissing.localizedDescription)
+            throw InternalErrorType.shareSymbolMissing
         }
         
         guard let shortName = shortName else {
-            progressDelegate?.downloadError(error: DownloadAndAnalysisError.shareShortNameMissing.localizedDescription)
-            throw DownloadAndAnalysisError.shareShortNameMissing
+            progressDelegate?.downloadError(error: InternalErrorType.shareShortNameMissing.localizedDescription)
+            throw InternalErrorType.shareShortNameMissing
         }
         
         var hyphenatedShortName = String()
         let shortNameComponents = shortName.split(separator: " ")
         hyphenatedShortName = String(shortNameComponents.first ?? "").lowercased()
         guard hyphenatedShortName != "" else {
-            progressDelegate?.downloadError(error: DownloadAndAnalysisError.shareShortNameMissing.localizedDescription)
-            throw DownloadAndAnalysisError.shareShortNameMissing
+            progressDelegate?.downloadError(error: InternalErrorType.shareShortNameMissing.localizedDescription)
+            throw InternalErrorType.shareShortNameMissing
         }
         
         for index in 1..<shortNameComponents.count {
@@ -364,8 +364,8 @@ class WebPageScraper2: NSObject {
             components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(hyphenatedShortName)/" + pageName)
             
             guard let url = components?.url else {
-                progressDelegate?.downloadError(error: DownloadAndAnalysisError.urlInvalid.localizedDescription)
-                throw DownloadAndAnalysisError.urlInvalid
+                progressDelegate?.downloadError(error: InternalErrorType.urlInvalid.localizedDescription)
+                throw InternalErrorType.urlInvalid
             }
             
             var htmlText: String?
@@ -374,7 +374,7 @@ class WebPageScraper2: NSObject {
                 NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
                 
                 htmlText = try await downloader.downloadDataWithRedirection(url: url)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 progressDelegate?.downloadError(error: error.localizedDescription)
                 throw error
             }
@@ -413,8 +413,8 @@ class WebPageScraper2: NSObject {
             components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(hyphenatedShortName)/" + pageName)
             
             guard let url = components?.url else {
-                progressDelegate?.downloadError(error: DownloadAndAnalysisError.urlInvalid.localizedDescription)
-                throw DownloadAndAnalysisError.urlInvalid
+                progressDelegate?.downloadError(error: InternalErrorType.urlInvalid.localizedDescription)
+                throw InternalErrorType.urlInvalid
             }
             
             // the following values are NOT ANNUAL but quarterly, sort of!
@@ -435,15 +435,15 @@ class WebPageScraper2: NSObject {
             components?.queryItems = [URLQueryItem(name: "p", value: symbol)]
             
             guard let url = components?.url else {
-                progressDelegate?.downloadError(error: DownloadAndAnalysisError.urlInvalid.localizedDescription)
-                throw DownloadAndAnalysisError.urlInvalid
+                progressDelegate?.downloadError(error: InternalErrorType.urlInvalid.localizedDescription)
+                throw InternalErrorType.urlInvalid
             }
 
             var htmlText = String()
 
             do {
                 htmlText = try await Downloader.downloadData(url: url)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 progressDelegate?.downloadError(error: error.localizedDescription)
                 throw error
             }
@@ -503,7 +503,7 @@ class WebPageScraper2: NSObject {
                             case "Total insider shares held":
                                 r1v.insiderStocks = result.values.last ?? Double()
                             default:
-                                ErrorController.addErrorLog(errorLocation: "WebPageScraper2.r1DataDownload", systemError: nil, errorInfo: "unspecified result label \(result.label) for share \(symbol)")
+                                ErrorController.addInternalError(errorLocation: "WebPageScraper2.r1DataDownload", systemError: nil, errorInfo: "unspecified result label \(result.label) for share \(symbol)")
                             }
                         }
                         
@@ -527,7 +527,7 @@ class WebPageScraper2: NSObject {
                 }
             } catch let error {
                 progressDelegate?.downloadError(error: error.localizedDescription)
-                ErrorController.addErrorLog(errorLocation: "WebPageScraper2.r1DataDownload", systemError: error, errorInfo: "Error saving R1 data download results for \(symbol)")
+                ErrorController.addInternalError(errorLocation: "WebPageScraper2.r1DataDownload", systemError: error, errorInfo: "Error saving R1 data download results for \(symbol)")
             }
         }
         
@@ -537,7 +537,7 @@ class WebPageScraper2: NSObject {
         
         guard let symbol = shareSymbol else {
             progressDelegate?.downloadError(error: "Failed DCF valuation download: missing share symbol")
-            throw DownloadAndAnalysisError.shareSymbolMissing
+            throw InternalErrorType.shareSymbolMissing
         }
          
  // 1 Download and analyse web page data
@@ -553,13 +553,13 @@ class WebPageScraper2: NSObject {
                     
             guard let url = components?.url else {
                 progressDelegate?.downloadError(error: "Failed DCF valuation download for \(symbol): invalid url")
-                throw DownloadAndAnalysisError.urlInvalid
+                throw InternalErrorType.urlInvalid
             }
             
             var htmlText = String()
             do {
                 htmlText = try await Downloader.downloadData(url: url)
-            } catch let error as DownloadAndAnalysisError {
+            } catch let error as InternalErrorType {
                 progressDelegate?.downloadError(error: "Failed DCF valuation download for \(symbol): \(error.localizedDescription)")
             }
             
@@ -612,7 +612,7 @@ class WebPageScraper2: NSObject {
                             case _ where result.label.starts(with: "Sales growth (year/est)"):
                                 dcfv.revGrowthPred = result.values
                             default:
-                                ErrorController.addErrorLog(errorLocation: "WebPageScraper2.dcfDataDownload", systemError: nil, errorInfo: "unspecified result label \(result.label) for share \(symbol)")
+                                ErrorController.addInternalError(errorLocation: "WebPageScraper2.dcfDataDownload", systemError: nil, errorInfo: "unspecified result label \(result.label) for share \(symbol)")
                             }
                         }
                         
@@ -623,13 +623,12 @@ class WebPageScraper2: NSObject {
                         if dcfValue != nil {
                             let trendValue = DatedValue(date: dcfv.creationDate!, value: dcfValue!)
                             dcfv.share?.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .dCFValue)
-                            print("added new DCFValue trend to share \(dcfv.share?.name_short)")
                         }
 
                         progressDelegate?.downloadComplete()
                         
                     } catch let error {
-                        ErrorController.addErrorLog(errorLocation: "WebPageScraper2.dcfDataDownload", systemError: error, errorInfo: "Error saving DCF data download results for \(symbol)")
+                        ErrorController.addInternalError(errorLocation: "WebPageScraper2.dcfDataDownload", systemError: error, errorInfo: "Error saving DCF data download results for \(symbol)")
                     }
                    
                 }
@@ -656,17 +655,17 @@ class WebPageScraper2: NSObject {
 //        print("downloadAnalyseSaveWBValuationData for \(shareSymbol ?? "")")
         
         guard let symbol = shareSymbol else {
-            throw DownloadAndAnalysisError.shareSymbolMissing
+            throw InternalErrorType.shareSymbolMissing
         }
         
         guard var sn = shortName else {
-            throw DownloadAndAnalysisError.shareShortNameMissing
+            throw InternalErrorType.shareShortNameMissing
         }
         
         if sn.contains(" ") {
             sn = sn.replacingOccurrences(of: " ", with: "-")
         }
-        var downloadErrors: [DownloadAndAnalysisError]?
+        var downloadErrors: [InternalErrorType]?
         
         let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios"]
         
@@ -702,8 +701,8 @@ class WebPageScraper2: NSObject {
                         sectionCount += 1
                     }
                     else {
-                        if downloadErrors == nil { downloadErrors = [DownloadAndAnalysisError.generalDownloadError] }
-                        else { downloadErrors?.append(DownloadAndAnalysisError.generalDownloadError)}
+                        if downloadErrors == nil { downloadErrors = [InternalErrorType.generalDownloadError] }
+                        else { downloadErrors?.append(InternalErrorType.generalDownloadError)}
                     }
                 }
             }
@@ -728,14 +727,14 @@ class WebPageScraper2: NSObject {
                     htmlText = try await Downloader.downloadData(url: url)
                     
                     hxPriceValues = try macrotrendsScrapeColumn(html$: htmlText, tableHeader: "Historical Annual Stock Price Data</th>", tableTerminal: "</tbody>", columnTerminal: "</td>" ,noOfColumns: 7, targetColumnFromRight: 6)
-                } catch let error as DownloadAndAnalysisError {
+                } catch let error as InternalErrorType {
                     if error == .generalDownloadError {
                         
                         let info = ["Redirection": "Object"]
                         NotificationCenter.default.post(name: Notification.Name(rawValue: "Redirection"), object: info)
                         return
                     } else {
-                        ErrorController.addErrorLog(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
+                        ErrorController.addInternalError(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
                     }
                 }
             }
@@ -748,7 +747,6 @@ class WebPageScraper2: NSObject {
         try await backgroundMoc.perform {
 
             do {
-//                print("WPS2.downloadAnalyseSaveWBValuationData get wbv from backgroundMoc")
 
                 if let wbv = backgroundMoc.object(with: valuationID) as? WBValuation {
                                                                 
@@ -787,7 +785,7 @@ class WebPageScraper2: NSObject {
                             case "Book Value Per Share":
                                 wbv.bvps = result.values
                             default:
-                                ErrorController.addErrorLog(errorLocation: "WebScraper2.downloadAndAnalyseWBVData", systemError: nil, errorInfo: "undefined download result with title \(result.label)")
+                                ErrorController.addInternalError(errorLocation: "WebScraper2.downloadAndAnalyseWBVData", systemError: nil, errorInfo: "undefined download result with title \(result.label)")
                             }
                         }
                         
@@ -817,12 +815,12 @@ class WebPageScraper2: NSObject {
                 }
                 try backgroundMoc.save()
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "couldn't save background MOC")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "couldn't save background MOC")
             }
             
             
-            if (downloadErrors ?? []).contains(DownloadAndAnalysisError.generalDownloadError) {
-                throw DownloadAndAnalysisError.generalDownloadError
+            if (downloadErrors ?? []).contains(InternalErrorType.generalDownloadError) {
+                throw InternalErrorType.generalDownloadError
             }
         }
         
@@ -831,11 +829,11 @@ class WebPageScraper2: NSObject {
     class func keyratioDownloadAndSave(shareSymbol: String?, shortName: String?, shareID: NSManagedObjectID) async throws {
         
         guard let symbol = shareSymbol else {
-            throw DownloadAndAnalysisError.shareSymbolMissing
+            throw InternalErrorType.shareSymbolMissing
         }
         
         guard var shortName = shortName else {
-            throw DownloadAndAnalysisError.shareShortNameMissing
+            throw InternalErrorType.shareShortNameMissing
         }
         
         if shortName.contains(" ") {
@@ -843,12 +841,12 @@ class WebPageScraper2: NSObject {
         }
         
         guard var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/key-statistics") else {
-            throw DownloadAndAnalysisError.urlInvalid
+            throw InternalErrorType.urlInvalid
         }
         components.queryItems = [URLQueryItem(name: "p", value: symbol), URLQueryItem(name: ".tsrc", value: "fin-srch")]
 
         guard let url = components.url else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
         
         let htmlText = try await Downloader.downloadData(url: url)
@@ -883,69 +881,21 @@ class WebPageScraper2: NSObject {
                         } else if result.label == "Forward annual dividend yield" {
                             bgShare.divYieldCurrent = result.values.first ?? Double()
                         } else {
-                            ErrorController.addErrorLog(errorLocation: "WebScraper2.keyratioDownload", systemError: nil, errorInfo: "undefined download result with title \(result.label)")
+                            ErrorController.addInternalError(errorLocation: "WebScraper2.keyratioDownload", systemError: nil, errorInfo: "undefined download result with title \(result.label)")
                         }
                     }
+                    
                 }
                 
                 try backgroundMoc.save()
+                
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "couldn't save background MOC")
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "couldn't save background MOC")
             }
         }
     }
     
     class func downloadAndAnalyseDailyTradingPrices(shareSymbol: String, minDate:Date?=nil) async throws -> [PricePoint]? {
- 
-        // 1 csv file download - abandoned due to complexity and lack of async/ await API for URLSession.shared.downloadTask
-//        let nowSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate) // set to 00:00 today
-//
-//        var otherTimeAgoSinceRefDate: Date?
-//
-//        if minDate != nil {
-//            otherTimeAgoSinceRefDate = {
-//                let calendar = Calendar.current
-//                let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
-//                var dateComponents = calendar.dateComponents(components, from: minDate!)
-//                dateComponents.second = 0
-//                dateComponents.minute = 0
-//                dateComponents.hour = 0
-//                return calendar.date(from: dateComponents) ?? Date()
-//            }()
-//        }
-//
-//        let startDateSinceRefDate = (otherTimeAgoSinceRefDate ?? yahooPricesStartDate).timeIntervalSince(yahooRefDate)
-//
-//        let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
-//        let start$ = numberFormatter.string(from: startDateSinceRefDate as NSNumber) ?? "" // yearAgoSinceRefDate
-//
-//        var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(shareSymbol)")
-//        urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
-//
-//        var webPath = "https://query1.finance.yahoo.com/v7/finance/download/"
-//        webPath += shareSymbol+"?"
-//        webPath += "period1=" + start$
-//        webPath += "&period2=" + end$
-//        webPath += "&interval=1d&events=history&includeAdjustedClose=true"
-//
-//        guard let sourceURL = urlComponents?.url else {
-//            throw DownloadAndAnalysisError.urlInvalid
-//        }
-//
-//        var pricePoints: [PricePoint]?
- 
-
-//        await Downloader.downloadAndReturnFile(url: sourceURL, symbol: shareSymbol, completion: { fileURL in
-//
-//            guard fileURL != nil else {
-//                return
-//            }
-//
-//            pricePoints = CSVImporter.extractPricePointsFromFile(url: fileURL!, symbol: shareSymbol)
-//            self.removeFile(fileURL!)
-//            completion(pricePoints)
-//        })
-//
 
 // 2 data download usually for the last 3 momnths or so
         var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(shareSymbol)/history?")
@@ -953,10 +903,8 @@ class WebPageScraper2: NSObject {
         
         
         guard let sourceURL = urlComponents?.url else {
-            throw DownloadAndAnalysisError.urlInvalid
+            throw InternalError(location: "WebScraper2.downloadAndAnalyseDailyTradingPrices", errorInfo: "\(String(describing: urlComponents))", errorType: .urlInvalid)
         }
-        
-//        print("downloading daily prices from \(sourceURL)")
         
         let dataText = try await Downloader.downloadData(url: sourceURL)
 
@@ -978,7 +926,7 @@ class WebPageScraper2: NSObject {
         }()
 
         guard let tableText = try extractMTTable2(htmlText: htmlText) else {
-            throw DownloadAndAnalysisError.htmlTableTextNotExtracted
+            throw InternalError(location: "WebScraper2.extractDatedValuesFromMTTable", errorInfo: "table text not extracted", errorType: .htmlTableTextNotExtracted)
         }
         
         var results = [Labelled_DatedValues]()
@@ -1054,15 +1002,15 @@ class WebPageScraper2: NSObject {
         let pageText = htmlText
         
         guard pageText.count > 0 else {
-            throw DownloadAndAnalysisError.emptyWebpageText
+            throw InternalErrorType.emptyWebpageText
         }
         
         guard let tableStartIndex = pageText.range(of: mtTableDataStart) else {
-            throw DownloadAndAnalysisError.htmlTableSequenceStartNotFound
+            throw InternalErrorType.htmlTableSequenceStartNotFound
         }
         
         guard let tableEndIndex = pageText.range(of: mtTableDataEnd,options: [NSString.CompareOptions.literal], range: tableStartIndex.upperBound..<pageText.endIndex, locale: nil) else {
-            throw DownloadAndAnalysisError.htmlTableEndNotFound
+            throw InternalErrorType.htmlTableEndNotFound
         }
         
         return String(pageText[tableStartIndex.upperBound...tableEndIndex.upperBound]) // lowerBound
@@ -1076,24 +1024,13 @@ class WebPageScraper2: NSObject {
         let startSequence = tableStartSequence ?? tableTitle
         
         let tableStartIndex = html.range(of: startSequence)
-//        var titleComponents = tableTitle.split(separator: " ")
-//
-//        repeat {
-//            titleComponents = titleComponents.dropLast()
-//            tableTitle = ""
-//            for component in titleComponents {
-//                tableTitle += String(component)
-//            }
-//            tableStartIndex = html.range(of: tableTitle)
-//
-//        } while tableStartIndex == nil && titleComponents.count > 0
         
         if tableStartIndex == nil {
-            throw DownloadAndAnalysisError.htmlTableTitleNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: tableTitle)) in \(html)", errorType: .htmlTableTitleNotFound)
         }
         
         guard let tableEndIndex = html.range(of: tableEndSequence ?? "</table>",options: [NSString.CompareOptions.literal], range: tableStartIndex!.upperBound..<html.endIndex, locale: nil) else {
-            throw DownloadAndAnalysisError.htmlTableEndNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: tableEndSequence)) in \(html)", errorType: .htmlTableEndNotFound)
         }
         
         let tableText = String(html[tableStartIndex!.upperBound..<tableEndIndex.lowerBound])
@@ -1109,11 +1046,12 @@ class WebPageScraper2: NSObject {
         let rowEndSequence = "</th>"
         
         guard let headerStartIndex = html.range(of: headerStartSequence) else {
-            throw DownloadAndAnalysisError.htmTablelHeaderStartNotFound
+            throw InternalErrorType.htmTablelHeaderStartNotFound
         }
         
         guard let headerEndIndex = html.range(of: headerEndSequence,options: [NSString.CompareOptions.literal], range: headerStartIndex.upperBound..<html.endIndex, locale: nil) else {
-            throw DownloadAndAnalysisError.htmlTableHeaderEndNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: headerEndSequence)) in \(html)", errorType: .htmlTableHeaderEndNotFound)
+
         }
         
         var headerText = String(html[headerStartIndex.upperBound..<headerEndIndex.lowerBound])
@@ -1158,11 +1096,11 @@ class WebPageScraper2: NSObject {
         var datedValues = [Dated_EPS_PER_Values]()
         
         guard let bodyStartIndex = html.range(of: bodyStartSequence) else {
-            throw DownloadAndAnalysisError.htmlTableBodyStartIndexNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: bodyStartSequence)) in \(html)", errorType: .htmlTableBodyStartIndexNotFound)
         }
         
         guard let bodyEndIndex = html.range(of: bodyEndSequence,options: [NSString.CompareOptions.literal], range: bodyStartIndex.upperBound..<html.endIndex, locale: nil) else {
-            throw DownloadAndAnalysisError.htmlTableBodyEndIndexNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: bodyEndSequence)) in \(html)", errorType: .htmlTableBodyEndIndexNotFound)
         }
         
         var tableText = String(html[bodyStartIndex.upperBound..<bodyEndIndex.lowerBound])
@@ -1242,17 +1180,17 @@ class WebPageScraper2: NSObject {
         let startSequence = extractionCodes.tableTitle ?? extractionCodes.tableStartSequence
         
         guard let tableStartIndex = html.range(of: startSequence) else {
-            throw DownloadAndAnalysisError.htmlTableTitleNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: startSequence)) in \(html)", errorType: .htmlTableTitleNotFound)
         }
         
         var tableText = String(html[tableStartIndex.upperBound..<html.endIndex])
 
         guard let bodyStartIndex = tableText.range(of: bodyStartSequence) else {
-            throw DownloadAndAnalysisError.htmlTableBodyStartIndexNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: bodyStartSequence)) in \(tableText)", errorType: .htmlTableBodyStartIndexNotFound)
         }
         
         guard let bodyEndIndex = tableText.range(of: bodyEndSequence,options: [NSString.CompareOptions.literal], range: bodyStartIndex.upperBound..<tableText.endIndex, locale: nil) else {
-            throw DownloadAndAnalysisError.htmlTableBodyEndIndexNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: bodyEndSequence)) in \(tableText)", errorType: .htmlTableBodyEndIndexNotFound)
         }
         
         
@@ -1304,7 +1242,7 @@ class WebPageScraper2: NSObject {
                                 rowText = String(rowText[valueEndIndex.upperBound..<rowText.endIndex])
                             }
                             else {
-                                print("missing valueEndIndex \(extractionCodes.dataCellEndSequence) for \(rowText)")
+                                ErrorController.addInternalError(errorLocation: #function, errorInfo: "missing valueEndIndex \(extractionCodes.dataCellEndSequence) for \(rowText)")
                                 rowText = ""
                             }
                         }
@@ -1359,7 +1297,6 @@ class WebPageScraper2: NSObject {
             }
             else {
                 return nil
-//                throw DownloadAndAnalysisError.contentStartSequenceNotFound
             }
             
             tableText.removeSubrange(...numberEndIndex!.upperBound)
@@ -1379,13 +1316,13 @@ class WebPageScraper2: NSObject {
         var pageText = String(html$ ?? "")
         
         guard let titleIndex = pageText.range(of: tableHeader) else {
-            throw DownloadAndAnalysisError.htmlTableHeaderEndNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: tableHeader)) in \(pageText)", errorType: .htmlTableHeaderEndNotFound)
         }
 
         let tableEndIndex = pageText.range(of: tableTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<pageText.endIndex, locale: nil)
         
         guard tableEndIndex != nil else {
-            throw DownloadAndAnalysisError.htmlTableEndNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: tableTerminal)) in \(pageText)", errorType: .htmlTableEndNotFound)
         }
         
         pageText = String(pageText[titleIndex.upperBound..<tableEndIndex!.lowerBound])
@@ -1436,21 +1373,21 @@ class WebPageScraper2: NSObject {
         }()
 
         guard let validHtml = html$ else {
-            throw DownloadAndAnalysisError.emptyWebpageText
+            throw InternalError(location: #function, errorInfo: "empty web page text for \(tableHeader)", errorType: .emptyWebpageText)
         }
         
         let pageText = String(validHtml)
         
         guard let titleIndex = pageText.range(of: tableHeader) else {
-            throw DownloadAndAnalysisError.htmlTableHeaderEndNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: tableHeader)) in \(pageText)", errorType: .htmlTableHeaderEndNotFound)
         }
 
         guard let tableEndIndex = pageText.range(of: tableTerminal,options: [NSString.CompareOptions.literal], range: titleIndex.upperBound..<pageText.endIndex, locale: nil) else {
-            throw DownloadAndAnalysisError.htmlTableEndNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: tableTerminal)) in \(pageText)", errorType: .htmlTableEndNotFound)
         }
                 
         guard let tableStartIndex = pageText.range(of: tableStart, range: titleIndex.upperBound..<pageText.endIndex) else {
-            throw DownloadAndAnalysisError.htmlTableBodyStartIndexNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: tableStart)) in \(pageText)", errorType: .htmlTableSequenceStartNotFound)
         }
         
         let tableText = String(pageText[tableStartIndex.upperBound..<tableEndIndex.lowerBound])
@@ -1512,7 +1449,7 @@ class WebPageScraper2: NSObject {
         
         guard htmlText != "" else {
             return nil
-//            throw DownloadAndAnalysisError.emptyWebpageText
+//            throw InternalErrorType.emptyWebpageText
         }
         
 
@@ -1610,7 +1547,7 @@ class WebPageScraper2: NSObject {
     class func dcfDataExtraction(htmlText: String, section: String) throws -> [LabelledValues] {
     
         guard htmlText != "" else {
-            throw DownloadAndAnalysisError.emptyWebpageText
+            throw InternalError(location: #function, errorInfo: "empty web page found for \(section)", errorType: .emptyWebpageText)
         }
         
         let yahooPages = ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"]
@@ -1721,7 +1658,6 @@ class WebPageScraper2: NSObject {
         if sectionTitle != nil {
             guard let sectionIndex = pageText?.range(of: sectionTitle!) else {
                 return nil
-//                throw DownloadAndAnalysisError.htmlSectionTitleNotFound
             }
             pageText = String(pageText!.suffix(from: sectionIndex.upperBound))
         }
@@ -1730,7 +1666,6 @@ class WebPageScraper2: NSObject {
         var rowStartIndex = pageText?.range(of: rowStart)
         guard rowStartIndex != nil else {
             return nil
-//            throw DownloadAndAnalysisError.htmlRowStartIndexNotFound
         }
         
         if let validStarter = rowDataStartDelimiter {
@@ -1749,7 +1684,6 @@ class WebPageScraper2: NSObject {
         }
         else {
             return nil
-//            throw DownloadAndAnalysisError.htmlRowEndIndexNotFound
         }
         
         if website == .macrotrends {
@@ -1759,8 +1693,6 @@ class WebPageScraper2: NSObject {
             return values // MT.com rows are time_DESCENDING from left to right, so the valueArray is in time-ASCENDING order deu to backwards row scraping.
         }
         else {
-//                let numberTerminal = "</td>"
-//                let rowTerminal = "</td></tr>"
                 let values = yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberStarter: numberStarter, numberTerminal: numberTerminal, exponent: webpageExponent)
                 return values
         }
@@ -1774,7 +1706,7 @@ class WebPageScraper2: NSObject {
 
         guard pageText != nil else {
             return nil
-//            throw DownloadAndAnalysisError.emptyWebpageText
+//            throw InternalErrorType.emptyWebpageText
         }
         
                         
@@ -1782,7 +1714,7 @@ class WebPageScraper2: NSObject {
         let rowStartIndex = pageText?.range(of: rowStart)
         guard rowStartIndex != nil else {
             return nil
-//            throw DownloadAndAnalysisError.htmlRowStartIndexNotFound
+//            throw InternalErrorType.htmlRowStartIndexNotFound
         }
                 
 // C Find end of row - or if last row end of table - and reduce pageText to this row
@@ -1791,7 +1723,7 @@ class WebPageScraper2: NSObject {
         }
         else {
             return nil
-//            throw DownloadAndAnalysisError.htmlRowEndIndexNotFound
+//            throw InternalErrorType.htmlRowEndIndexNotFound
         }
 
         let values = yahooRowNumbersExtraction(table$: pageText ?? "", rowTitle: rowTitle, numberTerminal: numberTerminal)
@@ -1816,7 +1748,7 @@ class WebPageScraper2: NSObject {
         repeat {
             guard let labelStartIndex = tableText.range(of: numberStarter, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil) else {
                 return nil
-//                throw DownloadAndAnalysisError.contentStartSequenceNotFound
+//                throw InternalErrorType.contentStartSequenceNotFound
             }
             
             let value$ = tableText[labelStartIndex.upperBound...]
@@ -1844,14 +1776,14 @@ class WebPageScraper2: NSObject {
         let tableTerminal = sectionTerminal ?? "</p>"
 
         guard pageText != nil else {
-            throw DownloadAndAnalysisError.emptyWebpageText
+            throw InternalError(location: #function, errorInfo: "empty web page found for \(String(describing: sectionTitle))", errorType: .emptyWebpageText)
         }
         
 // 1 Remove leading and trailing parts of the html code
 // A Find section header
         if sectionTitle != nil {
             guard let sectionIndex = pageText?.range(of: sectionTitle!) else {
-                throw DownloadAndAnalysisError.htmlSectionTitleNotFound
+                throw InternalError(location: #function, errorInfo: "did not find \(String(describing: sectionTitle)) in \(String(describing: pageText))", errorType: .htmlSectionTitleNotFound)
             }
             pageText = String(pageText!.suffix(from: sectionIndex.upperBound))
         }
@@ -1859,7 +1791,7 @@ class WebPageScraper2: NSObject {
 // B Find beginning of row
         let rowStartIndex = pageText?.range(of: rowStart)
         guard rowStartIndex != nil else {
-            throw DownloadAndAnalysisError.htmlRowStartIndexNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: rowStart)) in \(String(describing: pageText))", errorType: .htmlRowStartIndexNotFound)
         }
         
 // C Find end of row - or if last row end of table - and reduce pageText to this row
@@ -1869,7 +1801,7 @@ class WebPageScraper2: NSObject {
             pageText = String(pageText![rowStartIndex!.upperBound..<tableEndIndex.lowerBound])
         }
         else {
-            throw DownloadAndAnalysisError.htmlRowEndIndexNotFound
+            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: rowTerminal)) in \(String(describing: pageText))", errorType: .htmlRowEndIndexNotFound)
         }
         
         let textArray = try yahooRowStringExtraction(table$: pageText ?? "", rowTitle: rowTitle, textTerminal: textTerminal)
@@ -1890,7 +1822,7 @@ class WebPageScraper2: NSObject {
 
         repeat {
             guard let labelStartIndex = tableText.range(of: textStarter, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil) else {
-                throw DownloadAndAnalysisError.contentStartSequenceNotFound
+                throw InternalError(location: #function, errorInfo: "did not find \(String(describing: textStarter)) in \(tableText)", errorType: .contentStartSequenceNotFound)
             }
             
             let value$ = String(tableText[labelStartIndex.upperBound...])
@@ -2020,7 +1952,7 @@ class WebPageScraper2: NSObject {
             }
         
             guard let validPageText = htmlText else {
-                throw DownloadAndAnalysisError.generalDownloadError // possible result of MT redirection
+                throw InternalError(location: #function, errorInfo: "html text = nil for url \(url)", errorType: .generalDownloadError)
             }
                 
             do {
@@ -2029,8 +1961,7 @@ class WebPageScraper2: NSObject {
                 datedValues = try extractQEPSTableData(html: validPageText, extractionCodes: codes, untilDate: date)
                 return datedValues
             } catch let error {
-                print(error.localizedDescription)
-               throw error
+                throw InternalError(location: #function, systemError: error as NSError, errorInfo: "failed hist q EPS extraction \(url)", errorType: .generalDownloadError)
             }
 
     }
@@ -2083,7 +2014,7 @@ class WebPageScraper2: NSObject {
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }

@@ -16,45 +16,7 @@ enum ShareTrendNames {
     case pcRatio
     case caRatio
     case intrinsicValue
-}
-
-enum DownloadAndAnalysisError: Error {
-    case mimeType
-    case urlError
-    case emptyWebpageText
-    case htmlTableTitleNotFound
-    case htmlTableEndNotFound
-    case htmTablelHeaderStartNotFound
-    case htmlTableHeaderEndNotFound
-    case htmlTableRowEndNotFound
-    case htmlTableRowStartIndexNotFound
-    case htmlTableBodyStartIndexNotFound
-    case htmlTableBodyEndIndexNotFound
-    case htmlTableSequenceStartNotFound
-    case urlInvalid
-    case shareSymbolMissing
-    case shareShortNameMissing
-    case shareWBValuationMissing
-    case noBackgroundShareWithSymbol
-    case htmlSectionTitleNotFound
-    case htmlRowStartIndexNotFound
-    case htmlRowEndIndexNotFound
-    case contentStartSequenceNotFound
-    case noBackgroundMOC
-    case htmlTableTextNotExtracted
-    case fileFormatNotCSV
-    case couldNotFindCompanyProfileData
-    case generalDownloadError
-    case statusCodeError
-    case downloadedFileURLinvalid
-}
-
-enum InternalErrors: Error {
-    case missingPricePointsInShareCreation
-    case noValidBackgroundMOC
-    case noShareFetched
-    case urlPathError
-    case mocReadError
+    case healthScore
 }
 
 enum WebPageExtractionCodeOptions {
@@ -81,7 +43,7 @@ typealias ScoreData = (score: Double, maxScore: Double, factorArray: [String])
 //var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
 //var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-var errorLog: [ErrorLog]?
+var errorLog: [InternalError]?
 let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
 let gradientBar = UIImage(named: "GradientBar")
 let userDefaultTerms = UserDefaultTerms()
@@ -209,7 +171,7 @@ var stockTickerDictionary: [String:String]? = {
             return try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [String: String]
         }
     } catch let error {
-        ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't read stock ticker dictionary data from Main bundle file")
+        ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't read stock ticker dictionary data from Main bundle file")
     }
     
     return nil
@@ -500,21 +462,6 @@ let dateFormatter: DateFormatter = {
     formatter.dateStyle = .short
     return formatter
 }()
-
-struct ErrorLog {
-    var location = String()
-    var systemMessage: Error?
-    var errorInfo = String()
-    
-    mutating func create(location: String, systemError: NSError? = nil, errorInfo: String) {
-        self.location = location
-        self.errorInfo = errorInfo
-        if systemError != nil {
-            self.systemMessage = NSError()
-            self.systemMessage = systemError
-        }
-    }
-}
 
 
 struct Correlation {

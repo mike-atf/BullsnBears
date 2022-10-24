@@ -8,6 +8,13 @@
 import UIKit
 import CoreData
 
+enum WBVInfoSection {
+    case PE
+    case BVPStoPrice
+    case Lynch
+    case intrinsicValue
+}
+
 class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     var downloadButton: UIBarButtonItem!
@@ -18,12 +25,15 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     var movingToValueListTVC = false
     var r1DataReload = false
     var dcfDataReload = false
+    var valuationInfosTexts = [WBVInfoSection: String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         downloadButton = UIBarButtonItem(title: "Download", style: .plain, target: self, action: #selector(startDownload))
          self.navigationItem.rightBarButtonItem = downloadButton
+        
+        setValuationInfoTexts()
         
         self.navigationController?.title = share.name_short
         tableView.register(UINib(nibName: "WBValuationCell", bundle: nil), forCellReuseIdentifier: "wbValuationCell")
@@ -105,8 +115,12 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         let height: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 50 : 50
         header.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: height)
         
-        let title = controller?.sectionHeaderText(section: section) ?? ""
+        var title = controller?.sectionHeaderText(section: section) ?? ""
         let subtitle = controller?.sectionSubHeaderText(section: section)
+        
+        if section == 0 {
+            title = "\(share.symbol!) " + title
+        }
 
         let largeFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 20 : 20
         let smallFontSize: CGFloat = (UIDevice().userInterfaceIdiom == .pad) ? 16 : 12
@@ -187,38 +201,31 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        if indexPath.section == 0 {
+        let valuationInfoPaths = [IndexPath(row: 0, section: 0), IndexPath(row: 5, section: 0),IndexPath(row: 6, section: 0)]
+        
+        if valuationInfoPaths.contains(indexPath) {
+            // DCF and R1 valuations display 'ValuationListVC'
             performSegue(withIdentifier: "showDCFR1DetailsSegue", sender: nil)
-        } else {
+        }
+        else if indexPath.section > 0 {
+            // WBV valuation details
             performSegue(withIdentifier: "valueListSegue", sender: nil)
+        }
+        else {
+            // simple info texts about non-DCF/R1 rows in section 0
+            performSegue(withIdentifier: "showWBVInfoSegue", sender: nil)
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+    func setValuationInfoTexts() {
         
-        var infoText = String()
+        valuationInfosTexts[.PE] = "Shows the current P/E (price per earnings) ratio, and past P/E's (minimum - maximum) during the period 6-24 months ago.\n\nThe number of years of earnings at current level to earn back the amount invested now.\n\nCurrent to past range comparison helps to judge whether a stock price is above or below recent levels. Helpful to spot over- or under-pricing"
+        valuationInfosTexts[.BVPStoPrice] = "The Book value per share to current share price (in %), and the book value per share)in $.\n\nHelps to judge the stock price in relation to company assets.\n\n Note that the book value may differ from real market value of assets."
+        valuationInfosTexts[.Lynch] = "Earnings growth + dividend yield divided by PE ratio.\n\nLess than 1.0 is poor, 1.5 is ok, >2.0 is interesting.\n'One up on Wall Street' by Peter Lynch\nSimon & Schuster, 1989"
+
+        valuationInfosTexts[.intrinsicValue] = "The Intrinsic value based on 10y prediction.\nTaking into account past earnings growth, pre-tax EPS and a long-term discount rate of 2.1%.\n\nAs calculated in 'Warren Buffet and the Interpretation of Financial Statements'\n(Simon & Schuster, 2008)"
         
-        switch indexPath.row {
-        case 0:
-            infoText = "Current P/E ratio, and P/E (minimum - maximum) during the period 6-24 months ago.\nThis allows comparison of current P/E to the recent past in order to help judge whether a stock price is above or below recent levels. Helpful to spot over- or under-pricing"
-        case 1:
-            infoText = "Not implemented"
-        case 2:
-            infoText = "Proportion of book value to current share price in %, as well (book value per share).\nHelps to judge the stock price in relation to company assets.\nCurrent real market value of assets may differ from the book value."
-        case 3:
-            infoText = "Earnings growth + dividend yield divided by P/E ratio.\nLess than 1.0 is poor, 1.5 is ok, >2.0 is interesting.\n'One up on Wall Street' by P Lynch. Simon & Schuster, 1989"
-        case 4:
-            infoText = "Proportion of book value/ share to current share price in %, as well (book value per share).\nHelps to judge the stock price in relation to company assets."
-        case 5:
-            infoText = "Intrinsic value based on 10y prediction.\nTaking into account past earnings growth, pre-tax EPS and a long-term discount rate of 2.1%.\nAs calculated in 'Warren Buffet and the Interpretation of Financial Statements' (Simon & Schuster, 2008)"
-        default:
-            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "encountered default in switch statement")
-        }
-        
-        let view = tableView.cellForRow(at: indexPath)?.contentView
-        
-        infoButtonAction(errors: [infoText], sender: view!)
     }
 
     // MARK: - Navigation
@@ -346,6 +353,30 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 dcfDataReload = true
             }
             destination.share = share
+        }
+        else if let destination = segue.destination as? ValuationErrorsTVC {
+            
+            var headerText = "What is "
+            
+            switch selectedPath.row {
+            case 1:
+                destination.errors = [valuationInfosTexts[.PE]!]
+                headerText += "the PE ratio?"
+            case 2:
+                destination.errors = [valuationInfosTexts[.BVPStoPrice]!]
+                headerText += "the BVPS / Price ratio?"
+            case 3:
+                destination.errors = [valuationInfosTexts[.Lynch]!]
+                headerText += "the 'Lynch' score?"
+            case 4:
+                destination.errors = [valuationInfosTexts[.intrinsicValue]!]
+                headerText += "the Intrinsic value?"
+            default:
+                headerText = "Unimplemented Info Section"
+                destination.errors = ["Not implemented"]
+            }
+            
+            destination.sectionHeaderTexts = [headerText]
         }
         
     }
@@ -477,13 +508,3 @@ extension WBValuationTVC: WBValuationCellDelegate {
 
     
 }
-
-//extension WBValuationTVC: ValuationListDelegate {
-//    func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?) {
-//
-//        print("valuation delegTE: COMPLETE")
-//    }
-//
-//
-//}
-

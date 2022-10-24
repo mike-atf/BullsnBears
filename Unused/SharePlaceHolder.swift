@@ -114,7 +114,7 @@ class SharePlaceHolder: NSObject {
                 }
             }
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
         }
         
         return nil
@@ -164,7 +164,7 @@ class SharePlaceHolder: NSObject {
             let data2 = try NSKeyedArchiver.archivedData(withRootObject: data1, requiringSecureCoding: false)
             return data2
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing historical price data")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing historical price data")
         }
 
         return nil
@@ -181,7 +181,7 @@ class SharePlaceHolder: NSObject {
             let data2 = try NSKeyedArchiver.archivedData(withRootObject: data1, requiringSecureCoding: false)
             return data2
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing MCD data")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing MCD data")
         }
 
         return nil
@@ -201,7 +201,7 @@ class SharePlaceHolder: NSObject {
                     }
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored MACD data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored MACD data")
             }
         }
         else { return calculateMACDs(shortPeriod: 8, longPeriod: 17) }
@@ -313,17 +313,17 @@ class SharePlaceHolder: NSObject {
         dataTask = yahooSession.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock live price download error")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock live price download error")
                 return
             }
             
             guard urlResponse != nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock live price download error \(urlResponse.debugDescription)")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock live price download error \(urlResponse.debugDescription)")
                 return
             }
             
             guard let validData = data else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock live price download error - empty website data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock live price download error - empty website data")
                 return
             }
 
@@ -388,14 +388,14 @@ class SharePlaceHolder: NSObject {
             
             guard errorOrNil == nil else {
                 DispatchQueue.main.async {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: errorOrNil, errorInfo: "couldn't download stock update ")
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: errorOrNil, errorInfo: "couldn't download stock update ")
                 }
                 return
             }
             
             guard responseOrNil != nil else {
                 DispatchQueue.main.async {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "couldn't download stock update, website response \(String(describing: responseOrNil))")
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "couldn't download stock update, website response \(String(describing: responseOrNil))")
                 }
                 return
             }
@@ -448,7 +448,7 @@ class SharePlaceHolder: NSObject {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't move and save downloaded file")
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't move and save downloaded file")
                 }
             }
         }
@@ -462,7 +462,7 @@ class SharePlaceHolder: NSObject {
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }
@@ -479,17 +479,17 @@ class SharePlaceHolder: NSObject {
             data, urlResponse, error in
             
             guard error == nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "web data download for \(url) failed with error \(error!.localizedDescription)")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "web data download for \(url) failed with error \(error!.localizedDescription)")
                 return
             }
             
             guard urlResponse != nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "web data download for \(url) failed due to urlReponse == nil")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "web data download for \(url) failed due to urlReponse == nil")
                 return
             }
             
             guard let validData = data else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
                 return
             }
 
@@ -531,17 +531,17 @@ class SharePlaceHolder: NSObject {
         dataTask = yahooSession.dataTask(with: validURL) { (data, urlResponse, error) in
             
             guard error == nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock keyratio download error")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock keyratio download error")
                 return
             }
             
             guard urlResponse != nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error \(urlResponse.debugDescription)")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error \(urlResponse.debugDescription)")
                 return
             }
             
             guard let validData = data else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
                 return
             }
 
@@ -638,17 +638,17 @@ class SharePlaceHolder: NSObject {
         dataTask = yahooSession.dataTask(with: validURL) { (data, urlResponse, error) in
 
             guard error == nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock profile download error")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error!, errorInfo: "stock profile download error")
                 return
             }
             
             guard urlResponse != nil else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock profile download error \(urlResponse.debugDescription)")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock profile download error \(urlResponse.debugDescription)")
                 return
             }
             
             guard let validData = data else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock profile download error - empty website data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock profile download error - empty website data")
                 return
             }
 
@@ -697,7 +697,7 @@ class SharePlaceHolder: NSObject {
 
             if loaderrors.count > 0 {
                 for error in loaderrors {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
 
                 }
             }

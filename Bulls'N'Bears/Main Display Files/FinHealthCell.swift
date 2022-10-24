@@ -33,7 +33,12 @@ class FinHealthCell: UITableViewCell {
         
         chart.minimumTimeAxisTimeSpan = chartMinimumTime ?? year
 //        let titleInfo = ChartLabelInfo(position: .left, text: primaryData.title, font: UIFont.systemFont(ofSize: 14), color: nil, alignment: .left)
-        chart.configureChart(primaryData: primaryData, secondaryData: secondaryData ,types: [.lineWithFill], chartLabelsData: nil, declineThresholdsForColorChange: [0.2, 0.1])
+        let thresholds = [0.2, 0.1]
+        if primaryData.title.contains("Debt/equity") {
+            // increase is bad
+            chart.declineIsBad = false
+        }
+        chart.configureChart(primaryData: primaryData, secondaryData: secondaryData ,types: [.lineWithFill], chartLabelsData: nil, declineThresholdsForColorChange: thresholds)
     }
     
 }

@@ -26,7 +26,7 @@ class Diary_StocksListVC: UIViewController, UITableViewDelegate, UITableViewData
         do {
             try sL.performFetch()
         } catch let error as NSError {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
         }
         return sL
     }()

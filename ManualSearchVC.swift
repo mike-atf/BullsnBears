@@ -155,7 +155,7 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
                 DispatchQueue.main.async {
                     self.symbolFoundImage.image = UIImage(systemName: "x.circle.fill")
                     self.symbolFoundImage.tintColor = UIColor.systemRed
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't move and save downloaded file")
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't move and save downloaded file")
                 }
             }
         }
@@ -191,7 +191,7 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
             }
             
             guard let validData = data else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
                 nameFoundImage.tintColor = UIColor.systemRed
                 nameFoundImage.image = UIImage(systemName: "x.circle.fill")
                 return
@@ -248,7 +248,7 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }

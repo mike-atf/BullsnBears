@@ -654,7 +654,7 @@ extension HTTPCookie {
             let data = try NSKeyedArchiver.archivedData(withRootObject: cookieProperties, requiringSecureCoding: false)
             return data
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into data object")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into data object")
         }
         return nil
     }
@@ -664,7 +664,7 @@ extension HTTPCookie {
             let unarchivedDictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [HTTPCookiePropertyKey : Any]
             return unarchivedDictionary
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into data object")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error converting website cookies into data object")
         }
         return nil
     }

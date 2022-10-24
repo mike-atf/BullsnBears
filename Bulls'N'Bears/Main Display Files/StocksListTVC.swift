@@ -76,7 +76,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             try sL.performFetch()
                         
         } catch let error as NSError {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't fetch files")
         }
         return sL
     }()
@@ -86,6 +86,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var refreshControl: UIRefreshControl!
     
     var searchController: UISearchController?
+//    var cellPathsToReloadAfterBGUpdate: [IndexPath]? // in case TVC is not visible when update in background completes
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -148,7 +149,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         do {
             try controller.performFetch()
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Error updating Stocks list")
+            ErrorController.addInternalError(errorLocation: #file + #function, systemError: error, errorInfo: "Error updating Stocks list")
         }
         
         tableView.reloadData()
@@ -192,7 +193,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             do {
                 try controller.updateStocksData()
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: "StocksListVC - updateShares", systemError: nil, errorInfo: "error when trying to update stock data: \(error)")
+                ErrorController.addInternalError(errorLocation: "StocksListVC - updateShares", systemError: nil, errorInfo: "error when trying to update stock data: \(error)")
             }
             tableView.refreshControl?.endRefreshing()
         
@@ -278,7 +279,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + #function, systemError: error, errorInfo: "Failure to add new share from file \(fileURL)")
+                ErrorController.addInternalError(errorLocation: #file + #function, systemError: error, errorInfo: "Failure to add new share from file \(fileURL)")
             }
     }
     
@@ -376,7 +377,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             do {
                 try self.controller.updateStocksData(singleShare: objectOwned)
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: "StocksListTVC", systemError: error, errorInfo: "unable to update data for \(objectOwned.symbol ?? "") when moving from archive to watch list.")
+                ErrorController.addInternalError(errorLocation: "StocksListTVC", systemError: error, errorInfo: "unable to update data for \(objectOwned.symbol ?? "") when moving from archive to watch list.")
             }
         }
         watchAction.backgroundColor = UIColor.systemGray
@@ -607,7 +608,7 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
 
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol) \(error)")
+                ErrorController.addInternalError(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol) \(error)")
             }
     }
 
@@ -669,7 +670,7 @@ extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
             do {
                 try sL.performFetch()
             } catch let error as NSError {
-                ErrorController.addErrorLog(errorLocation: #function, systemError: error, errorInfo: "can't fetch files")
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "can't fetch files")
             }
 
             return sL
@@ -691,24 +692,28 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
         let _ = share.getDailyPrices(needRecalcDueToNew: true)
         let _ = share.wbValuation?.epsQWithDates()
         
-        tableView.reloadRows(at: [atPath], with: .none)
-        
-        if tableView.indexPathForSelectedRow == nil {
-            tableView.selectRow(at: atPath, animated: false, scrollPosition: .none) // does not trigger segue
-            return
-        }
-        
-        var researchViewOpen = false
-        if let nav = self.splitViewController?.navigationController {
-            for vc in nav.viewControllers {
-                if let _ = vc as? ResearchTVC {
-                    researchViewOpen = true
+        if navigationController?.visibleViewController == self {
+            tableView.reloadRows(at: [atPath], with: .none)
+            
+            if tableView.indexPathForSelectedRow == nil {
+                tableView.selectRow(at: atPath, animated: false, scrollPosition: .none) // does not trigger segue
+                return
+            }
+            
+            var researchViewOpen = false
+            if let nav = self.splitViewController?.navigationController {
+                for vc in nav.viewControllers {
+                    if let _ = vc as? ResearchTVC {
+                        researchViewOpen = true
+                    }
                 }
             }
-        }
-        if !researchViewOpen {
-            performSegue(withIdentifier: "showChartSegue", sender: nil)
-        }
+            
+            if !researchViewOpen {
+                performSegue(withIdentifier: "showChartSegue", sender: nil)
+            }
+
+        }        
         
     }
     
@@ -791,7 +796,7 @@ extension StocksListTVC: NSFetchedResultsControllerDelegate {
             tableView.deleteRows(at: [indexPath!], with: .automatic)
             tableView.insertRows(at: [newIndexPath!], with: .automatic)
         @unknown default:
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined change to shares list controller")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined change to shares list controller")
         }
     }
     
@@ -808,7 +813,7 @@ extension StocksListTVC: NSFetchedResultsControllerDelegate {
         case .move:
             tableView.reloadSections([sectionIndex], with: .automatic)
         @unknown default:
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined change to shares list sections")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined change to shares list sections")
         }
 
     }

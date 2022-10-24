@@ -48,7 +48,7 @@ public class WBValuation: NSManagedObject {
                     return datedValues
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored EPS historical data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored EPS historical data")
             }
         }
         
@@ -73,7 +73,7 @@ public class WBValuation: NSManagedObject {
                     }
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
             }
         }
         
@@ -98,7 +98,7 @@ public class WBValuation: NSManagedObject {
                     }
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
             }
         }
         
@@ -123,7 +123,7 @@ public class WBValuation: NSManagedObject {
                     return sorted.compactMap{ $0.value }
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
             }
         }
         
@@ -147,7 +147,7 @@ public class WBValuation: NSManagedObject {
                 try self.managedObjectContext?.save()
             }
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
         }
         
     }
@@ -192,7 +192,7 @@ public class WBValuation: NSManagedObject {
                 try self.managedObjectContext?.save()
             }
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
         }
         
     }
@@ -215,7 +215,7 @@ public class WBValuation: NSManagedObject {
                 try self.managedObjectContext?.save()
             }
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
         }
         
     }
@@ -1039,5 +1039,15 @@ public class WBValuation: NSManagedObject {
         
         return (ivalue, errors)
     }
+    
+    public func ageOfValuation() -> TimeInterval? {
+        
+        if let date = self.date {
+            return Date().timeIntervalSince(date)
+        }
+        
+        return nil
+    }
+
 
 }

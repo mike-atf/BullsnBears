@@ -53,7 +53,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                     //remove any existing file
                     try FileManager.default.removeItem(atPath: copyFilePath)
                 } catch let error {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File removing error")
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File removing error")
                 }
             }
             
@@ -63,7 +63,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                 try FileManager.default.copyItem(at: url, to: copyToURL)
                 return copyToURL
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File copying error")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File copying error")
             }
         }
         return nil
@@ -79,7 +79,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     }
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, failedToImportDocumentAt documentURL: URL, error: Error?) {
-        ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't import file")
+        ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "can't import file")
         
     }
     
@@ -90,7 +90,7 @@ extension DocumentBrowserViewController {
     func openRemoteDocument(_ inboundURL: URL, importIfNeeded: Bool) {
         self.revealDocument(at: inboundURL, importIfNeeded: importIfNeeded) { (url, error) in
             if let error = error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File import failure error")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File import failure error")
             } else if let url = url {
               
                 if let validStockList = self.stockListVC {

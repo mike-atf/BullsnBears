@@ -63,12 +63,12 @@ extension R1WebDataAnalyser: DataDownloaderDelegate {
         downloadTasksComplete += 1
         
         guard html$ != nil else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete, html string is empty")
             return
         }
         
         guard let section = pageTitle else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete - notification did not contain section info!!")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "download complete - notification did not contain section info!!")
             return
         }
         

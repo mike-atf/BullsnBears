@@ -15,13 +15,14 @@ class StockChartVC: UIViewController {
     @IBOutlet var errorButton: UIBarButtonItem!
     @IBOutlet var barTitleButton: UIBarButtonItem!
     @IBOutlet var dcfButton: UIButton!
-    @IBOutlet var r1Button: UIButton!
     @IBOutlet var priceUpdateButton: UIButton!
     
     @IBOutlet var healthButton: UIButton!
     @IBOutlet var transactionButton: UIButton!
     @IBOutlet var researchButton: UIButton!
     
+    var spinner: UIActivityIndicatorView!
+    var spinnerMenuButton: UIBarButtonItem!
     var settingsMenuButton: UIBarButtonItem!
     var dcfErrors = [String]()
     var r1Errors: [String]?
@@ -42,17 +43,25 @@ class StockChartVC: UIViewController {
             label.preferredMaxLayoutWidth = self.view.frame.width * 0.5
             return label
         }()
-
+        
+        
         barTitleButton = UIBarButtonItem(customView: newLabel)
+        spinner = UIActivityIndicatorView()
+        spinner.style = .medium
+        spinner.color = UIColor.label
+        spinner.hidesWhenStopped = true
+        spinnerMenuButton = UIBarButtonItem(customView: spinner)
 
         settingsMenuButton = UIBarButtonItem(image: UIImage(systemName: "slider.horizontal.3"), style: .plain, target: self, action: #selector(settingsMenu))
 
-        let fixedSizeItem = UIBarButtonItem.fixedSpace(100)
         self.navigationItem.leftBarButtonItems = [barTitleButton]
-        self.navigationItem.rightBarButtonItem = settingsMenuButton
+        self.navigationItem.rightBarButtonItems = [settingsMenuButton, spinnerMenuButton]
         
         NotificationCenter.default.addObserver(self, selector: #selector(activateErrorButton), name: Notification.Name(rawValue: "NewErrorLogged"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showCitation), name: Notification.Name(rawValue: "ShowCitation"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(downloadStarted), name: Notification.Name(rawValue: "DownloadStarted"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(downloadEnded), name: Notification.Name(rawValue: "DownloadEnded"), object: nil)
+
         
     }
     
@@ -115,86 +124,25 @@ class StockChartVC: UIViewController {
     }
         
     func setValuationTexts() {
-        refreshDCFLabel()
-        refreshR1Label()
+        refreshValuationButton()
     }
     
-    func refreshDCFLabel() {
-        if let validValuation = share?.dcfValuation {
-//            let (value, errors) = validValuation.returnIValue()
-//            dcfErrorsButton.isHidden = (errors.count == 0)
-//            dcfErrors = errors
-            
-            if let creationDate = validValuation.ageOfValuation() {
-                if creationDate > 365*24*3600/2  {
-                    dcfButton.tintColor = UIColor.systemRed
-                } else if creationDate > 365*24*3600/4 {
-                    dcfButton.tintColor = UIColor.systemYellow
-                }
-            }
-            
-//            if let intrinsicValue = value {
-//                dcfValuationLabrl.text = "DCF :"
-//                if intrinsicValue > 0 {
-//                    let iv$ = currencyFormatterNoGapNoPence.string(from: intrinsicValue as NSNumber) ?? "--"
-//                    dcfValuationLabrl.text = "DCF : " + iv$
-//                }
-//                else {
-//                    dcfValuationLabrl.text = "DCF : negative"
-//                }
-//            }
-//            else {
-//                dcfValuationLabrl.text = "DCF : invalid"
-//            }
-        }
-    }
-    
-    func refreshR1Label() {
+    func refreshValuationButton() {
+        let dcfAge = share?.dcfValuation?.ageOfValuation()
+        let r1Age = share?.rule1Valuation?.ageOfValuation()
+        let wbvAge = share?.wbValuation?.ageOfValuation()
         
-        if let validValuation = share?.rule1Valuation {
-            
-//            var r1Title = "GBV: "
-//            let (value, errors) = validValuation.stickerPrice()
-//            r1ErrorsButton.isHidden = (errors == nil)
-//            r1Errors = errors
-//
-            if let creationDate = validValuation.ageOfValuation() {
-                if creationDate > 365*24*3600/2  {
-                    r1Button.tintColor = UIColor.systemRed
-                } else if creationDate > 365*24*3600/4 {
-                    r1Button.tintColor = UIColor.systemYellow
-                }
+        if let oldestDate = [dcfAge,r1Age,wbvAge].compactMap({$0}).min() {
+            if oldestDate > 365*24*3600/2  {
+                dcfButton.tintColor = UIColor.systemRed
+            } else if oldestDate > 365*24*3600/4 {
+                dcfButton.tintColor = UIColor.systemYellow
             }
 
-//            if let stickerPrice = value {
-//                if stickerPrice > 0 {
-//                    r1Title += (currencyFormatterNoGapNoPence.string(from: stickerPrice as NSNumber) ?? "--")
-//                }
-//                else { r1Title += " negative"}
-//
-//                if let score = validValuation.moatScore() {
-//                    if !score.isNaN {
-//                        let n$ = percentFormatter0Digits.string(from: score as NSNumber) ?? ""
-//                        r1Title = r1Title + " (Moat: " + n$ + ")"
-//                    }
-//                }
-//
-//                if let proportion = validValuation.debtProportion() {
-//                    if proportion > 3.0 {
-//                        r1Title += ", debt: " + (percentFormatter0Digits.string(from: proportion as NSNumber) ?? "-")
-//                    }
-//                }
-//
-//                if let proportion = validValuation.insiderSalesProportion() {
-//                    if proportion > 0.1 {
-//                        r1Title += ", insider sales: " + (percentFormatter0Digits.string(from: proportion as NSNumber) ?? "-")
-//                    }
-//                }
-//
-//                r1ValuationLabel.text = r1Title
-//            }
         }
+                
     }
+
     
     @IBAction func errorButtonAction(_ sender: UIBarButtonItem) {
         
@@ -236,91 +184,30 @@ class StockChartVC: UIViewController {
 
     @IBAction func dcfButtonAction(_ sender: UIButton) {
         
-        // TODO: - redirect to list vierw controller, not modal
-        guard let validShare = share else {
-            return
-        }
+//        // TODO: - redirect to list vierw controller, not modal
+//        guard let validShare = share else {
+//            return
+//        }
+//
+//        guard let symbol = validShare.symbol else {
+//            return
+//        }
         
-        guard let symbol = validShare.symbol else {
-            return
-        }
+        stocksListVC.showWBValuationView(indexPath: stocksListVC.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0), chartViewSegue: false)
                 
-        if CombinedValuationController.returnDCFValuations(company: symbol) == nil {
-            share?.dcfValuation = CombinedValuationController.createDCFValuation(company: symbol)
-        }
-
-        if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
-            tvc.valuationMethod = ValuationMethods.dcf
-            tvc.share = validShare
-            tvc.delegate = self
-            
-            self.present(tvc, animated: true, completion: nil)
-        }
+//        if CombinedValuationController.returnDCFValuations(company: symbol) == nil {
+//            share?.dcfValuation = CombinedValuationController.createDCFValuation(company: symbol)
+//        }
+//
+//        if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
+//            tvc.valuationMethod = ValuationMethods.dcf
+//            tvc.share = validShare
+//            tvc.delegate = self
+//
+//            self.present(tvc, animated: true, completion: nil)
+//        }
 
     }
-    
-    @IBAction func r1ButtonAction(_ sender: UIButton) {
-        
-        // TODO: - redirect to list vierw controller, not modal
-        guard let validShare = share else {
-            return
-        }
-        
-        guard let symbol = validShare.symbol else {
-            return
-        }
-
-        if CombinedValuationController.returnR1Valuations(company: symbol) == nil {
-            share?.rule1Valuation = CombinedValuationController.createR1Valuation(company: symbol)
-        }
-
-        if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
-            
-            tvc.valuationMethod = ValuationMethods.rule1
-            tvc.share = validShare
-            tvc.delegate = self
-            
-            self.present(tvc, animated: true, completion: nil)
-        }
-    }
-
-    /*
-    @IBAction func dcfErrorsButtonAction(_ sender: UIButton) {
-        
-        if let errorsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {
-            
-            errorsView.modalPresentationStyle = .popover
-            errorsView.preferredContentSize = CGSize(width: self.view.frame.width * 0.5, height: self.view.frame.height * 0.5)
-
-            let popUpController = errorsView.popoverPresentationController
-            popUpController!.permittedArrowDirections = .any
-            popUpController!.sourceView = sender
-            errorsView.loadViewIfNeeded()
-            
-            errorsView.errors = dcfErrors
-            
-            present(errorsView, animated: true, completion:  nil)
-        }
-    }
-    
-    @IBAction func r1ErrorsButtonAction(_ sender: UIButton) {
-        
-        if let errorsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {
-            
-            errorsView.modalPresentationStyle = .popover
-            errorsView.preferredContentSize = CGSize(width: self.view.frame.width * 0.5, height: self.view.frame.height * 0.5)
-
-            let popUpController = errorsView.popoverPresentationController
-            popUpController!.permittedArrowDirections = .any
-            popUpController!.sourceView = sender
-            errorsView.loadViewIfNeeded()
-            
-            errorsView.errors = r1Errors!
-            
-            present(errorsView, animated: true, completion:  nil)
-        }
-    }
-    */
     
     @objc
     func showCitation() {
@@ -349,6 +236,16 @@ class StockChartVC: UIViewController {
 
         self.parent?.present(citationView, animated: true, completion: nil)
 
+    }
+    
+    @objc
+    func downloadStarted() {
+        spinner.startAnimating()
+    }
+    
+    @objc
+    func downloadEnded() {
+        spinner.stopAnimating()
     }
         
     @IBAction func purchaseAction(_ sender: UIButton) {
@@ -415,14 +312,16 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate, UIPopov
 
         // return point from ValuationSummaryTVC for R1Valuations
         
-        if toDismiss != nil {
-
-            toDismiss?.dismiss(animated: true, completion: nil)
-            refreshR1Label()
-        }
-        else {
-            refreshDCFLabel()
-        }
+        refreshValuationButton()
+        
+//        if toDismiss != nil {
+//
+//            toDismiss?.dismiss(animated: true, completion: nil)
+//            refreshR1Label()
+//        }
+//        else {
+//            refreshValuationButton()
+//        }
     }
     
     func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?) {
@@ -438,7 +337,7 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate, UIPopov
                 }
             }
             else {
-                self.refreshDCFLabel()
+                self.refreshValuationButton()
             }
         })
     }

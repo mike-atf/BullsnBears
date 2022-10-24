@@ -93,7 +93,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let error = error
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
+            ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
         }
 
         return newValuation
@@ -114,7 +114,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
 //            valuations = try fetchRequest.execute()
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Rule1Valuation")
         }
         
         if valuations?.count ?? 0 > 1 {
@@ -142,7 +142,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             valuations = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
 //            valuations = try fetchRequest.execute()
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching dcfValuations")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching dcfValuations")
         }
 
         if valuations?.count ?? 0 > 1 {
@@ -168,7 +168,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let error = error
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving dcfValuations")
+            ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving dcfValuations")
         }
 
         return newValuation
@@ -234,7 +234,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             }
         }
         else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in Valuation.getDCFValue")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in Valuation.getDCFValue")
         }
         
         return nil
@@ -257,7 +257,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             }
         }
         else {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in Valuation.getDCFValue")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in Valuation.getDCFValue")
         }
         
         return String()
@@ -275,7 +275,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         }
         
         guard let value = Double(validtext.filter("-0123456789.".contains)) else {
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "error converting entered text to number: \(sender.text ?? "no text")")
+            ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "error converting entered text to number: \(sender.text ?? "no text")")
             return
         }
         
@@ -306,7 +306,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
     func checkValuation() -> [String]? {
         
         guard let validID = valuationID else {
-            ErrorController.addErrorLog(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
+            ErrorController.addInternalError(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
             return nil
         }
 
@@ -439,7 +439,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
     func updateData() {
         
         guard let validID = valuationID else {
-            ErrorController.addErrorLog(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
+            ErrorController.addInternalError(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
             return
         }
 
@@ -462,7 +462,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         let shortName = share.name_short
         
         guard let validID = valuationID else {
-            ErrorController.addErrorLog(errorLocation: "CombinedValController.startDataDownload", systemError: nil, errorInfo: "failed data donwload - no valid valuation object ID")
+            ErrorController.addInternalError(errorLocation: "CombinedValController.startDataDownload", systemError: nil, errorInfo: "failed data donwload - no valid valuation object ID")
             return
         }
 
@@ -473,7 +473,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                     let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: validID, progressDelegate: self.valuationListViewController, downloadRedirectDelegate: self)
                     try Task.checkCancellation()
                 } catch let error {
-                    ErrorController.addErrorLog(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                    ErrorController.addInternalError(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
                 }
                 return nil
             }
@@ -485,7 +485,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                     try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: validID, progressDelegate: self.valuationListViewController)
                     try Task.checkCancellation()
                 } catch let error {
-                    ErrorController.addErrorLog(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
+                    ErrorController.addInternalError(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
                 }
                 return nil
             }
@@ -523,7 +523,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             case 3:
                 UserDefaults.standard.set(value / 100.0, forKey: "LongTermMarketReturn")
             default:
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in DCFValuation.getValuationListItem")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in DCFValuation.getValuationListItem")
             }
         case 1:
             // 'Key Statistics
@@ -536,7 +536,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             case 2:
                 valuation.sharesOutstanding = value
             default:
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 2:
             // 'Income Statement S1 - Revenue
@@ -554,7 +554,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             case 2:
                 valuation.expenseIncomeTax = value
             default:
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 5:
             // 'balance sheet'
@@ -564,7 +564,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             case 1:
                 valuation.debtLT = value
             default:
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
             }
         case 6:
             // 'Cash Flow S1
@@ -585,7 +585,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             // adjsuted predicted growth rate
             valuation.revGrowthPredAdj?.add(value: value / 100.0, index: indexPath.row)
         default:
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
         }
         
         if let updatePaths = rowsToUpdateAfterUserEntry(indexPath) {
@@ -595,7 +595,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         do {
             try valuation.managedObjectContext?.save()
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "CombinedValController.convertUserEntryDCF", systemError: error , errorInfo: "Unable to to save user entry to valuation's moc")
+            ErrorController.addInternalError(errorLocation: "CombinedValController.convertUserEntryDCF", systemError: error , errorInfo: "Unable to to save user entry to valuation's moc")
         }
         
         var jumpToCellPath = IndexPath(row: indexPath.row+1, section: indexPath.section)
@@ -667,7 +667,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         case 12:
             valuation.ceoRating = value
         default:
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
+            ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
         }
         
         valuation.save()
@@ -984,7 +984,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             // 'CEO'
             return ("0-10", nil)
         default:
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
+            ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: nil, errorInfo: "unrecogniased indexPath \(indexPath)")
         }
         
         return (nil, nil)
@@ -1499,7 +1499,7 @@ extension CombinedValuationController: DownloadRedirectionDelegate {
             if let url = request.url {
                 
                 guard url.path.starts(with: "https://www.macrotrends.net") else {
-                    ErrorController.addErrorLog(errorLocation: "awaitingRedirection", systemError: nil, errorInfo: "redirection request to non-macrotredns page reived \(request.url?.path ?? "")")
+                    ErrorController.addInternalError(errorLocation: "awaitingRedirection", systemError: nil, errorInfo: "redirection request to non-macrotredns page reived \(request.url?.path ?? "")")
                     return
                 }
                        
@@ -1516,7 +1516,7 @@ extension CombinedValuationController: DownloadRedirectionDelegate {
                                 do {
                                     try self.share.managedObjectContext?.save()
                                 } catch let error {
-                                    ErrorController.addErrorLog(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "couldn't save \(symbol) in it's MOC after downlaod re-direction")
+                                    ErrorController.addInternalError(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "couldn't save \(symbol) in it's MOC after downlaod re-direction")
                                 }
                                 
                                 if let info = notification.userInfo as? [String:Any] {

@@ -133,7 +133,7 @@ class StocksController: NSFetchedResultsController<Share> {
             }
             
             guard let validData = data else {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "stock keyratio download error - empty website data")
                 return
             }
 
@@ -207,7 +207,7 @@ class StocksController: NSFetchedResultsController<Share> {
 //            shares = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest)
             shares = try fetchRequest.execute()
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
         }
         
         return shares
@@ -228,7 +228,7 @@ class StocksController: NSFetchedResultsController<Share> {
 //            share = try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.fetch(fetchRequest).first
             share = try fetchRequest.execute().first
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
         }
         
         return share
@@ -362,7 +362,7 @@ class StocksController: NSFetchedResultsController<Share> {
         do {
             shares  =  try theContext.fetch(request)
         } catch let error as NSError{
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+            ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
         }
         
         return shares?.first
@@ -378,7 +378,7 @@ class StocksController: NSFetchedResultsController<Share> {
             try FileManager.default.removeItem(at: atURL!)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }
@@ -413,7 +413,7 @@ extension StocksController: StockDelegate {
         
         if errors.count > 0 {
             for error in errors {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
             }
         }
 
@@ -433,7 +433,7 @@ extension StocksController: StockDelegate {
         
         if errors.count > 0 {
             for error in errors {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: error)
             }
         }
     }

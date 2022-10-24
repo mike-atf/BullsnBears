@@ -74,12 +74,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                             filesImported.append(targetPath)
                         }
                         catch let error {
-                            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to move file out of the Inbox into the Document folder")
+                            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to move file out of the Inbox into the Document folder")
                         }
                     }
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error checking the Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error checking the Inbox folder ")
             }
             
             if filesImported.count > 0 {
@@ -94,14 +94,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let path = tickerDictionaryPath() { // doesn't exist
             
             guard let content = CSVImporter.openCSVFile(url: nil, fileName:"StockTickerDictionary") else {
-                ErrorController.addErrorLog(errorLocation: "SceneDelegate.buildTickerDictionary", systemError: nil, errorInfo: "can't find ticker name csv file")
+                ErrorController.addInternalError(errorLocation: "SceneDelegate.buildTickerDictionary", systemError: nil, errorInfo: "can't find ticker name csv file")
                 return
             }
             
             let rows = content.components(separatedBy: NSMutableCharacterSet.newlines)
             
             if rows.count < 1 {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "csvExtraction error - no file content")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "csvExtraction error - no file content")
                 return
             }
 
@@ -111,7 +111,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 var count = 0
                 headerArray.forEach { (header) in
                     if header != expectedOrder[count] {
-                        ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: " trying to read .csv file - header not in required format \(expectedOrder).\nInstead is \(headerArray) " )
+                        ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: " trying to read .csv file - header not in required format \(expectedOrder).\nInstead is \(headerArray) " )
                         headerError = true
                     }
                     count += 1
@@ -133,7 +133,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 let fileData = try NSKeyedArchiver.archivedData(withRootObject: stockTickerDictionary!, requiringSecureCoding: true)
                 try fileData.write(to: URL(fileURLWithPath: dictPath))
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "Error trying to create Stoxk ticker ditionary at path \(dictPath) " )
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "Error trying to create Stoxk ticker ditionary at path \(dictPath) " )
             }
             
         }
@@ -158,7 +158,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     }
                 }
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error checking the Support Directory folder ")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error checking the Support Directory folder ")
             }
             
             return appSupportDirectoryPath
@@ -172,7 +172,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         do {
             try FileManager.default.removeItem(atPath: atPath)
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
         }
     }
     

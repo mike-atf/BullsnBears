@@ -136,7 +136,7 @@ class BackupManager {
             shares = try self.context.fetch(request)
             sharesData = try NSKeyedArchiver.archivedData(withRootObject: shares ?? [], requiringSecureCoding: false)
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive shares")
+            ErrorController.addInternalError(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive shares")
         }
         
         return  sharesData
@@ -155,7 +155,7 @@ class BackupManager {
             transactions = try self.context.fetch(request)
             transactionsData = try NSKeyedArchiver.archivedData(withRootObject: transactions ?? [], requiringSecureCoding: false)
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive transactions")
+            ErrorController.addInternalError(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive transactions")
         }
         
         return  transactionsData
@@ -174,7 +174,7 @@ class BackupManager {
             wbvs = try self.context.fetch(request)
             wbvsData = try NSKeyedArchiver.archivedData(withRootObject: wbvs ?? [], requiringSecureCoding: false)
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive WB Valuations")
+            ErrorController.addInternalError(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive WB Valuations")
         }
         
         return  wbvsData
@@ -193,7 +193,7 @@ class BackupManager {
             research = try self.context.fetch(request)
             researchData = try NSKeyedArchiver.archivedData(withRootObject: research ?? [], requiringSecureCoding: false)
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive stock research entries")
+            ErrorController.addInternalError(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive stock research entries")
         }
         
         return  researchData
@@ -212,7 +212,7 @@ class BackupManager {
             dcfv = try self.context.fetch(request)
             dcfvData = try NSKeyedArchiver.archivedData(withRootObject: dcfv ?? [], requiringSecureCoding: false)
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive DCF Valuations")
+            ErrorController.addInternalError(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive DCF Valuations")
         }
         
         return  dcfvData
@@ -231,7 +231,7 @@ class BackupManager {
             r1v = try self.context.fetch(request)
             r1vData = try NSKeyedArchiver.archivedData(withRootObject: r1v ?? [], requiringSecureCoding: false)
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive Rule1 Valuations")
+            ErrorController.addInternalError(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive Rule1 Valuations")
         }
         
         return  r1vData
@@ -328,7 +328,7 @@ class BackupManager {
         do {
             try self.context.execute(deleteRequest)
         } catch let error as NSError {
-            ErrorController.addErrorLog(errorLocation: "Backup Controller", systemError: error, errorInfo: "Error deleting existing shares prior to Backup/ Import")
+            ErrorController.addInternalError(errorLocation: "Backup Controller", systemError: error, errorInfo: "Error deleting existing shares prior to Backup/ Import")
             return false
         }
 
@@ -343,7 +343,7 @@ class BackupManager {
         do {
             try self.context.execute(deleteRequest)
         } catch let error as NSError {
-            ErrorController.addErrorLog(errorLocation: "Backup Controller", systemError: error, errorInfo: "Error deleting existing share transactions prior to Backup/ Import")
+            ErrorController.addInternalError(errorLocation: "Backup Controller", systemError: error, errorInfo: "Error deleting existing share transactions prior to Backup/ Import")
             return false
         }
 

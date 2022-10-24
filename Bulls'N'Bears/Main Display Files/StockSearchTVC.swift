@@ -180,7 +180,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }
@@ -201,7 +201,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                 do {
                     try await downloadWebData(sourceURL, stockName: name, task: "name")
                 } catch let error {
-                    ErrorController.addErrorLog(errorLocation: "StockSearchTVC.findNameOnYahoo", systemError: nil, errorInfo: "failed web data download \(error.localizedDescription)")
+                    ErrorController.addInternalError(errorLocation: "StockSearchTVC.findNameOnYahoo", systemError: nil, errorInfo: "failed web data download \(error.localizedDescription)")
                 }
             }
 
@@ -229,7 +229,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
  
             
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
+            ErrorController.addInternalError(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
         }
 
     }

@@ -128,7 +128,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             self.valuationID = valuation.objectID
         }
         else if let valuation = WBValuationController.returnWBValuations(share: share) {
-            // find old disconnected valutions persisted after share was deleted
+            // find old disconnected valuations persisted after share was deleted
             self.wbValuation = valuation
             self.valuationID = valuation.objectID
 
@@ -199,7 +199,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         do {
             valuations = try fetchRequest.execute()
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching WBValuation")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching WBValuation")
         }
         
         if valuations?.count ?? 0 > 1 {
@@ -228,7 +228,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let error = error
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
+            ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
         }
 
         return newValuation
@@ -248,7 +248,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         do {
             ratings = try fetchRequest.execute()
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching UserEvaluations")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching UserEvaluations")
         }
 
         return ratings
@@ -257,7 +257,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     func updateData() {
         
         guard let validID = valuationID else {
-            ErrorController.addErrorLog(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
+            ErrorController.addInternalError(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
             return
         }
         
@@ -446,7 +446,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
                 }
             default:
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
             }
             
             return (value$ ?? "no value", color, errors)
@@ -536,7 +536,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
                 return (value$, color, errors)
             default:
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
             }
         }
         else if path.section == 2 {
@@ -599,7 +599,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 //                return (value$, color, errors)
 
             default:
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
 
             }
         }
@@ -652,7 +652,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 return (value$, nil, errors)
 
             default:
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined row in path \(path)")
             }
         }
         
@@ -799,7 +799,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
         } catch {
             let error = error
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
+            ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error creating and saving Rule1Valuation")
         }
 
         return newValuation
@@ -866,7 +866,7 @@ extension WBValuationController: DownloadRedirectionDelegate {
                                 do {
                                     try self.share.managedObjectContext?.save()
                                 } catch let error {
-                                    ErrorController.addErrorLog(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "couldn't save \(symbol) in it's MOC after downlaod re-direction")
+                                    ErrorController.addInternalError(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "couldn't save \(symbol) in it's MOC after downlaod re-direction")
                                 }
                                 
                                 if let info = notification.userInfo as? [String:Any] {

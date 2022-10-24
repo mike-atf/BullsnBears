@@ -21,7 +21,8 @@ class StocksController2: NSFetchedResultsController<Share> {
     var backgroundMoc: NSManagedObjectContext?
     var sharesAwaitingUpdateDownload: [Share]? // to check if/when all share update download are complete
     var controllerDelegate: StocksController2Delegate?
-    
+    var shareInfosToDownload = 0
+
     // MARK: - FRC functions
     // these use the main MOC
     
@@ -36,7 +37,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         do {
             shares = try fetchRequest.execute()
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
         }
         
         return shares
@@ -56,7 +57,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         do {
             share = try fetchRequest.execute().first
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+                ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
         }
         
         return share
@@ -65,7 +66,7 @@ class StocksController2: NSFetchedResultsController<Share> {
     func createShare(with pricePoints: [PricePoint]?, symbol: String, companyName: String?=nil) throws -> Share? {
         
         guard let validPrices = pricePoints else {
-            throw InternalErrors.missingPricePointsInShareCreation
+            throw InternalErrorType.missingPricePointsInShareCreation
         }
         
         let stockName = symbol
@@ -137,11 +138,11 @@ class StocksController2: NSFetchedResultsController<Share> {
     func createShare(from file: URL?, companyName: String?=nil, deleteFile: Bool?=false) throws -> Share? {
         
         guard let fileURL = file else {
-            throw InternalErrors.missingPricePointsInShareCreation
+            throw InternalErrorType.missingPricePointsInShareCreation
         }
         
         guard let lastPathComponent = fileURL.lastPathComponent.split(separator: ".").first else {
-            throw InternalErrors.urlPathError
+            throw InternalErrorType.urlPathError
         }
         
         let stockName = String(lastPathComponent)
@@ -225,7 +226,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         do {
             shares  =  try theContext.fetch(request)
         } catch let error as NSError{
-            ErrorController.addErrorLog(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
+            ErrorController.addInternalError(errorLocation: #file + "."  + #function, systemError: error, errorInfo: "error fetching Shares")
         }
         
         return shares?.first
@@ -242,18 +243,18 @@ class StocksController2: NSFetchedResultsController<Share> {
         components?.queryItems = [URLQueryItem(name: "p", value: (symbol))]
         
         guard let validURL = components?.url else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
 
         var profile: ProfileData?
         do {
             profile = try await WebPageScraper2.downloadAndAnalyseProfile(url: validURL)
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "StocksController2 - downloadProfile", systemError: nil, errorInfo: "error downloading profile for \(symbol): \(error)")
+            ErrorController.addInternalError(errorLocation: "StocksController2 - downloadProfile", systemError: nil, errorInfo: "error downloading profile for \(symbol): \(error)")
         }
         
         guard profile != nil else {
-            throw DownloadAndAnalysisError.couldNotFindCompanyProfileData
+            throw InternalErrorType.couldNotFindCompanyProfileData
         }
 
 // then save these to the share in the background
@@ -263,7 +264,7 @@ class StocksController2: NSFetchedResultsController<Share> {
             try await backgroundMOC.perform {
             
             guard let backgroundShare = backgroundMOC.object(with: shareID) as? Share else {
-                throw InternalErrors.mocReadError
+                throw InternalErrorType.mocReadError
             }
             
             backgroundShare.sector = profile!.sector
@@ -273,11 +274,10 @@ class StocksController2: NSFetchedResultsController<Share> {
             try backgroundShare.managedObjectContext?.save()
             }
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "StocksController2 - downloadProfile", systemError: nil, errorInfo: "error saving profile for \(symbol): \(error.localizedDescription)")
+            ErrorController.addInternalError(errorLocation: "StocksController2 - downloadProfile", systemError: nil, errorInfo: "error saving profile for \(symbol): \(error.localizedDescription)")
         }
                 
     }
-
     
     func removeFile(_ atURL: URL?) {
        
@@ -289,7 +289,7 @@ class StocksController2: NSFetchedResultsController<Share> {
             try FileManager.default.removeItem(at: atURL!)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }
@@ -300,6 +300,8 @@ class StocksController2: NSFetchedResultsController<Share> {
     /// downloads daily prices, EPS/ qEPS, PER, live prices and tBond data
     /// updates MAC-Ds
     func updateStocksData(singleShare: Share?=nil) throws {
+        
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadStarted"), object: nil, userInfo: nil)
         
         if singleShare == nil {
             Task.init(priority: .background) {
@@ -362,7 +364,7 @@ class StocksController2: NSFetchedResultsController<Share> {
                     
                     do {
                         guard let backgroundShare = self.backgroundMoc?.object(with: shareID) as? Share else {
-                            throw DownloadAndAnalysisError.noBackgroundShareWithSymbol
+                            throw InternalErrorType.noBackgroundShareWithSymbol
                         }
                         
                         if let valid = labelledPrice.value {
@@ -389,7 +391,7 @@ class StocksController2: NSFetchedResultsController<Share> {
                            self.updateCompleteToDelegate(id: shareID)
                         }
                     } catch let error {
-                        ErrorController.addErrorLog(errorLocation: "StocksController2.updateStocksData", systemError: error, errorInfo: "error fetching from and/or saving backgroundMOC")
+                        ErrorController.addInternalError(errorLocation: "StocksController2.updateStocksData", systemError: error, errorInfo: "error fetching from and/or saving backgroundMOC")
                     }
                     
                 })
@@ -397,13 +399,12 @@ class StocksController2: NSFetchedResultsController<Share> {
         }
     }
     
-    /// checks up-to-date status of, and downloads DCF-, R1- and WB-Valuation data
-    /// updates trends
+    /// checks up-to-date status of, and if older than 1 month downloads DCF-, R1- and WB-Valuation data
+    /// updates trends; called after share price and eps updates complete, from 'updateCompleteToDelegate()'
     func updateStockInformation(singleShare: Share?=nil) {
-        
-        print("beginning to update share background infos...")
-        
+                
         var sharesToUpdate: [Share]?
+        let renewInterval: TimeInterval = 365*24*3600/12
         if let validShare = singleShare {
             sharesToUpdate = [validShare]
         } else {
@@ -412,14 +413,20 @@ class StocksController2: NSFetchedResultsController<Share> {
                 else { return false }
             })
         }
-
+        
+        var canStopDownloadSpinner = [true]
+        shareInfosToDownload = 0
+        NotificationCenter.default.addObserver(self, selector: #selector(recordDownloadCompleted), name: Notification.Name(rawValue: "InfoDownloadComplete"), object: nil)
+        
         for share in sharesToUpdate ?? [] {
             
             let symbol = share.symbol
             
-            if (share.dcfValuation?.creationDate ?? Date()).timeIntervalSince(Date()) > 365*24*3600/12 {
+            if (share.dcfValuation?.creationDate ?? Date()).timeIntervalSince(Date()) > renewInterval {
                 // refresh dcf valuation
                 // save new dcfvalue as trend
+                canStopDownloadSpinner.append(false)
+                shareInfosToDownload += 1
                 
                 if let dcfValuationID = share.dcfValuation?.objectID {
                     let dcfv = managedObjectContext.object(with: dcfValuationID) as! DCFValuation
@@ -432,18 +439,20 @@ class StocksController2: NSFetchedResultsController<Share> {
                     Task(priority: .background) {
                         do {
                             try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: dcfValuationID, progressDelegate: nil)
-                            //                        try Task.checkCancellation()
+                            NotificationCenter.default.post(name: Notification.Name(rawValue: "InfoDownloadComplete"), object: nil, userInfo: nil)
                         } catch let error {
-                            ErrorController.addErrorLog(errorLocation: "StocksController2.updateStockInformation.dcfValuation", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
+                            ErrorController.addInternalError(errorLocation: "StocksController2.updateStockInformation.dcfValuation", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
                         }
                     }
                 }
             }
             
-            if (share.rule1Valuation?.creationDate ?? Date()).timeIntervalSince(Date()) > 365*24*3600/12 {
+            if (share.rule1Valuation?.creationDate ?? Date()).timeIntervalSince(Date()) > renewInterval {
                 // refresh rule 1 valuation
                 // save new r1 moat and sticker price as trend
-                
+                canStopDownloadSpinner.append(false)
+                shareInfosToDownload += 1
+
                 let shortName = share.name_short
                 if let r1ValuationID = share.rule1Valuation?.objectID {
                     
@@ -464,19 +473,21 @@ class StocksController2: NSFetchedResultsController<Share> {
                         
                         do {
                             let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: r1ValuationID, progressDelegate: nil, downloadRedirectDelegate: self)
-                            try Task.checkCancellation()
+                            NotificationCenter.default.post(name: Notification.Name(rawValue: "InfoDownloadComplete"), object: nil, userInfo: nil)
                         } catch let error {
-                            ErrorController.addErrorLog(errorLocation: "StocksController2.updateSharesInfo.r1Valuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                            ErrorController.addInternalError(errorLocation: "StocksController2.updateSharesInfo.r1Valuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
                         }
                         
                     }
                 }
             }
             
-            if (share.wbValuation?.date ?? Date()).timeIntervalSince(Date()) > 365*24*3600/12 {
+            if (share.wbValuation?.date ?? Date()).timeIntervalSince(Date()) > renewInterval {
                 // refresh WB valuation 
                 // save intrinsic value as trend in Share
-                
+                canStopDownloadSpinner.append(false)
+                shareInfosToDownload += 1
+
                 let shortName = share.name_short
                 let shareID = share.objectID
                 if let wbValuationID = share.wbValuation?.objectID {
@@ -496,8 +507,10 @@ class StocksController2: NSFetchedResultsController<Share> {
                         do {
                             try await WebPageScraper2.downloadAnalyseSaveWBValuationData(shareSymbol: symbol, shortName: shortName, valuationID: wbValuationID, downloadRedirectDelegate: self)
                             try await WebPageScraper2.keyratioDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID)
+                            NotificationCenter.default.post(name: Notification.Name(rawValue: "InfoDownloadComplete"), object: nil, userInfo: nil)
+
                         } catch let error {
-                            ErrorController.addErrorLog(errorLocation: "StocksController2.updateSharesInfo.wbValuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                            ErrorController.addInternalError(errorLocation: "StocksController2.updateSharesInfo.wbValuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
                         }
 
                     }
@@ -507,6 +520,21 @@ class StocksController2: NSFetchedResultsController<Share> {
             
         }
         
+        if !canStopDownloadSpinner.contains(false) {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadEnded"), object: nil, userInfo: nil)
+        }
+        
+        
+    }
+    
+    @objc
+    func recordDownloadCompleted() {
+        
+        shareInfosToDownload -= 1
+        if shareInfosToDownload == 0 {
+            NotificationCenter.default.removeObserver(self)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadEnded"), object: nil, userInfo: nil)
+        }
         
     }
     
@@ -543,7 +571,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         components?.queryItems = [URLQueryItem(name: "p", value: shareSymbol), URLQueryItem(name: ".tsrc", value: "fin-srch")]
         
         guard let validURL = components?.url else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
         
         var price: Double?
@@ -551,8 +579,8 @@ class StocksController2: NSFetchedResultsController<Share> {
             try await price = WebPageScraper2.getCurrentPrice(url: validURL)
             return (shareSymbol, price)
 
-        } catch let error as DownloadAndAnalysisError {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
+        } catch let error as InternalErrorType {
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
         }
         return (shareSymbol, nil)
     }
@@ -579,7 +607,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         do {
             try share.managedObjectContext?.save()
         } catch let error {
-            ErrorController.addErrorLog(errorLocation: "StocksController2.updateUserAndValueScores", systemError: error, errorInfo: "error trying to save updated user and value scores")
+            ErrorController.addInternalError(errorLocation: "StocksController2.updateUserAndValueScores", systemError: error, errorInfo: "error trying to save updated user and value scores")
         }
     }
     
@@ -591,19 +619,19 @@ class StocksController2: NSFetchedResultsController<Share> {
         }
         
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(shareSymbol)/\(sn)/pe-ratio") else {
-            throw DownloadAndAnalysisError.urlInvalid
+            throw InternalErrorType.urlInvalid
         }
         
         guard let url = components.url else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
         
         var values: [Dated_EPS_PER_Values]?
         
         do {
             values = try await WebPageScraper2.getHxEPSandPEData(url: url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
-        }  catch let error as DownloadAndAnalysisError {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
+        }  catch let error as InternalErrorType {
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
         }
         
         let epsDates = values?.compactMap({ DatedValue(date: $0.date, value: $0.epsTTM) })
@@ -627,19 +655,19 @@ class StocksController2: NSFetchedResultsController<Share> {
         }
         
 //        guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(shareSymbol)/\(sn)/eps-earnings-per-share-diluted") else {
-//            throw DownloadAndAnalysisError.urlInvalid
+//            throw InternalErrorType.urlInvalid
 //        }
         
         guard let ycharts_url = URL(string: ("https://ycharts.com/companies/" + shareSymbol.uppercased() + "/eps")) else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
                 
         var values: [DatedValue]?
         
         do {
             values = try await WebPageScraper2.getqEPSDataFromYCharts(url: ycharts_url, companyName: sn, until: minDate, downloadRedirectDelegate: self)
-        }  catch let error as DownloadAndAnalysisError {
-            ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
+        }  catch let error as InternalErrorType {
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "a background download or analysis error for \(shareSymbol) occurred: \(error)")
         }
         
 
@@ -717,11 +745,11 @@ class StocksController2: NSFetchedResultsController<Share> {
 //        // until 4.2.22: "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx"
 //
 //        guard let url = urlComponents?.url else {
-//            throw DownloadAndAnalysisError.urlError
+//            throw InternalErrorType.urlError
 //        }
         
         guard let url = URL(string: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/"+year$+"/all?type=daily_treasury_yield_curve&field_tdr_date_value="+year$+"&page&_format=csv") else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
         
         await WebPageScraper2.downloadAndAanalyseTreasuryYields(url: url)
@@ -750,7 +778,7 @@ class StocksController2: NSFetchedResultsController<Share> {
     func saveBackgroundMOC(share: Share) throws {
         
         guard let moc = backgroundMoc else {
-            throw InternalErrors.noValidBackgroundMOC
+            throw InternalErrorType.noValidBackgroundMOC
         }
         
         if share.hasChanges {
@@ -758,7 +786,7 @@ class StocksController2: NSFetchedResultsController<Share> {
                 do {
                     try moc.save()
                 } catch let error {
-                    ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a background update error for \(share.symbol ?? "missing") occurred: can't save to background MOC: \(error.localizedDescription)")
+                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "a background update error for \(share.symbol ?? "missing") occurred: can't save to background MOC: \(error.localizedDescription)")
                 }
             }
         }
@@ -776,7 +804,7 @@ class StocksController2: NSFetchedResultsController<Share> {
 //                    do {
 //                        try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
 //                    } catch {
-//                        ErrorController.addErrorLog(errorLocation: "StocksController 2.backgroundContextDidSave", systemError: error, errorInfo: "Can't save main MOC after merging changes from background MOC")
+//                        ErrorController.addInternalError(errorLocation: "StocksController 2.backgroundContextDidSave", systemError: error, errorInfo: "Can't save main MOC after merging changes from background MOC")
 //                    }
                     
                 }
@@ -811,7 +839,7 @@ extension StocksController2: DownloadRedirectionDelegate {
                                 do {
                                     try share.managedObjectContext?.save()
                                 } catch let error {
-                                    ErrorController.addErrorLog(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "couldn't save \(symbol) in it's MOC after downlaod re-direction")
+                                    ErrorController.addInternalError(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "couldn't save \(symbol) in it's MOC after downlaod re-direction")
                                 }
                                 
                                 if let info = notification.userInfo as? [String:Any] {
@@ -821,7 +849,7 @@ extension StocksController2: DownloadRedirectionDelegate {
                                             do {
                                                 try self.updateStocksData(singleShare: share)
                                             } catch let error {
-                                                ErrorController.addErrorLog(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "error updating \(symbol) after redirect")
+                                                ErrorController.addInternalError(errorLocation: "StocksController2.awaitingRedirection", systemError: error, errorInfo: "error updating \(symbol) after redirect")
                                             }
                                         case .test:
                                             print("StocksController2: redirect for \(symbol) test task recevied")

@@ -73,6 +73,7 @@
         <attribute name="symbol" optional="YES" attributeType="String"/>
         <attribute name="trend_caRatio" optional="YES" attributeType="Binary"/>
         <attribute name="trend_DCFValue" optional="YES" attributeType="Binary"/>
+        <attribute name="trend_healthScore" optional="YES" attributeType="Binary"/>
         <attribute name="trend_intrinsicValue" optional="YES" attributeType="Binary"/>
         <attribute name="trend_LynchScore" optional="YES" attributeType="Binary"/>
         <attribute name="trend_MoatScore" optional="YES" attributeType="Binary"/>

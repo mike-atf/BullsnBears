@@ -41,13 +41,11 @@ class Downloader: NSObject {
                   return String(data: data, encoding: .utf8) ?? ""
                 }
                 else {
-                    print(response.mimeType ?? "no response.mimeType")
-                    throw DownloadAndAnalysisError.mimeType
+                    throw InternalError(location: #function, errorInfo: "download response error for \(url), mimeType not text but \(String(describing: response.mimeType))", errorType: .mimeType)
                 }
             }
             else {
-                print(response.statusCode)
-                throw DownloadAndAnalysisError.generalDownloadError
+                throw InternalError(location: #function, errorInfo: "download error for \(url), response \(String(describing: response.statusCode))", errorType: .statusCodeError)
             }
         }
         
@@ -84,12 +82,11 @@ class Downloader: NSObject {
                     htmlText = String(data: data, encoding: .utf8) ?? ""
                 }
                 else {
-                    throw DownloadAndAnalysisError.mimeType
+                    throw InternalError(location: #function, errorInfo: "download response error for \(url), mimeType not text but \(String(describing: response.mimeType))", errorType: .mimeType)
                 }
             }
             else {
-                ErrorController.addErrorLog(errorLocation: "Downloader.downloadData", systemError: nil, errorInfo: "bad status code response \(response.statusCode) when downloading from \(url)")
-                throw DownloadAndAnalysisError.statusCodeError
+                throw InternalError(location: #function, errorInfo: "download error for \(url), response \(String(describing: response.statusCode))", errorType: .statusCodeError)
             }
         }
         
@@ -110,11 +107,11 @@ class Downloader: NSObject {
                   return String(data: data, encoding: .utf8) ?? ""
                 }
                 else {
-                    throw DownloadAndAnalysisError.mimeType
+                    throw InternalError(location: #function, errorInfo: "download response error for \(url), mimeType not text but \(String(describing: response.mimeType))", errorType: .mimeType)
                 }
             }
             else {
-                throw DownloadAndAnalysisError.generalDownloadError
+                throw InternalError(location: #function, errorInfo: "download error for \(url), response \(String(describing: response.statusCode))", errorType: .statusCodeError)
             }
         }
         
@@ -138,11 +135,11 @@ class Downloader: NSObject {
                     htmlText = String(data: data, encoding: .utf8) ?? ""
                 }
                 else {
-                    throw DownloadAndAnalysisError.mimeType
+                    throw InternalError(location: #function, errorInfo: "download response error for \(String(describing: request?.url)), mimeType not text but \(String(describing: response.mimeType))", errorType: .mimeType)
                 }
             }
             else {
-                throw DownloadAndAnalysisError.generalDownloadError
+                throw InternalError(location: #function, errorInfo: "download error for \(String(describing: request?.url)), response \(String(describing: response.statusCode))", errorType: .statusCodeError)
             }
         }
         
@@ -215,7 +212,7 @@ class Downloader: NSObject {
             } catch {
                 
                 DispatchQueue.main.async {
-                    ErrorController.addErrorLog(errorLocation: #function, systemError: error, errorInfo: "can't move and save downloaded file")
+                    ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "can't move and save downloaded file \(fileURL)")
                 }
             }
         }
@@ -268,7 +265,8 @@ class Downloader: NSObject {
                     // if so download webpage content with table
                     removeFile(tempURL)
                     
-                    throw DownloadAndAnalysisError.fileFormatNotCSV
+                    throw InternalError(location: #function, errorInfo: "file doesn't match .csv format \(tempURL)", errorType: .fileFormatNotCSV)
+
                 }
                 
                 if FileManager.default.fileExists(atPath: targetURL.path) {
@@ -280,7 +278,7 @@ class Downloader: NSObject {
                 completion(targetURL)
             } catch {
                 DispatchQueue.main.async {
-                    ErrorController.addErrorLog(errorLocation: #function, systemError: error, errorInfo: "can't move and save downloaded file")
+                    ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "can't move and save downloaded file \(fileURL)")
                 }
             }
         }
@@ -294,7 +292,7 @@ class Downloader: NSObject {
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addErrorLog(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error trying to remove existing file \(atURL) in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }

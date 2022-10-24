@@ -73,6 +73,7 @@ class ATFChart: UIView {
     var insets: [Position: CGFloat] = [.top: 5, .bottom : 5, .left : 5.0, .right: 5.0]
     
     var chartTypes: [ChartType] = [.bar]
+    var declineIsBad = true
     
     // chart data
     var primaryData: LabelledChartDataSet?
@@ -130,13 +131,31 @@ class ATFChart: UIView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
+        self.backgroundColor = UIColor.clear
+        
     }
 
     /// declineThresholdsForColorChange is an optional  array of 1-2 Doubles between 0-1, indicating decline thresholds from last primaryData value to last primaryDats value the first is the concern threshold for changing color to red, the second (optional) is the caution alert changing color to orange
     func configureChart(primaryData: LabelledChartDataSet?, secondaryData: LabelledChartDataSet?=nil, types: [ChartType], chartLabelsData:[ChartLabelInfo]?, declineThresholdsForColorChange: [Double]?=nil) {
         
-        self.primaryData = primaryData
-        self.secondaryData = secondaryData
+        
+        // ensure chartData are date ascending
+        if let validP = primaryData {
+            let sortedChartData = validP.chartData.sorted(by: { e0, e1 in
+                if e0.x! < e1.x! { return true }
+                else { return false }
+            })
+            self.primaryData = LabelledChartDataSet(title: validP.title, chartData: sortedChartData, format: validP.format)
+        } else { self.primaryData = primaryData }
+        
+        if let validS = secondaryData {
+            let sortedChartData = validS.chartData.sorted(by: { e0, e1 in
+                if e0.x! < e1.x! { return true }
+                else { return false }
+            })
+            self.secondaryData = LabelledChartDataSet(title: validS.title, chartData: sortedChartData, format: validS.format)
+        } else { self.secondaryData = secondaryData }
+        
         self.chartTypes = types
         self.chartLabelData = chartLabelsData
         self.yAxisFormat = primaryData?.format ?? .currency
@@ -226,14 +245,16 @@ class ATFChart: UIView {
         for line in visibleChartLines {
             switch line {
             case .top:
-                chartLines.move(to: CGPoint(x: insets[.left]!, y: insets[.top]!))
-                chartLines.addLine(to: CGPoint(x: rect.width - insets[.right]!, y: insets[.top]!))
+                // thin line in case top line is zero line
+                chartGrid.move(to: CGPoint(x: insets[.left]!, y: insets[.top]!))
+                chartGrid.addLine(to: CGPoint(x: rect.width - insets[.right]!, y: insets[.top]!))
             case .left:
                 chartLines.move(to: CGPoint(x: insets[.left]!, y: insets[.top]!))
                 chartLines.addLine(to: CGPoint(x: insets[.left]!, y: rect.height - insets[.bottom]!))
             case .bottom:
-                chartLines.move(to: CGPoint(x: insets[.left]!, y: rect.height - insets[.bottom]!))
-                chartLines.addLine(to: CGPoint(x: rect.width - insets[.right]!, y: rect.height - insets[.bottom]!))
+                // thin line in case bottom line is zero line, but may not be
+                chartGrid.move(to: CGPoint(x: insets[.left]!, y: rect.height - insets[.bottom]!))
+                chartGrid.addLine(to: CGPoint(x: rect.width - insets[.right]!, y: rect.height - insets[.bottom]!))
             case .right:
                 chartLines.move(to: CGPoint(x: rect.width - insets[.right]!, y: insets[.top]!))
                 chartLines.addLine(to: CGPoint(x: rect.width - insets[.right]!, y: rect.height - insets[.bottom]!))
@@ -262,6 +283,13 @@ class ATFChart: UIView {
                 }
             }
         }
+        
+        // zero horizontal line
+        let zeroLineStartPoint = plotDataPoint(dataPoint: ChartDataSet(x: timeAxisStartDate, y: 0.0), frame: rect)
+        let zeroLineEndPoint = plotDataPoint(dataPoint: ChartDataSet(x: timeAxisEndDate, y: 0.0), frame: rect)
+        chartLines.move(to: zeroLineStartPoint)
+        chartLines.addLine(to: zeroLineEndPoint)
+        
         chartGrid.lineWidth = chartLineWidth[.minor]!
         chartLineColor[.minor]!.setStroke()
         chartGrid.stroke()
@@ -349,11 +377,14 @@ class ATFChart: UIView {
                     filledLinePath.addLine(to: CGPoint(x: startPoint.x, y: rect.height - insets[.bottom]!))
                     filledLinePath.addLine(to: startPoint)
                     
-                    if let threshold = thresholdsForColorChange_decline {
-                        let changeFromLastToFirstRatio = 1 - (validDataSet.last!.y! / validDataSet.first!.y!)
-                        if changeFromLastToFirstRatio > threshold.first! {
+                    if let thresholds = thresholdsForColorChange_decline {
+                        let max = declineIsBad ? validDataSet.compactMap{ $0.y }.max()! : validDataSet.compactMap{ $0.y }.min()!
+                        
+                        let latest = validDataSet.last!.y!
+                        let changeFromLastToFirstRatio = abs(max - latest) / max
+                        if changeFromLastToFirstRatio > thresholds.first! {
                             UIColor.systemRed.withAlphaComponent(0.5).setFill()
-                        } else if changeFromLastToFirstRatio > threshold.last! {
+                        } else if changeFromLastToFirstRatio > thresholds.last! {
                             UIColor.systemOrange.withAlphaComponent(0.5).setFill()
                         } else {
                             lineColor.withAlphaComponent(0.5).setFill()
@@ -408,18 +439,17 @@ class ATFChart: UIView {
                     let barPath = UIBezierPath(roundedRect: barRect, cornerRadius: 1)
                     
                     if let thresholds = thresholdsForColorChange_decline {
-                        let changeFromLastToFirstRatio = 1 - validDataSet.last!.y! / (validDataSet.first!.y!)
+                        let max = validDataSet.compactMap{ $0.y }.max()!
+                        let latest = validDataSet.last!.y!
+                        let changeFromLastToFirstRatio = (max - latest) / max
                         if changeFromLastToFirstRatio > thresholds.first! {
-                            UIColor.systemRed.withAlphaComponent(0.5).setFill()
-                        }
-                        else if changeFromLastToFirstRatio > thresholds.last! {
-                            UIColor.systemOrange.withAlphaComponent(0.5).setFill()
-                        }
-                        else {
-                            barColor.setFill()
+                            barColor = UIColor.systemRed.withAlphaComponent(0.5)
+                        } else if changeFromLastToFirstRatio > thresholds.last! {
+                            barColor = UIColor.systemOrange.withAlphaComponent(0.5)
                         }
                     }
                     
+                    barColor.setFill()
                     barPath.fill()
                     
                 }
@@ -540,11 +570,16 @@ class ATFChart: UIView {
                 timeAxisStartDate = DatesManager.beginningOfQuarter(of: combinedMin)
                 timeAxisEndDate = DatesManager.endOfQuarter(of: combinedMax)
                 timeAxisStepInterval = week
-            default:
-                // >months...
+            case 365*24*3600/4...365*24*3600:
+                // one year...
                 timeAxisStartDate = DatesManager.beginningOfYear(of: combinedMin)
                 timeAxisEndDate = DatesManager.endOfYear(of: combinedMax)
                 timeAxisStepInterval = month
+            default:
+                // >more than one year...
+                timeAxisStartDate = DatesManager.beginningOfYear(of: combinedMin)
+                timeAxisEndDate = DatesManager.endOfYear(of: combinedMax)
+                timeAxisStepInterval = quarter
             }
             
             let axisTimeSpan = timeAxisEndDate.timeIntervalSince(timeAxisStartDate)
@@ -571,7 +606,7 @@ class ATFChart: UIView {
             axisMax = 0
         } else {
             var e:Double = 0
-            let options = [0.1,0.25,0.5, 0.75, 1.0]
+            let options = [0.01, 0.025, 0.05,0.1,0.25,0.5, 0.75, 1.0]
             
             while axisMax / abs(max) <= 1.0 {
                 e += 1.0
@@ -693,15 +728,20 @@ class ATFChart: UIView {
             switch yAxisFormat {
             case .percent:
                 yAxisFormatter = percentFormatter0Digits
-                if axisParameters[.vertical]!.max < 0.1 {
+                if axisParameters[.vertical]!.max < 1 {
                     yAxisFormatter = percentFormatter2Digits
                 }
             case .numberWithDecimals:
                 yAxisFormatter = numberFormatterWith1Digit
+                if axisParameters[.vertical]!.max < 1 {
+                    yAxisFormatter = numberFormatter2Decimals
+                }
             default:
                 yAxisFormatter = currencyFormatterNoGapWithPence
                 if axisParameters[.vertical]!.max > 10 {
                     yAxisFormatter = currencyFormatterGapNoPence
+                } else if axisParameters[.vertical]!.max < 1 {
+                    yAxisFormatter = currencyFormatterNoGapWithPence
                 }
             }
             

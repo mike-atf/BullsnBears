@@ -23,7 +23,7 @@ class FinHealthController: NSObject {
     var quickRatios = [ChartDataSet]()
     var currentRatios = [ChartDataSet]()
     var debEquityRatios = [ChartDataSet]()
-
+    var currentHealthScore: Double?
 
     init(share: Share!, finHealthTVC: FinHealthTVC) {
         super.init()
@@ -31,7 +31,7 @@ class FinHealthController: NSObject {
         self.share = share
         self.finHealthTVC = finHealthTVC
         
-        earliestChartDate = DatesManager.beginningOfYear(of: Date())
+        earliestChartDate = DatesManager.beginningOfYear(of: Date().addingTimeInterval(-year))
         
         let shortName = share.name_short!
         let symbol = share.symbol!
@@ -42,6 +42,8 @@ class FinHealthController: NSObject {
 
         NotificationCenter.default.addObserver(self, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
 
+        let bgShare = share
+//        finHealthTVC.startActivityView()
         downloadTask = Task.init(priority: .background, operation: {
             do {
                 await getR1Data(shortName: shortName, symbol: symbol, r1vID: r1ValuationID, bgMOC: backgroundMoc!)
@@ -53,12 +55,20 @@ class FinHealthController: NSObject {
                 try await efficiencyData(share: self.share) // not saved/ stored
                 try await liquidityData(share: self.share) // not saved/ stored
                 try await solvencyData(share: self.share)  // not saved/ stored
+                
+                currentHealthScore = healthScore()
+                if let healthScoreCurrent = currentHealthScore {
+                    let datedValue = DatedValue(date: Date(), value: healthScoreCurrent)
+                    bgShare?.saveTrendsData(datedValuesToAdd: [datedValue], trendName: .healthScore)
+                }
+                
             } catch let error {
-                ErrorController.addErrorLog(errorLocation: "FinHealthController.init", systemError: error, errorInfo: "can't download Health data for \(symbol)")
+                ErrorController.addInternalError(errorLocation: "FinHealthController.init", systemError: error, errorInfo: "can't download Health data for \(symbol)")
             }
 
             DispatchQueue.main.async {
-                self.finHealthTVC.tableView.reloadRows(at: [IndexPath(row: 0, section: 1), IndexPath(row: 0, section: 2),IndexPath(row: 0, section: 3), IndexPath(row: 1, section: 3)], with: .automatic)
+                self.finHealthTVC.stopActivityView()
+                self.finHealthTVC.tableView.reloadData()
                 NotificationCenter.default.removeObserver(self)
             }
             return nil
@@ -71,7 +81,7 @@ class FinHealthController: NSObject {
         var chartData = [ChartDataSet]()
         let labelledChartData = LabelledChartDataSet(title:"Empty", chartData: chartData, format: .numberWithDecimals)
 
-        if indexPath.section == 0 {
+        if indexPath.section == 1 {
             if indexPath.row == 0 {
                 // MOAT
                 for moatData in share?.trendValues(trendName: .moatScore) ?? [] {
@@ -110,15 +120,15 @@ class FinHealthController: NSObject {
                 return LabelledChartDataSet(title: "Lynch", chartData: chartData, format: .numberWithDecimals)
             }
         }
-        else if indexPath.section == 1 {
+        else if indexPath.section == 2 {
             // Profitability - net profit margin
             return LabelledChartDataSet(title: "Net Profit Margin", chartData: netProfitMargins, format: .percent)
 
-        } else if indexPath.section == 2 {
+        } else if indexPath.section == 3 {
             // Efficiency - operating margin
            return LabelledChartDataSet(title: "Operating Margin", chartData: operatingMargins, format: .percent)
 
-        } else if indexPath.section == 3 {
+        } else if indexPath.section == 4 {
             // Liquidity - operating margin
             if indexPath.row == 0 {
                 return LabelledChartDataSet(title: "Quick ratio", chartData: quickRatios, format: .numberWithDecimals)
@@ -126,7 +136,7 @@ class FinHealthController: NSObject {
                 return LabelledChartDataSet(title: "Current ratio", chartData: currentRatios, format: .numberWithDecimals)
             }
 
-        } else if indexPath.section == 4 {
+        } else if indexPath.section == 5 {
             // Solvency - debt equity ratio
             return LabelledChartDataSet(title: "Debt/equity ratio", chartData: debEquityRatios, format: .numberWithDecimals)
         } else {
@@ -163,7 +173,7 @@ class FinHealthController: NSObject {
                         let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: r1ValuationID, progressDelegate: self, downloadRedirectDelegate: self)
 //                        try Task.checkCancellation()
                     } catch let error {
-                        ErrorController.addErrorLog(errorLocation: "FinHealthController.getR1Data", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                        ErrorController.addInternalError(errorLocation: "FinHealthController.getR1Data", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
                     }
                     
 //                    return nil
@@ -191,7 +201,7 @@ class FinHealthController: NSObject {
                     try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: dcfValuationID, progressDelegate: self)
                     //                        try Task.checkCancellation()
                 } catch let error {
-                    ErrorController.addErrorLog(errorLocation: "StocksController2.updateStockInformation.dcfValuation", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
+                    ErrorController.addInternalError(errorLocation: "StocksController2.updateStockInformation.dcfValuation", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
                 }
             }
         }
@@ -206,20 +216,19 @@ class FinHealthController: NSObject {
         }
         
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/net-profit-margin") else {
-            ErrorController.addErrorLog(errorLocation: "FinHealthController.profitabilityData", systemError: nil, errorInfo: "url components error for \(share.symbol!)")
+            ErrorController.addInternalError(errorLocation: "FinHealthController.profitabilityData", systemError: nil, errorInfo: "url components error for \(share.symbol!)")
             return
         }
         
         guard let url = components.url else {
-            ErrorController.addErrorLog(errorLocation: "FinHealthController.profitabilityData", systemError: nil, errorInfo: "url error for \(share.symbol!)")
+            ErrorController.addInternalError(errorLocation: "FinHealthController.profitabilityData", systemError: nil, errorInfo: "url error for \(share.symbol!)")
             return
         }
         
         var values: [DatedValue]?
         
         do {
-            let earliestDate = Date().addingTimeInterval(-year)
-            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Net Profit Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestDate)
+            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Net Profit Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values ?? [] {
                 if !(value.date < earliestChartDate) {
@@ -227,8 +236,8 @@ class FinHealthController: NSObject {
                 }
             }
             
-        }  catch let error as DownloadAndAnalysisError {
-            ErrorController.addErrorLog(errorLocation: "FinHealthController.profitabilityData", systemError: nil, errorInfo: "a background download or analysis error for \(share.symbol!) occurred: \(error)")
+        }  catch let error as InternalErrorType {
+            ErrorController.addInternalError(errorLocation: "FinHealthController.profitabilityData", systemError: nil, errorInfo: "a background download or analysis error for \(share.symbol!) occurred: \(error)")
         }
         
     }
@@ -241,28 +250,27 @@ class FinHealthController: NSObject {
         }
         
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/operating-margin") else {
-            ErrorController.addErrorLog(errorLocation: "FinHealthController.efficiencyData", systemError: nil, errorInfo: "url components error for \(share.symbol!)")
+            ErrorController.addInternalError(errorLocation: "FinHealthController.efficiencyData", systemError: nil, errorInfo: "url components error for \(share.symbol!)")
             return
         }
         
         guard let url = components.url else {
-            ErrorController.addErrorLog(errorLocation: "FinHealthController.efficiencyData", systemError: nil, errorInfo: "url error for \(share.symbol!)")
+            ErrorController.addInternalError(errorLocation: "FinHealthController.efficiencyData", systemError: nil, errorInfo: "url error for \(share.symbol!)")
             return
         }
         
         var values: [DatedValue]?
         
         do {
-            let earliestDate = Date().addingTimeInterval(-year)
-            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Operating Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestDate)
+            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Operating Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values ?? [] {
                 if !(value.date < earliestChartDate) {
                     operatingMargins.append(ChartDataSet(x: value.date, y: value.value))
                 }
             }
-        }  catch let error as DownloadAndAnalysisError {
-            ErrorController.addErrorLog(errorLocation: "FinHealthController.efficiencyData", systemError: nil, errorInfo: "a background download or analysis error for \(share.symbol!) occurred: \(error)")
+        }  catch let error as InternalErrorType {
+            ErrorController.addInternalError(errorLocation: "FinHealthController.efficiencyData", systemError: nil, errorInfo: "a background download or analysis error for \(share.symbol!) occurred: \(error)")
         }
         
     }
@@ -285,26 +293,24 @@ class FinHealthController: NSObject {
         }
         
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/quick-ratio") else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
 
         guard let url = components.url else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
         
         var values1: [DatedValue]?
         do {
-            let earliestDate = Date().addingTimeInterval(-year)
-            values1 = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Quick Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestDate)
+            values1 = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Quick Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values1 ?? [] {
                 if !(value.date < earliestChartDate) {
                     quickRatios.append(ChartDataSet(x: value.date, y: value.value))
                 }
             }
-        }  catch let error as DownloadAndAnalysisError {
+        }  catch let error as InternalErrorType {
             throw error
-//            ErrorController.addErrorLog(errorLocation: "FinHealthController.liquidityData", systemError: nil, errorInfo: "a background download or analysis error for \(share.symbol!) occurred: \(error)")
         }
 
  
@@ -318,26 +324,24 @@ class FinHealthController: NSObject {
         }
         
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/current-ratio") else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
 
         guard let url = components.url else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
         
         var values: [DatedValue]?
         do {
-            let earliestDate = Date().addingTimeInterval(-year)
-            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Current Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestDate)
+            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Current Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values ?? [] {
                 if !(value.date < earliestChartDate) {
                     currentRatios.append(ChartDataSet(x: value.date, y: value.value))
                 }
             }
-        }  catch let error as DownloadAndAnalysisError {
+        }  catch let error as InternalErrorType {
             throw error
-//            ErrorController.addErrorLog(errorLocation: "FinHealthController.liquidityData", systemError: nil, errorInfo: "a background download or analysis error for \(share.symbol!) occurred: \(error)")
         }
 
  
@@ -351,29 +355,188 @@ class FinHealthController: NSObject {
         }
         
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/debt-equity-ratio") else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
 
         guard let url = components.url else {
-            throw DownloadAndAnalysisError.urlError
+            throw InternalErrorType.urlError
         }
         
         var values: [DatedValue]?
         do {
-            let earliestDate = Date().addingTimeInterval(-year)
-            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Debt/Equity Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestDate)
+            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Debt/Equity Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values ?? [] {
                 if !(value.date < earliestChartDate) {
                     debEquityRatios.append(ChartDataSet(x: value.date, y: value.value))
                 }
             }
-        }  catch let error as DownloadAndAnalysisError {
+        }  catch let error as InternalErrorType {
             throw error
-//            ErrorController.addErrorLog(errorLocation: "FinHealthController.liquidityData", systemError: nil, errorInfo: "a background download or analysis error for \(share.symbol!) occurred: \(error)")
+        }
+    }
+    
+    func healthScore() -> Double? {
+                
+        let keyFinTypes: [ShareTrendNames] = [.moatScore, .stickerPrice, .lynchScore, .dCFValue, .intrinsicValue]
+        var keyFinScores = [Double?]()
+        
+        for i in 0..<keyFinTypes.count {
+            if let keyFinTrend = share.trendChartData(trendName: keyFinTypes[i]) {
+                // chartData are returned date ASCENDING
+                
+                if keyFinTypes[i] == .moatScore {
+                    keyFinScores.append(keyFinTrend.last!.y!)
+                    if let trendRatio = firstValueRatioToMax(datedValues: keyFinTrend) {
+                        if trendRatio < 0.9 {
+                            keyFinScores[i]! *= trendRatio
+                        }
+                    }
+                }
+                else if [.stickerPrice, .intrinsicValue, .dCFValue].contains(keyFinTypes[i]) {
+                    if keyFinTrend.count > 1 {
+                        if let trendRatio = firstValueRatioToMax(datedValues: keyFinTrend) {
+                            if trendRatio < 0.9 {
+                                keyFinScores.append(trendRatio)
+                            } else {
+                                keyFinScores.append(1.0)
+                            }
+                        }
+                        else {
+                            keyFinScores.append(nil)
+                        }
+                    } else {
+                        keyFinScores.append(nil)
+                    }
+
+                    let debug = keyFinScores.count > i ? keyFinScores[i] : nil
+                }
+                else if keyFinTypes[i] == .lynchScore {
+                    
+                    if keyFinTrend.last!.y! < 1 {
+                        keyFinScores.append(0)
+                    } else if keyFinTrend.last!.y! < 2 {
+                        keyFinScores.append(keyFinTrend.last!.y!-1)
+                    } else {
+                        keyFinScores.append(1.0)
+                    }
+                    
+                    if let trendRatio = firstValueRatioToMax(datedValues: keyFinTrend) {
+                        if trendRatio < 0.9 {
+                            keyFinScores[i]! *= trendRatio
+                        }
+                    }
+
+                }
+            }
+        }
+        
+        // PROFITABILITY
+        var profitabilityScore: Double?
+        if let netMarginsTrendratio = firstValueRatioToMax(datedValues: netProfitMargins) {
+           
+            profitabilityScore = 1.0
+            if netMarginsTrendratio < 0.9 {
+                profitabilityScore! *= netMarginsTrendratio
+            }
+            
+            if netProfitMargins.first!.y! < 0 {
+                profitabilityScore = 0
+            }
+
+        }
+        
+        // EFFICIENCY
+        var efficiencyScore: Double?
+        if let opMarginsTrendratio = firstValueRatioToMax(datedValues: operatingMargins) {
+            efficiencyScore = 1.0
+            if opMarginsTrendratio < 0.9 {
+                efficiencyScore! *= opMarginsTrendratio
+            }
+            
+            if operatingMargins.first!.y! < 0 {
+                efficiencyScore = 0
+            }
+
+        }
+        
+        // LIQUIDITY
+        let liquidityRatios = [quickRatios, currentRatios]
+        let weighting = [0.6, 0.4]
+        var liquidityScore: Double?
+        
+        for i in 0..<liquidityRatios.count {
+            
+            if let liquidityTrendratio = firstValueRatioToMax(datedValues: liquidityRatios[i]) {
+                if liquidityScore == nil {
+                    liquidityScore = 0.0
+                }
+                
+                var baseScore: Double = weighting[i]
+                // qr and cr = higher is better
+                // below 1.0 is concern
+                
+                // dropping trend is a concern
+                if liquidityTrendratio < 0.9 {
+                    baseScore *= liquidityTrendratio
+                }
+                
+                if liquidityRatios[i].first!.y! < 1.0 {
+                    baseScore *= liquidityRatios[i].first!.y!
+                }
+                
+                liquidityScore! += baseScore
+            }
+        }
+        
+        // SOLVENCY
+        var solvencyScore: Double?
+        if let solvencyRatio = firstValueRatioToMax(datedValues: debEquityRatios, useMax: false) {
+            // > 1 is not ideal
+            solvencyScore = 1.0
+            // trend increase is concern
+            if debEquityRatios.first!.y! > 1.0 {
+                solvencyScore! /= debEquityRatios.first!.y!
+            } else if debEquityRatios.first!.y! < 0 {
+                solvencyScore = 0
+            }
+
+            if solvencyRatio > 1.2 {
+                solvencyScore! /= solvencyRatio
+            }
         }
 
- 
+        var allScores = [liquidityScore, profitabilityScore, efficiencyScore, solvencyScore]
+        allScores.append(contentsOf: keyFinScores)
+        let sum = allScores.compactMap{ $0 }.reduce(0, +)
+        let count = allScores.compactMap{ $0 }.count
+        
+        if count > 0 {
+            return sum / Double(count)
+        }
+        
+        return nil
+    }
+    
+    func returnHealthScore$() -> String {
+        
+        if let valid = currentHealthScore {
+            return percentFormatter0Digits.string(from: valid as NSNumber) ?? " - "
+        } else {
+            return " - "
+        }
+    }
+    
+    /// send datedValues in date DESCENDING order which is default after extraction from MacroTrends; useMax compares latest(first) to HIGHEST value, if FALSE compares to LOWEST value
+    func firstValueRatioToMax(datedValues: [ChartDataSet], useMax:Bool?=true) -> Double? {
+        
+        if let max = useMax! ? datedValues.compactMap({ $0.y }).max() : datedValues.compactMap({ $0.y }).min() {
+            let latest = datedValues.first!.y!
+            let ratioLatestToMax = latest / max
+            return ratioLatestToMax
+        }
+        
+        return nil
     }
 
     
