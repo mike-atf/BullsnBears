@@ -40,7 +40,6 @@ class ChartPricesView: UIView {
     
     let dateTimeFormatter: DateFormatter = {
         let formatter = DateFormatter()
-//        formatter.dateFormat = "dd.MM"
         formatter.timeStyle = .short
         return formatter
     }()
@@ -79,6 +78,21 @@ class ChartPricesView: UIView {
         minPrice = (lowestPriceInRange! * 0.9).rounded()
         maxPrice = (highestPriceInRange! * 1.1).rounded() + 1
         
+        if let buyPrice = share?.research?.targetBuyPrice {
+            if buyPrice < minPrice { minPrice = buyPrice }
+            else if buyPrice > maxPrice { maxPrice = buyPrice }
+        }
+        
+        if let predictions = share?.research?.sharePricePredictions() {
+            if let maxPredictedPrice = predictions.values.max() {
+                if maxPredictedPrice > maxPrice { maxPrice = maxPredictedPrice }
+            }
+            
+            if let minPredcitedPrice = predictions.values.min() {
+                if minPredcitedPrice < minPrice { minPrice = minPredcitedPrice }
+            }
+        }
+
         let nonNullLivePrice = (share?.lastLivePrice != 0.0) ? share?.lastLivePrice : nil
         if let validPrice = nonNullLivePrice ?? share?.latestPrice(option: .close) {
             currentPrice = validPrice
@@ -172,7 +186,7 @@ class ChartPricesView: UIView {
     
     private func findYAxisValues(min: Double, max: Double) -> Double {
         
-        let options = [2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0]
+        let options = [0.1,0.5,1.0,2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0,1000.0,10000.0]
         let range = max - min
         
         var count = 100.0
@@ -260,7 +274,6 @@ class ChartPricesView: UIView {
         if let validPrice = nonNullLivePrice ?? share.latestPrice(option: .close) {
             currentPriceLabel?.text = " " + currencyFormatterNoGapWithPence.string(from: NSNumber(value: validPrice))! + " "
             if let date = share.lastLivePriceDate { currentPriceLabel?.text! += "\n " + timeFormatter.localizedString(for: date, relativeTo: Date()) + " " }
-//            if let date = priceDate { currentPriceLabel.text! += "\n " + dateTimeFormatter.string(from: date) + " " }
             currentPriceLabel?.sizeToFit()
         }
     }

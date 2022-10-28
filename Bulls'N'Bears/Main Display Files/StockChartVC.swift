@@ -314,14 +314,6 @@ extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate, UIPopov
         
         refreshValuationButton()
         
-//        if toDismiss != nil {
-//
-//            toDismiss?.dismiss(animated: true, completion: nil)
-//            refreshR1Label()
-//        }
-//        else {
-//            refreshValuationButton()
-//        }
     }
     
     func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?) {

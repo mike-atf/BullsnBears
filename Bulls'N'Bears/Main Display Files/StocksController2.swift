@@ -359,7 +359,7 @@ class StocksController2: NSFetchedResultsController<Share> {
                 let labelled_datedQEPS = try await getQuarterlyEarningsForUpdate(shareSymbol: symbol, shortName: shortName, minDate: minDate, latestQEPSDate: latestQEPSDate)
                 
                 let updatedPricePoints = try await getDailyPricesForUpdate(shareSymbol: symbol, existingDailyPrices: existingPricePoints)
-                
+                                
                 await backgroundMoc?.perform({
                     
                     do {
@@ -387,14 +387,17 @@ class StocksController2: NSFetchedResultsController<Share> {
                         
                         try backgroundShare.managedObjectContext?.save()
                         
-                        DispatchQueue.main.async {
-                           self.updateCompleteToDelegate(id: shareID)
-                        }
+                        
                     } catch let error {
                         ErrorController.addInternalError(errorLocation: "StocksController2.updateStocksData", systemError: error, errorInfo: "error fetching from and/or saving backgroundMOC")
                     }
                     
                 })
+                
+                DispatchQueue.main.async {
+                   self.updateCompleteToDelegate(id: shareID)
+                }
+
             })
         }
     }
@@ -686,6 +689,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         
         
         if let lastPriceDate = existingDailyPrices?.last?.tradingDate {
+            
             guard (Date().timeIntervalSince(lastPriceDate) > 12 * 3600) else {
                 return nil
             }
@@ -693,8 +697,6 @@ class StocksController2: NSFetchedResultsController<Share> {
         
 
         let minDate = existingDailyPrices?.last?.tradingDate
-
-//        print("downloading daily prices for \(shareSymbol) last price date \(minDate!)")
 
         if let downloadedDailyPrices = try await WebPageScraper2.downloadAndAnalyseDailyTradingPrices(shareSymbol: shareSymbol, minDate: minDate) {
             
@@ -738,21 +740,11 @@ class StocksController2: NSFetchedResultsController<Share> {
         }()
         let year$ = dateFormatter.string(from: Date())
         
-        // to download .html file: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value=2022"
-        
-//        var urlComponents = URLComponents(string: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2022/all?type=daily_treasury_yield_curve&field_tdr_date_value=2022&page&_format=csv" )
-//        urlComponents?.queryItems = [URLQueryItem(name: "data", value: "yieldYear"),URLQueryItem(name: "year", value: year$)]
-//        // until 4.2.22: "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx"
-//
-//        guard let url = urlComponents?.url else {
-//            throw InternalErrorType.urlError
-//        }
-        
         guard let url = URL(string: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/"+year$+"/all?type=daily_treasury_yield_curve&field_tdr_date_value="+year$+"&page&_format=csv") else {
             throw InternalErrorType.urlError
         }
         
-        await WebPageScraper2.downloadAndAanalyseTreasuryYields(url: url)
+        await WebPageScraper2.downloadAndAnalyseTreasuryYields(url: url)
         
     }
     

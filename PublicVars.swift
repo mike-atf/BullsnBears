@@ -13,8 +13,6 @@ enum ShareTrendNames {
     case dCFValue
     case stickerPrice
     case lynchScore
-    case pcRatio
-    case caRatio
     case intrinsicValue
     case healthScore
 }
@@ -29,13 +27,15 @@ typealias ShareID_Symbol_sName = (id: NSManagedObjectID, symbol: String?, shortN
 typealias ShareID_Value = (id: NSManagedObjectID, value: Double?)
 typealias Dated_EPS_PER_Values = (date: Date, epsTTM: Double, peRatio: Double)
 typealias ShareID_DatedValues = (id: NSManagedObjectID, values: [DatedValue]?)
-typealias PriceDate = (date: Date, price: Double)
+//typealias PriceDate = (date: Date, price: Double)
 typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
 typealias ProfileData = (sector: String, industry: String, employees: Double)
 typealias LabelledValue = (label: String, value: Double?)
 typealias LabelledValues = (label: String, values: [Double])
 typealias Labelled_DatedValues = (label: String, datedValues: [DatedValue])
-typealias DatedValue = (date: Date, value: Double)
+//typealias DatedValue = (date: Date, value: Double)
+//typealias DatedValues = (date: Date, values: [Double])
+//typealias DatedText = (date: Date, text: String)
 typealias ShareNamesDictionary = (symbol: String, shortName: String)
 typealias LabelledFileURL = (symbol: String, fileURL: URL)
 typealias ScoreData = (score: Double, maxScore: Double, factorArray: [String])
@@ -50,6 +50,26 @@ let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
 var valuationWeightsSingleton = Financial_Valuation_Factors()
 let nonRefreshTimeInterval: TimeInterval  = 300
+
+struct DatedValues: Codable {
+    var date: Date
+    var values: [Double]
+}
+
+struct DatedValue: Codable {
+    var date: Date
+    var value: Double
+}
+
+struct PriceDate: Codable {
+    var date: Date
+    var price: Double
+}
+
+struct DatedText: Codable {
+    var date: Date
+    var text: String
+}
 
 
 struct WebpageExtractionCodes {

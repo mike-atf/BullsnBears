@@ -640,9 +640,9 @@ class WebPageScraper2: NSObject {
     
     /// calls Downloader function with completion handler to return csv file
     /// returns extracted [DateValue] array through Notification with name ""TBOND csv file downloaded""
-    class func downloadAndAanalyseTreasuryYields(url: URL) async {
+    class func downloadAndAnalyseTreasuryYields(url: URL) async {
         
-       let treasuryCSVHeaderTitles = ["Date","\"1 Mo\"", "\"2 Mo\"","\"3 Mo\"","\"6 Mo\"","\"1 Yr\"","\"2 Yr\"","\"3 Yr\"","\"5 Yr\"","\"7 Yr\"","\"10 Yr\"","\"20 Yr\"","\"30 Yr\""]
+       let treasuryCSVHeaderTitles = ["Date","\"1 Mo\"", "\"2 Mo\"","\"3 Mo\"","\"4 Mo\"","\"6 Mo\"","\"1 Yr\"","\"2 Yr\"","\"3 Yr\"","\"5 Yr\"","\"7 Yr\"","\"10 Yr\"","\"20 Yr\"","\"30 Yr\""]
         var datedValues: [DatedValue]?
         await Downloader.downloadAndReturnCSVFile(url: url, symbol: "TBonds", expectedHeaderTitles: treasuryCSVHeaderTitles, completion: { fileURL in
             datedValues = CSVImporter.extractTBondRatesFromCSVFile(url: fileURL, expectedHeaderTitles: treasuryCSVHeaderTitles)

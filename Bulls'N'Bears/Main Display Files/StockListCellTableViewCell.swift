@@ -39,7 +39,7 @@ class StockListCellTableViewCell: UITableViewCell {
         self.scoreIcon.isHidden = true
         actionView.resetForReuse()
         updateIcon.image = nil
-//        updateIcon.tintColor = UIColor.systemRed
+        reportDateLabel.backgroundColor = UIColor.clear
     }
     
     public func configureCell(indexPath: IndexPath, stock: Share, userRatingScore: Double?, valueRatingScore: Double?, scoreDelegate: ScoreCircleDelegate, userCommentCount: Int) {
@@ -56,6 +56,7 @@ class StockListCellTableViewCell: UITableViewCell {
             detail.text = timeFormatter.localizedString(for: lastPrice.tradingDate, relativeTo: Date())
         }
         
+        var imminent = false
         var reportDate$ = "Report: -"
         if let valid = stock.research?.nextReportDate {
             let dateFormatter: DateFormatter = {
@@ -63,9 +64,15 @@ class StockListCellTableViewCell: UITableViewCell {
                 formatter.dateStyle = .short
                 return formatter
             }()
+            if abs(valid.timeIntervalSinceNow) < 3*day { imminent = true }
             reportDate$ = "Report: " + dateFormatter.string(from: valid)
         }
         reportDateLabel.text = reportDate$
+        
+        if imminent {
+            reportDateLabel.text = " " + reportDate$ + " "
+            reportDateLabel.backgroundColor = UIColor.systemRed
+        }
 
         
         actionView.configure(share: stock)

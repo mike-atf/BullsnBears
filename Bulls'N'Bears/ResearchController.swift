@@ -53,17 +53,12 @@ class ResearchController {
                     }
                 }
                 
-                if validShare.research?.competitiveEdge == nil {
-                    if let score = validR1.moatScore() {
-                        share?.research?.competitiveEdge = "Moat = " + (percentFormatter0Digits.string(from: score as NSNumber) ?? "-")
-                    }
-                }
             }
             
             if let wbValuation = validShare.wbValuation {
                 
                 if validShare.research?.assets == nil {
-                    let lastStockPrice =  validShare.getDailyPrices()?.last?.close //stock.dailyPrices.last?.close
+                    let lastStockPrice =  validShare.getDailyPrices()?.last?.close
                     if let valid = wbValuation.bvps?.first {
                         if lastStockPrice != nil {
                             if let t$ = percentFormatter0Digits.string(from: (valid / lastStockPrice!) as NSNumber) {
@@ -76,20 +71,8 @@ class ResearchController {
 
                 }
                 
-                if validShare.research?.shareBuyBacks == nil {
-                    if let retEarningsGrowths = wbValuation.equityRepurchased?.growthRates() {
-                        if let meanGrowth = retEarningsGrowths.ema(periods: 7) {
-                            let lastValue = wbValuation.equityRepurchased!.first!
-                            let lastValue$ = lastValue > 0 ? "Retained earnings positive" : "Retained earnings negative"
-                            validShare.research?.shareBuyBacks = lastValue$ + ", EMA7: " + (percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-")
-                        }
-                    }
-                }
             }
  
-            if validShare.research?.crisisPerformance == nil {
-                validShare.research?.crisisPerformance = "2020 Corona:\n2008 Crash:\n2000 Bubble:"
-            }
             validShare.save()
         }
 
@@ -100,49 +83,47 @@ class ResearchController {
         guard let names = share?.research!.sections() else { return nil }
         var allNames = names
         allNames.append("industry")
-        allNames.append("growthType")
-        allNames.append("growthSubType")
 
         var sectionTitles = [String: String]()
         
         for name in allNames {
             switch name {
             case "growthPlan":
-                sectionTitles[name] = "Future growth plan"
+                sectionTitles[name] = "Predicted earnings range"
             case "futureGrowthMean":
-                sectionTitles[name] = "Future mean earnings growth estimate (%)"
-            case "crisisPerformance":
-                sectionTitles[name] = "Performance during last crises"
+                sectionTitles[name] = "Predicted mean earnings estimate (in %)"
             case "companySize":
-                sectionTitles[name] = "Company size"
-            case "competitors":
-                sectionTitles[name] = "Competitors"
+                sectionTitles[name] = "Size"
             case "productsNiches":
-                sectionTitles[name] = "Special products or niches and their impact"
-            case "competitiveEdge":
-                sectionTitles[name] = "Competitive advantages"
+                sectionTitles[name] = "Special products and their impact"
             case "assets":
                 sectionTitles[name] = "Assets and their value"
             case "insiderBuying":
                 sectionTitles[name] = "Insider buying & selling"
-            case "shareBuyBacks":
-                sectionTitles[name] = "Retained earnings"
             case "theBuyStory":
-                sectionTitles[name] = "Why do you want to buy this stock?"
+                sectionTitles[name] = "Why do you want to own this stock?"
             case "news":
-                sectionTitles[name] = "Important company news"
+                sectionTitles[name] = "Company news"
             case "industry":
                 sectionTitles[name] = "Industry"
-            case "growthType":
-                sectionTitles[name] = "Growth Category" // enum GrowthCategoryNames
-            case "growthSubType":
-                sectionTitles[name] = "Growth Sub Category" // enum GrowthCategoryNames
             case "businessDescription":
-                sectionTitles[name] = "Products or Services" // enum GrowthCategoryNames
+                sectionTitles[name] = "Business description"
             case "nextReportDate":
                 sectionTitles[name] = "Date of next Financial Report"
             case "targetBuyPrice":
-                sectionTitles[name] = "x - at what price would you buy?"
+                sectionTitles[name] = "At what price would you buy?"
+            case "pricePredictions":
+                var date$ = String()
+                if let date = share?.research?.sharePricePredictions()?.date {
+                    date$ = " (" + dateFormatter.string(from: date) + ")"
+                }
+                sectionTitles[name] = "Predicted share prices" + date$
+            case "annualStatementOutlook":
+                var date$ = String()
+                if let date = share?.research?.returnAnnualStatementOutlook()?.date {
+                    date$ = " (" + dateFormatter.string(from: date) + ")"
+                }
+                sectionTitles[name] = "Latest outlook from Annual Report" + date$
             default:
                 print("error: default")
             }
@@ -153,7 +134,22 @@ class ResearchController {
     
     func sectionTitles() -> [String] {
         
-        return Array(titleDictionary!.values.sorted())
+        var titles = [titleDictionary!["businessDescription"]!]
+        
+        titles.append(titleDictionary!["industry"]!)
+        titles.append(titleDictionary!["companySize"]!)
+        titles.append(titleDictionary!["productsNiches"]!)
+        titles.append(titleDictionary!["assets"]!)
+        titles.append(titleDictionary!["annualStatementOutlook"]!)
+        titles.append(titleDictionary!["nextReportDate"]!)
+        titles.append(titleDictionary!["news"]!)
+        titles.append(titleDictionary!["theBuyStory"]!)
+        titles.append(titleDictionary!["growthPlan"]!)
+        titles.append(titleDictionary!["futureGrowthMean"]!)
+        titles.append(titleDictionary!["pricePredictions"]!)
+        titles.append(titleDictionary!["targetBuyPrice"]!)
+
+        return titles
     }
         
     func values(indexPath: IndexPath) -> [String]? {
@@ -162,15 +158,18 @@ class ResearchController {
             return nil
         }
         
+        let title = sectionTitles()[indexPath.section]
+
         let parameters = Array(titleDictionary!.values.sorted())
         guard parameters.count > indexPath.section else { return nil }
         
         var parameter = String()
         for key in validDict.keys {
-            if validDict[key] == parameters[indexPath.section] {
+            if validDict[key] == title { //parameters[indexPath.section]
                 parameter = key
             }
         }
+        
         
         switch parameter {
         case "businessDescription":
@@ -192,9 +191,6 @@ class ResearchController {
                 return [valid$]
             }
             else { return nil }
-        case "crisisPerformance":
-            if let valid = share?.research?.crisisPerformance { return [valid] }
-            else { return nil }
         case "companySize":
             var employees$ = String()
             if let validEmployees = share?.employees {
@@ -204,23 +200,14 @@ class ResearchController {
                 return [valid + ", " + employees$]
             }
             else { return [employees$] }
-        case "competitors":
-            if let valid = share?.research?.competitors { return valid }
-            else { return nil }
         case "productsNiches":
             if let valid = share?.research?.productsNiches { return valid }
-            else { return nil }
-        case "competitiveEdge":
-            if let valid = share?.research?.competitiveEdge { return [valid] }
             else { return nil }
         case "assets":
             if let valid = share?.research?.assets { return [valid] }
             else { return nil }
         case "insiderBuying":
             if let valid = share?.research?.insiderBuying { return [valid] }
-            else { return nil }
-        case "shareBuyBacks":
-            if let valid = share?.research?.shareBuyBacks { return [valid] }
             else { return nil }
         case "theBuyStory":
             if let valid = share?.research?.theBuyStory { return [valid] }
@@ -232,16 +219,25 @@ class ResearchController {
                 return [valid]
             }
             else { return nil }
-        case "growthType":
-            if let valid = share?.growthType {
-                if let v = share?.growthSubType {
-                    return [valid, v]
+        case "pricePredictions":
+            let pre = ["Low: ", "Mean: ", "High: "]
+            if let dVs = share?.research?.sharePricePredictions() {
+                var prices$ = [String]()
+                var count = 0
+                for price in dVs.values {
+                    let text = pre[count] + (currencyFormatterNoGapWithPence.string(from: price as NSNumber) ?? "-")
+                    prices$.append(text)
+                    count += 1
                 }
-                else {
-                    return [valid]
-                }
+                return prices$
             }
-            else { return nil }
+            return pre
+        case "annualStatementOutlook":
+            if let valid = share?.research?.returnAnnualStatementOutlook() {
+                return [valid.text]
+            } else {
+                return ["https://www.sec.gov/edgar.shtml"]
+            }
         default:
             return nil
         }
@@ -266,10 +262,6 @@ class ResearchController {
             guard share?.research?.news?.count ?? 0 > cellPath.row else  { return }
             let newsToDelete = share!.research!.returnNews()![cellPath.row]
             share!.research!.removeFromNews(newsToDelete)
-            share?.research?.save()
-        case "competitors":
-            guard share?.research?.competitors?.count ?? 0 > cellPath.row else { return }
-            share?.research?.competitors?.remove(at: cellPath.row)
             share?.research?.save()
         case "productsNiches":
             guard share?.research?.productsNiches?.count ?? 0 > cellPath.row else { return }
@@ -299,9 +291,9 @@ extension ResearchController: ResearchCellDelegate {
         let parameters = Array(titleDictionary!.values.sorted())
         guard parameters.count > cellPath.section else { return }
         
-        var parameter = String()
+        var parameter = sectionTitles()[cellPath.section]
         for key in validDict.keys {
-            if validDict[key] == parameters[cellPath.section] {
+            if validDict[key] == parameter { //parameters[cellPath.section]
                 parameter = key
             }
         }
@@ -314,38 +306,44 @@ extension ResearchController: ResearchCellDelegate {
         case "futureGrowthMean":
             let valid$ = notes.filter("-0123456789.".contains)
             share?.research?.futureGrowthMean = (Double(valid$) ?? 0.0) / 100
-        case "crisisPerformance":
-            share?.research?.crisisPerformance = notes
         case "companySize":
             share?.research?.companySize = notes
-        case "competitors":
-            share?.research?.competitors?[cellPath.row] = notes
-            transferCompetitors(symbol: notes)
         case "productsNiches":
             share?.research?.productsNiches?[cellPath.row] = notes
-        case "competitiveEdge":
-            share?.research?.competitiveEdge = notes
         case "assets":
             share?.research?.assets = notes
         case "insiderBuying":
             share?.research?.insiderBuying = notes
-        case "shareBuyBacks":
-            share?.research?.shareBuyBacks = notes
         case "theBuyStory":
             share?.research?.theBuyStory = notes
         case "news":
             share?.research?.returnNews()![cellPath.row].newsText = notes
         case "industry":
             share?.industry = notes
-        case "growth type":
-            share?.growthType = notes
-        case "growthSubType":
-            share?.growthSubType = notes
         case "businessDescription":
             share?.research?.businessDescription = notes
         case "targetBuyPrice":
             let number = notes.filter("-0123456789.".contains)
             share?.research?.targetBuyPrice = Double(number) ?? 0.0
+        case "pricePredictions":
+            if var predictions = share?.research?.sharePricePredictions() {
+                if predictions.values.count > cellPath.row {
+                    predictions.values[cellPath.row] = Double(notes.filter("-0123456789.".contains)) ?? 0
+                    predictions.date = Date()
+                } else {
+                    predictions.values.append(Double(notes.filter("-0123456789.".contains)) ?? 0)
+                }
+                share?.research?.savePricePredictions(datedValues: predictions)
+            } else {
+                var values = [0.0,0.0,0.0]
+                values[cellPath.row] = Double(notes.filter("-0123456789.".contains)) ?? 0
+                let prediction = DatedValues(date: Date(), values: values)
+                share?.research?.savePricePredictions(datedValues: prediction)
+            }
+        case "annualStatementOutlook":
+            let datedText = DatedText(date: Date(), text: notes)
+            share?.research?.saveAnnualStatementOutlook(datedText: datedText)
+
         default:
             print("error: default")
         }
@@ -363,6 +361,7 @@ extension ResearchController: ResearchCellDelegate {
         else { return nil }
     }
     
+    /*
     func transferCompetitors(symbol: String) {
         
         if let competitor = StocksController2.allShares()?.filter({ (share) -> Bool in
@@ -393,4 +392,5 @@ extension ResearchController: ResearchCellDelegate {
         }
         
     }
+     */
 }

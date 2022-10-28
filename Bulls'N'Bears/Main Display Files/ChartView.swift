@@ -63,17 +63,33 @@ class ChartView: UIView {
         guard let validStock = share else { return }
 
         let priceRange = validStock.priceRange(nil, nil)
-        lowestPriceInRange = priceRange?.first
-        highestPriceInRange = priceRange?.last
+        lowestPriceInRange = priceRange?.first ?? 0
+        highestPriceInRange = priceRange?.last ?? 1
         
         dateRange = validStock.priceDateRangeWorkWeeksForCharts(withForecastTime: withForeCast ?? true)
 
-        guard lowestPriceInRange != nil else { return }
-        guard highestPriceInRange != nil else { return }
+//        guard lowestPriceInRange != nil else { return }
+//        guard highestPriceInRange != nil else { return }
         guard dateRange != nil else { return }
         
         minPrice = (lowestPriceInRange! * 0.9).rounded()
         maxPrice = (highestPriceInRange! * 1.1).rounded() + 1
+        
+        if let buyPrice = share?.research?.targetBuyPrice {
+            if buyPrice < minPrice { minPrice = buyPrice }
+            else if buyPrice > maxPrice { maxPrice = buyPrice }
+        }
+        
+        if let predictions = share?.research?.sharePricePredictions() {
+            if let maxPredictedPrice = predictions.values.max() {
+                if maxPredictedPrice > maxPrice { maxPrice = maxPredictedPrice }
+            }
+            
+            if let minPredcitedPrice = predictions.values.min() {
+                if minPredcitedPrice < minPrice { minPrice = minPredcitedPrice }
+            }
+        }
+        
         
         if let latestCrossings = share?.latest3Crossings() {
             latestSMA10crossing = latestCrossings.filter({ (crossing) -> Bool in
@@ -267,8 +283,8 @@ class ChartView: UIView {
                 if let currentPrice = nonNullLivePrice ?? dailyPrices.last?.close {
                     
                     let currentPriceLine = UIBezierPath()
-                    let pp1 = PriceDate(dailyPrices.first!.tradingDate, currentPrice)
-                    let pp2 = PriceDate(dailyPrices.last!.tradingDate, currentPrice)
+                    let pp1 = PriceDate(date: dailyPrices.first!.tradingDate, price: currentPrice)
+                    let pp2 = PriceDate(date: dailyPrices.last!.tradingDate, price: currentPrice)
                     
                     let startPoint = plotPricePoint(pricePoint: pp1)
                     var endPoint = plotPricePoint(pricePoint: pp2)
@@ -302,8 +318,8 @@ class ChartView: UIView {
                         legendLabelStartX = targetBuyPriceLabel?.frame.maxX ?? 0
 
                         let targetPriceLine = UIBezierPath()
-                        let pp1 = PriceDate(dailyPrices.first!.tradingDate, targetPrice)
-                        let pp2 = PriceDate(dailyPrices.last!.tradingDate, targetPrice)
+                        let pp1 = PriceDate(date: dailyPrices.first!.tradingDate, price: targetPrice)
+                        let pp2 = PriceDate(date: dailyPrices.last!.tradingDate, price: targetPrice)
                         
                         let startPoint = plotPricePoint(pricePoint: pp1)
                         var endPoint = plotPricePoint(pricePoint: pp2)
@@ -319,14 +335,44 @@ class ChartView: UIView {
                     }
 
                 }
-
+                
+                //MARK: - pricePredictionBox
+                if let predictions = share?.research?.sharePricePredictions() {
+                   
+                    let sp = PriceDate(date: predictions.date.addingTimeInterval(-90*3600*24), price: predictions.values.max()!)
+                    let ep = PriceDate(date: (dateRange?.max()!)!, price: predictions.values.min()!)
+                    let startPoint = plotPricePoint(pricePoint: sp)
+                    let endPoint = plotPricePoint(pricePoint: ep)
+                    let box = CGRect(x: startPoint.x, y: startPoint.y, width: endPoint.x - startPoint.x, height:  endPoint.y - startPoint.y)
+                    let pricePredictionBox = UIBezierPath(rect: box)
+                    
+                    for layer in self.layer.sublayers ?? [] {
+                        if let gradient = layer as? CAGradientLayer {
+                            gradient.removeFromSuperlayer()
+                        }
+                    }
+                    
+                    let range = predictions.values.max()! - predictions.values.min()!
+                    let average = predictions.values[1] - predictions.values.min()!
+                    let averageRatio = 1.0 - average / range
+                    let gradient = CAGradientLayer()
+                    gradient.frame = pricePredictionBox.bounds
+                    gradient.colors = [UIColor.clear.cgColor, (UIColor.systemGreen.withAlphaComponent(0.25)).cgColor, UIColor.clear.cgColor]
+                    gradient.locations = [0.0, (averageRatio as NSNumber), 1.0]
+                    let shapeMask = CAShapeLayer()
+                    shapeMask.path = pricePredictionBox.cgPath
+                    gradient.mask = shapeMask
+                    gradient.addSublayer(shapeMask)
+                    self.layer.addSublayer(gradient)
+                    
+                }
                 
                 //MARK: - purchase Price line
                 if let purchasePrice = share?.purchasePrice() {
                     
                     let purchasePriceLine = UIBezierPath()
-                    let pp1 = PriceDate(dailyPrices.first!.tradingDate, purchasePrice)
-                    let pp2 = PriceDate(dailyPrices.last!.tradingDate, purchasePrice)
+                    let pp1 = PriceDate(date: dailyPrices.first!.tradingDate, price: purchasePrice)
+                    let pp2 = PriceDate(date: dailyPrices.last!.tradingDate, price: purchasePrice)
                     
                     let startPoint = plotPricePoint(pricePoint: pp1)
                     var endPoint = plotPricePoint(pricePoint: pp2)
@@ -344,7 +390,7 @@ class ChartView: UIView {
                         var counter = 0
                         for transaction in transactions {
 
-                            let pricePoint = PriceDate(transaction.date!, transaction.price)
+                            let pricePoint = PriceDate(date: transaction.date!, price: transaction.price)
                             let point = plotPricePoint(pricePoint: pricePoint)
                             
                             purchaseButtons![counter].frame.origin = CGPoint(x: point.x - 15, y: point.y - 15)
@@ -518,8 +564,8 @@ class ChartView: UIView {
 
             startPrice = trend.startPrice!
             projectedPrice = startPrice + trend.incline! * dateRange!.last!.timeIntervalSince(trend.startDate)
-            startPoint = plotPricePoint(pricePoint: PriceDate(trend.startDate,startPrice))
-            endPoint = plotPricePoint(pricePoint: PriceDate(trendEnd, projectedPrice))
+            startPoint = plotPricePoint(pricePoint: PriceDate(date: trend.startDate,price: startPrice))
+            endPoint = plotPricePoint(pricePoint: PriceDate(date: trendEnd, price: projectedPrice))
             
         }
         

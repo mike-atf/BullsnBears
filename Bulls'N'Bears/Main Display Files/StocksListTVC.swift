@@ -119,7 +119,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
             }
             performSegue(withIdentifier: "showChartSegue", sender: nil)
-            // updateShares() call here NOT necessary as TVC acts as observer to "ActivatedFromBackground" even if launching (?)
+            updateShares() //call here NOT necessary as TVC acts as observer to "ActivatedFromBackground" even if launching (?)
         }
         else {
             showWelcomeView()
@@ -149,7 +149,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         do {
             try controller.performFetch()
         } catch let error {
-            ErrorController.addInternalError(errorLocation: #file + #function, systemError: error, errorInfo: "Error updating Stocks list")
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error updating Stocks list")
         }
         
         tableView.reloadData()
@@ -170,14 +170,13 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         do {
             try dcfvcs.performFetch()
-            print("\(dcfvcs.fetchedObjects?.count ?? 0) DCFVals retrieved")
             
             for object in dcfvcs.fetchedObjects ?? [DCFValuation]() {
                 object.delete()
             }
 
         } catch let error as NSError {
-            print("error fetching old DCFV \(error)")
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error fetching old DCFV \(error)")
         }
         
     }
@@ -568,6 +567,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
          let share = controller.object(at: indexPath)
          
          if let navView = segue.destination as? UINavigationController {
+             
              if let chartView = navView.topViewController as? StockChartVC {
                  chartView.share = controller.object(at: indexPath)
                  chartView.configure(share: share)
@@ -697,7 +697,6 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
             
             if tableView.indexPathForSelectedRow == nil {
                 tableView.selectRow(at: atPath, animated: false, scrollPosition: .none) // does not trigger segue
-                return
             }
             
             var researchViewOpen = false

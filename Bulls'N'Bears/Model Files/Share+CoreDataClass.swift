@@ -17,6 +17,7 @@ public class Share: NSManagedObject {
     var macds: [MAC_D]?
     var osc: [StochasticOscillator]?
     var latestBuySellSignals: [LineCrossing?]?
+    var sharePriceSplitCorrected = false
     
     public override func awakeFromInsert() {
         eps = Double()
@@ -35,21 +36,13 @@ public class Share: NSManagedObject {
         if sector == nil {
             sector = "Unknown"
         }
-
-        if growthType == nil {
-            growthType = "Unknown"
-        }
-        
-        if growthSubType == nil {
-            growthSubType = "Unknown"
-        }
         
         if moatCategory == nil {
             moatCategory = "NA"
         }
         
         if let date = self.research?.nextReportDate {
-            if date < Date() {
+            if date < Date().addingTimeInterval(-quarter) {
                 self.research?.nextReportDate = nil
             }
         }
@@ -61,9 +54,8 @@ public class Share: NSManagedObject {
         if self.valueScore.isNaN {
             self.valueScore = Double()
         }
-                
+                        
     }
-    
     
    func save() {
     
@@ -94,10 +86,6 @@ public class Share: NSManagedObject {
             data = trend_DCFValue
         case .lynchScore:
             data = trend_LynchScore
-        case .caRatio:
-            data = trend_caRatio
-        case .pcRatio:
-            data = trend_pcRatio
         case .intrinsicValue:
             data = trend_intrinsicValue
         case .healthScore:
@@ -155,10 +143,6 @@ public class Share: NSManagedObject {
                         datedValue = DatedValue(date:date, value: sp)
                     }
                 }
-            case .caRatio:
-                data = trend_caRatio
-            case .pcRatio:
-                data = trend_pcRatio
             case .intrinsicValue:
                 if let wbv = self.wbValuation {
                     let (sp, _) = wbv.ivalue()
@@ -193,10 +177,6 @@ public class Share: NSManagedObject {
             data = trend_DCFValue
         case .lynchScore:
             data = trend_LynchScore
-        case .caRatio:
-            data = trend_caRatio
-        case .pcRatio:
-            data = trend_pcRatio
         case .intrinsicValue:
             data = trend_intrinsicValue
         case .healthScore:
@@ -254,10 +234,6 @@ public class Share: NSManagedObject {
                         dataSet = ChartDataSet(x:date, y: sp)
                     }
                 }
-            case .caRatio:
-                data = trend_caRatio
-            case .pcRatio:
-                data = trend_pcRatio
             case .intrinsicValue:
                 if let wbv = self.wbValuation {
                     let (sp, _) = wbv.ivalue()
@@ -306,10 +282,6 @@ public class Share: NSManagedObject {
                 trend_DCFValue = validData
             case .lynchScore:
                 trend_LynchScore = validData
-            case .caRatio:
-                trend_caRatio = validData
-            case .pcRatio:
-                trend_pcRatio = validData
             case .intrinsicValue:
                 trend_intrinsicValue = validData
             case .healthScore:
@@ -321,7 +293,7 @@ public class Share: NSManagedObject {
                     try self.managedObjectContext?.save()
                 }
                 catch let error {
-                    ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing share trend data \(trendName)")
+                    ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error storing share trend data \(trendName)")
                 }
             }
         }
@@ -397,6 +369,7 @@ public class Share: NSManagedObject {
         return nil
     }
     
+    /// return PricePoint array in date ascending order
     func getDailyPrices(needRecalcDueToNew: Bool?=false) -> [PricePoint]? {
 
         if (needRecalcDueToNew ?? false) == false {
@@ -412,37 +385,52 @@ public class Share: NSManagedObject {
                 // the 'setDailyPrices' function ensure PricePoints are stored in date sorted order for faster retrieval without sorting
                 prices = try PropertyListDecoder().decode([PricePoint].self, from: data)
 //once
-//                if symbol == "NVDA" {
-//                    let dateFormatter: DateFormatter = {
-//                        let formatter = DateFormatter()
-//                        formatter.locale = NSLocale.current
-//                        formatter.timeZone = NSTimeZone.local
-//                        formatter.dateFormat = "MM/dd/yy"
-//                        return formatter
-//                    }()
-//                    let splitDate = dateFormatter.date(from: "07/20/21")!
-//                    var correctedPrices = [PricePoint]()
-//                    for point in prices ?? [] {
-//                        if point.tradingDate < splitDate {
-//                            let newPoint = PricePoint(open: point.open / 4, close: point.close / 4, low: point.low / 4, high: point.high / 4, volume: point.volume, date: point.tradingDate)
-//                            correctedPrices.append(newPoint)
-//                        }
-//                        else {
-//                            correctedPrices.append(point)
-//                        }
-//                    }
-//                    print("corrected NVDA pricePoints")
-//                    setDailyPrices(pricePoints: correctedPrices)
-//                    return correctedPrices
+//                if symbol == "TSLA" && !sharePriceSplitCorrected {
+//                    let ratio = Double(1/3)
+//                    return shareSplitPriceRecalculation(pricePoints: prices, splitDateString: "08/24/22" , newPerOldShares: ratio)
 //                }
 // once
-                return prices
+                return prices?.sorted(by: { p0, p1 in
+                    if p0.tradingDate < p1.tradingDate { return true }
+                    else { return false }
+                })
             }
         } catch let error {
             ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
         }
         
         return nil
+    }
+    
+    func shareSplitPriceRecalculation(pricePoints: [PricePoint]?, splitDateString: String, newPerOldShares: Double) -> [PricePoint]? {
+                
+            sharePriceSplitCorrected = true
+        
+            let dateFormatter: DateFormatter = {
+                let formatter = DateFormatter()
+                formatter.locale = NSLocale.current
+                formatter.timeZone = NSTimeZone.local
+                formatter.dateFormat = "MM/dd/yy"
+                return formatter
+            }()
+        
+            let splitDate = dateFormatter.date(from: "06/23/22")!
+            var correctedPrices = [PricePoint]()
+            for point in prices ?? [] {
+                if point.tradingDate < splitDate {
+                    let newPoint = PricePoint(open: point.open / newPerOldShares, close: point.close / newPerOldShares, low: point.low / newPerOldShares, high: point.high / newPerOldShares, volume: point.volume, date: point.tradingDate)
+                    correctedPrices.append(newPoint)
+                }
+                else {
+                    correctedPrices.append(point)
+                }
+            }
+        
+        print("corrected \(String(describing: symbol)) pricePoints")
+            setDailyPrices(pricePoints: correctedPrices)
+        
+            return correctedPrices
+        
     }
     
     func getMACDs() -> [MAC_D]? {

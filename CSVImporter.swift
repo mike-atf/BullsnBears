@@ -171,8 +171,8 @@ class CSVImporter: NSObject {
                 ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "error converting to 'date' \(array[0])")
                 continue
             }
-            guard let tenYrate = Double(array[10]) else {
-                ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "error converting to 10 year rate \(array[10])")
+            guard let tenYrate = Double(array[11]) else {
+                ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "error converting to 10 year rate \(array[11])")
                 continue
             }
 

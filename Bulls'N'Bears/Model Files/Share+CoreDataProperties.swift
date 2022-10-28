@@ -22,8 +22,6 @@ extension Share {
     @NSManaged public var divYieldCurrent: Double
     @NSManaged public var employees: Double
     @NSManaged public var eps: Double
-    @NSManaged public var growthSubType: String?
-    @NSManaged public var growthType: String?
     @NSManaged public var industry: String?
     @NSManaged public var lastLivePrice: Double
     @NSManaged public var lastLivePriceDate: Date?
@@ -48,8 +46,6 @@ extension Share {
     @NSManaged public var trend_DCFValue: Data?
     @NSManaged public var trend_LynchScore: Data?
     @NSManaged public var trend_StickerPrice: Data?
-    @NSManaged public var trend_pcRatio: Data?
-    @NSManaged public var trend_caRatio: Data?
     @NSManaged public var trend_intrinsicValue: Data?
     @NSManaged public var trend_healthScore: Data?
    @NSManaged public var capitalAssetRatio: Double

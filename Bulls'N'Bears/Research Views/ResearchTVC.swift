@@ -20,11 +20,13 @@ class ResearchTVC: UITableViewController {
         tableView.register(UINib(nibName: "ResearchCell", bundle: nil), forCellReuseIdentifier: "researchCell")
         tableView.register(UINib(nibName: "DateSelectionCell", bundle: nil), forCellReuseIdentifier: "dateSelectionCell")
         
-        self.title = "\(share?.name_short ?? "missing")  - research"
-        
         controller =  ResearchController(share: share, researchList: self)
         
         research = share?.research
+        
+        let latestChangeDate = dateFormatter.string(from: research?.creationDate ?? Date())
+        self.title = "\(share?.name_short ?? "missing") - Research (" + latestChangeDate + ")"
+
         sectionTitles = controller?.sectionTitles()
     }
 
@@ -40,11 +42,11 @@ class ResearchTVC: UITableViewController {
         if (sectionTitles?[section] ?? "").contains("news") {
             return research?.news?.count ?? 0
         }
-        else if (sectionTitles?[section] ?? "").contains("Competitors") {
-            return research?.competitors?.count ?? 0
-        }
         else if (sectionTitles?[section] ?? "").contains("products") {
             return research?.productsNiches?.count ?? 0
+        }
+        else if (sectionTitles?[section] ?? "").contains("share prices") {
+            return 3
         }
         else {
             return 1
@@ -71,62 +73,32 @@ class ResearchTVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-//        let competitorsCount = research?.competitors?.count ?? 0
-//        let newsCounts = research?.news?.count ?? 0
-        
-        if indexPath.section == 0 { // assets & values
-            return 70
-        }
-        else if indexPath.section == 1	 { // size
+        if sectionTitles![indexPath.section].contains("description") {
+            return 150
+        } else if sectionTitles![indexPath.section].contains("Assets") {
             return 44
-        }
-        else if indexPath.section == 2 { // compet. advantges
+        } else if sectionTitles![indexPath.section].contains("Size") {
             return 44
-        }
-        else if indexPath.section == 3 { // competitors (sub rows)
-            return 44
-        }
-        else if indexPath.section == 4 { // Financial report date
+        } else if sectionTitles![indexPath.section].contains("Date") {
             return 60
-        }
-        else if indexPath.section == 5 { // future growth plan
+        } else if sectionTitles![indexPath.section].contains("Industry") {
+            return 44
+        } else if sectionTitles![indexPath.section].contains("products") {
+            return 70
+        } else if sectionTitles![indexPath.section].contains("Insider") {
+            return 44
+        } else if sectionTitles![indexPath.section].contains("news") {
+            return 60
+        } else if sectionTitles![indexPath.section].contains("mean earnings") {
+            return 44
+        } else if sectionTitles![indexPath.section].contains("earnings range") {
             return 120
-        }
-        else if indexPath.section == 6 { // future growth mean
+        } else if sectionTitles![indexPath.section].contains("share prices") {
             return 44
-        }
-        else if indexPath.section == 7 { // category
-            return 44
-        }
-        else if indexPath.section == 8 { // sub category
-            return 44
-        }
-        else if indexPath.section == 9 { // news (sub rows)
-            return 60
-        }
-        else if indexPath.section == 10 { // industry
-            return 44
-        }
-        else if indexPath.section == 11 { // insider buying selling
-            return 44
-        }
-        else if indexPath.section == 12 { // crises performance
-            return 100
-        }
-        else if indexPath.section == 13 { // business description
+        } else if sectionTitles![indexPath.section].contains("outlook") {
             return 150
-        }
-        else if indexPath.section == 14 { // ret. earnings
+        } else if sectionTitles![indexPath.section].contains("would you buy") {
             return 44
-        }
-        else if indexPath.section == 15 { // special products
-            return 70
-        }
-        else if indexPath.section == 16 { // buy story
-            return 150
-        }
-        else if indexPath.section == 17 { // buy story
-            return 70
         }
         else {
             return 100
@@ -144,6 +116,7 @@ class ResearchTVC: UITableViewController {
         let titleLabel: UILabel = {
             let label = UILabel()
             let fontSize = largeFontSize
+            label.textColor = UIColor.systemOrange
             label.font = UIFont.systemFont(ofSize: fontSize, weight: .bold)
             label.text = sectionTitles?[section] ?? ""
             return label
@@ -187,16 +160,6 @@ class ResearchTVC: UITableViewController {
             news.creationDate = Date()
             research?.addToNews(news)
             news.save()
-            tableView.reloadSections([section], with: .automatic)
-        }
-        else if title.contains("Competitors") {
-            if research?.competitors == nil {
-                research?.competitors = [String()]
-            }
-            else {
-                research?.competitors?.append(String())
-            }
-            research?.save()
             tableView.reloadSections([section], with: .automatic)
         }
         else if title.contains("products") {

@@ -15,6 +15,7 @@ class DateSelectionCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
+                
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         datePicker.contentHorizontalAlignment = .leading
     }
@@ -27,11 +28,20 @@ class DateSelectionCell: UITableViewCell {
     
     func configure(date: Date?, path: IndexPath, delegate: ResearchCellDelegate?) {
         
+        let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+        var dateComponents = Calendar.current.dateComponents(components, from: Date())
+        dateComponents.second = 0
+        dateComponents.minute = 0
+        dateComponents.hour = 0
+        dateComponents.day = 1
+        dateComponents.month = 1
+        dateComponents.year = 2000
+        let defaultDate = Calendar.current.date(from: dateComponents)!
+
+        
         self.cellPath = path
         self.cellDelegate = delegate
-        if let valid = date {
-            datePicker.date = valid
-        }
+        datePicker.date = date ?? defaultDate
     
     }
     

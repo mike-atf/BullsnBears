@@ -41,12 +41,13 @@ class ResearchCell: UITableViewCell {
         
         textView.text = delegate?.value(indexPath: path)
         originalText = textView.text
+        textView.font = UIFont.systemFont(ofSize: 14)
     }
     
 }
 
 extension ResearchCell: UITextViewDelegate {
-    
+        
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         
         addDoneButtonToKeyboard(sender: textView)
@@ -56,6 +57,7 @@ extension ResearchCell: UITextViewDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
+        
         if !textSaved {
             textSaved = true
             if let validText = textView.text {
@@ -63,7 +65,7 @@ extension ResearchCell: UITextViewDelegate {
             }
         }
     }
-
+    
     @objc
     func endedTextEntry() {
         
@@ -79,13 +81,12 @@ extension ResearchCell: UITextViewDelegate {
         let doneButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(endedTextEntry))
         let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelTextEntry))
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let toolbar = UIToolbar()
-        toolbar.frame.size.height = 44.0
-        doneButton.width = contentView.frame.width * 1/3
-        
-        toolbar.items = [cancelButton,space,doneButton]
-        
-        sender.inputAccessoryView = toolbar
+
+        let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 35))
+        toolBar.barStyle = .default
+        toolBar.items = [cancelButton,space,doneButton]
+        toolBar.sizeToFit()
+        sender.inputAccessoryView = toolBar
     }
     
     @objc

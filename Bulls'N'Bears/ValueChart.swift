@@ -291,6 +291,17 @@ class ValueChart: UIView {
         guard valueArray?.count ?? 0 > 0 else {
             return
         }
+        
+        if let median = valueArray?.median() {
+            let maxSpread = valueArray!.max()! / median
+            let minSpread = valueArray!.min()! / median
+            
+            if maxSpread > 10 || abs(minSpread) > 10 {
+                // use logarhithmic scale
+                
+                
+            }
+        }
                 
         let options:[CGFloat] = [0.01, 0.025, 0.05, 0.1, 0.25, 0.5,1.0, 2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0,1000.0, 5000.0,10000.0, 50000.0,100000.0]
         let range = max - min

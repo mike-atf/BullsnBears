@@ -18,15 +18,11 @@ extension StockResearch {
 
     @NSManaged public var symbol: String?
     @NSManaged public var growthPlan: String?
-    @NSManaged public var crisisPerformance: String?
     @NSManaged public var companySize: String?
-    @NSManaged public var competitors: [String]?
     @NSManaged public var productsNiches: [String]?
-    @NSManaged public var competitiveEdge: String?
     @NSManaged public var creationDate: Date?
     @NSManaged public var assets: String?
     @NSManaged public var insiderBuying: String?
-    @NSManaged public var shareBuyBacks: String?
     @NSManaged public var theBuyStory: String?
     @NSManaged public var share: Share?
     @NSManaged public var news: NSSet?
@@ -34,6 +30,8 @@ extension StockResearch {
     @NSManaged public var nextReportDate: Date?
     @NSManaged public var futureGrowthMean: Double
     @NSManaged public var targetBuyPrice: Double
+    @NSManaged public var annualStatementOutlook: Data?
+    @NSManaged public var pricePredictions: Data?
 
 }
 

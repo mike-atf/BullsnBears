@@ -265,8 +265,7 @@ class Downloader: NSObject {
                     // if so download webpage content with table
                     removeFile(tempURL)
                     
-                    throw InternalError(location: #function, errorInfo: "file doesn't match .csv format \(tempURL)", errorType: .fileFormatNotCSV)
-
+                    throw InternalError(location: #function, errorInfo: "file \(tempURL.path) doesn't match expected .csv or header row format \(expectedHeaderTitles) ", errorType: .fileFormatNotCSV)
                 }
                 
                 if FileManager.default.fileExists(atPath: targetURL.path) {
