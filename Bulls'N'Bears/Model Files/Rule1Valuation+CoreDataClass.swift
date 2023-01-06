@@ -60,6 +60,38 @@ public class Rule1Valuation: NSManagedObject {
         opCashFlow = Double()
         netIncome = Double()
         adjFuturePE = Double()
+                    
+        if let valuation = share?.wbValuation  {
+            
+            if (valuation.bvps ?? [Double]()).reduce(0, +) != 0 {
+                self.bvps = valuation.bvps
+            }
+            
+            if (valuation.revenue ?? [Double]()).reduce(0, +) != 0 {
+                self.revenue = valuation.revenue
+            }
+            
+            if (valuation.eps ?? [Double]()).reduce(0, +) != 0 {
+                self.eps = valuation.eps
+            }
+            
+            if (valuation.netEarnings?.first ?? 0) != 0 {
+                self.netIncome = valuation.netEarnings!.first!
+            }
+            
+            if (valuation.opCashFlow ?? [Double]()).reduce(0, +) != 0 {
+                self.opCashFlow = valuation.opCashFlow!.first!
+            }
+        }
+        
+        if let valuation = share?.dcfValuation {
+            
+            if (valuation.netIncome ?? [Double]()).reduce(0, +) != 0 {
+                self.netIncome = valuation.netIncome!.first!
+            }
+
+        }
+
         
     }
 
@@ -67,7 +99,7 @@ public class Rule1Valuation: NSManagedObject {
     func save() {
         
         do {
-            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+            try managedObjectContext?.save()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error in SiteDetails.save function \(nserror), \(nserror.userInfo)")
@@ -189,16 +221,37 @@ public class Rule1Valuation: NSManagedObject {
         return nil
     }
     
+    func r1MoatParameterCount() -> Int? {
+        
+        
+        
+        let arrays = [bvps, eps, revenue, opcs, roic]
+        var countNonZero = 0
+        for array in arrays {
+            countNonZero += array?.compactMap{ $0 }.filter({ (value) -> Bool in
+                if value != 0 { return true }
+                else { return false }
+            }).count ?? 0
+        }
+        
+        return countNonZero
+    }
+
+    
     /// 0-1
     func moatScore() -> Double? {
         
-        let moatArrays = [bvps, eps, revenue, opcs]
+        var moatArrays = [bvps, eps, revenue, opcs]
         var moatGrowthRates = [[Double]]()
         self.share?.moatCategory = "NA"
 
         var sumValidRates = 0
-        for moatArray in moatArrays {
-            if let compoundRates = Calculator.compoundGrowthRates(values: moatArray) {
+        for i in 0..<moatArrays.count {
+            
+            if moatArrays[i]?.first ?? 1.0 == 0.0 {
+                moatArrays[i] = Array(moatArrays[i]!.dropFirst())
+            }
+            if let compoundRates = Calculator.compoundGrowthRates(values: moatArrays[i]) {
                 moatGrowthRates.append(compoundRates)
                 sumValidRates += compoundRates.filter({ element in
                     if element != Double() { return true }
@@ -257,7 +310,12 @@ public class Rule1Valuation: NSManagedObject {
         }
         let lowBVPSGrowth = bvpsGrowthRates.mean()
         
-        let analystPredictedGrowth = adjGrowthEstimates?.mean() ?? growthEstimates?.mean()
+        var analystPredictedGrowth:Double?
+        if adjGrowthEstimates?.mean() ?? 0.0 != 0 {
+            analystPredictedGrowth = adjGrowthEstimates?.mean()
+        } else if growthEstimates?.mean() ?? 0.0 != 0 {
+            analystPredictedGrowth = growthEstimates?.mean()
+        }
         return analystPredictedGrowth != nil ? analystPredictedGrowth! : lowBVPSGrowth
     }
     

@@ -22,16 +22,24 @@ public class StockResearch: NSManagedObject {
     }
     
     func save() {
+        
+        do {
+            try self.managedObjectContext?.save()
+        } catch {
+            let nserror = error as NSError
+            fatalError("Unresolved error in Research.save function \(nserror), \(nserror.userInfo)")
+
+        }
                
-         DispatchQueue.main.async {
-            do {
-                self.creationDate = Date()
-                try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-             } catch {
-                 let nserror = error as NSError
-                 fatalError("Unresolved error in Research.save function \(nserror), \(nserror.userInfo)")
-             }
-         }
+//         DispatchQueue.main.async {
+//            do {
+//                self.creationDate = Date()
+//                try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+//             } catch {
+//                 let nserror = error as NSError
+//                 fatalError("Unresolved error in Research.save function \(nserror), \(nserror.userInfo)")
+//             }
+//         }
      }
 
     func returnNews() -> [CompanyNews]? {

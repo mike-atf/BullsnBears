@@ -5,6 +5,7 @@
 //  Created by aDav on 10/12/2020.
 //
 
+
 import UIKit
 
 
@@ -34,9 +35,9 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
             sourceURL.stopAccessingSecurityScopedResource()
             
             if let validStockList = stockListVC {
-                if let validUrl = localURL {
-                    validStockList.addShare(fileURL: validUrl)
-                }
+//                if let validUrl = localURL {
+//                    validStockList.addShare(fileURL: validUrl)
+//                }
                 self.dismiss(animated: true, completion: nil)
             }
         }
@@ -72,7 +73,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didImportDocumentAt sourceURL: URL, toDestinationURL destinationURL: URL) {
         
         if let validStockList = stockListVC {
-            validStockList.addShare(fileURL: sourceURL)
+//            validStockList.addShare(fileURL: sourceURL)
             self.dismiss(animated: true, completion: nil)
         }
 
@@ -94,10 +95,11 @@ extension DocumentBrowserViewController {
             } else if let url = url {
               
                 if let validStockList = self.stockListVC {
-                    validStockList.addShare(fileURL: url)
+//                    validStockList.addShare(fileURL: url)
                     self.dismiss(animated: true, completion: nil)
                 }
             }
         }
     }
 }
+

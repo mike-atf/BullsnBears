@@ -80,12 +80,10 @@ class ValueChart: UIView {
         var mostRecentYear: Int?
         if let validDate = latestDataDate {
             let components: Set<Calendar.Component> = [.year]
-    //        let newestMTDataDate = UserDefaults.standard.value(forKey: UserDefaultTerms().newestMTDataDate) as? Date
             let dateComponents = Calendar.current.dateComponents(components, from:  validDate)
             mostRecentYear = dateComponents.year! - 2000
         } else if let validDate = altLatestDate {
             let components: Set<Calendar.Component> = [.year]
-    //        let newestMTDataDate = UserDefaults.standard.value(forKey: UserDefaultTerms().newestMTDataDate) as? Date
             let dateComponents = Calendar.current.dateComponents(components, from:  validDate)
             mostRecentYear = dateComponents.year! - 2000 - 1
         }
@@ -272,14 +270,14 @@ class ValueChart: UIView {
                     r2$ = percentFormatter0Digits.string(from: r2! as NSNumber) ?? ""
                 }
                 growthEMA$ = valuesAreGrowth ? "EMA: " + (percentFormatter0DigitsPositive.string(from: ema as NSNumber) ?? "-") : ""
-                meanChangeOfGrowth$ = valuesAreGrowth ? "Compound growth trend " + (percentFormatter0Digits.string(from: valuesTrend!.incline as NSNumber) ?? "-") + " to " : ""
+                meanChangeOfGrowth$ = valuesAreGrowth ? "YoY growth trend " + (percentFormatter0Digits.string(from: valuesTrend!.incline as NSNumber) ?? "-") + " to " : ""
             }
             
             if titleIsLong {
-                trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$) \(meanChangeOfGrowth$) \(growthEMA$)", indicesOfSuperscripts: [1])
+                trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$), \(meanChangeOfGrowth$) \(growthEMA$)", indicesOfSuperscripts: [1])
             }
             else {
-                trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$), \(growthEMA$)", indicesOfSuperscripts: [1])
+                trendlabel?.setAttributedTextWithSuperscripts(text: "R2: \(r2$) \(growthEMA$)", indicesOfSuperscripts: [1])
             }
             trendlabel?.sizeToFit()
         }
@@ -291,19 +289,8 @@ class ValueChart: UIView {
         guard valueArray?.count ?? 0 > 0 else {
             return
         }
-        
-        if let median = valueArray?.median() {
-            let maxSpread = valueArray!.max()! / median
-            let minSpread = valueArray!.min()! / median
-            
-            if maxSpread > 10 || abs(minSpread) > 10 {
-                // use logarhithmic scale
-                
-                
-            }
-        }
-                
-        let options:[CGFloat] = [0.01, 0.025, 0.05, 0.1, 0.25, 0.5,1.0, 2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0,1000.0, 5000.0,10000.0, 50000.0,100000.0]
+                        
+        let options:[CGFloat] = [0.01, 0.025, 0.05, 0.1, 0.25, 0.5,1.0, 2.0,2.5,5.0,10.0,20.0,25.0,50.0,100.0,150.0,200.0,250.0,500.0,1000.0, 5000.0,10000.0, 50000.0,100000.0,250_000.0,500_000.0, 1000_000.0, 2500_000.0,5000_000.0,10_000_000.0]
         let range = max - min
         
         var count: CGFloat = 100.0
@@ -311,7 +298,7 @@ class ValueChart: UIView {
         repeat {
             index += 1
             count = range / options[index]
-        } while count > 6
+        } while count > 6 && index < options.count-1
         
         let step = options[index]
         

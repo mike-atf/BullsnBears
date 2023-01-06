@@ -23,7 +23,8 @@ public class Share: NSManagedObject {
         eps = Double()
         peRatio = Double()
         beta = Double()
-//        watchStatus = 0 // 0 watchList, 1 owned, 2 archived
+        watchStatus = 2
+//        watchStatus = 0 // 0 watchList, 1 owned, 3 archived, 2 research
     }
     
     public override func awakeFromFetch() {
@@ -54,7 +55,7 @@ public class Share: NSManagedObject {
         if self.valueScore.isNaN {
             self.valueScore = Double()
         }
-                        
+        
     }
     
    func save() {
@@ -95,16 +96,18 @@ public class Share: NSManagedObject {
        
         if let valid = data {
             do {
-                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
-                    var datedValues = [DatedValue]()
-                    for element in dictionary {
-                        datedValues.append(DatedValue(date: element.key, value: element.value))
-                    }
-                    return datedValues.sorted { (e0, e1) -> Bool in
-                        if e0.date > e1.date { return true }
-                        else { return false }
-                    }
-                }
+//                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
+//                    var datedValues = [DatedValue]()
+//                    for element in dictionary {
+//                        datedValues.append(DatedValue(date: element.key, value: element.value))
+//                    }
+//                    return datedValues.sorted { (e0, e1) -> Bool in
+//                        if e0.date > e1.date { return true }
+//                        else { return false }
+//                    }
+//                }
+                
+                return try dataToDatedValues(data: valid)
             } catch let error {
                 ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
             }
@@ -298,6 +301,78 @@ public class Share: NSManagedObject {
             }
         }
         
+    }
+    
+    /// if called from background thread set save to false
+    func saveDividendData(datedValues: [DatedValue]?, save:Bool) {
+                
+        self.dividendWDates = datedValuesToData(datedValues: datedValues)
+        
+        if save {
+            do {
+                try self.managedObjectContext?.save()
+            } catch {
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error when trying to save share dividend data")
+            }
+        }
+    }
+    
+    func dividendWithDates() -> [DatedValue]? {
+        
+        guard let valid = dividendWDates else { return nil }
+        
+        do {
+            return try dataToDatedValues(data: valid)
+        } catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error)
+            return nil
+        }
+        
+    }
+    
+    /// returns compound average growth rate of price gain + dividends paid, over the last 'years' years
+    func returnRateCAGR(years: Int) -> Double? {
+        
+        guard years > 0 else { return nil }
+        
+        var cagrBase: Double = 0
+        var yearCount: Double = 0
+        if years <= 3 {
+            cagrBase = return3y
+            yearCount = 3.0
+        } else if years <= 10  {
+            cagrBase = return10y
+            yearCount = 10.0
+        }
+        
+        guard cagrBase != 0 else { return nil }
+        guard yearCount > 0 else { return nil }
+
+        return Calculator.compoundGrowthRate(endValue: cagrBase, startValue: 1.0, years: yearCount)
+        
+    }
+    
+    /// returns [DatedValue] array in date DESCENDING order
+    func dataToDatedValues(data: Data) throws -> [DatedValue]? {
+        
+        do {
+            if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Date: Double] {
+                var datedValues = [DatedValue]()
+                for element in dictionary {
+                    datedValues.append(DatedValue(date: element.key, value: element.value))
+                }
+                return datedValues.sorted { (e0, e1) -> Bool in
+                    if e0.date > e1.date { return true }
+                    else { return false }
+                }
+            }
+        } catch let error {
+            throw InternalError.init(location: #function, systemError: error, errorInfo: "error retrieving datedValue data")
+
+//            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving datedValue data")
+        }
+        return nil
+
     }
     
     func datedValuesToData(datedValues: [DatedValue]?) -> Data? {
@@ -580,7 +655,7 @@ public class Share: NSManagedObject {
     public func priceDateRangeWorkWeeksForCharts(withForecastTime: Bool) -> [Date] {
         
         guard let dailyPrices = getDailyPrices() else {
-            return [Date(), Date().addingTimeInterval(7*24*3600)]
+            return [Date(), Date().addingTimeInterval(week)]
         }
         
         let previewTime = withForecastTime ? foreCastTime : 0
@@ -621,7 +696,9 @@ public class Share: NSManagedObject {
                 return [firstMondayMidNight, lastMondayMidNight]
         }
         
-        return [Date(), Date().addingTimeInterval(7*24*3600)]
+        let endOfToday = DatesManager.endOfDay(of: Date())
+        let beginningOfToday = DatesManager.beginningOfDay(of: Date())
+        return [beginningOfToday, endOfToday.addingTimeInterval(week)]
     }
 
     
@@ -638,12 +715,13 @@ public class Share: NSManagedObject {
         }
         
         else {
-            var previousPrice = prices.first!
-            for i in 1..<prices.count {
-                if prices[i].tradingDate > date {
-                    return (prices[i].returnPrice(option: priceOption) + previousPrice.returnPrice(option: priceOption)) / 2
+            if var previousPrice = prices.first {
+                for i in 1..<prices.count {
+                    if prices[i].tradingDate > date {
+                        return (prices[i].returnPrice(option: priceOption) + previousPrice.returnPrice(option: priceOption)) / 2
+                    }
+                    previousPrice = prices[i]
                 }
-                previousPrice = prices[i]
             }
         }
         return nil
@@ -1831,4 +1909,5 @@ public class Share: NSManagedObject {
         return sortedTA
         
     }
+    
 }

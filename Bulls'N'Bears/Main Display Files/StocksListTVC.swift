@@ -86,21 +86,19 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var refreshControl: UIRefreshControl!
     
     var searchController: UISearchController?
-//    var cellPathsToReloadAfterBGUpdate: [IndexPath]? // in case TVC is not visible when update in background completes
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.register(UINib(nibName: "StockListCellTableViewCell", bundle: nil), forCellReuseIdentifier: "stockListCell")
         
-        NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(userChangedValuationWeights), name: Notification.Name(rawValue: "userChangedValuationWeights"), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "FileDownloadComplete"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "FileDownloadComplete"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateShares), name: Notification.Name(rawValue: "ActivatedFromBackground"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateSingleShare(notification:)), name: Notification.Name(rawValue: "SingleShareUpdateRequest"), object: nil)
-
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(downloadEnded(notification:)), name: Notification.Name(rawValue: "DownloadEnded"), object: nil) // called after new share created and dta downloads finished on a background thread. TVC UI nneds updating on the man thread, which this notification should action
         
         controller.delegate = self
         controller.controllerDelegate = self
@@ -158,6 +156,22 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     override func viewDidAppear(_ animated: Bool) {
         wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC
+        
+//        for share in controller.fetchedObjects ?? [] {
+//            
+//                if share.watchStatus == 2 {
+//                    print("\(String(describing: share.symbol)) is \(share.watchStatus)")
+//                    share.watchStatus = 3
+//                    print("\(String(describing: share.symbol)) changed to \(share.watchStatus)")
+//                    do {
+//                        try share.managedObjectContext?.save()
+//                    } catch {
+//                        ErrorController.addInternalError(errorLocation: #function, systemError: error as NSError, errorInfo: "can;t save")
+//                    }
+//                }
+//
+//        }
+        
     }
     
 
@@ -204,7 +218,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         guard let share = notification.object as? Share else { return }
         
         do {
-            try controller.updateStocksData(singleShare: share)
+            try controller.updateStocksData(singleShareID: share.objectID)
         } catch let error {
             alertController.showDialog(title: "Update failure", alertMessage: "Couldn't update \(share); \(error.localizedDescription)", viewController: self, delegate: nil)
         }
@@ -242,44 +256,188 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
     }
     
-    @objc
-    func filesReceivedInBackground(notification: Notification) {
+    /// send either url, OR pricePoints with symbol. companyName is an optional long name for the company to override the name found in the stocksDictionary
+    public func addShare(url: URL?, pricePoints: [PricePoint]?, symbol: String?, companyName: String?=nil) {
         
-        if let paths = notification.object as? [String] {
-            for path in paths {
-                addShare(fileURL: URL(fileURLWithPath: path))
-            }
-        }
-    }
-    
-    @objc
-    func fileDownloaded(_ notification: Notification) {
-                
-        if let url = notification.object as? URL {
-            addShare(fileURL: url, companyName: notification.userInfo?["companyName"] as? String)
-        }
-    }
-    
-    public func addShare(fileURL: URL, companyName: String?=nil) {
+        // create new share from fileURL details on the MAIN THREAD to trigger FRC didChange function to make new share visible
+        var validPricePoints:[PricePoint]?
+        var validSymbol = String()
         
-            do {
-                if let share = try controller.createShare(from: fileURL, companyName: companyName ,deleteFile: true) {
-                    try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-                    let shareID = share.objectID // is thread safe
-                        
-                    
-                    Task.init(priority: .background) {
-                        try await controller.downloadProfile(symbol: share.symbol!, shareID: shareID)
-                    }
-                    if let indexPath = controller.indexPath(forObject: share) {
-                        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                        performSegue(withIdentifier: "showChartSegue", sender: nil)
-                    }
-
+        // 1 Extract PricePoints from either csv url or pricePoint data
+        if let fileURL = url {
+            // create share from csv fileURL
+            var lastPathComponent = String()
+            if #available(iOS 16.0, *) {
+                lastPathComponent = fileURL.lastPathComponent.replacing(".csv", with: "")
+            } else {
+                if let csvRange = fileURL.lastPathComponent.range(of: ".csv") {
+                    lastPathComponent = String(fileURL.lastPathComponent[...csvRange.lowerBound])
                 }
-            } catch let error {
-                ErrorController.addInternalError(errorLocation: #file + #function, systemError: error, errorInfo: "Failure to add new share from file \(fileURL)")
             }
+            
+            if let type = lastPathComponent.range(of: "_") {
+                lastPathComponent = String(lastPathComponent[..<type.lowerBound])
+            }
+
+            validSymbol = lastPathComponent
+            let oneYearAgo = Date().addingTimeInterval(-year)
+            if let pricePoints = CSVImporter.extractPricePointsFromFile(url: fileURL, symbol: validSymbol, minDate: oneYearAgo) {
+                validPricePoints = pricePoints
+            }
+            
+        } else {
+            // create Share from pricePoints
+            if symbol != nil  {
+                validSymbol = symbol!
+            } else {
+                return
+            }
+            guard let pricePoints = pricePoints else {
+                AlertController.shared().showDialog(title: "Not completed", alertMessage: "\(validSymbol) couldn;t be created due to missing prices information.")
+                return
+            }
+            validPricePoints = pricePoints
+        }
+        
+        
+// 2 correct short- and long company names
+        var longName: String?
+        var shortName: String?
+        if let dictionary = stockTickerDictionary {
+            
+            longName = companyName ?? dictionary[validSymbol]
+            
+            // some dictionary values start with "\" for some reason or other
+            // this doesn't work with web addresses when downloading data so needs to be removed
+            if (longName ?? "").starts(with: "\"") {
+                    longName = String(longName!.dropFirst())
+            }
+
+            if let longNameComponents = longName?.split(separator: " ") {
+                let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co.", "SE", "o.N", "O.N", "Namens-Aktien"] // "Group",
+                let replaceTerms = ["S.A.": "sa "]
+                var cleanedName = String()
+                for component in longNameComponents {
+                    if replaceTerms.keys.contains(String(component)) {
+                        cleanedName += replaceTerms[String(component)] ?? ""
+                    } else if !removeTerms.contains(String(component)) {
+                        cleanedName += String(component) + " "
+                    }
+                }
+                shortName = String(cleanedName.dropLast())
+            }
+        }
+        
+        if let shares = controller.fetchedObjects {
+            guard !shares.compactMap({ $0.symbol }).contains(validSymbol) else {
+                AlertController.shared().showDialog(title: "Not completed", alertMessage: "\(validSymbol) is alrady included in your stock list.")
+                return
+            }
+        }
+        
+
+// 3 create share and save basic data, all on MainThread for updating UI/TVC
+        let moc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let newShare = Share.init(context: moc)
+        newShare.symbol = validSymbol
+        newShare.name_long = longName
+        newShare.name_short = shortName
+        newShare.creationDate = Date()
+        newShare.dailyPrices = newShare.convertDailyPricesToData(dailyPrices: validPricePoints)
+        
+        newShare.wbValuation = WBValuationController.returnWBValuations(share: newShare)
+        newShare.wbValuation?.date = Date().addingTimeInterval(-(controller.renewInterval+1))
+        newShare.dcfValuation = CombinedValuationController.returnDCFValuations(company: newShare.symbol!)
+        newShare.dcfValuation?.creationDate = Date().addingTimeInterval(-(controller.renewInterval+1))
+        newShare.rule1Valuation = CombinedValuationController.returnR1Valuations(company: newShare.symbol)
+        newShare.rule1Valuation?.creationDate = Date().addingTimeInterval(-(controller.renewInterval+1))
+        newShare.research = StockResearch(context: moc)
+        newShare.research?.share = newShare
+        newShare.research?.creationDate = Date()
+
+        do {
+            try newShare.managedObjectContext?.save()
+        } catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "failure trying to save new share in mainthread MOC")
+        }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(receivedISINandCurrencyInfo(notification: )), name: Notification.Name(rawValue: "ISIN and CURRENCY INFO"), object: nil)
+
+// 4 slower download tasks for more data do on a background thread, using NSManagedObjectID
+        let newShareID = newShare.objectID
+        
+        // then pass shareID to background process to get all other details. Creating the share in a background task fails to trigger FRC didChange function, so will not make the new share visible right away.
+        Task.init() {
+            do {
+                try await WebPageScraper2.keyratioDownloadAndSave(shareSymbol: symbol, shortName: newShare.name_short, shareID: newShareID)
+                try await controller.getDataForNewShare(objectID: newShareID, url: url, symbol: symbol)
+                        DispatchQueue.main.async {
+                            do {
+                                try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+                            } catch {
+                                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Failure to save main background context after creating new share on background context")
+                            }
+                            
+                            if let indexPath = self.controller.indexPath(forObject: newShare) {
+                                self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+                                self.performSegue(withIdentifier: "showChartSegue", sender: nil)
+
+                            } else {
+                                self.tableView.reloadData()
+                            }
+                       }
+
+            } catch {
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Failure to add new share from file for \(newShare.symbol ?? "")")
+            }
+        }
+    }
+    
+    @objc
+    func receivedISINandCurrencyInfo(notification: Notification) {
+        
+        if let symbol = notification.object as? String {
+            
+            guard let share = controller.fetchShare(symbol: symbol) else {
+                return
+            }
+            
+            if let dictionary = notification.userInfo as? [String:String] {
+                share.isin = dictionary["isin"]
+                share.currency = dictionary["currency"]
+                
+                print("share \(symbol) received \(dictionary)")
+                
+                do {
+                    try share.managedObjectContext?.save()
+                } catch {
+                    ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error when tryingf to save ISIN and Currency info for \(symbol)")
+                }
+            }
+            
+        }
+    }
+    
+    @objc
+    func downloadEnded(notification: Notification) {
+        
+        if let shareID = notification.object as? NSManagedObjectID {
+            if let share = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: shareID) as? Share {
+                if let indexPath = controller.indexPath(forObject: share) {
+                    DispatchQueue.main.async {
+                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    }
+                }
+                else {
+                    print("can't find indexPath for \(share.symbol!)")
+                    print()
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
     }
     
     @objc
@@ -314,6 +472,9 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 return "Owned"
             }
             else if sectionInfo.name == "2" {
+                return "Research & compare"
+            }
+            else if sectionInfo.name == "3" {
                 return "Archive"
             }
 
@@ -365,7 +526,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             objectOwned.watchStatus = 1
             objectOwned.save()
         }
-        ownAction.backgroundColor = UIColor.systemGreen
+        ownAction.backgroundColor = UIColor.systemYellow
         ownAction.image = UIImage(systemName: "bag.badge.plus")
 
         let watchAction = UIContextualAction(style: .normal, title: "Watch")
@@ -374,31 +535,43 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             objectOwned.watchStatus = 0
             objectOwned.save()
             do {
-                try self.controller.updateStocksData(singleShare: objectOwned)
+                try self.controller.updateStocksData(singleShareID: objectOwned.objectID)
             } catch let error {
                 ErrorController.addInternalError(errorLocation: "StocksListTVC", systemError: error, errorInfo: "unable to update data for \(objectOwned.symbol ?? "") when moving from archive to watch list.")
             }
         }
-        watchAction.backgroundColor = UIColor.systemGray
+        watchAction.backgroundColor = UIColor.systemGreen
         watchAction.image = UIImage(systemName: "eyeglasses")
         
         let archiveAction = UIContextualAction(style: .normal, title: "Archive")
         { (action, view, bool) in
             
-            objectOwned.watchStatus = 2
+            objectOwned.watchStatus = 3
             objectOwned.save()
         }
         archiveAction.backgroundColor = UIColor.systemOrange
         archiveAction.image = UIImage(systemName: "archivebox")
         
+        let researchAction = UIContextualAction(style: .normal, title: "Research")
+        { (action, view, bool) in
+            
+            objectOwned.watchStatus = 2
+            objectOwned.save()
+        }
+        researchAction.backgroundColor = UIColor.systemBlue
+        researchAction.image = UIImage(systemName: "books.vertical.fill")
+
+        
         if objectOwned.watchStatus == 0 {
-            return UISwipeActionsConfiguration(actions: [ownAction, archiveAction])
+            return UISwipeActionsConfiguration(actions: [ownAction, researchAction, archiveAction])
         }
         else if objectOwned.watchStatus == 1 {
             return UISwipeActionsConfiguration(actions: [watchAction, archiveAction])
+        } else if objectOwned.watchStatus == 2 {
+            return UISwipeActionsConfiguration(actions: [watchAction, ownAction, archiveAction])
         }
         else {
-            return UISwipeActionsConfiguration(actions: [watchAction, ownAction])
+            return UISwipeActionsConfiguration(actions: [watchAction, researchAction, ownAction])
         }
     }
 
@@ -406,7 +579,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if !tableView.isEditing {
-            performSegue(withIdentifier: "showChartSegue", sender: nil)
+//            performSegue(withIdentifier: "showChartSegue", sender: nil)
+            showWBValuationView(indexPath: indexPath, chartViewSegue: true)
         }
         else {
             let selectedShare = controller.object(at: indexPath)
@@ -560,7 +734,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     // MARK: - Navigation
 
- override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
      
         guard let indexPath = tableView.indexPathForSelectedRow else { return }
      
@@ -574,44 +748,48 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                  chartView.stocksListVC = self // unowned var to avoid retention cycle
              }
          }
-
- }
+    }
 
     @IBAction func downloadAction(_ sender: Any) {
         
         guard let entryView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StockSearchTVC") as? StockSearchTVC else { return }
 
         entryView.callingVC = self
-        entryView.downloadDelegate = self
         
         navigationController?.pushViewController(entryView, animated: true)
     }
 
 }
 
-extension StocksListTVC: SortDelegate, StockSearchDataDownloadDelegate {
+extension StocksListTVC: SortDelegate {
     
-    func newShare(symbol: String, prices: [PricePoint]?) {
-                
+    /*
+    func addNewShare(symbol: String, prices: [PricePoint]?) {
+        
+        Task {
             do {
-                if let share = try controller.createShare(with: prices, symbol: symbol) {
-                    try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-                                            
-                    Task.init(priority: .background) {
-                        try await controller.downloadProfile(symbol: share.symbol!, shareID: share.objectID)
-                    }
+                try await controller.newShare(from: nil, with: prices, symbol: symbol)  // createShare(with: prices, symbol: symbol)
+//                    try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+//
+//                    Task.init(priority: .background) {
+//                        try await controller.downloadProfile(symbol: share.symbol!, shareID: share.objectID)
+//                    }
 
-                    if let indexPath = controller.indexPath(forObject: share) {
-                        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                        performSegue(withIdentifier: "showChartSegue", sender: nil)
-                    }
+                    tableView.reloadData()
+//                    if let indexPath = controller.indexPath(forObject: share) {
+//                        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+//                        performSegue(withIdentifier: "showChartSegue", sender: nil)
+//                    } else {
+//                        print("indexpath for new shre not found")
+//                    }
 
-                }
             } catch let error {
                 ErrorController.addInternalError(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol) \(error)")
             }
+        }
+                
     }
-
+    */
     
     func sortParameterChanged() {
         

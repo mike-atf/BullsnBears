@@ -65,6 +65,8 @@ public class DCFValuation: NSManagedObject {
         
         company = String()
         creationDate = Date()
+        
+        copyDataFromDCFaR1Valuations()
     }
     
     public func ageOfValuation() -> TimeInterval? {
@@ -76,22 +78,10 @@ public class DCFValuation: NSManagedObject {
         return nil
     }
     
-//    static func create(company: String, in managedObjectContext: NSManagedObjectContext) {
-//        let newValuation = self.init(context: managedObjectContext)
-//        newValuation.company = company
-//
-//        do {
-//            try  managedObjectContext.save()
-//        } catch {
-//            let nserror = error as NSError
-//            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-//        }
-//    }
-//
     func save() {
         
         do {
-            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+            try self.managedObjectContext?.save()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error in DCFValuation.save function \(nserror), \(nserror.userInfo)")
@@ -100,7 +90,6 @@ public class DCFValuation: NSManagedObject {
     
     func delete() {
        
-//        (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.delete(self)
         managedObjectContext?.delete(self)
  
         do {
@@ -111,24 +100,43 @@ public class DCFValuation: NSManagedObject {
         }
     }
     
-//    func getDataFromR1Valuation(r1Valuation: Rule1Valuation?) {
-//
-//        guard let valuation = r1Valuation else {
-//            return
-//        }
-//
-//        var count = 0
-//        for sales in valuation.revenue ?? [] {
-//            self.tRevenueActual?.insert(sales, at: count)
-//            count += 1
-//        }
-//
-//        count = 0
-//        for sales in valuation.opcs ?? [] {
-//            self.tFCFo?.insert(sales, at: count)
-//            count += 1
-//        }
-//    }
+    func copyDataFromDCFaR1Valuations() {
+
+        // own properties are set to [0,0,0,0] as default on insert!
+        
+        if (self.tRevenueActual ?? [Double]()).reduce(0,+) == 0 {
+            if let valuation = share?.rule1Valuation  {
+                if (valuation.revenue ?? [Double]()).reduce(0, +) != 0 {
+                    self.tRevenueActual = valuation.revenue
+                }
+            }
+        }
+
+        if (self.tFCFo ?? [Double]()).reduce(0,+) == 0 {
+            if let valuation = share?.rule1Valuation {
+                if (valuation.opcs ?? [Double]()).reduce(0, +) != 0 {
+                    self.tFCFo = valuation.opcs
+                }
+            }
+        }
+        
+        if (self.capExpend ?? [Double]()).reduce(0,+) == 0 {
+            if let valuation = share?.wbValuation {
+                if (valuation.capExpend ?? [Double]()).reduce(0, +) != 0 {
+                    self.capExpend = valuation.capExpend
+                }
+            }
+        }
+        
+        if (self.netIncome ?? [Double]()).reduce(0,+) == 0 {
+            if let valuation = share?.wbValuation {
+                if (valuation.capExpend ?? [Double]()).reduce(0,+) != 0 {
+                    self.capExpend = valuation.capExpend
+                }
+            }
+        }
+
+    }
     
     public func returnIValue() -> (Double?, [String]) {
         
@@ -153,6 +161,8 @@ public class DCFValuation: NSManagedObject {
         // 18 last PVofFutureCF[5] from 'terminalValue' / discountFactors[].last (not 5!)
         // 19 'todaysValue' = sum(PVofFutureCF[+1-5])
         // 20 fairValue = 'todaysValue' / sharesOutstanding (drop last three!)
+        
+        copyDataFromDCFaR1Valuations()
         
         guard tRevenueActual != nil && capExpend != nil && netIncome != nil && tFCFo != nil else {
             return (nil, ["revenue, cap expend, net income or FCF data missing"])

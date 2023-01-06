@@ -18,7 +18,7 @@ extension WBValuation {
 
     // careful: MT.com row-based webdata are in time-DESCENDING order
 
-    @NSManaged public var capExpend: [Double]? // converted from NEGATIVE in MacroTrends to positive!
+    @NSManaged public var capExpend: [Double]? // converted from NEGATIVE in MacroTrends to positive! also stored in DCFvaluation.capExpend
     @NSManaged public var opCashFlow: [Double]?
     @NSManaged public var company: String?
     @NSManaged public var date: Date?
@@ -40,7 +40,7 @@ extension WBValuation {
     @NSManaged public var userEvaluations: NSSet?
     @NSManaged public var avAnStockPrice: [Double]?
     @NSManaged public var bvps: [Double]?
-    @NSManaged public var perDates: Data?
+    @NSManaged public var perDates: Data? // these are usually quarterly P/E from MacroTrends
     @NSManaged public var epsDates: Data? // qEPS TTM
     @NSManaged public var epsDatesq: Data? // qEPS
     @NSManaged public var share: Share?

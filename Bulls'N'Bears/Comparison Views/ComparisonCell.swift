@@ -94,7 +94,7 @@ class ComparisonCell: UITableViewCell {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = UIFont.systemFont(ofSize: financialsFontSize)
-                label.text = "Compound growth"
+                label.text = ""
                 label.textAlignment = .right
                 label.numberOfLines = 0
                 label.sizeToFit()
@@ -141,8 +141,6 @@ class ComparisonCell: UITableViewCell {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = UIFont.systemFont(ofSize: financialsFontSize, weight: .bold)
-//                label.font = UIFont.systemFont(ofSize: financialsFontSize)
-//                label.textColor = colors[Int(count)]
                 label.text = string
                 label.numberOfLines = 0
                 label.sizeToFit()
@@ -242,7 +240,7 @@ class ComparisonCell: UITableViewCell {
             
             newChart.backgroundColor = UIColor.systemBackground
             let biggerIsBetter = (cellPath.section == 6) ? false : true
-            newChart.configure(array: array, biggerIsBetter: biggerIsBetter ,trendLabel: label, longTitle: false ,valuesAreGrowth: true, showXLabels: false, showYLabels: true, latestDataDate: nil, altLatestDate: nil)
+            newChart.configure(array: array, biggerIsBetter: biggerIsBetter ,trendLabel: label, longTitle: false ,valuesAreGrowth: false, showXLabels: false, showYLabels: true, latestDataDate: nil, altLatestDate: nil) // valuesAreGrowth: true
             charts?.append(newChart)
             count += 1
         }

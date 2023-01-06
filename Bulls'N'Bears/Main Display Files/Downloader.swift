@@ -16,6 +16,13 @@ enum DownloadTask {
     case healthData
 }
 
+protocol CSVFileDownloadDelegate {
+    
+    func csvFileDownloadComplete(localURL: URL, companyName: String)
+    func csvFileDownloadWithHeaderError(symbol: String, companyName: String)
+    func dataDownloadCompleted(results: [DatedValue]?)
+}
+
 class Downloader: NSObject {
     
     var task: DownloadTask?
@@ -27,11 +34,15 @@ class Downloader: NSObject {
         self.task = task
     }
         
-    ///  posts notificaiton "Redirection" with object: URlReqeust and userInfo [task:Dowloadtask] and [dellocate:Downloader]
+    ///  posts notificaiton "Redirection" with object: URlReqeust and userInfo [task:Dowloadtask] and [dellocate:Downloader]; see below URLSessionTaskDelegate
     ///  caller should add a  DownloadRedirectionDelegate observer to NotificationCenter.default to receive any redirection nofitications
-    func downloadDataWithRedirection(url: URL) async throws -> String? {
+    func downloadDataWithRedirection(url: URL?) async throws -> String? {
         
-        let request = URLRequest(url: url)
+        guard url != nil else {
+            throw InternalError(location: #function, errorInfo: "Invalid url download request", errorType: .urlInvalid)
+        }
+        
+        let request = URLRequest(url: url!)
             
         let (data,urlResponse) = try await URLSession.shared.data(for: request,delegate: self)
         
@@ -41,11 +52,11 @@ class Downloader: NSObject {
                   return String(data: data, encoding: .utf8) ?? ""
                 }
                 else {
-                    throw InternalError(location: #function, errorInfo: "download response error for \(url), mimeType not text but \(String(describing: response.mimeType))", errorType: .mimeType)
+                    throw InternalError(location: #function, errorInfo: "download response error for \(url!), mimeType not text but \(String(describing: response.mimeType))", errorType: .mimeType)
                 }
             }
             else {
-                throw InternalError(location: #function, errorInfo: "download error for \(url), response \(String(describing: response.statusCode))", errorType: .statusCodeError)
+                throw InternalError(location: #function, errorInfo: "download error for \(url!), response \(String(describing: response.statusCode))", errorType: .statusCodeError)
             }
         }
         
@@ -69,9 +80,13 @@ class Downloader: NSObject {
             else { return false }
     }
     
-    class func downloadData(url: URL) async throws -> String {
+    class func downloadData(url: URL?) async throws -> String {
         
-        let request = URLRequest(url: url)
+        guard url != nil else {
+            throw InternalError(location: #function, errorInfo: "invalid url download attempt", errorType: .urlInvalid)
+        }
+        
+        let request = URLRequest(url: url!)
             
         let (data,urlResponse) = try await URLSession.shared.data(for: request)
         var htmlText = String()
@@ -82,11 +97,11 @@ class Downloader: NSObject {
                     htmlText = String(data: data, encoding: .utf8) ?? ""
                 }
                 else {
-                    throw InternalError(location: #function, errorInfo: "download response error for \(url), mimeType not text but \(String(describing: response.mimeType))", errorType: .mimeType)
+                    throw InternalError(location: #function, errorInfo: "download response error for \(url!), mimeType not text but \(String(describing: response.mimeType))", errorType: .mimeType)
                 }
             }
             else {
-                throw InternalError(location: #function, errorInfo: "download error for \(url), response \(String(describing: response.statusCode))", errorType: .statusCodeError)
+                throw InternalError(location: #function, errorInfo: "download error for \(url!), response \(String(describing: response.statusCode))", errorType: .statusCodeError)
             }
         }
         
@@ -146,28 +161,35 @@ class Downloader: NSObject {
         return htmlText
     }
     
+    /*
     /// returns Notification with message  "FileDownloadComplete" with fileURL as object
     /// or - if file not in .csv format - sends a notification 'FileDownloadedNotCSV' with  'symbol' as object and companyName as userInfo
-    class func downloadCSVFile(url: URL, symbol: String, companyName: String, expectedHeaderTitles: [String]) async {
+    class func downloadCSVFile
+    (url: URL, symbol: String, companyName: String, expectedHeaderTitles: [String], delegate: CSVFileDownloadDelegate) async {
                 
         let downloadTask = URLSession.shared.downloadTask(with: url) {  [self]
             urlOrNil, response, errorOrNil in
             
             guard errorOrNil == nil else {
                 DispatchQueue.main.async {
-                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(symbol) due to error \(errorOrNil!.localizedDescription)", viewController: nil, delegate: nil)
+                    ErrorController.addInternalError(errorLocation: #function, systemError: errorOrNil, errorInfo: "couldn't download historical prices csv for \(symbol) from Yahoo")
                 }
                 return
             }
             
             guard response != nil else {
                 DispatchQueue.main.async {
-                    alertController.showDialog(title: "Download error", alertMessage: "couldn't download \(symbol) due to error \(String(describing: response!.textEncodingName))", viewController: nil, delegate: nil)
+                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "couldn't download historical prices csv for \(symbol) from Yahoo due to lack of response from server")
                 }
                 return
             }
                         
-            guard let fileURL = urlOrNil else { return }
+            guard let fileURL = urlOrNil else {
+                DispatchQueue.main.async {
+                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "couldn't download historical .csv file for \(symbol) from Yahoo. url is nil")
+                }
+                return
+            }
             
             do {
                 let documentsURL = try
@@ -191,23 +213,35 @@ class Downloader: NSObject {
             
 
                 if !CSVImporter.matchesExpectedFormat(url: tempURL, expectedHeaderTitles: expectedHeaderTitles) {
-                    // this may be due to 'invalid cookie' error
                     // if so download webpage content with table
                     removeFile(tempURL)
+                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "downloaded historical .csv for \(symbol) from Yahoo does not match expected header format \(expectedHeaderTitles). Downloading web page instead")
                     
                     DispatchQueue.main.async {
-                        var userDict = [String:String]()
-                        userDict["companyName"] = companyName
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadNotCSV"), object: symbol, userInfo:  userDict) // send to StocksListVC
+                        delegate.csvFileDownloadWithHeaderError(symbol: symbol, companyName: companyName)
                     }
+                    
+                    
+//                    DispatchQueue.main.async {
+//                        var userDict = [String:String]()
+//                        userDict["companyName"] = companyName
+//                        NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadNotCSV"), object: symbol, userInfo:  userDict) // send to StocksListVC
+//                    }
                     return
                 }
 
                 try FileManager.default.moveItem(at: tempURL, to: targetURL)
                 
                 DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadComplete"), object:   targetURL, userInfo: ["companySymbol": symbol]) // send to StocksListVC
+                    delegate.csvFileDownloadComplete(localURL: targetURL, companyName: companyName)
                 }
+                
+//                DispatchQueue.main.async {
+//                    var userDict = [String:String]()
+//                    userDict["companyName"] = companyName
+//                    userDict["companySymbol"] = symbol
+//                    NotificationCenter.default.post(name: Notification.Name(rawValue: "FileDownloadComplete"), object:   targetURL, userInfo: userDict) // send to StocksListVC
+//                }
 
             } catch {
                 
@@ -219,7 +253,40 @@ class Downloader: NSObject {
 
         downloadTask.resume()
     }
+    */
     
+    /// does NOT check header titles; for 'type' use _Div , _PPoints or _TB as without these files dividend and pricePoint files will overwrite each other
+    class func downloadCSVFile2(url: URL, symbol: String, type: String) async throws -> URL? {
+        
+        let (tempURL, _) = try await URLSession.shared.download(from: url)
+        do {
+            let documentsURL = try
+                FileManager.default.url(for: .documentDirectory,
+                                        in: .userDomainMask,
+                                        appropriateFor: nil,
+                                        create: true)
+            
+            let targetURL = documentsURL.appendingPathComponent(symbol + type + ".csv")
+            
+            if FileManager.default.fileExists(atPath: targetURL.path) {
+                removeFile(targetURL)
+            }
+
+            try FileManager.default.moveItem(at: tempURL, to: targetURL)
+
+            return targetURL
+                                
+        } catch {
+            DispatchQueue.main.async {
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "can't move and save downloaded file \(tempURL)")
+            }
+        }
+
+        return nil
+        
+    }
+     
+    /*
     /// returns the downloaded file in Notification with message  "FileDownloadComplete" with fileURL as object
     /// or returns with throwing an error
     class func downloadAndReturnCSVFile(url: URL, symbol: String, expectedHeaderTitles: [String], completion: @escaping (URL?) -> Void) async -> Void {
@@ -284,7 +351,8 @@ class Downloader: NSObject {
 
         downloadTask.resume()
     }
-
+    */
+    
     class func removeFile(_ atURL: URL) {
        
         do {

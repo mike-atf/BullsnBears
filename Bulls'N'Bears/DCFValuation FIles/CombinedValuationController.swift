@@ -257,7 +257,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             }
         }
         else {
-            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in Valuation.getDCFValue")
+            ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "undefined indexpath \(indexPath) in Valuation.getDCFValue")
         }
         
         return String()
@@ -289,8 +289,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
 
     func cellInfo(indexPath: IndexPath) -> ValuationListCellInfo {
         
-//        let value = getValue(indexPath: indexPath)
-        let value$ = getValueString(indexPath: indexPath) // valueText(value: value, indexPath: indexPath)
+        let value$ = getValueString(indexPath: indexPath)
         let title = (rowtitles ?? rowTitles())[indexPath.section][indexPath.row]
         let format = valueFormat(indexPath: indexPath)
         
@@ -343,8 +342,8 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
 
             self.valuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? Rule1Valuation)!
 
-            if let moatCount = r1MoatParameterCount() {
-                if moatCount < 25 {
+            if let moatCount = valuation.r1MoatParameterCount() {
+                if moatCount < 30 {
                     if alerts == nil {
                         alerts = [String]()
                     }
@@ -455,14 +454,14 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
     
     //MARK: - Internal functions
     
-    public func startDataDownload() {
+    public func startDataDownload(progressDelegate: ProgressViewDelegate?=nil) {
         
         // accessing share properties must happen on main thread!
         let symbol =  share.symbol
         let shortName = share.name_short
         
         guard let validID = valuationID else {
-            ErrorController.addInternalError(errorLocation: "CombinedValController.startDataDownload", systemError: nil, errorInfo: "failed data donwload - no valid valuation object ID")
+            ErrorController.addInternalError(errorLocation: "CombinedValController.startDataDownload", systemError: nil, errorInfo: "failed data download - no valid valuation object ID")
             return
         }
 
@@ -477,6 +476,31 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                 }
                 return nil
             }
+
+            // US Stocks
+//            if !symbol!.contains(".") {
+//                downloadTask = Task.init(priority: .background) {
+//                    do {
+//                        let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: validID, progressDelegate: self.valuationListViewController, downloadRedirectDelegate: self)
+//                        try Task.checkCancellation()
+//                    } catch let error {
+//                        ErrorController.addInternalError(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+//                    }
+//                    return nil
+//                }
+//            }
+//            else {
+//                // EU stocks should contain "." in their symbol
+//                downloadTask = Task.init(priority: .background) {
+//                    do {
+//                        try await WebPageScraper2.nonMTRule1DataDownload(symbol: shortName, valuationID: validID, progressController: self.valuationListViewController)
+//                    } catch {
+//                        downloadTask?.cancel()
+//                        ErrorController.addInternalError(errorLocation: "CombinedValuationController.startDataDownload non-US", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+//                    }
+//                    return nil
+//                }
+//            }
         }
         else {
             downloadTask = Task.init(priority: .background) {
@@ -869,10 +893,17 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         case 1:
             // 'Predictions
             if indexPath.row == 0 {
-                guard let adjSalesGrowthPrediction = valuation.adjGrowthEstimates?.mean() else {
+                var salesGrowthPrediction: Double?
+                if valuation.adjGrowthEstimates?.mean() ?? 0 != 0.0 {
+                    salesGrowthPrediction = valuation.adjGrowthEstimates?.mean()
+                } else if valuation.growthEstimates?.mean() ?? 0 != 0 {
+                    salesGrowthPrediction = valuation.growthEstimates?.mean()
+                }
+                
+                guard let prediction = salesGrowthPrediction else {
                     return ("-", UIColor.label)
                 }
-                let prediction$ = percentFormatter2Digits.string(from: adjSalesGrowthPrediction as NSNumber) ?? "-"
+                let prediction$ = percentFormatter2Digits.string(from: prediction as NSNumber) ?? "-"
                 return (prediction$, UIColor.label)
             }
             else if indexPath.row == 1 {
@@ -1154,17 +1185,18 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
 
     }
     
+    /*
     internal func valueText(value: Any?, indexPath: IndexPath) -> String? {
         
         guard  let validValue = value else {
             return nil
         }
         
-        let percentWith2Digits = (method == .dcf) ? [0,9,10] : [7,5,8]
-        let numberWithDigits = (method == .dcf) ? [1] : [6,11]
+        let percentWith2Digits = (method == .dcf) ? [0,9,10] : [7,5,8,10,11]
+        let numberWithDigits = (method == .dcf) ? [1] : [6,9]
         let numberNoDigits = (method == .dcf) ? [] : [10]
         let currencyGapWithPence = (method == .dcf) ? [] : [1,2,3,4]
-        let currencyGapNoPence = (method == .dcf) ? [2,3,4,5,6,7,8] : []
+        let currencyGapNoPence = (method == .dcf) ? [2,3,4,5,6,7] : []
         
         // r1 Section 9 have two different formats
         
@@ -1188,7 +1220,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             else if currencyGapNoPence.contains(indexPath.section) {
                 return currencyFormatterGapNoPence.string(from: number as NSNumber)
             }
-            else if [9].contains(indexPath.section) {
+            else if [10].contains(indexPath.section) {
                 // Rule 1 'Debt section'
                 if indexPath.row == 0 {
                     return numberFormatterWith1Digit.string(from: number as NSNumber)
@@ -1204,7 +1236,8 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         return nil
 
     }
-
+     */
+    
     internal func valueFormat(indexPath: IndexPath) -> ValuationCellValueFormat {
         
         let dcfFormats:[[ValuationCellValueFormat]] = [[.date, .percent, .percent, .percent],
@@ -1219,7 +1252,8 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
                                                        [.percent,.percent],
                                                        [.percent,.percent]]
                                                        
-        let r1Formats:[[ValuationCellValueFormat]] = [[.date], [.percent, .numberNoDecimals],
+        let r1Formats:[[ValuationCellValueFormat]] = [[.date],
+                                                      [.percent, .numberNoDecimals],
                                                       [.currency,.currency, .currency, .currency, .currency, .currency,.currency, .currency, .currency, .currency],
                                                       [.currency,.currency, .currency, .currency, .currency, .currency,.currency, .currency, .currency, .currency],
                                                       [.currency,.currency, .currency, .currency, .currency, .currency,.currency, .currency, .currency, .currency],
@@ -1341,8 +1375,19 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         let section1 = [creationDate]
         
         let (cleanedBVPS, _) = ValuationDataCleaner.cleanValuationData(dataArrays: [valuation.bvps ?? [], valuation.eps ?? []], method: .rule1)
-        let futureGrowth = valuation.futureGrowthEstimate(cleanedBVPS: cleanedBVPS.first!)!
-        let predictedGrowth = valuation.adjGrowthEstimates?.mean() ?? valuation.growthEstimates?.mean()
+        guard let first = cleanedBVPS.first else {
+            return [[String()]]
+        }
+        guard let futureGrowth = valuation.futureGrowthEstimate(cleanedBVPS: first) else {
+            return [[String()]]
+        }
+        var predictedGrowth = 0.0
+        if valuation.adjGrowthEstimates?.mean() ?? 0 != 0.0 {
+            predictedGrowth = valuation.adjGrowthEstimates!.mean()!
+        } else if valuation.growthEstimates?.mean() ?? 0 != 0.0 {
+            predictedGrowth = valuation.growthEstimates!.mean()!
+        }
+        
         var futurePER$ = ""
         if let futurePER = valuation.futurePER(futureGrowth: futureGrowth) {
             futurePER$ = futurePER.shortString(decimals: 1, formatter: numberFormatterNoFraction)
@@ -1356,7 +1401,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         let section4 = valuation.revenue?.shortStrings(decimals: 2)  ?? [String]()
         let section5 = valuation.opcs?.shortStrings(decimals: 2) ?? [String]()
         let section6 = valuation.roic?.shortStrings(decimals: 1, formatter: percentFormatter2Digits) ?? [String]()
-        let section7 = valuation.hxPE?.shortStrings(decimals: 0, formatter: numberFormatterNoFraction) ?? [String]()
+        let section7 = valuation.hxPE?.shortStrings(decimals: 1, formatter: numberFormatterWith1Digit) ?? [String]()
         
         var averageGrowth = [Double?]()
         if let growth = averageGrowthPrediction() {
@@ -1371,7 +1416,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         let section12Value = [valuation.ceoRating]
         
         let section9 = section9Values.shortStrings(decimals: 2, formatter: percentFormatter2Digits)
-        let section10 = section10Values.shortStrings(decimals: 1)
+        let section10 = [section10Values[0]?.shortString(decimals: 0, formatter: currencyFormatterNoGapNoPence) ?? "-", section10Values[1]?.shortString(decimals: 2, formatter: percentFormatter2Digits) ?? "-"]
         let section11 = section11Values.shortStrings(decimals: 2, formatter: numberFormatterNoFraction)
         let section12 = section12Value.shortStrings(decimals: 0, formatter: numberFormatterNoFraction)
 
@@ -1404,6 +1449,11 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
             else { return nil }
         }
         else if let valuation = self.valuation as? Rule1Valuation  {
+            
+            if valuation.growthEstimates?.count ?? 0 == 1 {
+                // if there's only one element (min, max) then duplicate the one element
+                valuation.growthEstimates?.append(valuation.growthEstimates!.first!)
+            }
 
             if valuation.growthEstimates?.count ?? 0 > 0 {
                 return valuation.growthEstimates?.mean()
@@ -1444,7 +1494,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
     /// the element number is interpreted as 'years' backwards since date of first element
     internal func calculateGrowthR1(valueArray: [Double]?, element: Int) -> Double? {
         
-        guard element > 1 && element < (valueArray?.count ?? 0) else {
+        guard element > 0 && element < (valueArray?.count ?? 0) else {
             return nil
         }
         
@@ -1468,24 +1518,24 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         return (pow((endValue / startValue) , (1/years)) - 1)
     }
     
-    func r1MoatParameterCount() -> Int? {
-        
-        
-        guard  let v = valuation as? Rule1Valuation else {
-            return nil
-        }
-        
-        let arrays = [v.bvps, v.eps, v.revenue, v.opcs, v.roic]
-        var countNonZero = 0
-        for array in arrays {
-            countNonZero += array?.compactMap{ $0 }.filter({ (value) -> Bool in
-                if value != 0 { return true }
-                else { return false }
-            }).count ?? 0
-        }
-        
-        return countNonZero
-    }
+//    func r1MoatParameterCount() -> Int? {
+//
+//
+//        guard  let v = valuation as? Rule1Valuation else {
+//            return nil
+//        }
+//
+//        let arrays = [v.bvps, v.eps, v.revenue, v.opcs, v.roic]
+//        var countNonZero = 0
+//        for array in arrays {
+//            countNonZero += array?.compactMap{ $0 }.filter({ (value) -> Bool in
+//                if value != 0 { return true }
+//                else { return false }
+//            }).count ?? 0
+//        }
+//
+//        return countNonZero
+//    }
 
 }
 
@@ -1498,8 +1548,8 @@ extension CombinedValuationController: DownloadRedirectionDelegate {
         if let request = notification.object as? URLRequest {
             if let url = request.url {
                 
-                guard url.path.starts(with: "https://www.macrotrends.net") else {
-                    ErrorController.addInternalError(errorLocation: "awaitingRedirection", systemError: nil, errorInfo: "redirection request to non-macrotredns page reived \(request.url?.path ?? "")")
+                guard url.absoluteString.starts(with: "https://www.macrotrends.net") else {
+                    ErrorController.addInternalError(errorLocation: "awaitingRedirection", systemError: nil, errorInfo: "redirection request to non-macrotrends page reived \(request.url?.path ?? "")")
                     return
                 }
                        

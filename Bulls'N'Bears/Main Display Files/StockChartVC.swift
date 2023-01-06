@@ -184,29 +184,9 @@ class StockChartVC: UIViewController {
 
     @IBAction func dcfButtonAction(_ sender: UIButton) {
         
-//        // TODO: - redirect to list vierw controller, not modal
-//        guard let validShare = share else {
-//            return
-//        }
-//
-//        guard let symbol = validShare.symbol else {
-//            return
-//        }
         
         stocksListVC.showWBValuationView(indexPath: stocksListVC.tableView.indexPathForSelectedRow ?? IndexPath(row: 0, section: 0), chartViewSegue: false)
                 
-//        if CombinedValuationController.returnDCFValuations(company: symbol) == nil {
-//            share?.dcfValuation = CombinedValuationController.createDCFValuation(company: symbol)
-//        }
-//
-//        if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationListViewController") as? ValuationListViewController {
-//            tvc.valuationMethod = ValuationMethods.dcf
-//            tvc.share = validShare
-//            tvc.delegate = self
-//
-//            self.present(tvc, animated: true, completion: nil)
-//        }
-
     }
     
     @objc
@@ -240,12 +220,16 @@ class StockChartVC: UIViewController {
     
     @objc
     func downloadStarted() {
-        spinner.startAnimating()
+        DispatchQueue.main.async {
+            self.spinner.startAnimating()
+        }
     }
     
     @objc
     func downloadEnded() {
-        spinner.stopAnimating()
+        DispatchQueue.main.async {
+            self.spinner.stopAnimating()
+        }
     }
         
     @IBAction func purchaseAction(_ sender: UIButton) {

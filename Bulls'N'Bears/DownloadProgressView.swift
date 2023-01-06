@@ -12,6 +12,10 @@ protocol ProgressViewDelegate: AnyObject {
     func cancelRequested()
     func downloadComplete()
     func downloadError(error: String)
+    func taskCompleted()
+    
+    var allTasks: Int { get set }
+    var completedTasks: Int { get set }
 }
 
 class DownloadProgressView: UIView {

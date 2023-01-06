@@ -17,32 +17,23 @@ enum ShareTrendNames {
     case healthScore
 }
 
-enum WebPageExtractionCodeOptions {
+enum WebServiceName {
     case macroTrends
     case yahoo
     case yCharts
+    case tagesschau
 }
 
 typealias ShareID_Symbol_sName = (id: NSManagedObjectID, symbol: String?, shortName: String?)
 typealias ShareID_Value = (id: NSManagedObjectID, value: Double?)
 typealias Dated_EPS_PER_Values = (date: Date, epsTTM: Double, peRatio: Double)
 typealias ShareID_DatedValues = (id: NSManagedObjectID, values: [DatedValue]?)
-//typealias PriceDate = (date: Date, price: Double)
 typealias TrendInfoPackage = (incline: Double?, endPrice: Double, pctIncrease: Double, increaseMin: Double, increaseMax: Double)
-typealias ProfileData = (sector: String, industry: String, employees: Double)
-typealias LabelledValue = (label: String, value: Double?)
-typealias LabelledValues = (label: String, values: [Double])
-typealias Labelled_DatedValues = (label: String, datedValues: [DatedValue])
-//typealias DatedValue = (date: Date, value: Double)
-//typealias DatedValues = (date: Date, values: [Double])
-//typealias DatedText = (date: Date, text: String)
-typealias ShareNamesDictionary = (symbol: String, shortName: String)
+//typealias ShareNamesDictionary = (symbol: String, shortName: String)
 typealias LabelledFileURL = (symbol: String, fileURL: URL)
 typealias ScoreData = (score: Double, maxScore: Double, factorArray: [String])
 
-//var stocks = [Stock]()
 var foreCastTime: TimeInterval = 30*24*3600
-//var managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 var errorLog: [InternalError]?
 let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
 let gradientBar = UIImage(named: "GradientBar")
@@ -50,6 +41,34 @@ let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
 var valuationWeightsSingleton = Financial_Valuation_Factors()
 let nonRefreshTimeInterval: TimeInterval  = 300
+
+struct ProfileData {
+    var sector: String
+    var industry: String
+    var employees: Double
+    var description: String
+}
+
+struct PageRowServiceTitle {
+    var page: String
+    var rowTitle: String
+    var service: WebpageExtractionCodes
+}
+
+struct LabelledValue: Codable {
+    var label: String
+    var value: Double?
+}
+
+struct LabelledValues: Codable {
+    var label: String
+    var values: [Double]
+}
+
+struct Labelled_DatedValues: Codable {
+    var label: String
+    var datedValues: [DatedValue]
+}
 
 struct DatedValues: Codable {
     var date: Date
@@ -71,6 +90,83 @@ struct DatedText: Codable {
     var text: String
 }
 
+struct WebPageAndTitle {
+    var rowColumnTitle = String()
+    var pageTitle = String()
+}
+
+/// links different web page names for same parameter
+struct FinancialParameterNames {
+    var macroTrends: WebPageAndTitle
+    var yahoo: WebPageAndTitle
+    var tagesschau: WebPageAndTitle
+    
+    init(macroTrends: WebPageAndTitle, yahoo: WebPageAndTitle, tagesschau: WebPageAndTitle) {
+        self.macroTrends = macroTrends
+        self.yahoo = yahoo
+        self.tagesschau = tagesschau
+    }
+}
+
+struct FinancialParameterDetail {
+    
+    var pageRowService: PageRowServiceTitle
+    
+    init(pageRowService: PageRowServiceTitle) {
+        self.pageRowService = pageRowService
+    }
+    
+    func url(share: Share, service: WebServiceName) -> URL? {
+        
+        guard let symbol = share.symbol else {
+            return nil
+        }
+        
+        var url: URL?
+        
+        switch service {
+        case .yahoo:
+            var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/\(pageRowService.page)")
+            components?.queryItems = [URLQueryItem(name: "p", value: symbol)]
+            url = components?.url
+            
+        case .macroTrends:
+            guard let shortName = share.name_short else {
+                return nil
+            }
+            
+            var hyphenatedShortName = String()
+            let shortNameComponents = shortName.split(separator: " ")
+            hyphenatedShortName = String(shortNameComponents.first ?? "").lowercased()
+            
+            guard hyphenatedShortName != "" else {
+                return nil
+            }
+            
+            for index in 1..<shortNameComponents.count {
+                if !shortNameComponents[index].contains("(") {
+                    hyphenatedShortName += "-" + String(shortNameComponents[index]).lowercased()
+                }
+            }
+            
+            var components: URLComponents?
+            components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(hyphenatedShortName)/" + pageRowService.page)
+            url = components?.url
+            
+        case .tagesschau:
+            let webString = symbol.replacingOccurrences(of: " ", with: "+")
+            url = URL(string: "https://www.tagesschau.de/wirtschaft/boersenkurse/suche/?suchbegriff=\(webString)")
+
+        case .yCharts:
+            url = URL(string: ("https://ycharts.com/companies/" + symbol.uppercased() + "/eps"))
+
+        }
+        
+        return url
+    }
+    
+}
+
 
 struct WebpageExtractionCodes {
     var tableTitle:String?
@@ -83,9 +179,9 @@ struct WebpageExtractionCodes {
     var dataCellStartSequence = "<td>"
     var dataCellEndSequence = "</td>"
     var dateFormatter: DateFormatter!
-    var option: WebPageExtractionCodeOptions!
+    var option: WebServiceName!
     
-    init(tableTitle: String?, option: WebPageExtractionCodeOptions?=nil,tableStartSequence: String?=nil, tableEndSequence: String?=nil, bodyStartSequence: String?=nil, bodyEndSequence: String?=nil ,rowStartSequence: String?=nil, rowEndSequence: String?=nil, dataCellStartSequence: String?=nil, dataCellEndSequence: String?=nil, dateFormatter: DateFormatter?=nil) {
+    init(tableTitle: String?, option: WebServiceName?=nil,tableStartSequence: String?=nil, tableEndSequence: String?=nil, bodyStartSequence: String?=nil, bodyEndSequence: String?=nil ,rowStartSequence: String?=nil, rowEndSequence: String?=nil, dataCellStartSequence: String?=nil, dataCellEndSequence: String?=nil, dateFormatter: DateFormatter?=nil) {
         
         self.tableTitle = tableTitle
         self.dateFormatter = dateFormatter
@@ -114,6 +210,8 @@ struct WebpageExtractionCodes {
                 if let valid = dateFormatter {
                     self.dateFormatter = valid
                 }
+            default:
+                print("undefined web page extraction code \(option)")
             }
         }
 
@@ -142,8 +240,30 @@ struct WebpageExtractionCodes {
             self.dataCellEndSequence = valid
         }
     }
-    
 }
+
+var rowTitlesAndPages: [FinancialParameterNames] = {
+    
+    var parameterNames = [FinancialParameterNames]()
+    
+    let yahooPageNames = ["financials", "balance-sheet","cash-flow"]
+    let mtPageNames = ["financial-statements", "financial-ratios", "balance-sheet"]
+    
+    let yahooRowTitles = [["Total revenue","Basic EPS","Net income"],["Total non-current liabilities", "Common stock"],["Operating cash flow]"]]
+    let mtRowTitles = [["Revenue","EPS - Earnings Per Share","Net Income"],["ROI - Return On Investment","Book Value Per Share","Operating Cash Flow Per Share"],["Long Term Debt"]]
+    
+    for i in 0..<yahooPageNames.count {
+        for j in 0..<yahooRowTitles.count {
+            let mt = WebPageAndTitle(rowColumnTitle: mtRowTitles[i][j], pageTitle: mtPageNames[i])
+            let yahoo = WebPageAndTitle(rowColumnTitle: yahooRowTitles[i][j], pageTitle: yahooPageNames[i])
+            let tageschau = WebPageAndTitle(rowColumnTitle: "", pageTitle: "")
+            let new = FinancialParameterNames(macroTrends: mt, yahoo: yahoo, tagesschau: tageschau)
+            parameterNames.append(new)
+        }
+    }
+            
+    return parameterNames
+}()
 
 var yahooRefDate: Date = {
     let calendar = Calendar.current
@@ -165,7 +285,7 @@ var yahooPricesStartDate: Date {
     dateComponents.second = 0
     dateComponents.minute = 0
     dateComponents.hour = 0
-    dateComponents.year! -= 1
+    dateComponents.year! -= 10
     return calendar.date(from: dateComponents) ?? Date()
 }
 
@@ -482,6 +602,21 @@ let dateFormatter: DateFormatter = {
     formatter.dateStyle = .short
     return formatter
 }()
+
+let yahooWebpageDateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "dd MMM yyyy"
+    formatter.calendar.timeZone = TimeZone(identifier: "UTC")!
+    return formatter
+}()
+
+let yahooCSVFileDateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+    formatter.calendar.timeZone = TimeZone(identifier: "UTC")!
+    return formatter
+}()
+
 
 
 struct Correlation {

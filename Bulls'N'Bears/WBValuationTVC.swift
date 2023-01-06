@@ -11,6 +11,7 @@ import CoreData
 enum WBVInfoSection {
     case PE
     case BVPStoPrice
+    case Returns
     case Lynch
     case intrinsicValue
 }
@@ -20,12 +21,17 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     var downloadButton: UIBarButtonItem!
     var controller: WBValuationController?
     var share: Share!
-    var progressView: DownloadProgressView?
     var fromIndexPath: IndexPath!
     var movingToValueListTVC = false
     var r1DataReload = false
     var dcfDataReload = false
     var valuationInfosTexts = [WBVInfoSection: String]()
+    
+    // progressView
+    var progressView: DownloadProgressView?
+    var allDownloadTasks = 0
+    var completedDownloadTasks = 0
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -201,12 +207,20 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let valuationInfoPaths = [IndexPath(row: 0, section: 0), IndexPath(row: 5, section: 0),IndexPath(row: 6, section: 0)]
+        // key financial values for Moat, R1 price and DCF price
+        let valuationInfoPaths = [IndexPath(row: 0, section: 0), IndexPath(row: 6, section: 0),IndexPath(row: 7, section: 0)]
         
         if valuationInfoPaths.contains(indexPath) {
             // DCF and R1 valuations display 'ValuationListVC'
             performSegue(withIdentifier: "showDCFR1DetailsSegue", sender: nil)
         }
+//        else if indexPath == IndexPath(row: 4, section: 0) {
+//            // Return over 10 and 3 years
+//            //TODO: - show CAGR values for 10 and 3 years
+//            // using share.returnRateCAGR(years: <#T##Int#>)
+//
+//            performSegue(withIdentifier: "valueListSegue", sender: nil)
+//        }
         else if indexPath.section > 0 {
             // WBV valuation details
             performSegue(withIdentifier: "valueListSegue", sender: nil)
@@ -225,6 +239,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         valuationInfosTexts[.Lynch] = "Earnings growth + dividend yield divided by PE ratio.\n\nLess than 1.0 is poor, 1.5 is ok, >2.0 is interesting.\n'One up on Wall Street' by Peter Lynch\nSimon & Schuster, 1989"
 
         valuationInfosTexts[.intrinsicValue] = "The Intrinsic value based on 10y prediction.\nTaking into account past earnings growth, pre-tax EPS and a long-term discount rate of 2.1%.\n\nAs calculated in 'Warren Buffet and the Interpretation of Financial Statements'\n(Simon & Schuster, 2008)"
+        valuationInfosTexts[.Returns] = "If you invested $1000 10 (3) years ago, the value would now be..."
         
     }
 
@@ -345,7 +360,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             }
         }
         else if let destination = segue.destination as? ValuationListViewController {
-            if ([0,5].contains(selectedPath.row)) {
+            if ([0,6].contains(selectedPath.row)) {
                 destination.valuationMethod = .rule1
                 r1DataReload = true
             } else {
@@ -369,6 +384,29 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 destination.errors = [valuationInfosTexts[.Lynch]!]
                 headerText += "the 'Lynch' score?"
             case 4:
+                destination.errors = [valuationInfosTexts[.Returns]!]
+                
+                var currentValue = "-/-"
+                if share.return10y != 0 {
+                    currentValue = (currencyFormatterNoGapNoPence.string(from: (share.return10y * 1000) as NSNumber) ?? "-")
+                }
+                if share.return3y != 0 {
+                    currentValue += " (" + (currencyFormatterNoGapNoPence.string(from: (share.return3y * 1000) as NSNumber) ?? "-") + ")"
+                }
+                destination.errors.append(currentValue)
+                
+                var cagr$ = String()
+                if let cagr10 = share.returnRateCAGR(years: 10) {
+                    cagr$ += percentFormatter2Digits.string(from: cagr10 as NSNumber) ?? "-"
+                }
+                if let cagr3 = share.returnRateCAGR(years: 3) {
+                    cagr$ += " (" + (percentFormatter2Digits.string(from: cagr3 as NSNumber) ?? "-") + ")"
+                }
+                cagr$ += " annual compound return"
+                
+                destination.errors.append(cagr$)
+                headerText += "this?"
+            case 8:
                 destination.errors = [valuationInfosTexts[.intrinsicValue]!]
                 headerText += "the Intrinsic value?"
             default:
@@ -444,9 +482,40 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     }
     
-    //MARK: - ProgressViewDelegate funcions
+    //MARK: - ProgressViewDelegate functions
     
+    var completedTasks: Int {
+        get {
+            completedDownloadTasks
+        }
+        set (newValue) {
+            completedDownloadTasks = newValue
+        }
+    }
+    
+    
+    func taskCompleted() {
+        completedTasks += 1
+        if allDownloadTasks < completedTasks {
+            completedTasks = allDownloadTasks
+        }
+        
+        self.progressUpdate(allTasks: allDownloadTasks, completedTasks: completedTasks)
+    }
+    
+    var allTasks: Int {
+        get {
+            return allDownloadTasks
+        }
+        set (newValue) {
+            allDownloadTasks = newValue
+        }
+    }
+
     func downloadError(error: String) {
+        
+        allDownloadTasks -= 1
+        completedTasks += 1
 
         DispatchQueue.main.async {
             self.progressView?.title.font = UIFont.systemFont(ofSize: 14)

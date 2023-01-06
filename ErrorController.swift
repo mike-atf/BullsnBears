@@ -55,8 +55,7 @@ struct InternalError: Error {
         
         return description
 
-        }
-    
+    }
 }
 
 
@@ -104,6 +103,7 @@ enum InternalErrorType: Error {
     case htmlRowStartIndexNotFound
     case htmlRowEndIndexNotFound
     case contentStartSequenceNotFound
+    case contentEndSequenceNotFound
     case noBackgroundMOC
     case htmlTableTextNotExtracted
     case fileFormatNotCSV

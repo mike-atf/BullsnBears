@@ -24,7 +24,9 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     var controller: CombinedValuationController!
     var progressView: DownloadProgressView?
     var newDataDownloaded = false
-    
+    var allDownloadTasks = 0 // for ProgressDelegate
+    var completedDownloadTasks = 0 // for ProgressDelegate
+
     var showDownloadCompleteMessage = false // used because asking alertConotrller to show message in 'dataUpdated' right after reloadData causes 'table view or one of its superviews has not been added to a window' error, assuming that reloading rows still takes place while the alertView is in front. so instead show this when the viewDidLayouSubviews, using this bool
     
     override func viewDidLoad() {
@@ -178,25 +180,6 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
             donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor,constant: -5).isActive = true
         }
         
-//        var saveButtonTargetSection = (sectionTitles?.count ?? 0) - 1
-//        if valuationMethod == .rule1 {
-//            saveButtonTargetSection = (sectionTitles?.count ?? 0) - 4
-//        }
-//
-//        if section == saveButtonTargetSection {
-//            var config = UIButton.Configuration.borderedTinted()
-////            config.title = "Save"
-//            config.image = UIImage(systemName: "square.and.arrow.down.fill")
-//
-//            let saveButton = UIButton(configuration: config, primaryAction: nil)
-//            saveButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
-//            saveButton.translatesAutoresizingMaskIntoConstraints = false
-//            header.addSubview(saveButton)
-//
-//            saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-//            saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor,constant: -5).isActive = true
-//        }
-
         return header
         
     }
@@ -252,7 +235,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
 
         progressView?.delegate = self
-        progressView?.title.text = "Downloading data..."
+        progressView?.title.text = "Downloading..."
                 
         controller.startDataDownload()
         
@@ -313,6 +296,35 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
 
 extension ValuationListViewController: ProgressViewDelegate {
+    
+    var completedTasks: Int {
+        get {
+            completedDownloadTasks
+        }
+        set (newValue) {
+            completedDownloadTasks = newValue
+        }
+    }
+    
+    
+    func taskCompleted() {
+        completedTasks += 1
+        if allDownloadTasks < completedTasks {
+            completedTasks = allDownloadTasks
+        }
+        
+        self.progressUpdate(allTasks: allDownloadTasks, completedTasks: completedTasks)
+    }
+    
+    var allTasks: Int {
+        get {
+            return allDownloadTasks
+        }
+        set (newValue) {
+            allDownloadTasks = newValue
+        }
+    }
+    
     
     func downloadError(error: String) {
         

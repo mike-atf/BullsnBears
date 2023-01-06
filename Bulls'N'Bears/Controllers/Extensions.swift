@@ -106,6 +106,25 @@ extension Double {
 
 extension Array where Element == Double {
     
+    // divides each element by the corresponding element of the divisor array 'self / divisor'; if element count doesn't match returns only count elements of smaller array
+    func divideElements(divisor: [Double]) -> [Double]? {
+    
+        guard self.count > 0 && divisor.count > 0 else {
+            return nil
+        }
+        
+        var result = [Double]()
+        
+        for i in 0..<self.count {
+            if divisor.count > i {
+                result.append(self[i] / divisor[i])
+            }
+        }
+        
+        return result
+        
+    }
+    
     /// returns fraction number  with 'B', 'M', 'K' or no letter at the end
     func shortStrings(decimals: Int, formatter: NumberFormatter?=nil, nilString: String? = "-") -> [String] {
                 
@@ -742,6 +761,47 @@ extension Array where Element == CGFloat {
             return sum / CGFloat(self.count)
         }
         else { return nil }
+    }
+
+}
+
+extension String {
+    
+    func numberFromText(rowTitle: String, exponent: Double?=nil) -> Double {
+        
+        var value = Double()
+        
+        if self.filter("-0123456789.".contains) != "" {
+            if let v = Double(self.filter("-0123456789.".contains)) {
+              
+                if self.last == "%" {
+                    value = v / 100.0
+                }
+                else if self.uppercased().last == "T" {
+                    value = v * pow(10.0, 12) // should be 12 but values are entered as '000
+                } else if self.uppercased().last == "B" {
+                    value = v * pow(10.0, 9) // should be 9 but values are entered as '000
+                }
+                else if self.uppercased().last == "M" {
+                    value = v * pow(10.0, 6) // should be 6 but values are entered as '000
+                }
+                else if self.uppercased().last == "K" {
+                    value = v * pow(10.0, 3) // should be 6 but values are entered as '000
+                }
+                else if rowTitle.contains("Beta") {
+                    value = v
+                }
+                else {
+                    value = v * (pow(10.0, exponent ?? 0.0))
+                }
+                
+                if self.last == ")" {
+                    value = v * -1
+                }
+            }
+        }
+        
+        return value
     }
 
 }

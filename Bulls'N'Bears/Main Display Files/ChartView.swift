@@ -68,8 +68,6 @@ class ChartView: UIView {
         
         dateRange = validStock.priceDateRangeWorkWeeksForCharts(withForecastTime: withForeCast ?? true)
 
-//        guard lowestPriceInRange != nil else { return }
-//        guard highestPriceInRange != nil else { return }
         guard dateRange != nil else { return }
         
         minPrice = (lowestPriceInRange! * 0.9).rounded()
@@ -339,7 +337,7 @@ class ChartView: UIView {
                 //MARK: - pricePredictionBox
                 if let predictions = share?.research?.sharePricePredictions() {
                    
-                    let sp = PriceDate(date: predictions.date.addingTimeInterval(-90*3600*24), price: predictions.values.max()!)
+                    let sp = PriceDate(date: predictions.date, price: predictions.values.max()!)
                     let ep = PriceDate(date: (dateRange?.max()!)!, price: predictions.values.min()!)
                     let startPoint = plotPricePoint(pricePoint: sp)
                     let endPoint = plotPricePoint(pricePoint: ep)
@@ -440,10 +438,6 @@ class ChartView: UIView {
             }
             
         }
-        else {
-            print("\(share!.symbol!) has no eps ttm data")
-            print()
-        }
         
         //MARK: - qEPS line
         // uses different vertical scale!
@@ -490,9 +484,6 @@ class ChartView: UIView {
                 labelPath.stroke()
             }
             
-        } else {
-            print("\(share!.symbol!) has no q eps data")
-            print()
         }
 
         //MARK: - SMA Labels

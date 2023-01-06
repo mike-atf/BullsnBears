@@ -41,17 +41,27 @@ class CSVImporter: NSObject {
         return nil
     }
 
-
-    class func extractPricePointsFromFile(url: URL? = nil, symbol: String) -> [PricePoint]? {
+    /// extracts pricepoint data from yahoo csv file. Going through in descending time order will stop at minDate if provided. If providing specific date will provide pricepoint for this date only
+    class func extractPricePointsFromFile(url: URL?, symbol: String, minDate:Date?=nil, specificDate:Date?=nil) -> [PricePoint]? {
         
         guard let validURL = url else {
             ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "wrong/ missing url when trying to extract CSV")
             return nil
         }
         
-        guard let lastPathComponent = validURL.lastPathComponent.split(separator: ".").first else {
-            return nil
+        var lastPathComponent = String()
+        if #available(iOS 16.0, *) {
+            lastPathComponent = validURL.lastPathComponent.replacing(".csv", with: "")
+        } else {
+            if let csvRange = validURL.lastPathComponent.range(of: ".csv") {
+                lastPathComponent = String(validURL.lastPathComponent[...csvRange.lowerBound])
+            }
         }
+        
+        if let type = lastPathComponent.range(of: "_") {
+            lastPathComponent = String(lastPathComponent[..<type.lowerBound])
+        }
+
         guard symbol == String(lastPathComponent) else {
             return nil
         }
@@ -82,17 +92,43 @@ class CSVImporter: NSObject {
             }
         }
         
-        if headerError { return nil }
+        if headerError {
+            return nil
+        }
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        for index in 1..<rows.count { // first line has header titles
+        
+        if let specific = specificDate {
+            let firstRowArray = rows[1].components(separatedBy: ",")
+            guard let date$ = firstRowArray.first else {
+                return nil
+            }
+            guard let date = dateFormatter.date(from: date$) else {
+                return nil
+            }
+            
+            // if earliest date is after specific date the specific date can't be returned
+            if date.addingTimeInterval(-week) > specific {
+                return nil
+            }
+        }
+        
+        for index in 1..<rows.count { // first line has header titles, Yahoo csv files are in date ASCENDING order
             let array = rows[index].components(separatedBy: ",")
             let date$ = array[0]
             guard let date = dateFormatter.date(from: date$) else {
                 ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "error converting to 'date' \(array[0])")
                 continue
             }
+            
+            // don't add rows if date < limit; csv is in date ASCENDING order
+            if let limit = minDate {
+                if date < limit {
+                    continue
+                }
+            }
+
             guard let open = Double(array[1]) else {
                 ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "error converting to 'date' \(array[1])")
                 continue
@@ -115,8 +151,16 @@ class CSVImporter: NSObject {
 
             }
             
-            let newObject = PricePoint(open: open, close: close, low: low, high: high, volume: volume, date: date)
-            stockPrices.append(newObject)
+            if specificDate == nil {
+                let newObject = PricePoint(open: open, close: close, low: low, high: high, volume: volume, date: date)
+                stockPrices.append(newObject)
+            } else {
+                if date > specificDate! {
+                    let newObject = PricePoint(open: open, close: close, low: low, high: high, volume: volume, date: date)
+                    return [newObject]
+                }
+            }
+            
         }
         
 
@@ -185,11 +229,12 @@ class CSVImporter: NSObject {
         return datedValues
     }
 
-    
-    class func extractPriceData(url: URL?, symbol: String) -> [PricePoint]? {
+    /*
+    /// extracts pricepoint data from yahoo csv file. Going through in descending time order will stop at minDate if provided. If providing specific date will provide pricepoint for this date only
+    class func extractPriceData(url: URL?, symbol: String, minDate:Date?=nil, specificDate:Date?=nil) -> [PricePoint]? {
         
         guard let validURL = url else {
-            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: nil, errorInfo: "wrong/ missing url when trying to extract CSV")
+            ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "wrong/ missing url when trying to extract CSV")
             return nil
         }
         
@@ -260,12 +305,26 @@ class CSVImporter: NSObject {
 
             }
             
-            let newObject = PricePoint(open: open, close: close, low: low, high: high, volume: volume, date: date)
-            stockPrices.append(newObject)
+            if specificDate == nil {
+                let newObject = PricePoint(open: open, close: close, low: low, high: high, volume: volume, date: date)
+                stockPrices.append(newObject)
+            } else {
+                if date < specificDate! {
+                    let newObject = PricePoint(open: open, close: close, low: low, high: high, volume: volume, date: date)
+                    return [newObject]
+                }
+            }
+            
+            if let limit = minDate {
+                if date < limit {
+                    return stockPrices
+                }
+            }
         }
         
         return stockPrices
     }
+    */
     
     /// checks that first row if csv files has the expected header elements
     class func matchesExpectedFormat(url: URL?, expectedHeaderTitles:[String]) -> Bool {

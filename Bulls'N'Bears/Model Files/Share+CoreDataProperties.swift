@@ -34,7 +34,7 @@ extension Share {
     @NSManaged public var symbol: String?
     @NSManaged public var userEvaluationScore: Double
     @NSManaged public var valueScore: Double
-    @NSManaged public var watchStatus: Int16 // 0 watchList, 1 owned, 2 archived
+    @NSManaged public var watchStatus: Int16 // 0 watchList, 1 owned, 3 archived, 2 research
     @NSManaged public var dcfValuation: DCFValuation?
     @NSManaged public var transactions: NSSet?
     @NSManaged public var research: StockResearch?
@@ -48,9 +48,12 @@ extension Share {
     @NSManaged public var trend_StickerPrice: Data?
     @NSManaged public var trend_intrinsicValue: Data?
     @NSManaged public var trend_healthScore: Data?
-   @NSManaged public var capitalAssetRatio: Double
-    @NSManaged public var pcRatio: Double
-
+    @NSManaged public var dividendWDates: Data?
+    @NSManaged public var exchange: String?
+    @NSManaged public var isin: String?
+    @NSManaged public var return3y: Double
+    @NSManaged public var return10y: Double
+    @NSManaged public var currency: String?
 
 }
 

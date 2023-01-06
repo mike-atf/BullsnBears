@@ -49,6 +49,37 @@ class Calculator {
         
         return rates
     }
+    
+    /// returns a time-DESCENDING array (n-1 elements) of the year-on-year / element to next element  growth rates
+    /// the array should be in time DESCENDING order and the time between each element is assumed to one year
+    /// any placeholder (Double()) element will return a growthRate placeholder element (0.0)
+    class func growthRatesYoY(values: [Double]?) -> [Double]? {
+        
+        guard let array = values else {
+            return nil
+        }
+
+        guard array.count > 1 else {
+            return nil
+        }
+        
+        let timeAscendingArray = Array(array.reversed())
+        var timeAscendingRates = [Double]()
+        var current = timeAscendingArray.first!
+        
+        for i in 1..<timeAscendingArray.count {
+            if current != 0 {
+                let growth = (timeAscendingArray[i] - current) / abs(current)
+                timeAscendingRates.append(growth)
+            } else {
+                timeAscendingRates.append(0.0)
+            }
+            current = timeAscendingArray[i]
+        }
+        
+        return timeAscendingRates.reversed()
+        
+    }
 
     class func futureValue(present: Double, growth: Double, years: Double) -> Double {
         return present * pow((1+growth), years)

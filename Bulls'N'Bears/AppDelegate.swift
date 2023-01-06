@@ -114,6 +114,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 
         // Reveal / import the document at the URL
         guard let masterSplitView = window?.rootViewController as? MasterSplitView else { return false }
+        self.window?.makeKeyAndVisible()
         
         masterSplitView.openRemoteDocument(inputURL, importIfNeeded: true)
 

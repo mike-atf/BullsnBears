@@ -40,17 +40,7 @@ class ValueListTVC: UITableViewController {
         
        proportions = controller.valueListTVCProportions(values: values) // values = time-DESCENDING, proportions come back in same order
    }
-    
-    // this cell is used to show latest date of WBValuation Data taken from MacroTrends.
-    // Not used for user comments any longer - consider getting rid of the NSManagedObject
-//    override func viewWillDisappear(_ animated: Bool) {
-//
-//        if let textcell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) as? ValueListTextEntryCell {
-//            let parameter = textcell.wbvParameter ?? ""
-//            controller.userEnteredNotes(notes: textcell.textView.text, parameter: parameter)
-//        }
-//    }
-    
+        
     override func viewDidDisappear(_ animated: Bool) {
                  
         NotificationCenter.default.post(name: Notification.Name(rawValue: "refreshWBValuationTVCRow"), object: indexPath, userInfo: nil)
@@ -83,9 +73,6 @@ class ValueListTVC: UITableViewController {
             let parameter = sectionTitles[2] // ! careful. This assumes the first two sectionsTitles are '["Your Rating (keep tapping the stars)","Newest available data from"]' to which the parameter and more are appended in WBValuationController prepareForSegue()
             let userEvaluation = controller.returnUserEvaluation(for: parameter)
             let text = controller.latestDataDate() != nil ? dateFormatter.string(from: controller.latestDataDate()!) : "NA"
-//            if let comment = userEvaluation?.comment {
-//                text += "\n" + comment + " (" + dateFormatter.string(from: userEvaluation?.date ?? Date()) + ")"
-//            }
             
             cell.configure(text: text, delegate: controller, wbvParameter: userEvaluation?.wbvParameter ?? "missing")
             
@@ -103,8 +90,8 @@ class ValueListTVC: UITableViewController {
             }
             else if indexPath.row == 1 {
                 // chart of growth
-                let trendLineChartValues = (values?.count ?? 0 > 1) ? Calculator.compoundGrowthRates(values: proportions) : proportions
-                let rowtitle = "Compound growth rates of " + cellLegendTitles.first!
+                let trendLineChartValues = (values?.count ?? 0 > 1) ? Calculator.growthRatesYoY(values: proportions) : proportions // Calculator.compoundGrowthRates(values: proportions)
+                let rowtitle = "YoY growth of " + cellLegendTitles.first!
                 
                 cell.configure(values: trendLineChartValues, biggerIsBetter: higherGrowthIsBetter ,rightTitle: rowtitle, valuesAreGrowth: true, latestDataDate: controller.latestDataDate(), altLatestDate: controller.valuationDate())
             }

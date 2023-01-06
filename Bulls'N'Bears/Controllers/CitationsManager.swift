@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 class CitationsManager {
     
@@ -101,11 +102,29 @@ class CitationsManager {
         let jmCitations = [jm1,jm2, jm3, jm4, jm5, jm6, jm7, jm8, jm9, jm10,jm11,jm12,jm13,jm14,jm15, jm16]
         let bgCitations = [bg1, bg2, bg3, bg4, bg5, bg6, bg7, bg8]
         
+        //
+        var userCitations = [String]()
+        let reqeust = NSFetchRequest<ShareTransaction>(entityName: "ShareTransaction")
+        reqeust.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+        
+        let moc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        do {
+            let transactions = try moc.fetch(reqeust)
+            for ta in transactions {
+                if let lessonLearnt = ta.lessonsLearnt {
+                    userCitations.append(lessonLearnt)
+                }
+            }
+        } catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "can't fetch share transactions")
+        }
+        
         var allCitations = plCitations
         allCitations.append(contentsOf: wbCitations)
         allCitations.append(contentsOf: pl1Citations)
         allCitations.append(contentsOf: jmCitations)
         allCitations.append(contentsOf: bgCitations)
+        allCitations.append(contentsOf: userCitations)
 
         if let lastCitation = UserDefaults.standard.value(forKey: userDefaultTerms.lastCitation) as? String {
             var count = 0
@@ -119,7 +138,6 @@ class CitationsManager {
         }
         
         let citationCount = allCitations.count
-//        let randomCitationNo = Int.random(in: 0..<citationCount)
         let randomCitationNo = Int.random(in: 0..<citationCount)
         let randomCitation = "\"" + allCitations[randomCitationNo] + "\""
         let tributePL = "\n\nPeter Lynch\n'One up on Wall Street'\nSimon & Schuster, 1989"
@@ -127,6 +145,7 @@ class CitationsManager {
         let tributeWB = "\n\nMary Buffett and David Clark\n'Warren Buffett and the Interpretation of Financial Statements'\nSimon & Schuster, 2008"
         let tributeJM = "\n\nJames Mortimer\n'The Little Book of Behavioural Investing'\nJohn Wiley & Sons Ltd,  2010"
         let tributeBG = "\n\nBruce Greenwald\n'Value Investing (2nd Ed)\nJohn Wiley & Sons Ltd,  2021"
+        let tributeUser = "\n\nYou, in your Lessons from Buying or Selling"
 
         var tribute = String()
         
@@ -134,8 +153,9 @@ class CitationsManager {
         let step2Count = step1Count + pl1Citations.count
         let step3Count = step2Count + wbCitations.count
         let step4Count = step3Count + jmCitations.count
-//        let step5Count = step4Count + bgCitations.count
-        
+        let step5Count = step4Count + bgCitations.count
+        let step6Count = step5Count + userCitations.count
+
         
         switch randomCitationNo {
         case 0..<step1Count:
@@ -146,8 +166,10 @@ class CitationsManager {
             tribute = tributePL2
         case step3Count..<step4Count:
             tribute = tributeJM
-        case step4Count...:
+        case step4Count..<step5Count:
             tribute = tributeBG
+        case step5Count...:
+            tribute = tributeUser
         default:
             tribute = "missing"
         }

@@ -61,26 +61,18 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
         guard let name = ticker else {
             return
         }
-
-//        let calendar = Calendar.current
-//        let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
-//        var dateComponents = calendar.dateComponents(components, from: Date())
-//        dateComponents.second = 0
-//        dateComponents.minute = 0
-//        dateComponents.hour = 0
-//        dateComponents.year = 1970
-//        dateComponents.day = 1
-//        dateComponents.month = 1
-//        let yahooRefDate = calendar.date(from: dateComponents) ?? Date()
-        let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
-        let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
-
-        let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
-        let start$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
         
-        var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(name)")
-        urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
-                
+        guard let valid = symbol else { return }
+
+        let tenYearsSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
+        let nowSinceRefDate = Date().timeIntervalSince(yahooRefDate)
+
+        let start$ = numberFormatter.string(from: tenYearsSinceRefDate as NSNumber) ?? ""
+        let end$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
+        
+        var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(valid)")
+        urlComponents?.queryItems = [ URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"),URLQueryItem(name: "includeAdjustedClose", value: "true") ]
+
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
             downLoadCSVFile(sourceURL, stockName: name, expectedHeaderTitles: ["Date","Open","High","Low","Close","Adj Close","Volume"])
         }

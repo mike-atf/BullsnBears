@@ -34,6 +34,33 @@ public class WBValuation: NSManagedObject {
         equityRepurchased = [Double]()
         date = Date()
         
+        if let dcf = share?.dcfValuation {
+            if (dcf.capExpend ?? [Double]()).reduce(0, +) != 0 {
+                self.capExpend = dcf.capExpend
+            }
+            
+            if (dcf.netIncome ?? [Double]()).reduce(0, +) != 0 {
+                self.netEarnings = dcf.netIncome
+            }
+
+        }
+        
+        if let r1 = share?.rule1Valuation {
+            if (r1.bvps ?? [Double]()).reduce(0, +) != 0 {
+                self.bvps = r1.bvps
+            }
+            
+            if (r1.revenue ?? [Double]()).reduce(0, +) != 0 {
+                self.revenue = r1.revenue
+            }
+            
+            if (r1.eps ?? [Double]()).reduce(0, +) != 0 {
+                self.eps = r1.eps
+            }
+
+
+        }
+        
     }
     
     func peRatiosWithDates() -> [DatedValue]? {
@@ -1028,6 +1055,10 @@ public class WBValuation: NSManagedObject {
 //                errors.append("highly variable past earnings growth rates. Resulting intrinsic value is unreliable")
 //            }
 //        }
+        
+        guard eps?.first != nil else {
+            return (nil, ["iValue lacks EPS values"])
+        }
         
         let futureEPS = Calculator.futureValue(present: eps!.first!, growth: meanEPSGrowth, years: 10.0)
         

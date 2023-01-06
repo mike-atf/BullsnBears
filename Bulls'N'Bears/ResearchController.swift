@@ -13,16 +13,18 @@ class ResearchController {
     var titleDictionary: [String: String]?
     var controlledView: ResearchTVC?
     
-    init(share: Share?, researchList: ResearchTVC) {
+    init(share: Share?, researchList: ResearchTVC?) {
         
         
         self.share = share
         self.controlledView = researchList
+        let moc = share?.managedObjectContext ?? (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         
         if  share?.research == nil {
-            share?.research = StockResearch.init(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+            share?.research = StockResearch.init(context: moc)
             share?.research?.symbol = share?.symbol
             share?.research?.save()
+            share?.research?.share = share
         }
         
         fillParameters()
@@ -187,10 +189,27 @@ class ResearchController {
             else { return nil }
         case "futureGrowthMean":
             if let valid = share?.research?.futureGrowthMean {
-                let valid$ = percentFormatter2Digits.string(from: valid as NSNumber) ?? ""
-                return [valid$]
+                if valid != 0.0 {
+                    let valid$ = percentFormatter2Digits.string(from: valid as NSNumber) ?? ""
+                    return [valid$]
+                }
             }
-            else { return nil }
+            
+            // don't use ELSE IF as valid maybe 0.0 so this wouldn't result in alterntives
+            if let valid = share?.rule1Valuation?.adjGrowthEstimates?.mean() {
+                if valid != 0.0 { return [(percentFormatter2Digits.string(from: valid as NSNumber) ?? "")] }
+            }
+            if let valid = share?.rule1Valuation?.growthEstimates?.mean() {
+                if valid != 0.0 { return [(percentFormatter2Digits.string(from: valid as NSNumber) ?? "")] }
+            }
+            if let valid = share?.dcfValuation?.revGrowthPred?.mean() {
+                if valid != 0.0 { return [(percentFormatter2Digits.string(from: valid as NSNumber) ?? "")] }
+            }
+            if let valid = share?.dcfValuation?.revenueGrowth.mean() {
+                if valid != 0.0 { return [percentFormatter2Digits.string(from: valid as NSNumber) ?? ""] }
+            }
+            
+            return nil
         case "companySize":
             var employees$ = String()
             if let validEmployees = share?.employees {
@@ -305,7 +324,9 @@ extension ResearchController: ResearchCellDelegate {
             share?.research?.growthPlan = notes
         case "futureGrowthMean":
             let valid$ = notes.filter("-0123456789.".contains)
-            share?.research?.futureGrowthMean = (Double(valid$) ?? 0.0) / 100
+            let mean = (Double(valid$) ?? 0.0) / 100
+            share?.research?.futureGrowthMean = mean
+            share?.rule1Valuation?.adjGrowthEstimates = [mean, mean]
         case "companySize":
             share?.research?.companySize = notes
         case "productsNiches":

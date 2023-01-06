@@ -22,9 +22,9 @@ extension Rule1Valuation {
     @NSManaged public var opcs: [Double]? // use OPCS = operating cash flow per share in MacroTrends
     @NSManaged public var opCashFlow: Double // use OPCS = operating cash flow per share in MacroTrends
     @NSManaged public var netIncome: Double
-    @NSManaged public var roic: [Double]?
+    @NSManaged public var roic: [Double]? //  (Net Income-Dividends)/(Debt+Equity)=Return on Invested Capital.
     @NSManaged public var debt: Double
-    @NSManaged public var hxPE: [Double]?
+    @NSManaged public var hxPE: [Double]? // ANNUAL historical P/E; WBV typically uses quarterly PE with dates
     @NSManaged public var adjFuturePE: Double
     @NSManaged public var growthEstimates: [Double]?
     @NSManaged public var adjGrowthEstimates: [Double]?

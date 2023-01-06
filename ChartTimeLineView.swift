@@ -56,7 +56,7 @@ class ChartTimeLineView: UIView {
             label.sizeToFit()
             return label
         }()
-        stdLabelWidth = stdLabel.bounds.width * 1.75
+        stdLabelWidth = stdLabel.bounds.width * 1.4
 
     }
     
@@ -141,18 +141,24 @@ class ChartTimeLineView: UIView {
     }
 
     private func getDateLabels(width: CGFloat) -> [UILabel] {
+        
+        for label in dateLabels {
+            label.removeFromSuperview()
+        }
+        dateLabels = [UILabel]()
                 
         var labels = [UILabel]()
         let maxLabelCount = Int(width / stdLabelWidth)
-        let labelTimeIntervalOptions:[TimeInterval] = [24*3600,7*24*3600,14*24*3600,28*24*3600,(365/12)*24*3600,(365/4*24*3600)]
+        let labelTimeIntervalOptions:[TimeInterval] = [day,week,week*2,week*4,month,week*8, month*2,quarter,quarter*2,year]
         let totalChartTime = dateRange.last!.timeIntervalSince(dateRange.first!)
         
         var labelCount = 0
-        
+//        print("totalChart time = \(Int(totalChartTime/day))")
         for option in labelTimeIntervalOptions {
-            if (totalChartTime / option) < Double(maxLabelCount) {
+//            print("option \(Int(option/day))")
+            if (totalChartTime / option) <= Double(maxLabelCount) {
                 timeIntervalBetweenLabels = option
-                labelCount = Int(totalChartTime / option)
+                labelCount = Int(totalChartTime / option) + 1
                 break
             }
         }

@@ -24,6 +24,11 @@ class FinHealthController: NSObject {
     var currentRatios = [ChartDataSet]()
     var debEquityRatios = [ChartDataSet]()
     var currentHealthScore: Double?
+    
+    // progressView
+//    var progressView: DownloadProgressView?
+//    var allDownloadTasks = 0
+//    var completedDownloadTasks = 0
 
     init(share: Share!, finHealthTVC: FinHealthTVC) {
         super.init()
@@ -43,7 +48,7 @@ class FinHealthController: NSObject {
         NotificationCenter.default.addObserver(self, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
 
         let bgShare = share
-//        finHealthTVC.startActivityView()
+
         downloadTask = Task.init(priority: .background, operation: {
             do {
                 await getR1Data(shortName: shortName, symbol: symbol, r1vID: r1ValuationID, bgMOC: backgroundMoc!)
@@ -167,17 +172,12 @@ class FinHealthController: NSObject {
                     share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .stickerPrice)
                 }
                 
-//                downloadTask = Task(priority: .background) {
+                do {
+                    let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: r1ValuationID, progressDelegate: nil, downloadRedirectDelegate: self)
+                } catch let error {
+                    ErrorController.addInternalError(errorLocation: "FinHealthController.getR1Data", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                }
                     
-                    do {
-                        let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: r1ValuationID, progressDelegate: self, downloadRedirectDelegate: self)
-//                        try Task.checkCancellation()
-                    } catch let error {
-                        ErrorController.addInternalError(errorLocation: "FinHealthController.getR1Data", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
-                    }
-                    
-//                    return nil
-//                }
             }
         }
 
@@ -198,8 +198,7 @@ class FinHealthController: NSObject {
                 }
 
                 do {
-                    try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: dcfValuationID, progressDelegate: self)
-                    //                        try Task.checkCancellation()
+                    try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: dcfValuationID, progressDelegate: nil)
                 } catch let error {
                     ErrorController.addInternalError(errorLocation: "StocksController2.updateStockInformation.dcfValuation", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
                 }
@@ -560,26 +559,56 @@ extension FinHealthController: DownloadRedirectionDelegate {
     
 }
 
-extension FinHealthController: ProgressViewDelegate {
-    
-    func progressUpdate(allTasks: Int, completedTasks: Int) {
-        print("download progress update")
-    }
-    
-    func cancelRequested() {
-        self.downloadTask?.cancel()
-    }
-    
-    func downloadComplete() {
-        DispatchQueue.main.async {
-//            self.finHealthTVC.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
-            self.finHealthTVC.tableView.reloadData()
-        }
-    }
-    
-    func downloadError(error: String) {
-        print("download error in FHC \(error)")
-    }
-    
-    
-}
+//extension FinHealthController: ProgressViewDelegate {
+//
+//    var completedTasks: Int {
+//        get {
+//            completedDownloadTasks
+//        }
+//        set (newValue) {
+//            completedDownloadTasks = newValue
+//        }
+//    }
+//
+//
+//    func taskCompleted() {
+//        completedTasks += 1
+//        if allDownloadTasks < completedTasks {
+//            completedTasks = allDownloadTasks
+//        }
+//
+//        self.progressUpdate(allTasks: allDownloadTasks, completedTasks: completedTasks)
+//    }
+//
+//    var allTasks: Int {
+//        get {
+//            return allDownloadTasks
+//        }
+//        set (newValue) {
+//            allDownloadTasks = newValue
+//        }
+//    }
+//
+//    func progressUpdate(allTasks: Int, completedTasks: Int) {
+//        DispatchQueue.main.async {
+//            self.progressView?.updateProgress(tasks: allTasks, completed: completedTasks)
+//        }
+//    }
+//
+//    func cancelRequested() {
+//        self.downloadTask?.cancel()
+//    }
+//
+//    func downloadComplete() {
+//        DispatchQueue.main.async {
+////            self.finHealthTVC.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
+//            self.finHealthTVC.tableView.reloadData()
+//        }
+//    }
+//
+//    func downloadError(error: String) {
+//        print("download error in FHC \(error)")
+//    }
+//
+//
+//}
