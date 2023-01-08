@@ -26,6 +26,7 @@ extension DCFValuation {
     @NSManaged public var expenseInterest: Double
     @NSManaged public var debtST: Double
     @NSManaged public var debtLT: Double
+    @NSManaged public var totalDebt: Double
     @NSManaged public var incomePreTax: Double
     @NSManaged public var expenseIncomeTax: Double
     @NSManaged public var marketCap: Double

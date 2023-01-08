@@ -526,10 +526,10 @@ class StocksController2: NSFetchedResultsController<Share> {
                 shareInfosToDownload += 1
 
                 let shortName = share.name_short
-                if let r1ValuationID = share.rule1Valuation?.objectID {
+                let shareID = share.objectID
                     
-                    // save existing values if necessary
-                    let r1v = managedObjectContext.object(with: r1ValuationID) as! Rule1Valuation
+                // save existing values if necessary
+                if  let r1v = share.rule1Valuation {
                     if let moat = r1v.moatScore() {
                         let trendValue = DatedValue(date: r1v.creationDate!, value: moat)
                         share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .moatScore)
@@ -547,11 +547,11 @@ class StocksController2: NSFetchedResultsController<Share> {
                             
                             if symbol!.contains(".") {
                                 // US Stocks
-                                let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: r1ValuationID, progressDelegate: nil, downloadRedirectDelegate: self)
+                                let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
                                 NotificationCenter.default.post(name: Notification.Name(rawValue: "InfoDownloadComplete"), object: nil, userInfo: nil)
                             } else {
                                 // non-US Stocks
-                                try await WebPageScraper2.nonMTRule1DataDownload(symbol: symbol, shortName: share.name_short, valuationID: r1ValuationID)
+                                try await WebPageScraper2.nonMTRule1DataDownload(symbol: symbol, shortName: share.name_short, shareID: shareID)
                             }
                         } catch {
                             ErrorController.addInternalError(errorLocation: "StocksController2.updateSharesInfo.r1Valuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")

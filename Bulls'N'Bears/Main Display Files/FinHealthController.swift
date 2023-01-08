@@ -40,7 +40,7 @@ class FinHealthController: NSObject {
         
         let shortName = share.name_short!
         let symbol = share.symbol!
-        let r1ValuationID = share.rule1Valuation?.objectID
+//        let r1ValuationID = share.rule1Valuation?.objectID
         let dcfValuationID = share.dcfValuation?.objectID
         backgroundMoc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc!.automaticallyMergesChangesFromParent = true
@@ -51,7 +51,7 @@ class FinHealthController: NSObject {
 
         downloadTask = Task.init(priority: .background, operation: {
             do {
-                await getR1Data(shortName: shortName, symbol: symbol, r1vID: r1ValuationID, bgMOC: backgroundMoc!)
+                await getR1Data(shortName: shortName, symbol: symbol, shareID: bgShare?.objectID, bgMOC: backgroundMoc!)
                 try Task.checkCancellation()
                 await getDCFData(shortName: shortName, symbol: symbol, dcfvID: dcfValuationID, bgMOC: backgroundMoc!)
                 try Task.checkCancellation()
@@ -152,32 +152,36 @@ class FinHealthController: NSObject {
 
     }
     
-    func getR1Data(shortName: String, symbol: String, r1vID: NSManagedObjectID?, bgMOC: NSManagedObjectContext) async {
+    func getR1Data(shortName: String, symbol: String, shareID: NSManagedObjectID?, bgMOC: NSManagedObjectContext) async {
         
         if (share.rule1Valuation?.creationDate ?? Date()).timeIntervalSince(Date()) > 24*3600 {
             // refresh rule 1 valuation
             // save new r1 moat and sticker price as trend
             
-            if let r1ValuationID = r1vID {
+            if let shareID = shareID {
                 
                 // save existing values if necessary
-                let r1v = bgMOC.object(with: r1ValuationID) as! Rule1Valuation
-                if let moat = r1v.moatScore() {
-                    let trendValue = DatedValue(date: r1v.creationDate!, value: moat)
-                    share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .moatScore)
+                guard let bgShare = bgMOC.object(with: shareID) as? Share else {
+                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "objectID error: can't load background share by objectID sent")
+                    return
                 }
-                let (value2, _) = r1v.stickerPrice()
-                if value2 != nil {
-                    let trendValue = DatedValue(date: r1v.creationDate!, value: value2!)
-                    share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .stickerPrice)
-                }
-                
-                do {
-                    let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: r1ValuationID, progressDelegate: nil, downloadRedirectDelegate: self)
-                } catch let error {
-                    ErrorController.addInternalError(errorLocation: "FinHealthController.getR1Data", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
-                }
+                if let r1v = bgShare.rule1Valuation {
+                    if let moat = r1v.moatScore() {
+                        let trendValue = DatedValue(date: r1v.creationDate!, value: moat)
+                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .moatScore)
+                    }
+                    let (value2, _) = r1v.stickerPrice()
+                    if value2 != nil {
+                        let trendValue = DatedValue(date: r1v.creationDate!, value: value2!)
+                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .stickerPrice)
+                    }
                     
+                    do {
+                        let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
+                    } catch let error {
+                        ErrorController.addInternalError(errorLocation: "FinHealthController.getR1Data", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+                    }
+                }
             }
         }
 

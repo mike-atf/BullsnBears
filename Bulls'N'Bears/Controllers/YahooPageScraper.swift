@@ -18,7 +18,7 @@ enum YahooPageType {
 
 struct YahooPageDelimiters {
     
-    var tableStart = String()
+    var tableStart:String?
     var tableEnd = String()
     var rowStart = [String]()
     /// rowEnd may not be found in last row, so check for tableEnd if not found
@@ -27,9 +27,11 @@ struct YahooPageDelimiters {
     var dataStart = String()
     var dataEnd = String()
     
-    init(pageType: YahooPageType, tableHeader: String, rowTitles: [String]) {
+    init(pageType: YahooPageType, tableHeader: String?, rowTitles: [String]) {
         
-        tableStart = "<span>" + tableHeader + "</span>"
+        if tableHeader != nil {
+            tableStart = "<span>" + tableHeader! + "</span>"
+        }
         for title in rowTitles {
             rowStart.append(title + "</span>") //"<span>" +
         }
@@ -78,99 +80,101 @@ struct YahooPageDelimiters {
 
 class YahooPageScraper {
     
-    /// rerturns ALL column values; filerting needs to happen if not all columns are wanted
-    class func extractYahooPageData(html: String?, pageType: YahooPageType, tableHeader: String, rowTitles:[String], replacementRowTitles:[String]?=nil) -> [LabelledValues]? {
+    
+    /// missing arrays for BVPS, ROI, OPCF/s and PE Hx
+    class func r1DataFromYahoo(symbol: String, progressDelegate: ProgressViewDelegate?=nil, avoidMTTitles: Bool?=nil ,downloadRedirectDelegate: DownloadRedirectionDelegate?) async throws -> [LabelledValues]? {
         
-        guard let pageText = html else {
-            return nil
-        }
-                
-        let delimiters = YahooPageDelimiters(pageType: pageType, tableHeader: tableHeader, rowTitles: rowTitles)
+        var results = [LabelledValues]()
         
-        guard let headerPosition = pageText.range(of: delimiters.tableStart) else {
-            return nil
-        }
-        
-        var tableText = String()
-        
-        if let tableEndPosition = pageText.range(of: delimiters.tableEnd, range: headerPosition.upperBound..<pageText.endIndex) {
-            tableText = String(pageText[headerPosition.upperBound...tableEndPosition.upperBound])
-        } else {
-            tableText = String(pageText[headerPosition.upperBound..<pageText.endIndex])
-        }
-        
-        var labelledValues = [LabelledValues]()
-        var i = 0
-        for rStart in delimiters.rowStart {
-            
-            var rowValues = [Double]()
-            guard let rowStartPosition = tableText.range(of: rStart) else {
-                labelledValues.append(LabelledValues(label:  replacementRowTitles?[i] ?? rowTitles[i], values: rowValues))
-                continue
-            }
-            
-            var rowText = String()
-            
-            if let rowEndPosition = tableText.range(of: delimiters.rowEnd ,range: rowStartPosition.upperBound..<tableText.endIndex) {
-                rowText = String(tableText[rowStartPosition.upperBound..<rowEndPosition.lowerBound])
+        let pageNames = (avoidMTTitles ?? false) ? ["balance-sheet","insider-transactions", "analysis", "key-statistics"] : ["financials","balance-sheet","cash-flow", "insider-transactions", "analysis", "key-statistics"]
 
-            } else if let rowEndPosition = tableText.range(of: delimiters.tableEnd ,range: rowStartPosition.upperBound..<tableText.endIndex) {
-                rowText = String(tableText[rowStartPosition.upperBound..<rowEndPosition.lowerBound])
-            } else {
-                labelledValues.append(LabelledValues(label: replacementRowTitles?[i] ?? rowTitles[i], values: rowValues))
+        let tableTitles = (avoidMTTitles ?? false) ? ["Balance sheet", "Insider purchases - Last 6 months", "Revenue estimate", "Valuation measures"] : ["Income statement", "Balance sheet", "Cash flow", "Insider purchases - Last 6 months", "Revenue estimate", "Valuation measures"]
+
+        let rowTitles = (avoidMTTitles ?? false) ? [["Common stock"],["Total insider shares held", "Purchases", "Sales"], ["Sales growth (year/est)"],["Forward P/E"]] : [["Total revenue","Basic EPS","Net income"], ["Total non-current liabilities", "Common stock"],["Net cash provided by operating activities"],["Total insider shares held", "Purchases", "Sales"], ["Sales growth (year/est)"],["Forward P/E"]]
+        
+        let saveTitles = (avoidMTTitles ?? false) ? [["Common stock"],["Total insider shares held", "Purchases", "Sales"],["Sales growth (year/est)"],["Forward P/E"]] : [["Revenue","EPS - Earnings Per Share", "Net Income"], ["Long Term Debt", "Common stock"],["Operating cash flow"],["Total insider shares held", "Purchases", "Sales"],["Sales growth (year/est)"],["Forward P/E"]]
+        
+
+        var count = 0
+        for pageName in pageNames {
+            
+//            var type: YahooPageType!
+//            if pageName.contains("balance") {
+//                type = .balance_sheet
+//            } else if pageName.contains("insider") {
+//                type = .insider_transactions
+//            } else if pageName.contains("financials") {
+//                type = .financials
+//            } else if pageName.contains("analysis") {
+//                type = .analysis
+//            } else if pageName.contains("cash") {
+//                type = .cash_flow
+//            } else if pageName.contains("statistics") {
+//                type = .key_statistics
+//            }
+            
+            var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/\(pageName)")
+            components?.queryItems = [URLQueryItem(name: "p", value: symbol)]
+            
+            guard let url = components?.url else {
+                progressDelegate?.downloadError(error: InternalErrorType.urlInvalid.localizedDescription)
                 continue
             }
-            
-            let columnTexts = rowText.split(separator: delimiters.columnStart).dropFirst()
-            for ct in columnTexts {
-                let dataStartPosition = ct.range(of: delimiters.dataStart) ?? ct.range(of: ">")
-                
-                guard dataStartPosition != nil else {
-                    rowValues.append(0.0)
-                    continue
-                }
-                
-                var modifier = 1.0
-                
-                if let dataEndPosition = ct.range(of: delimiters.dataEnd, range: dataStartPosition!.upperBound..<ct.endIndex)  {
-                    var content$ = ct[dataStartPosition!.upperBound..<dataEndPosition.lowerBound].filter("-0123456789.MT".contains)
-                    if content$ != "" {
-                        if content$.last! == "M" {
-                            modifier = 1_000_000.0
-                            content$.removeLast()
-                        } else if content$.last! == "T" {
-                            modifier = 1_000.0
-                            content$.removeLast()
-                        }
-                        rowValues.append((Double(content$) ?? 0.0) * modifier)
-                    }
-                } else if let dataEndPosition = ct.range(of: "</div>", range: dataStartPosition!.upperBound..<ct.endIndex)  {
-                    var content$ = ct[dataStartPosition!.upperBound..<dataEndPosition.lowerBound].filter("-0123456789.MT".contains)
-                    if content$ != "" {
-                        if content$.last! == "M" {
-                            modifier = 1_000_000.0
-                            content$.removeLast()
-                        } else if content$.last! == "T" {
-                            modifier = 1_000.0
-                            content$.removeLast()
-                        }
-                        rowValues.append((Double(content$) ?? 0.0) * modifier)
-                    }
-                }
-                else {
-                    rowValues.append(0.0)
-                    continue
-                }
+
+            var type = getYahooPageType(url: url)
+
+            var htmlText = String()
+
+            do {
+                htmlText = try await Downloader.downloadData(url: url)
+            } catch let error as InternalErrorType {
+                progressDelegate?.downloadError(error: error.localizedDescription)
+                continue
             }
+
+
+            if var labelledResults = extractYahooPageData(html: htmlText, pageType: type, tableHeader: tableTitles[count], rowTitles: rowTitles[count],replacementRowTitles: saveTitles[count] ){
+                
+                for i in 0..<labelledResults.count {
+                    // eliminate duplicate TTM figure if same as previous full year figure
+                    if labelledResults[i].values.count > 1 {
+                        if labelledResults[i].values[0] == labelledResults[i].values[1] {
+                            labelledResults[i].values = Array(labelledResults[i].values.dropFirst())
+                            //                        labelledResults[i].values = newValues
+                        }
+                    }
+                    
+                    if labelledResults[i].label == "Sales" || labelledResults[i].label.contains("Purchases") {
+                        labelledResults[i].values = [labelledResults[i].values.first ?? 0.0]
+                    } else if labelledResults[i].label.contains("Sales growth") {
+                        labelledResults[i].values = [labelledResults[i].values.compactMap{ $0 / 100 }.last ?? 0.0] // growth percent values
+                    }
+                }
+
+//                print("Yahoo results for \(rowTitles[count])")
+//                print("alt titles are \(saveTitles[count])")
+//                for result in results {
+//                    print(result)
+//                }
+//                print()
+
+                results.append(contentsOf: labelledResults)
+            }
+            // DEBUG ONLY
+            else {
+                print("Download Yahoo results for \(rowTitles[count]) NO RESULTS")
+            }
+            //DEBUG ONLY
             
-            labelledValues.append(LabelledValues(label: replacementRowTitles?[i] ?? rowTitles[i], values: rowValues))
-            
-            i += 1
+            progressDelegate?.taskCompleted()
+            count += 1
             
         }
         
-        return labelledValues
+        return results
+        
     }
+
     
     /// using yahoo as source
     class func downloadHxDividendsFile(symbol: String, companyName: String, years: TimeInterval) async throws -> [DatedValue]? {
@@ -375,7 +379,7 @@ class YahooPageScraper {
     class func companyNameSearchOnPage(html: String) throws -> [String: String]? {
         
         var pageText = html
-        let sectionStart = "<span>Exchange"
+//        let sectionStart = "<span>Exchange"
         let tableStart$ = "</thead>"
         let rowStart$ = "/quote/"
         let tableEnd$ = "</table>"
@@ -435,6 +439,141 @@ class YahooPageScraper {
 
 
     //MARK: - internal functions
+    
+    /// returns ALL column values; filerting needs to happen if not all columns are wanted; if no tableHeader provided searches the enire web page for the rowTitles
+    class func extractYahooPageData(html: String?, pageType: YahooPageType, tableHeader: String?, rowTitles:[String], replacementRowTitles:[String]?=nil) -> [LabelledValues]? {
+        
+        guard let pageText = html else {
+            return nil
+        }
+                
+        let delimiters = YahooPageDelimiters(pageType: pageType, tableHeader: tableHeader, rowTitles: rowTitles)
+                
+        // some functions don't look for table headers, just row titles
+        var tableText = pageText
+        if let headerText = delimiters.tableStart {
+            if let headerPosition = pageText.range(of: headerText) {
+                if let tableEndPosition = pageText.range(of: delimiters.tableEnd, range: headerPosition.upperBound..<pageText.endIndex) {
+                    tableText = String(pageText[headerPosition.upperBound...tableEndPosition.upperBound])
+                } else {
+                    tableText = String(pageText[headerPosition.upperBound..<pageText.endIndex])
+                }
+            }
+        }
+        
+        var labelledValues = [LabelledValues]()
+        var i = 0
+        for rStart in delimiters.rowStart {
+            
+            var rowValues = [Double]()
+            guard let rowStartPosition = tableText.range(of: rStart) else {
+                labelledValues.append(LabelledValues(label:  replacementRowTitles?[i] ?? rowTitles[i], values: rowValues))
+                continue
+            }
+            
+            var rowText = String()
+            
+            if let rowEndPosition = tableText.range(of: delimiters.rowEnd ,range: rowStartPosition.upperBound..<tableText.endIndex) {
+                rowText = String(tableText[rowStartPosition.upperBound..<rowEndPosition.lowerBound])
+
+            } else if let rowEndPosition = tableText.range(of: delimiters.tableEnd ,range: rowStartPosition.upperBound..<tableText.endIndex) {
+                rowText = String(tableText[rowStartPosition.upperBound..<rowEndPosition.lowerBound])
+            } else {
+                labelledValues.append(LabelledValues(label: replacementRowTitles?[i] ?? rowTitles[i], values: rowValues))
+                continue
+            }
+            
+            let columnTexts = rowText.split(separator: delimiters.columnStart).dropFirst()
+            for ct in columnTexts {
+                let dataStartPosition = ct.range(of: delimiters.dataStart) ?? ct.range(of: ">")
+                
+                guard dataStartPosition != nil else {
+                    rowValues.append(0.0)
+                    continue
+                }
+                
+                var modifier = 1.0
+                
+                if let dataEndPosition = ct.range(of: delimiters.dataEnd, range: dataStartPosition!.upperBound..<ct.endIndex)  {
+                    var content$ = ct[dataStartPosition!.upperBound..<dataEndPosition.lowerBound].filter("-0123456789.TBMk".contains)
+                    if content$ != "" {
+                        if content$.capitalized.last! == "M" {
+                            modifier = 1_000_000.0
+                            content$.removeLast()
+                        }
+                        else if content$.capitalized.last! == "K" {
+                            modifier = 1_000.0
+                            content$.removeLast()
+                        }
+                        else if content$.capitalized.last! == "B" {
+                            modifier = 1_000_000_000.0
+                            content$.removeLast()
+                        }
+                        else if content$.capitalized.last! == "T" {
+                            modifier = 1_000_000_000_000.0
+                            content$.removeLast()
+                        }
+                        rowValues.append((Double(content$) ?? 0.0) * modifier)
+                    }
+                } else if let dataEndPosition = ct.range(of: "</div>", range: dataStartPosition!.upperBound..<ct.endIndex)  {
+                    var content$ = ct[dataStartPosition!.upperBound..<dataEndPosition.lowerBound].filter("-0123456789.Mk".contains)
+                    if content$ != "" {
+                        if content$.capitalized.last! == "M" {
+                            modifier = 1_000_000.0
+                            content$.removeLast()
+                        } else if content$.capitalized.last! == "K" {
+                            modifier = 1_000.0
+                            content$.removeLast()
+                        }
+                        else if content$.capitalized.last! == "B" {
+                            modifier = 1_000_000_000.0
+                            content$.removeLast()
+                        }
+                        else if content$.capitalized.last! == "T" {
+                            modifier = 1_000_000_000_000.0
+                            content$.removeLast()
+                        }
+                        rowValues.append((Double(content$) ?? 0.0) * modifier)
+                    }
+                }
+                else {
+                    rowValues.append(0.0)
+                    continue
+                }
+            }
+            
+            labelledValues.append(LabelledValues(label: replacementRowTitles?[i] ?? rowTitles[i], values: rowValues))
+            
+            i += 1
+            
+        }
+        
+        return labelledValues
+    }
+    
+    class func getYahooPageType(url: URL) -> YahooPageType {
+        
+        let pageName = url.pathComponents.last ?? ""
+        
+        var type: YahooPageType!
+        if pageName.contains("balance") {
+            type = .balance_sheet
+        } else if pageName.contains("insider") {
+            type = .insider_transactions
+        } else if pageName.contains("financials") {
+            type = .financials
+        } else if pageName.contains("analysis") {
+            type = .analysis
+        } else if pageName.contains("cash") {
+            type = .cash_flow
+        } else if pageName.contains("statistics") {
+            type = .key_statistics
+        } else {
+            type = .key_statistics
+        }
+
+        return type
+    }
         
     /// expect one table row of html text; called from WebScraper 2
     class func yahooRowNumbersExtraction(table$: String, rowTitle: String, numberStarter: String?=nil, numberTerminal: String?=nil, exponent: Double?=nil) -> [Double]? {

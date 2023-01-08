@@ -459,50 +459,26 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         // accessing share properties must happen on main thread!
         let symbol =  share.symbol
         let shortName = share.name_short
+        let shareID = share.objectID
         
-        guard let validID = valuationID else {
-            ErrorController.addInternalError(errorLocation: "CombinedValController.startDataDownload", systemError: nil, errorInfo: "failed data download - no valid valuation object ID")
-            return
-        }
-
         if method == .rule1 {
 
             downloadTask = Task.init(priority: .background) {
                 do {
-                    let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: validID, progressDelegate: self.valuationListViewController, downloadRedirectDelegate: self)
+                    let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, progressDelegate: self.valuationListViewController, downloadRedirectDelegate: self)
                     try Task.checkCancellation()
                 } catch let error {
                     ErrorController.addInternalError(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
                 }
                 return nil
             }
-
-            // US Stocks
-//            if !symbol!.contains(".") {
-//                downloadTask = Task.init(priority: .background) {
-//                    do {
-//                        let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: validID, progressDelegate: self.valuationListViewController, downloadRedirectDelegate: self)
-//                        try Task.checkCancellation()
-//                    } catch let error {
-//                        ErrorController.addInternalError(errorLocation: "CombinedValuationController.startDataDownload", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
-//                    }
-//                    return nil
-//                }
-//            }
-//            else {
-//                // EU stocks should contain "." in their symbol
-//                downloadTask = Task.init(priority: .background) {
-//                    do {
-//                        try await WebPageScraper2.nonMTRule1DataDownload(symbol: shortName, valuationID: validID, progressController: self.valuationListViewController)
-//                    } catch {
-//                        downloadTask?.cancel()
-//                        ErrorController.addInternalError(errorLocation: "CombinedValuationController.startDataDownload non-US", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
-//                    }
-//                    return nil
-//                }
-//            }
         }
         else {
+            guard let validID = valuationID else {
+                ErrorController.addInternalError(errorLocation: "CombinedValController.startDataDownload", systemError: nil, errorInfo: "failed data download - no valid valuation object ID")
+                return
+            }
+
             downloadTask = Task.init(priority: .background) {
 
                 do {
@@ -1143,7 +1119,7 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         var roicTitles = ["ROIC"]
         
         let hxPERTitles = ["past PER min" , "past PER max"]
-        let growthPredTitles = ["Pred. sales growth min", "Pred. sales growth min"]
+        let growthPredTitles = ["Pred. sales growth min", "Pred. sales growth max"]
         let adjGrowthPredTitles = ["Adj. sales growth min", "Adj. sales growth max"]
         let debtRowTitles = ["Long term debt", "Debt / income"]
         let insideTradingRowTitles = ["Total insider shares", "Inside share buys", "Inside Share sells"]
@@ -1394,14 +1370,14 @@ class CombinedValuationController: NSObject ,ValuationDelegate {
         } else {
             futurePER$ = "\(valuation.hxPE?.min() ?? 0) - \(valuation.hxPE?.max() ?? 0)"
         }
-        let section1New1 = [(predictedGrowth ?? 0).shortString(decimals: 1, formatter: percentFormatter2Digits), futurePER$]
+        let section1New1 = [predictedGrowth.shortString(decimals: 1, formatter: percentFormatter2Digits), futurePER$]
         
         let section2 = valuation.bvps?.shortStrings(decimals: 2) ?? [String]()
         let section3 = valuation.eps?.shortStrings(decimals: 2) ?? [String]()
         let section4 = valuation.revenue?.shortStrings(decimals: 2)  ?? [String]()
         let section5 = valuation.opcs?.shortStrings(decimals: 2) ?? [String]()
         let section6 = valuation.roic?.shortStrings(decimals: 1, formatter: percentFormatter2Digits) ?? [String]()
-        let section7 = valuation.hxPE?.shortStrings(decimals: 1, formatter: numberFormatterWith1Digit) ?? [String]()
+        let section7 = valuation.hxPE?.sorted().shortStrings(decimals: 1, formatter: numberFormatterWith1Digit) ?? [String]()
         
         var averageGrowth = [Double?]()
         if let growth = averageGrowthPrediction() {

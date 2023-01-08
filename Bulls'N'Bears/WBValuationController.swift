@@ -698,7 +698,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         let shortName = share.name_short
         let wbValuationID = wbValuation?.objectID
         let dcfValuationID = dcfValuation?.objectID
-        let r1ValuationID = r1Valuation?.objectID
+//        let r1ValuationID = r1Valuation?.objectID
         let shareID = share.objectID
         
         downloadTask = Task.init(priority: .background) {
@@ -723,13 +723,12 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
                 try Task.checkCancellation()
                 
-                if r1ValuationID != nil {
-                    progressDelegate?.allTasks += 1
+                progressDelegate?.allTasks += 1
 
-                    try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, valuationID: r1ValuationID!, progressDelegate: nil, downloadRedirectDelegate: self)
-                    
-                    progressDelegate?.taskCompleted()
-                }
+                try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
+                
+                progressDelegate?.taskCompleted()
+
                 try Task.checkCancellation()
                 if dcfValuationID != nil {
                     progressDelegate?.allTasks += 1

@@ -531,7 +531,7 @@ class WebPageScraper2: NSObject {
     
     //MARK: - Rule 1 Data
     
-    class func r1DataDownloadAndSave(shareSymbol: String?, shortName: String?, valuationID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
+    class func r1DataDownloadAndSave(shareSymbol: String?, shortName: String?, shareID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
         
         guard let symbol = shareSymbol else {
             progressDelegate?.downloadError(error: InternalErrorType.shareSymbolMissing.localizedDescription)
@@ -543,14 +543,13 @@ class WebPageScraper2: NSObject {
             throw InternalErrorType.shareShortNameMissing
         }
         
-        
         var results = [LabelledValues]()
         
         if symbol.contains(".") {
             // non-US Stocks
             do {
                 
-                try await nonMTRule1DataDownload(symbol: symbol, shortName: shortName, valuationID: valuationID)
+                try await nonMTRule1DataDownload(symbol: symbol, shortName: shortName, shareID: shareID)
 
             } catch {
                 ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error trying to download Rule1 data from Yahoo")
@@ -581,7 +580,7 @@ class WebPageScraper2: NSObject {
             // 2 Yahoo downloads for Rule1 Data
             
             do {
-                if let yahooR1Data = try await r1DataFromYahoo(symbol: symbol, progressDelegate: progressDelegate, avoidMTTitles: true,  downloadRedirectDelegate: downloadRedirectDelegate) {
+                if let yahooR1Data = try await YahooPageScraper.r1DataFromYahoo(symbol: symbol, progressDelegate: progressDelegate, avoidMTTitles: true,  downloadRedirectDelegate: downloadRedirectDelegate) {
                     results.append(contentsOf: yahooR1Data)
                     
                 }
@@ -597,7 +596,7 @@ class WebPageScraper2: NSObject {
         backgroundMoc.automaticallyMergesChangesFromParent = true
         
         do {
-            try await saveR1Data(valuationID: valuationID, labelledValues: results)
+            try await saveR1Data(shareID: shareID, labelledValues: results)
         } catch {
             progressDelegate?.downloadError(error: error.localizedDescription)
             throw error
@@ -696,7 +695,7 @@ class WebPageScraper2: NSObject {
         return results
     }
 
-    
+    /*
     /// missing arrays for BVPS, ROI, OPCF/s and PE Hx
     class func r1DataFromYahoo(symbol: String, progressDelegate: ProgressViewDelegate?=nil, avoidMTTitles: Bool?=nil ,downloadRedirectDelegate: DownloadRedirectionDelegate?) async throws -> [LabelledValues]? {
         
@@ -788,8 +787,8 @@ class WebPageScraper2: NSObject {
         return results
         
     }
-    
-    class func r1DataFromTagesschau(htmlText: String, symbol: String?, valuationID: NSManagedObjectID, progressController: ProgressViewDelegate?=nil) throws -> [LabelledValues] {
+    */
+    class func r1DataFromTagesschau(htmlText: String, symbol: String?, progressController: ProgressViewDelegate?=nil) throws -> [LabelledValues] {
         
 //        let sectionHeaders = ["Kennzahlen","Gewinn und Verlustrechnung", ">Cash flow</h2",">Bilanz</h2>", "Wertpapierdaten"]
 //        // vermeide äöü in html search string
@@ -914,7 +913,7 @@ class WebPageScraper2: NSObject {
             }
         }
                 
-        let aLV = allLabelledValues
+//        let aLV = allLabelledValues
 //        Task.init(priority: .background, operation: {
 //            try await saveR1Data(valuationID: valuationID, labelledValues: aLV)
 //            progressController?.downloadComplete()
@@ -1180,15 +1179,19 @@ class WebPageScraper2: NSObject {
          
  // 1 Download and analyse web page data
         var results = [LabelledValues]()
+        var oldResults = [LabelledValues]()
         let allTasks = 6
         var progressTasks = 0
         
+        let rowNames = [["Market cap (intra-day)", "Beta (5Y monthly)", "Shares outstanding"],["Total revenue", "Net income", "Interest expense","Income before tax","Income tax expense"],["Current debt","Long-term debt", "Total liabilities"],["Operating cash flow","Capital expenditure"],["Avg. Estimate", "Sales growth (year/est)"]]
+        
+        var i = 0
         for title in ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"] {
             var components: URLComponents?
-                    
+            
             components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/\(title)")
             components?.queryItems = [URLQueryItem(name: "p", value: shareSymbol)]
-                    
+            
             guard let url = components?.url else {
                 progressDelegate?.downloadError(error: "Failed DCF valuation download for \(symbol): invalid url")
                 throw InternalErrorType.urlInvalid
@@ -1200,22 +1203,68 @@ class WebPageScraper2: NSObject {
             } catch {
                 progressDelegate?.downloadError(error: "Failed DCF valuation download for \(symbol): \(error.localizedDescription)")
             }
-
+            
             progressTasks += 1
             progressDelegate?.progressUpdate(allTasks: allTasks, completedTasks: progressTasks)
             
-            let labelledResults = try dcfDataExtraction(htmlText: htmlText, section: title)
-            results.append(contentsOf: labelledResults)
+            var tableHeader = (title == "analysis") ? "Revenue estimate" : nil
+            
+            if var labelledResults = YahooPageScraper.extractYahooPageData(html: htmlText, pageType: YahooPageScraper.getYahooPageType(url: url), tableHeader: tableHeader, rowTitles: rowNames[i]) {
+                
+                for j in 0..<labelledResults.count {
+                    labelledResults[j].values = labelledResults[j].values.reversed()
+                    
+                    if title == "analysis" {
+                        if labelledResults[j].values.count > 1 {
+                            labelledResults[j].values = [labelledResults[j].values.first ?? Double(), labelledResults[j].values[1]].reversed() // ! order differs
+                        } else if labelledResults[j].values.count == 1{
+                            labelledResults[j].values = [labelledResults[j].values.first ?? Double()]
+                        }
+                        if labelledResults[j].label.contains("Sales growth") {
+                            labelledResults[j].values = labelledResults[j].values.compactMap{ $0 / 100}
+                        }
+                    }
+                    else if !(title == "cash-flow" || title == "key-statistics") {
+                        if !(labelledResults[j].label.contains("Total revenue") || labelledResults[j].label.contains("Net income")) {
+                            labelledResults[j].values = [labelledResults[j].values.last ?? Double()].compactMap{ $0 * 1000}
+                        }
+                        else {
+                            labelledResults[j].values = labelledResults[j].values.compactMap{ $0 * 1000}
+                        }
+                    } else if title == "cash-flow" {
+                        labelledResults[j].values = labelledResults[j].values.compactMap{ $0 * 1000}
+                    }
+
+                }
+                
+                results.append(contentsOf: labelledResults)
+            }
+                
+            if let labelledResults = try dcfDataExtraction(htmlText: htmlText, section: title) {
+                oldResults.append(contentsOf: labelledResults)
+            }
+            
+            i += 1
         }
         
-// 2 Save data to background DCFValuation
+        print()
+        for result in results {
+            print(result)
+        }
+        
+        print()
+        for result in oldResults {
+           print(result)
+        }
+            
+        // 2 Save data to background DCFValuation
         let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc.automaticallyMergesChangesFromParent = true
         
         await backgroundMoc.perform {
             do {
                 if let dcfv = backgroundMoc.object(with: valuationID) as? DCFValuation {
-
+                    
                     do {
                         for result in results {
                             switch result.label {
@@ -1239,7 +1288,7 @@ class WebPageScraper2: NSObject {
                                 dcfv.debtST = result.values.first ?? Double()
                             case _ where result.label.starts(with: "Long-term debt"):
                                 dcfv.debtLT = result.values.first ?? Double()
-                            case _ where result.label.starts(with: "Total Debt"):
+                            case _ where result.label.starts(with: "Total liabilities"):
                                 dcfv.totalDebt = result.values.first ?? Double()
                             case _ where result.label.starts(with: "Operating cash flow"):
                                 dcfv.tFCFo = result.values
@@ -1262,21 +1311,20 @@ class WebPageScraper2: NSObject {
                             let trendValue = DatedValue(date: dcfv.creationDate!, value: dcfValue!)
                             dcfv.share?.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .dCFValue)
                         }
-
+                        
                         progressDelegate?.downloadComplete()
                         
                     } catch let error {
                         ErrorController.addInternalError(errorLocation: "WebPageScraper2.dcfDataDownload", systemError: error, errorInfo: "Error saving DCF data download results for \(symbol)")
                     }
-                   
+                    
                 }
             }
         }
-        
     }
     
     /// called  by StocksController.updateStocks for non-US stocks when trying to download from MacroTrends
-    class func nonMTRule1DataDownload(symbol: String?, shortName: String?, valuationID: NSManagedObjectID ,progressController: ProgressViewDelegate?=nil) async throws {
+    class func nonMTRule1DataDownload(symbol: String?, shortName: String?, shareID: NSManagedObjectID ,progressController: ProgressViewDelegate?=nil) async throws {
         
         guard let valid = symbol else {
             ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "missing stock symbol")
@@ -1317,7 +1365,7 @@ class WebPageScraper2: NSObject {
                 
                 async let arivaHTML = try? Downloader.downloadData(url: arivaURL!)
                 // also download limited R1 data from Yahoo
-                async let yahooLVS = try? r1DataFromYahoo(symbol: symbol!, downloadRedirectDelegate: nil)
+                async let yahooLVS = try? YahooPageScraper.r1DataFromYahoo(symbol: symbol!, downloadRedirectDelegate: nil)
                 
                 // find full url for company on tagesschau search page
                 if let html = try await Downloader().downloadDataWithRedirection(url: tsURL) {
@@ -1335,7 +1383,7 @@ class WebPageScraper2: NSObject {
                             // 2 download tagesschau data webpage from full url
                             if let infoPage = try? await Downloader.downloadData(url: url) {
                                 if infoPage != "" {
-                                    if let tsLVS = try? r1DataFromTagesschau(htmlText: infoPage, symbol: symbol, valuationID: valuationID, progressController: progressController) {
+                                    if let tsLVS = try? r1DataFromTagesschau(htmlText: infoPage, symbol: symbol, progressController: progressController) {
                                         r1LabelledValues.append(contentsOf: tsLVS)
                                     }
                                 }
@@ -1431,7 +1479,7 @@ class WebPageScraper2: NSObject {
                     }
                 }
                                 
-                try await saveR1Data(valuationID: valuationID, labelledValues: r1LabelledValues)
+                try await saveR1Data(shareID: shareID, labelledValues: r1LabelledValues)
 
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadEnded"), object: nil, userInfo: nil)
 
@@ -1577,77 +1625,94 @@ class WebPageScraper2: NSObject {
         return ldv
     }
     
-    class func saveR1Data(valuationID: NSManagedObjectID, labelledValues: [LabelledValues]) async throws {
+    class func saveR1Data(shareID: NSManagedObjectID, labelledValues: [LabelledValues]) async throws {
         
         let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc.automaticallyMergesChangesFromParent = true
         
-        //TODO: - share some values with wbv, dcf and research
-
         try await backgroundMoc.perform {
 
             do {
-                if let r1v = backgroundMoc.object(with: valuationID) as? Rule1Valuation {
+                if let bgShare = backgroundMoc.object(with: shareID) as? Share {
                     
-                    for result in labelledValues {
-                        switch result.label.lowercased() {
-                        case "revenue":
-                            r1v.revenue = result.values
-                        case "eps - earnings per share":
-                            r1v.eps = result.values
-                        case "net income":
-                            if let value = result.values.first {
-                                r1v.netIncome = value * pow(10, 3)
-                            }
-                        case "roi - return on investment":
-                            r1v.roic = result.values.compactMap{ $0/100.0 }
-                        case "book value per share":
-                            r1v.bvps = result.values
-                        case "operating cash flow per share":
-                            r1v.opcs = result.values
-                        case "long term debt":
-                            let cleanedResult = result.values.filter({ (element) -> Bool in
-                                return element != Double()
-                            })
-                            if let debt = cleanedResult.first {
-                                r1v.debt = debt * 1000
-                            }
-                        case "pe ratio historical data":
-                            r1v.hxPE = result.values
-                        case "sales growth (year/est)":
-                            r1v.growthEstimates = result.values
-                        case "operating cash flow":
-                            r1v.opCashFlow = result.values.first ?? Double()
-                        case "purchases":
-                            r1v.insiderStockBuys = result.values.last ?? Double()
-                        case "sales":
-                            r1v.insiderStockSells = result.values.last ?? Double()
-                        case "total insider shares held":
-                            r1v.insiderStocks = result.values.last ?? Double()
-                        case "forward p/e":
-                            r1v.adjFuturePE = result.values.last ?? Double()
-                        default:
-                            ErrorController.addInternalError(errorLocation: "WebPageScraper2.saveR1Date", systemError: nil, errorInfo: "unspecified result label \(result.label)")
-                        }
+                    if bgShare.rule1Valuation == nil {
+                        bgShare.rule1Valuation = Rule1Valuation.init(context: backgroundMoc)
                     }
                     
-                    r1v.creationDate = Date()
-                    try backgroundMoc.save()
-                
-                    // save new value with date in a share trend
-                    if let vShare = r1v.share {
+                    if let r1v = bgShare.rule1Valuation {
+                        
+                        for result in labelledValues {
+                            switch result.label.lowercased() {
+                            case "revenue":
+                                r1v.revenue = result.values
+                            case "eps - earnings per share":
+                                r1v.eps = result.values
+                            case "net income":
+                                if let value = result.values.first {
+                                    r1v.netIncome = value * pow(10, 3)
+                                }
+                            case "roi - return on investment":
+                                r1v.roic = result.values.compactMap{ $0/100.0 }
+                            case "book value per share":
+                                r1v.bvps = result.values
+                            case "operating cash flow per share":
+                                r1v.opcs = result.values
+                            case "long term debt":
+                                let cleanedResult = result.values.filter({ (element) -> Bool in
+                                    return element != Double()
+                                })
+                                if let debt = cleanedResult.first {
+                                    r1v.debt = debt * 1000
+                                }
+                            case "pe ratio historical data":
+                                r1v.hxPE = result.values
+                            case "sales growth (year/est)":
+                                r1v.growthEstimates = result.values
+                            case "operating cash flow":
+                                r1v.opCashFlow = result.values.first ?? Double()
+                            case "purchases":
+                                r1v.insiderStockBuys = result.values.last ?? Double()
+                            case "sales":
+                                r1v.insiderStockSells = result.values.last ?? Double()
+                            case "total insider shares held":
+                                r1v.insiderStocks = result.values.last ?? Double()
+                            case "forward p/e":
+                                r1v.adjFuturePE = result.values.last ?? Double()
+                            default:
+                                ErrorController.addInternalError(errorLocation: "WebPageScraper2.saveR1Date", systemError: nil, errorInfo: "unspecified result label \(result.label)")
+                            }
+                        }
+                        
+                        r1v.creationDate = Date()
+                        try backgroundMoc.save()
+                        
+                        // save new value with date in a share trend
                         if let moat = r1v.moatScore() {
                             let dv = DatedValue(date: r1v.creationDate!, value: moat)
-                            vShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .moatScore)
+                            bgShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .moatScore)
+
                         }
                         let (price,_) = r1v.stickerPrice()
                         if price != nil {
                             let dv = DatedValue(date: r1v.creationDate!, value: price!)
-                            vShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .stickerPrice)
+                            bgShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .stickerPrice)
                         }
-                    }
 
+                    }
+                    
+                    //DEBUG ONLY
+                    else {
+                        print("Can't get R1Valuation from background share saving for R1 valuation")
+                    }
+                    //DEBUG ONLY
                 }
+                //DEBUG ONLY
+
+                else {
+                    print("Unable to get background share from objectID for R1 valuation")
+                }
+                //DEBUG ONLY
+
             } catch {
                 ErrorController.addInternalError(errorLocation: "WebPageScraper2.saveR1Data", systemError: error, errorInfo: "Error saving R1 data download")
                 throw error
@@ -3002,10 +3067,10 @@ class WebPageScraper2: NSObject {
         return tableContents
     }
     
-    class func dcfDataExtraction(htmlText: String, section: String) throws -> [LabelledValues] {
+    class func dcfDataExtraction(htmlText: String, section: String) throws -> [LabelledValues]? {
     
         guard htmlText != "" else {
-            throw InternalError(location: #function, errorInfo: "empty web page found for \(section)", errorType: .emptyWebpageText)
+            return nil
         }
         
         let yahooPages = ["key-statistics", "financials", "balance-sheet", "cash-flow", "analysis"]

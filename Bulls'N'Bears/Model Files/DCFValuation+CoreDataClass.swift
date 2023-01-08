@@ -20,8 +20,7 @@ public class DCFValuation: NSManagedObject {
     var fcfToEquity = [Double]()
     var fcfDivNetIncome = [Double]()
     var predictedRevenue = [Double]()
-    var totalDebt = Double()
-    var totalDebtRate = Double()
+    var aalDebtRate = Double()
     var taxRate = Double()
     var marketCapAndTotalDebt = Double()
     var totalDebtDivMarketCap = Double()
@@ -209,7 +208,7 @@ public class DCFValuation: NSManagedObject {
         }
         predictedRevenue = tRevenuePred ?? []
         
-        guard predictedRevenue.last != nil && predictedRevenue.last != nil && revGrowthPredAdj?.first != nil && revGrowthPredAdj?.last != nil else {
+        guard predictedRevenue.first != nil && predictedRevenue.last != nil && revGrowthPredAdj?.first != nil && revGrowthPredAdj?.last != nil else {
             errors.append("essential data missing")
             return (nil,errors)
         }
@@ -267,11 +266,11 @@ public class DCFValuation: NSManagedObject {
             taxRate = abs(expenseIncomeTax) / incomePreTax
         }
 // 10
-        let totalCompanyValue = marketCap + (debtST + debtLT)
+        let totalCompanyValue = marketCap + (debtLT + debtST) // ltDebt + stDebt
 // 11
-        let totalDebtToCompanyValue = (debtST + debtLT) / totalCompanyValue
+        let totalDebtToCompanyValue = (debtLT + debtST) / totalCompanyValue
 // 12
-        let costOfDebt = totalDebt * (1-taxRate)
+        let costOfDebt = (debtLT + debtST) * (1-taxRate)
 // 13
         let capAssetPrice = (UserDefaults.standard.value(forKey: "10YUSTreasuryBondRate") as! Double) + beta * (UserDefaults.standard.value(forKey: "LongTermMarketReturn") as! Double - (UserDefaults.standard.value(forKey: "10YUSTreasuryBondRate") as! Double))
 // 14
