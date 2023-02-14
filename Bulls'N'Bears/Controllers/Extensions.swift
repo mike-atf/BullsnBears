@@ -7,6 +7,585 @@
 
 import UIKit
 
+//MARK: - [DatedValue]
+extension [DatedValue] {
+    
+    /// merge rules: if new elements.count < existing.count replaces existing elements between dates new.earliest-last with new elements
+    /// if new.count == existing count: check if newest.date > existing.date; if yes add latest only to existing
+    /// if new.count > existing.count discard all existing older than new.latest
+    /// Yahoo usully has 4 element sonly, Macrotrend far more
+    func mergeIn(newDV: [DatedValue]?, removeZeroes:Bool?=false) -> [DatedValue]? {
+        
+        guard let new = newDV?.sortByDate(dateOrder: .ascending) else { return self }
+
+        var existing = self.sortByDate(dateOrder: .ascending)
+        if new.count < existing.count {
+            // replace all existing elements between new.latest and new.earliest
+            existing = existing.filter({ dv in
+                if dv.date >= new.first!.date && dv.date <= new.last!.date { return false }
+                else { return true }
+            })
+            
+            if removeZeroes ?? false {
+                existing.filter { dv in
+                    if dv.value == 0 { return false }
+                    else { return true }
+                }
+            }
+            
+            existing.append(contentsOf: new)
+            return existing
+
+        }
+        else if new.count == existing.count {
+            let newerDVs = new.filter ({ dv in
+                if dv.date > existing.last!.date { return true }
+                else { return false }
+            })
+            existing.append(contentsOf: newerDVs)
+            return existing
+        }
+        else {
+            var newerThanNewonly = existing.filter({ dv in
+                if dv.date.timeIntervalSince(new.last!.date) > 24*3600 { return true }
+                else { return false }
+            })
+            newerThanNewonly.append(contentsOf: new)
+            return newerThanNewonly
+        }
+        
+    }
+    
+    func addOrReplaceNewest(newDV: DatedValue?) -> [DatedValue]? {
+        
+        guard let new = newDV else { return self }
+
+        var existing = self.sortByDate(dateOrder: .ascending)
+        
+        let latestExisting = existing.last!
+        if new.date.timeIntervalSince(latestExisting.date) < 24*3600 {
+            existing = existing.dropLast()
+            existing.append(new)
+        } else {
+            existing.append(new)
+        }
+        
+        return existing
+
+    }
+    
+    func convertToData() -> Data? {
+                
+        var array = [Date: Double]()
+
+        for element in self {
+            array[element.date] = element.value
+        }
+
+        do {
+            return try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
+        } catch let error {
+            ErrorController.addInternalError(errorLocation: "datedValuesToData function", systemError: error, errorInfo: "error converting DatedValues to Data")
+        }
+
+        return nil
+    }
+    
+    func sortByDate(dateOrder: Order) -> [DatedValue] {
+        
+        return self.sorted { dv0, dv1 in
+            if dateOrder == .ascending {
+                if dv0.date < dv1.date { return true }
+                else { return false }
+            } else {
+                if dv0.date > dv1.date { return true }
+                else { return false }
+            }
+        }
+    }
+    
+    func dropZeros() -> [DatedValue] {
+        
+        return self.filter({ dv in
+            if dv.value == 0.0 { return false }
+            else { return true }
+        })
+    }
+
+    func maxYear$() -> String {
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy"
+            return formatter
+        }()
+        
+        if let maxYear = self.compactMap({ $0.date }).max() {
+            return dateFormatter.string(from: maxYear)
+        }
+        else {
+            return "max NA"
+        }
+    }
+    
+    func minYear$() -> String {
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy"
+            return formatter
+        }()
+
+        if let minYear = self.compactMap({ $0.date }).min() {
+            return dateFormatter.string(from: minYear)
+        }
+        else {
+            return "min NA"
+        }
+    }
+
+    func allYear$() -> [String] {
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy"
+            return formatter
+        }()
+
+        return self.compactMap{ dateFormatter.string(from: $0.date) }
+    }
+    
+    func values() -> [Double] {
+        return self.compactMap{ $0.value }
+    }
+    
+    /// simple element to element change rates
+    func growthRates(dateOrder: Order) -> [DatedValue]? {
+        
+        guard self.count > 1 else { return nil }
+        
+        let descending = self.sortByDate(dateOrder: .descending)
+        
+        var rates = [DatedValue]()
+        for i in 1..<descending.count {
+            var growth = 0.0
+            if descending[i].value != 0 {
+                growth = (descending[i-1].value - descending[i].value) / descending[i].value
+            }
+            rates.append(DatedValue(date: descending[i-1].date, value: growth))
+        }
+        
+        return rates.sortByDate(dateOrder: dateOrder)
+    }
+
+        
+}
+
+extension [DatedValue]? {
+    
+    func values(dateOrdered: Order) -> [Double]? {
+        
+        if let ordered = self?.sortByDate(dateOrder: dateOrdered) {
+            return ordered.compactMap{ $0.value }
+        }
+        
+        return nil
+    }
+    
+//    func valuesOnly() -> [Double]? {
+//        
+//        if self == nil { return nil }
+//        else {
+//            return self!.compactMap{ $0.value }
+//        }
+//    }
+    
+    func dropZeros() -> [DatedValue]? {
+        
+        if self == nil { return nil }
+        
+        return self!.filter({ dv in
+            if dv.value == 0.0 { return false }
+            else { return true }
+        })
+    }
+
+    func maxYear$() -> String? {
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy"
+            return formatter
+        }()
+
+        
+        if self == nil { return nil }
+        if let maxYear = self!.compactMap({ $0.date }).max() {
+            
+            return dateFormatter.string(from: maxYear)
+        } else {
+            return nil
+        }
+    }
+    
+    func minYear$() -> String? {
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy"
+            return formatter
+        }()
+
+        
+        if self == nil { return nil }
+        if let minYear = self!.compactMap({ $0.date }).max() {
+            
+            return dateFormatter.string(from: minYear)
+        } else {
+            return nil
+        }
+    }
+    
+    ///merge rules: if new elements.count < existing elements.count discard new elements
+    /// if new.count == existing count: check if newest.date > existing.date; if yes add latest only to existing
+    /// if new.count > existing.count discard existing and replce with new
+    /// Yahoo usully has 4 element sonly, Macrotrend far more
+
+    func mergeIn(newDV: [DatedValue]?) -> [DatedValue]? {
+        
+        guard let new = newDV?.sortByDate(dateOrder: .ascending) else { return self }
+        guard var existing = self?.sortByDate(dateOrder: .ascending) else { return new }
+
+        if new.count < existing.count { return existing }
+        else if new.count == existing.count {
+            let newerDVs = new.filter ({ dv in
+                if dv.date > existing.last!.date { return true }
+                else { return false }
+            })
+            existing.append(contentsOf: newerDVs)
+        }
+        else {
+            return new
+        }
+        
+        return existing
+    }
+    
+    func growthRates(dateOrder: Order) -> [DatedValue]? {
+        
+        guard let dv = self else { return nil }
+        
+        guard dv.count > 1 else { return nil }
+        
+        let descending = dv.sortByDate(dateOrder: .descending)
+        
+        var rates = [DatedValue]()
+        for i in 1..<descending.count {
+            let growth = (descending[i-1].value - descending[i].value) / descending[i].value
+            rates.append(DatedValue(date: descending[i-1].date, value: growth))
+        }
+        
+        return rates.sortByDate(dateOrder: dateOrder)
+    }
+
+    
+}
+
+extension [[DatedValue]]? {
+    
+    /// send  TWO arrays, with only one element per calendar year; array in position two is the denominator, in one the divisor.
+    func proportions() -> [DatedValue]? {
+        
+        guard self != nil else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "can't calculate proportions between two [DatedValue] array due to EMPTY [[DatedValue]]")
+            return nil
+        }
+        
+        guard self?.count ?? 0 == 2 else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "can't calculate proportions between two [DatedValue] array due to \(self?.count ?? 0) arrays sent")
+            return nil
+        }
+        
+        guard let harmonisedArrays = ValuationDataCleaner.harmonizeDatedValues(arrays: self!) else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "can't calculate proportions between two [DatedValue] array due to array harmonisation failure")
+            return nil
+        }
+        
+        let denominatorArray = harmonisedArrays[1]
+        let divisorArray = harmonisedArrays[0]
+        
+        var proportionsDV = [DatedValue]()
+        
+        for i in 0..<denominatorArray.count {
+            var proportion = 0.0
+            if denominatorArray[i].value != 0 {
+                proportion = divisorArray[i].value / denominatorArray[i].value
+            }
+            proportionsDV.append(DatedValue(date: denominatorArray[i].date, value: proportion))
+        }
+        
+        return proportionsDV
+
+    }
+}
+
+//MARK: - [DatedText]
+extension [DatedText] {
+    
+    func sortByDate(dateOrder: Order) -> [DatedText] {
+        
+        return self.sorted { dv0, dv1 in
+            if dateOrder == .ascending {
+                if dv0.date < dv1.date { return true }
+                else { return false }
+            } else {
+                if dv0.date > dv1.date { return true }
+                else { return false }
+            }
+        }
+    }
+    
+    func convertToData() -> Data? {
+                
+        var array = [Date: String]()
+
+        for element in self {
+            array[element.date] = element.text
+        }
+
+        do {
+            return try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
+        } catch let error {
+            ErrorController.addInternalError(errorLocation: "datedTextToData function", systemError: error, errorInfo: "error converting DatedTExt to Data")
+        }
+
+        return nil
+    }
+
+}
+
+//MARK: - [Labelled_DatedValues]
+extension [Labelled_DatedValues] {
+    
+    func convertToLabelledValues(dateOrder: Order) -> [LabelledValues] {
+        
+        var labelledValues = [LabelledValues]()
+        
+        for element in self {
+            let lvs = element.convertToLabelledValues(dateSortOrder: dateOrder)
+            labelledValues.append(lvs)
+        }
+        
+        return labelledValues
+    }
+    
+    func convertToValues(dateOrder: Order) -> [[Double]] {
+        
+        var values = [[Double]]()
+        
+        for element in self {
+            values.append(element.extractValuesOnly(dateOrder: dateOrder))
+        }
+        
+        return values
+    }
+    
+    func sortAllElementDatedValues(dateOrder: Order) -> [Labelled_DatedValues] {
+        
+        var sortedLDV = [Labelled_DatedValues]()
+        
+        for ldv in self {
+            let sorted = ldv.sort(dateOrder: dateOrder)
+            sortedLDV.append(sorted)
+        }
+        
+        return sortedLDV
+    }
+    
+}
+
+//MARK: - [DatedValue_s]
+extension [DatedValues] {
+    
+    func convertToData() -> Data? {
+        
+        var array = [Date: [Double]]()
+
+        for element in self {
+            array[element.date] = element.values
+        }
+
+        do {
+            return try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
+        } catch let error {
+            ErrorController.addInternalError(errorLocation: "datedValuesToData function", systemError: error, errorInfo: "error converting DatedValues to Data")
+        }
+
+        return nil
+
+    }
+
+}
+
+//MARK: - [Data?]
+
+extension Data? {
+        
+    func datedValues(dateOrder: Order, oneForEachYear:Bool?=nil) -> [DatedValue]? {
+        
+        guard self != nil else { return nil }
+        
+        do {
+            if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(self!) as? [Date: Double] {
+                var datedValues = [DatedValue]()
+                for element in dictionary {
+                    datedValues.append(DatedValue(date: element.key, value: element.value))
+                }
+                
+                if !(oneForEachYear ?? false) {
+                    return datedValues.sorted { (e0, e1) -> Bool in
+                        if dateOrder == .ascending {
+                            if e0.date < e1.date { return true }
+                            else { return false }
+                        }
+                        else {
+                            if e0.date > e1.date { return true }
+                            else { return false }
+                        }
+                    }
+                }
+                else {
+                    
+                    let yearDateFormatter: DateFormatter = {
+                        let formatter = DateFormatter()
+                        formatter.timeZone = TimeZone(identifier: "UTC")!
+                        formatter.dateFormat = "yyyy"
+                        return formatter
+                    }()
+
+                    var oneAnnualElementArray = [DatedValue]()
+                    let elementYears = Set<String>(datedValues.compactMap{ yearDateFormatter.string(from: $0.date) })
+                    
+                    for year$ in elementYears {
+                        let elementsInYear = datedValues.filter({ dv in
+                            if yearDateFormatter.string(from: dv.date) == year$ { return true }
+                            else { return false }
+                        })
+                        if elementsInYear.count == 1 {
+                            oneAnnualElementArray.append(elementsInYear.first!)
+                        }
+                        else if elementsInYear.count > 1 {
+                            let average = elementsInYear.compactMap{ $0.value}.mean()! // zero elements have been removed above
+                            let averageDV = DatedValue(date: yearDateFormatter.date(from: year$)!, value: average)
+                            oneAnnualElementArray.append(averageDV)
+                        }
+                    }
+                    return oneAnnualElementArray.sortByDate(dateOrder: dateOrder)
+                }
+            }
+        } catch  {
+            ErrorController.addInternalError(errorLocation: "Data extension dataToDatedValues", systemError: error, errorInfo: "error decodomg datedValue data")
+        }
+        return nil
+
+    }
+    
+    // for oneElement per year, returns the NEWEST element for a given year only
+    func datedTexts(dateOrder: Order, oneForEachYear:Bool?=nil) -> [DatedText]? {
+        
+        guard self != nil else { return nil }
+        
+        do {
+            if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(self!) as? [Date: String] {
+                var datedTexts = [DatedText]()
+                for element in dictionary {
+                    datedTexts.append(DatedText(date: element.key, text: element.value))
+                }
+                
+                if !(oneForEachYear ?? false) {
+                    return datedTexts.sorted { (e0, e1) -> Bool in
+                        if dateOrder == .ascending {
+                            if e0.date < e1.date { return true }
+                            else { return false }
+                        }
+                        else {
+                            if e0.date > e1.date { return true }
+                            else { return false }
+                        }
+                    }
+                }
+                else {
+                    
+                    let yearDateFormatter: DateFormatter = {
+                        let formatter = DateFormatter()
+                        formatter.timeZone = TimeZone(identifier: "UTC")!
+                        formatter.dateFormat = "yyyy"
+                        return formatter
+                    }()
+
+                    var oneAnnualElementArray = [DatedText]()
+                    let elementYears = Set<String>(datedTexts.compactMap{ yearDateFormatter.string(from: $0.date) })
+                    
+                    for year$ in elementYears {
+                        let elementsInYear = datedTexts.filter({ dv in
+                            if yearDateFormatter.string(from: dv.date) == year$ { return true }
+                            else { return false }
+                        })
+                        if elementsInYear.count == 1 {
+                            oneAnnualElementArray.append(elementsInYear.first!)
+                        }
+                        else if elementsInYear.count > 1 {
+                            let newest = elementsInYear.sorted { dt0, dt1 in
+                                if dt0.date < dt1.date { return true }
+                                else { return false }
+                            }.last!
+                            oneAnnualElementArray.append(newest)
+                        }
+                    }
+                    return oneAnnualElementArray.sortByDate(dateOrder: dateOrder)
+                }
+            }
+        } catch  {
+            ErrorController.addInternalError(errorLocation: "Data extension dataToDatedValues", systemError: error, errorInfo: "error decodomg datedValue data")
+        }
+        return nil
+
+    }
+    
+    func valuesOnly(dateOrdered: Order, withoutZeroes:Bool?=false, oneElementPerYear:Bool?=false) -> [Double]? {
+        
+        if let dvs = self.datedValues(dateOrder: dateOrdered, oneForEachYear: oneElementPerYear) {
+            if !(withoutZeroes ?? false) {
+                return dvs.compactMap{ $0.value }
+            } else {
+                return dvs.compactMap{ $0.value}.filter { d in
+                    if d == 0.0 { return false }
+                    else { return true }
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    func textsOnly(dateOrdered: Order, withoutEmpty:Bool?=false, oneElementPerYear:Bool?=false) -> [String]? {
+        
+        if let dvs = self.datedTexts(dateOrder: dateOrdered, oneForEachYear: oneElementPerYear) {
+            if !(withoutEmpty ?? false) {
+                return dvs.compactMap{ $0.text }
+            } else {
+                return dvs.compactMap{ $0.text}.filter { d in
+                    if d != "" { return true }
+                    else { return false }
+                }
+            }
+        }
+        
+        return nil
+    }
+
+}
+
 extension UIView {
     func findViewController() -> UIViewController? {
         if let nextResponder = self.next as? UIViewController {
@@ -282,7 +861,10 @@ extension Array where Element == Double {
         
         for i in appliedPeriods..<noNaN.count {
             if ascending[i] != Double() {
+//                print()
+//                print(ema, ascending[i])
                 ema = ascending[i] * (2/(Double(appliedPeriods+1))) + ema * (1 - 2/(Double(appliedPeriods+1)))
+//                print(ema)
             }
         }
         
@@ -315,7 +897,7 @@ extension Array where Element == Double {
     /// should have elemetns in time-descending order!
     /// return n-1 elements
     /// can include empty placeholder Double() elements instead of nil
-    func growthRates() -> [Double]? {
+    func growthRates(dateOrder:Order?=nil) -> [Double]? {
         
         guard self.count > 1 else {
             return nil
@@ -323,14 +905,23 @@ extension Array where Element == Double {
         
         var rates = [Double]()
         
-        for i in 0..<self.count - 1 {
-            if self[i] == Double() {
-                rates.append(Double())
+        if dateOrder ?? .descending == .descending {
+            for i in 0..<self.count - 1 {
+                if self[i] == Double() {
+                    rates.append(Double())
+                }
+                else if self[i+1] != 0 {
+                    rates.append((self[i] - self[i+1]) / abs(self[i+1]))
+                }
+                else { rates.append(Double()) }
             }
-            else if self[i+1] != 0 {
-                rates.append((self[i] - self[i+1]) / abs(self[i+1]))
+        }
+        else {
+            for i in 0..<self.count {
+                if (i + 1) < self.count {
+                    rates.append((self[i+1] - self[i]) / self[i])
+                }
             }
-            else { rates.append(Double()) }
         }
 
         return rates
@@ -767,7 +1358,13 @@ extension Array where Element == CGFloat {
 
 extension String {
     
-    func numberFromText(rowTitle: String, exponent: Double?=nil) -> Double {
+    func numbersOnly() -> String {
+        return self.filter("-0123456789.".contains)
+    }
+    
+    
+    /// for english .separated double. Returns the number ^ exponent ?? 1
+    func numberFromText(text: String, exponent: Double?=nil) -> Double {
         
         var value = Double()
         
@@ -788,20 +1385,112 @@ extension String {
                 else if self.uppercased().last == "K" {
                     value = v * pow(10.0, 3) // should be 6 but values are entered as '000
                 }
-                else if rowTitle.contains("Beta") {
+                // TODO: - removed for YahooPageExtraction - check compatibiity with MT data
+//                else if text.contains("Beta") {
+//                    value = v
+//                }
+//                else {
+//                    value = v * (pow(10.0, exponent ?? 1.0))
+//                }
+                else {
                     value = v
                 }
-                else {
-                    value = v * (pow(10.0, exponent ?? 0.0))
-                }
-                
+//
                 if self.last == ")" {
                     value = v * -1
+                }
+                
+            }
+        }
+        
+        return value
+    }
+    
+    /// for english .separated double. Takes into acount TBMK% at the end
+    func textToNumber() -> Double? {
+        
+        var value: Double?
+        
+        if self.filter("-0123456789.".contains) != "" {
+            if let v = Double(self.filter("-0123456789.".contains)) {
+              
+                if self.last == "%" {
+                    value = v / 100.0
+                }
+                else if self.uppercased().last == "T" {
+                    value = v * pow(10.0, 12) // should be 12 but values are entered as '000
+                } else if self.uppercased().last == "B" {
+                    value = v * pow(10.0, 9) // should be 9 but values are entered as '000
+                }
+                else if self.uppercased().last == "M" {
+                    value = v * pow(10.0, 6) // should be 6 but values are entered as '000
+                }
+                else if self.uppercased().last == "K" {
+                    value = v * pow(10.0, 3) // should be 6 but values are entered as '000
+                }
+                else {
+                    value = v
                 }
             }
         }
         
         return value
     }
+    
+}
 
+extension [PricePoint] {
+    
+    /// filters out any new pricePoints that are earlier than the latest existing PricePoint
+    func mergeIn(pricePoints: [PricePoint]?) -> [PricePoint] {
+        
+        guard let newPP = pricePoints else {
+            return self
+        }
+        
+        guard self.count > 0 else {
+            return pricePoints ?? [PricePoint]()
+        }
+        
+        let latestExistingDate = self.compactMap{ $0.tradingDate }.max()!
+        var merged = self
+        
+        let newerPricePoints = newPP.filter({ pp in
+            if pp.tradingDate > latestExistingDate {
+                return true
+            } else { return false }
+        })
+        
+        merged.append(contentsOf: newerPricePoints)
+        
+        return merged
+    }
+    
+    func fillGaps(pricePoints: [PricePoint]?) -> [PricePoint] {
+        
+        guard let newPP = pricePoints else {
+            return self
+        }
+        
+        guard self.count > 0 else {
+            return pricePoints ?? [PricePoint]()
+        }
+        
+        var mergedPP = [PricePoint]()
+        
+        for nPP in newPP {
+            
+            let existing = self.filter({ ePP in
+                if ePP.tradingDate == nPP.tradingDate { return true }
+                else { return false }
+            })
+            
+            if existing.count == 0 {
+                mergedPP.append(nPP)
+            }
+            
+        }
+        
+        return mergedPP
+    }
 }

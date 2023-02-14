@@ -173,7 +173,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         do {
             try FileManager.default.removeItem(atPath: atPath)
         } catch let error {
-            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "SceneDelegate - error trying to remove existing file \(atPath) in the  Document folder to be able to move new file of same name from Inbox folder ")
         }
     }
     

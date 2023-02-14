@@ -42,11 +42,26 @@ let sharesListSortParameter = SharesListSortParameter()
 var valuationWeightsSingleton = Financial_Valuation_Factors()
 let nonRefreshTimeInterval: TimeInterval  = 300
 
+enum Order {
+    case ascending
+    case descending
+}
+
 struct ProfileData {
     var sector: String
     var industry: String
     var employees: Double
     var description: String
+}
+
+struct TitleAndDetail {
+    var title = String()
+    var detail = String()
+    
+    init(title: String, detail: String) {
+        self.title = title
+        self.detail = detail
+    }
 }
 
 struct PageRowServiceTitle {
@@ -68,6 +83,130 @@ struct LabelledValues: Codable {
 struct Labelled_DatedValues: Codable {
     var label: String
     var datedValues: [DatedValue]
+        
+    func convertToLabelledValues(dateSortOrder: Order) -> LabelledValues {
+        
+        let dv = self.datedValues.sorted { dv0, dv1 in
+            if dateSortOrder == .ascending {
+                if dv0.date < dv1.date { return true }
+                else { return false }
+            } else {
+                if dv0.date > dv1.date { return true }
+                else { return false }
+            }
+        }
+        
+        let values = dv.compactMap{ $0.value }
+        return LabelledValues(label: self.label, values: values)
+        
+    }
+    
+    func extractValuesOnly(dateOrder: Order) -> [Double] {
+        
+        let dv = self.datedValues.sorted { dv0, dv1 in
+            if dateOrder == .ascending {
+                if dv0.date < dv1.date { return true }
+                else { return false }
+            } else {
+                if dv0.date > dv1.date { return true }
+                else { return false }
+            }
+        }
+        
+        return dv.compactMap{ $0.value }
+
+    }
+    
+    /// converts the datedValues to Data. Label should come come from variable
+    func convertToData() -> Data? {
+        
+         return datedValues.convertToData()
+    }
+
+    
+    mutating func convertFromData(data: Data, label: String) -> Labelled_DatedValues? {
+        
+        self.label = label
+        
+        do {
+            if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Date: Double] {
+                var datedValues = [DatedValue]()
+                for element in dictionary {
+                    datedValues.append(DatedValue(date: element.key, value: element.value))
+                }
+                self.datedValues = datedValues.sorted { (e0, e1) -> Bool in
+                    if e0.date > e1.date { return true }
+                    else { return false }
+                }
+                return self
+            }
+        } catch {
+            ErrorController.addInternalError(errorLocation:"Labelled datedValues convert from storage Data", systemError: error, errorInfo: "error retrieving datedValue data")
+
+        }
+        return nil
+
+    }
+    
+    func sort(dateOrder: Order) -> Labelled_DatedValues {
+        
+        let sorted = self.datedValues.sorted { dv0, dv1 in
+            if dateOrder == .ascending {
+                if dv0.date < dv1.date { return true }
+                else  { return false }
+            } else {
+                if dv0.date < dv1.date { return false }
+                else  { return true }
+            }
+        }
+        
+        return Labelled_DatedValues(label: self.label, datedValues: sorted)
+    }
+
+}
+
+struct Labelled_DatedTexts: Codable {
+    var label: String
+    var datedTexts: [DatedText]
+        
+    
+    func extractTextsOnly(dateOrder: Order) -> [String] {
+        
+        let dv = self.datedTexts.sorted { dv0, dv1 in
+            if dateOrder == .ascending {
+                if dv0.date < dv1.date { return true }
+                else { return false }
+            } else {
+                if dv0.date > dv1.date { return true }
+                else { return false }
+            }
+        }
+        
+        return dv.compactMap{ $0.text }
+
+    }
+    
+    /// converts the datedTExts to Data. Label should come come from variable
+    func convertToData() -> Data? {
+        
+         return datedTexts.convertToData()
+    }
+    
+    func sort(dateOrder: Order) -> Labelled_DatedTexts {
+        
+        let sorted = self.datedTexts.sorted { dv0, dv1 in
+            if dateOrder == .ascending {
+                if dv0.date < dv1.date { return true }
+                else  { return false }
+            } else {
+                if dv0.date < dv1.date { return false }
+                else  { return true }
+            }
+        }
+        
+        return Labelled_DatedTexts(label: self.label, datedTexts: sorted)
+    }
+
 }
 
 struct DatedValues: Codable {
@@ -78,6 +217,7 @@ struct DatedValues: Codable {
 struct DatedValue: Codable {
     var date: Date
     var value: Double
+    
 }
 
 struct PriceDate: Codable {
@@ -560,7 +700,7 @@ let percentFormatter0DigitsPositive: NumberFormatter = {
 
 let numberFormatterWith1Digit: NumberFormatter = {
     let formatter = NumberFormatter()
-    formatter.numberStyle = .decimal
+//    formatter.numberStyle = .decimal
     formatter.maximumFractionDigits = 1
     formatter.minimumIntegerDigits = 1
     formatter.usesGroupingSeparator = true
@@ -569,9 +709,8 @@ let numberFormatterWith1Digit: NumberFormatter = {
 
 let numberFormatter2Decimals: NumberFormatter = {
     let formatter = NumberFormatter()
-    formatter.numberStyle = .decimal
+//    formatter.numberStyle = .decimal
     formatter.maximumFractionDigits = 2
-//    formatter.minimumFractionDigits = 2
     formatter.minimumIntegerDigits = 1
     formatter.usesGroupingSeparator = true
     return formatter
@@ -695,6 +834,15 @@ struct PricePoint: Codable, Hashable {
     var close: Double
     var volume: Double
     
+    init() {
+        tradingDate = Date()
+        open = Double()
+        high = Double()
+        low = Double()
+        close = Double()
+        volume = Double()
+    }
+    
     init(open: Double, close: Double, low: Double, high: Double, volume: Double, date: Date) {
         
         self.open = open
@@ -716,19 +864,20 @@ struct PricePoint: Codable, Hashable {
     
     func returnPrice(option: PricePointOptions) -> Double {
     
-    switch option {
-    case .low:
-            return low
-        case .high:
-            return high
-        case .open:
-            return open
-        case .close:
-            return close
-        case .volume:
-            return volume
+        switch option {
+        case .low:
+                return low
+            case .high:
+                return high
+            case .open:
+                return open
+            case .close:
+                return close
+            case .volume:
+                return volume
+        }
+            
     }
-}
     
     /// expected that self.tradsingDate is LATER than pricepoint.tradingDate
     /// otherwise a negative incline would be returned instead of a positive and vice versa
@@ -737,7 +886,7 @@ struct PricePoint: Codable, Hashable {
         return (pricePoint.returnPrice(option: priceOption) - self.returnPrice(option: priceOption)) / pricePoint.tradingDate.timeIntervalSince(self.tradingDate)
 
     }
-    
+        
 }
 
 struct Financial_Valuation_Factors {
@@ -976,8 +1125,8 @@ struct Financial_Valuation_Factors {
 // 6 WBV Lynch score
             if let earningsGrowth = wbv.netEarnings?.growthRates()?.ema(periods: emaPeriods) {
                 let denominator = (earningsGrowth + forShare.divYieldCurrent) * 100
-                if forShare.peRatio > 0 {
-                    var value = (denominator / forShare.peRatio) - 1
+                if forShare.peRatio_current > 0 {
+                    var value = (denominator / forShare.peRatio_current) - 1
                     if value > 1 { value = 1 }
                     else if value < 0 { value = 0 }
 
@@ -1038,14 +1187,15 @@ struct Financial_Valuation_Factors {
 
         }
         
-        if let score = forShare.rule1Valuation?.moatScore() {
-
-            allFactors.append(sqrt(score)*moatScore)
-            allWeights.append(moatScore)
-            allFactorNames.append("Moat")
+        if let (errors, moat) = forShare.rule1Valuation?.moatScore() {
+            
+            if  moat != nil {
+                allFactors.append(sqrt(moat!) * moatScore)
+                allWeights.append(moat!)
+                (errors == nil) ? allFactorNames.append("Moat"): allFactorNames.append("(Moat!)")
+            }
         }
-        
-        
+
         let scoreSum = allFactors.reduce(0, +)
         let maximum = allWeights.reduce(0, +)
         

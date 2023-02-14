@@ -34,6 +34,7 @@ class FinHealthController: NSObject {
         super.init()
         
         self.share = share
+        let shareID = share.objectID
         self.finHealthTVC = finHealthTVC
         
         earliestChartDate = DatesManager.beginningOfYear(of: Date().addingTimeInterval(-year))
@@ -41,7 +42,7 @@ class FinHealthController: NSObject {
         let shortName = share.name_short!
         let symbol = share.symbol!
 //        let r1ValuationID = share.rule1Valuation?.objectID
-        let dcfValuationID = share.dcfValuation?.objectID
+//        let dcfValuationID = share.dcfValuation?.objectID
         backgroundMoc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc!.automaticallyMergesChangesFromParent = true
 
@@ -53,7 +54,7 @@ class FinHealthController: NSObject {
             do {
                 await getR1Data(shortName: shortName, symbol: symbol, shareID: bgShare?.objectID, bgMOC: backgroundMoc!)
                 try Task.checkCancellation()
-                await getDCFData(shortName: shortName, symbol: symbol, dcfvID: dcfValuationID, bgMOC: backgroundMoc!)
+                await getDCFData(shortName: shortName, symbol: symbol, shareID: shareID, bgMOC: backgroundMoc!)
                 try Task.checkCancellation()
                 
                 try await profitabilityData(share: self.share) // not saved/ stored
@@ -166,18 +167,22 @@ class FinHealthController: NSObject {
                     return
                 }
                 if let r1v = bgShare.rule1Valuation {
-                    if let moat = r1v.moatScore() {
-                        let trendValue = DatedValue(date: r1v.creationDate!, value: moat)
-                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .moatScore)
+                    
+                    let (_, moat) = r1v.moatScore()
+                    if moat != nil {
+//                        let trendValue = DatedValue(date: r1v.creationDate!, value: moat!)
+//                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .moatScore)
+                        share.rule1Valuation?.addMoatTrend(date: Date(), moat: moat!)
                     }
                     let (value2, _) = r1v.stickerPrice()
                     if value2 != nil {
-                        let trendValue = DatedValue(date: r1v.creationDate!, value: value2!)
-                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .stickerPrice)
+//                        let trendValue = DatedValue(date: r1v.creationDate!, value: value2!)
+//                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .stickerPrice)
+                        share.dcfValuation?.addIntrinsiceValueTrendAndSave(date: Date(), price: value2!)
                     }
                     
                     do {
-                        let _ = try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
+                        let _ = try await Rule1Valuation.downloadAnalyseAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
                     } catch let error {
                         ErrorController.addInternalError(errorLocation: "FinHealthController.getR1Data", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
                     }
@@ -187,24 +192,28 @@ class FinHealthController: NSObject {
 
     }
     
-    func getDCFData(shortName: String, symbol: String, dcfvID: NSManagedObjectID?, bgMOC: NSManagedObjectContext) async {
+    func getDCFData(shortName: String, symbol: String, shareID: NSManagedObjectID?, bgMOC: NSManagedObjectContext) async {
         
         if (share.dcfValuation?.creationDate ?? Date()).timeIntervalSince(Date()) > 24*3600 {
             // refresh dcf valuation
             // save new dcfvalue as trend
             
-            if let dcfValuationID = dcfvID {
-                let dcfv = bgMOC.object(with: dcfValuationID) as! DCFValuation
-                let (value,_) = dcfv.returnIValue()
-                if value != nil {
-                    let trendValue = DatedValue(date: dcfv.creationDate!, value: value!)
-                    share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .dCFValue)
-                }
-
-                do {
-                    try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: dcfValuationID, progressDelegate: nil)
-                } catch let error {
-                    ErrorController.addInternalError(errorLocation: "StocksController2.updateStockInformation.dcfValuation", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
+            if let validID = shareID {
+                if let share = bgMOC.object(with: validID) as? Share {
+                    let dcfv = share.dcfValuation ?? DCFValuation(context: bgMOC)
+                    dcfv.share = share
+                    let (value,_) = dcfv.returnIValueNew()
+                    if value != nil {
+//                        let trendValue = DatedValue(date: dcfv.creationDate!, value: value!)
+//                        share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .dCFValue)
+                        share.dcfValuation?.addIntrinsiceValueTrendAndSave(date: Date(), price: value!)
+                    }
+                    
+                    do {
+                        try await YahooPageScraper.dcfDownloadAnalyseAndSave(shareSymbol: symbol, shareID: validID, progressDelegate: nil)
+                    } catch let error {
+                        ErrorController.addInternalError(errorLocation: "StocksController2.updateStockInformation.dcfValuation", systemError: error, errorInfo: "Error downloading DCF valuation: \(error)")
+                    }
                 }
             }
         }
@@ -231,7 +240,7 @@ class FinHealthController: NSObject {
         var values: [DatedValue]?
         
         do {
-            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Net Profit Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
+            values = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Net Profit Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values ?? [] {
                 if !(value.date < earliestChartDate) {
@@ -265,7 +274,7 @@ class FinHealthController: NSObject {
         var values: [DatedValue]?
         
         do {
-            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Operating Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
+            values = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Operating Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values ?? [] {
                 if !(value.date < earliestChartDate) {
@@ -305,7 +314,7 @@ class FinHealthController: NSObject {
         
         var values1: [DatedValue]?
         do {
-            values1 = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Quick Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
+            values1 = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Quick Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values1 ?? [] {
                 if !(value.date < earliestChartDate) {
@@ -336,7 +345,7 @@ class FinHealthController: NSObject {
         
         var values: [DatedValue]?
         do {
-            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Current Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
+            values = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Current Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values ?? [] {
                 if !(value.date < earliestChartDate) {
@@ -367,7 +376,7 @@ class FinHealthController: NSObject {
         
         var values: [DatedValue]?
         do {
-            values = try await WebPageScraper2.getqColumnTableData(url: url, companyName: sn, tableHeader: "Debt/Equity Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
+            values = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Debt/Equity Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
             for value in values ?? [] {
                 if !(value.date < earliestChartDate) {
@@ -412,7 +421,7 @@ class FinHealthController: NSObject {
                         keyFinScores.append(nil)
                     }
 
-                    let debug = keyFinScores.count > i ? keyFinScores[i] : nil
+//                    let debug = keyFinScores.count > i ? keyFinScores[i] : nil
                 }
                 else if keyFinTypes[i] == .lynchScore {
                     

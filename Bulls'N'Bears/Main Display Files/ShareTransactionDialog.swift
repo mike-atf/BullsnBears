@@ -174,19 +174,19 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
             guard number > 0 else { return }
             
             
-            if let wbv = share?.wbValuation {
-                var pe$ = "PE: "
-                var minMaxValue$ = ""
-                if let hxPER = wbv.historicPEratio(for: dateField.date) {
-                    pe$ += numberFormatter2Decimals.string(from: hxPER as NSNumber) ?? "-"
-                }
-                let sixMonthsAgo = dateField.date.addingTimeInterval(-183*24*3600)
-                let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-365*24*3600)
-                if let (min, _, max) = wbv.minMeanMaxPER(from: twoYearsAgo, to: sixMonthsAgo) {
-                    minMaxValue$ = " (" + numberFormatterNoFraction.string(from: min as NSNumber)! + " - " + numberFormatterNoFraction.string(from: max as NSNumber)! + ")"
-                }
-                diaryField.text = diaryField.text + "\n" + pe$ + minMaxValue$
+//            if let wbv = share?.wbValuation {
+            var pe$ = "PE: "
+            var minMaxValue$ = ""
+            if let hxPER = share?.ratios?.historicPEratio(for: dateField.date) {
+                pe$ += numberFormatter2Decimals.string(from: hxPER as NSNumber) ?? "-"
             }
+            let sixMonthsAgo = dateField.date.addingTimeInterval(-183*24*3600)
+            let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-365*24*3600)
+            if let (min, _, max) = share?.ratios?.minMeanMaxPERatioInDateRange(from: twoYearsAgo, to: sixMonthsAgo) {
+                minMaxValue$ = " (" + numberFormatterNoFraction.string(from: min as NSNumber)! + " - " + numberFormatterNoFraction.string(from: max as NSNumber)! + ")"
+            }
+            diaryField.text = diaryField.text + "\n" + pe$ + minMaxValue$
+//            }
             
             purchaseToSave.price = price
             purchaseToSave.quantity = number
@@ -237,19 +237,19 @@ class ShareTransactionDialog: UIViewController, UITextViewDelegate, UITextFieldD
             guard number > 0 else { return }
             
             
-            if let wbv = share?.wbValuation {
-                var pe$ = "PE: "
-                var minMaxValue$ = ""
-                if let hxPER = wbv.historicPEratio(for: dateField.date) {
-                    pe$ += numberFormatter2Decimals.string(from: hxPER as NSNumber) ?? "-"
-                }
-                let sixMonthsAgo = dateField.date.addingTimeInterval(-183*24*3600)
-                let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-365*24*3600)
-                if let (min, _, max) = wbv.minMeanMaxPER(from: twoYearsAgo, to: sixMonthsAgo) {
-                    minMaxValue$ = " (" + numberFormatterNoFraction.string(from: min as NSNumber)! + " - " + numberFormatterNoFraction.string(from: max as NSNumber)! + ")"
-                }
-                diaryField.text = diaryField.text + "\n" + pe$ + minMaxValue$
+//            if let wbv = share?.wbValuation {
+            var pe$ = "PE: "
+            var minMaxValue$ = ""
+            if let hxPER = share?.ratios?.historicPEratio(for: dateField.date) {
+                pe$ += numberFormatter2Decimals.string(from: hxPER as NSNumber) ?? "-"
             }
+            let sixMonthsAgo = dateField.date.addingTimeInterval(-183*24*3600)
+            let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-365*24*3600)
+            if let (min, _, max) = share?.ratios?.minMeanMaxPERatioInDateRange(from: twoYearsAgo, to: sixMonthsAgo) {
+                minMaxValue$ = " (" + numberFormatterNoFraction.string(from: min as NSNumber)! + " - " + numberFormatterNoFraction.string(from: max as NSNumber)! + ")"
+            }
+            diaryField.text = diaryField.text + "\n" + pe$ + minMaxValue$
+//            }
             
             saleToSave.price = price
             saleToSave.quantity = number

@@ -129,20 +129,20 @@ class ValuationSummaryTVC: UITableViewController {
         subTitle.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
         subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
                 
-        if section == 0 {
-            var config = UIButton.Configuration.borderedTinted()
-            config.title = "Save"
-            let saveButton = UIButton(configuration: config, primaryAction: nil)
-            saveButton.setBackgroundImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
-            saveButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
-            saveButton.translatesAutoresizingMaskIntoConstraints = false
-            header.addSubview(saveButton)
-
-            saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
-            saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-//            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
-//            saveButton.widthAnchor.constraint(equalTo: saveButton.heightAnchor).isActive = true
-        }
+//        if section == 0 {
+//            var config = UIButton.Configuration.borderedTinted()
+//            config.title = "Save"
+//            let saveButton = UIButton(configuration: config, primaryAction: nil)
+//            saveButton.setBackgroundImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
+//            saveButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
+//            saveButton.translatesAutoresizingMaskIntoConstraints = false
+//            header.addSubview(saveButton)
+//
+//            saveButton.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+//            saveButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
+////            saveButton.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.6).isActive = true
+////            saveButton.widthAnchor.constraint(equalTo: saveButton.heightAnchor).isActive = true
+//        }
 
         return header
         

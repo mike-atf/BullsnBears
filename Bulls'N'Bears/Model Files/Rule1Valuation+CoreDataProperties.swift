@@ -33,6 +33,8 @@ extension Rule1Valuation {
     @NSManaged public var company: String?
     @NSManaged public var creationDate: Date?
     @NSManaged public var insiderStocks: Double
+    @NSManaged public var moatScoreTrend: Data?
+    @NSManaged public var stickerPriceTrend: Data?
     @NSManaged public var ceoRating: Double
     @NSManaged public var share: Share?
     @NSManaged public var alerts: [String]?

@@ -206,16 +206,16 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
         // second, if file download fails download price page table and extract price data
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-            do {
-                let pricePoints = try await downloadYahooPriceData(sourceURL, stockName: companyName)
-                
-                DispatchQueue.main.async {
-                    self.callingVC.addShare(url: nil, pricePoints: pricePoints, symbol: symbol, companyName: companyName)
-                }
-            } catch let error {
-                alertController.showDialog(title: "Dowload failed", alertMessage: "can't find any company data for \(symbol) on Yahoo finance \(error.localizedDescription)")
-                return
+//            do {
+            let pricePoints = await downloadYahooPriceData(sourceURL, stockName: companyName)
+            
+            DispatchQueue.main.async {
+                self.callingVC.addShare(url: nil, pricePoints: pricePoints, symbol: symbol, companyName: companyName)
             }
+//            } catch {
+//                alertController.showDialog(title: "Dowload failed", alertMessage: "can't find any company data for \(symbol) on Yahoo finance \(error.localizedDescription)")
+//                return
+//            }
         }
 
     }
@@ -227,7 +227,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "StockSearchTVC  -error trying to remove existing file \(atURL) in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }
@@ -270,7 +270,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             Task.init(priority: .background) {
                 do {
                     try await downloadYahooNameSearchPage(sourceURL)
-                } catch let error {
+                } catch {
                     ErrorController.addInternalError(errorLocation: "StockSearchTVC.findNameOnYahoo", systemError: nil, errorInfo: "failed web data download \(error.localizedDescription)")
                 }
             }
@@ -302,27 +302,23 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             }
             
         } catch let error {
-            ErrorController.addInternalError(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
+            ErrorController.addInternalError(errorLocation: "StockSearchTVC.downloadYahooNameSearchPage", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
         }
 
     }
 
 
-    func downloadYahooPriceData(_ url: URL, stockName: String) async throws -> [PricePoint]? {
+    func downloadYahooPriceData(_ url: URL, stockName: String) async -> [PricePoint]? {
         
         var htmlText = String()
         do {
             htmlText = try await Downloader.downloadData(url: url)
             
             let oneYearAgo = Date().addingTimeInterval(-year)
-            return YahooPageScraper.analyseYahooPriceTable(html$: htmlText, limitDate: oneYearAgo)
-            
-//            DispatchQueue.main.async {
-//                self.downloadDelegate?.newShare(symbol: stockName,  prices: pricePoints)
-//            }
-        
-        } catch let error {
-            ErrorController.addInternalError(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
+            return YahooPageScraper.priceTableAnalyse(html$: htmlText, limitDate: oneYearAgo)
+                    
+        } catch {
+            ErrorController.addInternalError(errorLocation: "StockSearchTVC.downloadYahooPriceData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
         }
         
         return nil

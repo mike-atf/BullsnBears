@@ -31,6 +31,20 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let methodName = valuationMethod == .dcf ? "DCF" : "R1"
+        var downloadButtonConfiguration = UIButton.Configuration.filled()
+        downloadButtonConfiguration.title = "Refresh " + methodName
+        downloadButtonConfiguration.buttonSize = .small
+        downloadButtonConfiguration.titleAlignment = .center
+        downloadButtonConfiguration.cornerStyle = .small
+        let db = UIButton(configuration: downloadButtonConfiguration, primaryAction: UIAction() {_ in
+//            self.downloadButtonConfiguration.showsActivityIndicator = true
+            self.downloadValuationData()
+        })
+        
+        let downloadButton = UIBarButtonItem(customView: db)
+        self.navigationItem.rightBarButtonItem = downloadButton
 
         tableView.register(UINib(nibName: "ValuationTableViewCell", bundle: nil), forCellReuseIdentifier: "valuationTableViewCell")
 
@@ -47,24 +61,25 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     }
     // MARK: - Table view data source
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+//    deinit {
+//        NotificationCenter.default.removeObserver(self)
+//    }
     
     override func viewDidLayoutSubviews() {
-        if showDownloadCompleteMessage {
-            var title = String()
-            var message = String()
-            if valuationMethod == .dcf {
-                title = "Stock valuation data downloaded successfully from Yahoo"
-                message = "Check the numbers, and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nSave after adjusting, using the blue button at the bottom!"
-            } else {
-                title = "Stock valuation data downloaded successfully from MacroTrends and Yahoo"
-                message = "Check the numbers and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nSave after adjusting, using the blue button at the bottom!"
-            }
-            AlertController.shared().showDialog(title: title, alertMessage: message, viewController: self)
-            showDownloadCompleteMessage = false
-        }
+        
+//        if showDownloadCompleteMessage {
+//            var title = String()
+//            var message = String()
+//            if valuationMethod == .dcf {
+//                title = "Stock valuation data downloaded successfully from Yahoo"
+//                message = "Check the numbers, and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nSave after adjusting, using the blue button at the bottom!"
+//            } else {
+//                title = "Stock valuation data downloaded successfully from MacroTrends and Yahoo"
+//                message = "Check the numbers and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nSave after adjusting, using the blue button at the bottom!"
+//            }
+//            AlertController.shared().showDialog(title: title, alertMessage: message, viewController: self)
+//            showDownloadCompleteMessage = false
+//        }
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -87,8 +102,9 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: indexPath) as! ValuationTableViewCell
 
         
-        let info = controller.cellInfo(indexPath: indexPath)
-        cell.configure(info: info, indexPath: indexPath, method: valuationMethod, delegate: controller)
+//        let info = controller.cellInfo(indexPath: indexPath)
+//        cell.configure(info: info, indexPath: indexPath, method: valuationMethod, delegate: controller)
+        cell.configureNew(indexPath: indexPath, data: controller.cellInfoNew(indexPath: indexPath), method: valuationMethod, delegate: controller)
         
         return cell
     }
@@ -159,31 +175,33 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         subTitle.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
         subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
         
-        if section == 0 {
-            var config = UIButton.Configuration.borderedTinted()
-            if newDataDownloaded {
-                config.image = UIImage(systemName: "square.and.arrow.down.fill")
-            } else {
-                config.image = UIImage(systemName: "arrow.down.square")
-            }
-//            config.title = "Download"
-            let donwloadButton = UIButton(configuration: config, primaryAction: nil)
-            if newDataDownloaded {
-                donwloadButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
-            } else {
-                donwloadButton.addTarget(self, action: #selector(downloadValuationData), for: .touchUpInside)
-            }
-            donwloadButton.translatesAutoresizingMaskIntoConstraints = false
-            header.addSubview(donwloadButton)
-
-            donwloadButton.topAnchor.constraint(equalTo: titleLabel.topAnchor,constant: 5).isActive = true
-            donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor,constant: -5).isActive = true
-        }
+//        if section == 0 {
+//            var config = UIButton.Configuration.borderedTinted()
+//            if newDataDownloaded {
+//                config.image = UIImage(systemName: "square.and.arrow.down.fill")
+//            } else {
+//                config.image = UIImage(systemName: "arrow.down.square")
+//            }
+////            config.title = "Download"
+//            let donwloadButton = UIButton(configuration: config, primaryAction: nil)
+//            if newDataDownloaded {
+//                donwloadButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
+//            } else {
+//                donwloadButton.addTarget(self, action: #selector(downloadValuationData), for: .touchUpInside)
+//            }
+//            donwloadButton.translatesAutoresizingMaskIntoConstraints = false
+//            header.addSubview(donwloadButton)
+//
+//            donwloadButton.topAnchor.constraint(equalTo: titleLabel.topAnchor,constant: 5).isActive = true
+//            donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor,constant: -5).isActive = true
+//        }
         
         return header
         
     }
     
+
+    /*
     @objc
     func completeValuation() {
         
@@ -217,12 +235,13 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
             }
         }
     }
+     */
     
     @objc
-    func downloadValuationData(_ button: UIButton) {
+    func downloadValuationData() {
         
-        button.isEnabled = false
-        
+//        button.isEnabled = false
+//
         progressView = DownloadProgressView.instanceFromNib()
         progressView?.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(progressView!)
@@ -251,31 +270,25 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         tableView.reloadRows(at: paths, with: .none)
     }
     
-    public func helperAskedToEnterNextTextField(targetPath: IndexPath) {
-        
-        if let targetCell = tableView.cellForRow(at: targetPath) as? ValuationTableViewCell {
-            targetCell.enterTextField()
-        }
-        else if let targetCell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: targetPath) as? ValuationTableViewCell {
-            targetCell.enterTextField()
-
-        }
-    }
+//    public func goToNextTextField(targetPath: IndexPath) {
+//        
+//        if let targetCell = tableView.cellForRow(at: targetPath) as? ValuationTableViewCell {
+//            targetCell.enterTextField()
+//        }
+//        else if let targetCell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: targetPath) as? ValuationTableViewCell {
+//            targetCell.enterTextField()
+//        }
+//    }
     
     @objc
     func dataUpdated(_ notification: Notification) {
-                
-        controller.updateData()
-                
-        self.sectionSubtitles?[0] = "Adjust pred. growth, then tap to save"
 
-        if (sectionTitles?.count ?? 0) > 0 {
-            tableView.reloadData()
+        DispatchQueue.main.async {
+            self.progressView?.delegate = nil
+            self.progressView?.removeFromSuperview()
+            self.progressView = nil
+            self.tableView.reloadData()
         }
-        
-        self.progressView?.delegate = nil
-        self.progressView?.removeFromSuperview()
-        self.progressView = nil
 
         if let errorList = notification.object as? [String] {
             

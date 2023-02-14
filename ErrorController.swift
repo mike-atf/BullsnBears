@@ -71,6 +71,12 @@ class ErrorController {
         errorLog?.append(newError)
         
         NotificationCenter.default.post(name: Notification.Name(rawValue: "NewErrorLogged"), object: nil, userInfo: nil)
+        
+        print()
+        print("=================================")
+        print("ERROR in \(errorLocation): \(errorInfo ?? ""), description: \(systemError?.localizedDescription ?? "")")
+        print("=================================")
+        print()
     }
     
 
@@ -111,6 +117,10 @@ enum InternalErrorType: Error {
     case generalDownloadError
     case statusCodeError
     case downloadedFileURLinvalid
+}
+
+enum RunTimeError: Error {
+    case specificError(description: String)
 }
 
 

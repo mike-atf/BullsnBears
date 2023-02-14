@@ -154,7 +154,7 @@ class CitationsManager {
         let step3Count = step2Count + wbCitations.count
         let step4Count = step3Count + jmCitations.count
         let step5Count = step4Count + bgCitations.count
-        let step6Count = step5Count + userCitations.count
+//        let step6Count = step5Count + userCitations.count
 
         
         switch randomCitationNo {

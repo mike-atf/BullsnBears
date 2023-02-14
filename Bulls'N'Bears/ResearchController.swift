@@ -27,14 +27,19 @@ class ResearchController {
             share?.research?.share = share
         }
         
-        fillParameters()
+//        fillParameters()
         
         titleDictionary = titleParameterDictionary()
     }
     
+    /*
     func fillParameters() {
         
         if let validShare = share {
+            
+            if let marketCap = validShare.key_stats?.marketCap.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+                
+            }
             
             if validShare.research?.companySize == nil {
                 if let validDCF = validShare.dcfValuation {
@@ -79,6 +84,7 @@ class ResearchController {
         }
 
     }
+    */
     
     func titleParameterDictionary() -> [String : String]? {
         
@@ -93,7 +99,7 @@ class ResearchController {
             case "growthPlan":
                 sectionTitles[name] = "Predicted earnings range"
             case "futureGrowthMean":
-                sectionTitles[name] = "Predicted mean earnings estimate (in %)"
+                sectionTitles[name] = "Estimated mean earnings growth (in %)"
             case "companySize":
                 sectionTitles[name] = "Size"
             case "productsNiches":
@@ -188,35 +194,28 @@ class ResearchController {
                 return [currencyFormatterNoGapWithPence.string(from: price as NSNumber) ?? ""] }
             else { return nil }
         case "futureGrowthMean":
-            if let valid = share?.research?.futureGrowthMean {
-                if valid != 0.0 {
-                    let valid$ = percentFormatter2Digits.string(from: valid as NSNumber) ?? ""
-                    return [valid$]
-                }
-            }
             
-            // don't use ELSE IF as valid maybe 0.0 so this wouldn't result in alterntives
-            if let valid = share?.rule1Valuation?.adjGrowthEstimates?.mean() {
-                if valid != 0.0 { return [(percentFormatter2Digits.string(from: valid as NSNumber) ?? "")] }
+            if let meanGeneralGrowthDV = share?.analysis?.adjFutureGrowthRate.datedValues(dateOrder: .ascending)?.last {
+                let valid$ = percentFormatter2Digits.string(from: meanGeneralGrowthDV.value as NSNumber) ?? ""
+                return [valid$]
             }
-            if let valid = share?.rule1Valuation?.growthEstimates?.mean() {
-                if valid != 0.0 { return [(percentFormatter2Digits.string(from: valid as NSNumber) ?? "")] }
+            else if let meanGeneralGrowthDV = share?.analysis?.future_growthNextYear.datedValues(dateOrder: .ascending)?.last {
+                let valid$ = percentFormatter2Digits.string(from: meanGeneralGrowthDV.value as NSNumber) ?? ""
+                return [valid$]
+            } else if let meanRevenueGrowthDV = share?.analysis?.future_revenueGrowthRate.datedValues(dateOrder: .ascending)?.last {
+                let valid$ = percentFormatter2Digits.string(from: meanRevenueGrowthDV.value as NSNumber) ?? ""
+                return [valid$]
             }
-            if let valid = share?.dcfValuation?.revGrowthPred?.mean() {
-                if valid != 0.0 { return [(percentFormatter2Digits.string(from: valid as NSNumber) ?? "")] }
-            }
-            if let valid = share?.dcfValuation?.revenueGrowth.mean() {
-                if valid != 0.0 { return [percentFormatter2Digits.string(from: valid as NSNumber) ?? ""] }
-            }
-            
+             
             return nil
         case "companySize":
             var employees$ = String()
             if let validEmployees = share?.employees {
                 employees$ = "Employees: " + (numberFormatterNoFraction.string(from: validEmployees as NSNumber) ?? "")
             }
-            if let valid = share?.research?.companySize {
-                return [valid + ", " + employees$]
+            if let valid = share?.key_stats?.marketCap.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+                let valid$ = valid.shortString(decimals: 2)
+                return [valid$ + ", " + employees$]
             }
             else { return [employees$] }
         case "productsNiches":
@@ -323,12 +322,16 @@ extension ResearchController: ResearchCellDelegate {
         case "growthPlan":
             share?.research?.growthPlan = notes
         case "futureGrowthMean":
-            let valid$ = notes.filter("-0123456789.".contains)
-            let mean = (Double(valid$) ?? 0.0) / 100
-            share?.research?.futureGrowthMean = mean
-            share?.rule1Valuation?.adjGrowthEstimates = [mean, mean]
+            
+            if let valid = notes.textToNumber() {
+                let newDV = DatedValue(date: Date().addingTimeInterval(365*24*3600), value: valid)
+                let newDV2 = DatedValue(date: Date().addingTimeInterval(2*365*24*3600), value: valid)
+                share?.analysis?.adjFutureGrowthRate = [newDV,newDV2].convertToData()
+            }
         case "companySize":
-            share?.research?.companySize = notes
+            if let valid = notes.textToNumber() {
+                share?.key_stats?.marketCap = [DatedValue(date: Date(), value: valid)].convertToData()
+            }
         case "productsNiches":
             share?.research?.productsNiches?[cellPath.row] = notes
         case "assets":
@@ -340,7 +343,7 @@ extension ResearchController: ResearchCellDelegate {
         case "news":
             share?.research?.returnNews()![cellPath.row].newsText = notes
         case "industry":
-            share?.industry = notes
+            share?.company_info?.industry = notes
         case "businessDescription":
             share?.research?.businessDescription = notes
         case "targetBuyPrice":
@@ -366,7 +369,7 @@ extension ResearchController: ResearchCellDelegate {
             share?.research?.saveAnnualStatementOutlook(datedText: datedText)
 
         default:
-            print("error: default")
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "Research controller received unexpected user entry category \(parameter)")
         }
         
         share?.save()
@@ -382,36 +385,5 @@ extension ResearchController: ResearchCellDelegate {
         else { return nil }
     }
     
-    /*
-    func transferCompetitors(symbol: String) {
-        
-        if let competitor = StocksController2.allShares()?.filter({ (share) -> Bool in
-            if share.symbol == symbol { return true }
-            else { return false }
-        }).first {
-            if competitor.research == nil {
-                let newResearch = StockResearch.init(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
-                newResearch.symbol = competitor.symbol
-                newResearch.competitors = [self.share?.symbol ?? ""]
-                newResearch.save()
-            }
-            else {
-                if competitor.research!.competitors == nil {
-                    competitor.research!.competitors = [self.share?.symbol ?? ""]
-                }
-                else {
-                    if !competitor.research!.competitors!.contains(self.share?.symbol ?? "") {
-                        competitor.research!.competitors!.append(self.share?.symbol ?? "")
-                    }
-                }
-                competitor.research?.save()
-            }
-            if competitor.industry == nil && self.share?.industry != nil {
-                competitor.industry = self.share?.industry!
-                competitor.save()
-            }
-        }
-        
-    }
-     */
+
 }

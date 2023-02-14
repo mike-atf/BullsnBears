@@ -32,7 +32,18 @@ class ValueListCell: UITableViewCell, UITextFieldDelegate {
         rightLowerLabel.text = rightTitle
         rightLowerLabel.textColor = UIColor.label
         
+        chartView.containingView = self
         chartView.configure(array: values, biggerIsBetter: biggerIsBetter ,trendLabel: title, valuesAreGrowth: valuesAreGrowth,valuesAreProportions:valuesAreProportions, latestDataDate: latestDataDate, altLatestDate: altLatestDate)
+    }
+    
+    public func configureForDV(values: [DatedValue]?, biggerIsBetter: Bool?=true ,rightTitle: String?, valuesAreGrowth: Bool, valuesAreProportions:Bool? = false) {
+
+        rightLowerLabel.text = rightTitle
+        rightLowerLabel.textColor = UIColor.label
+        chartView.containingView = self
+        chartView.configureWithDVs(array: values, biggerIsBetter: biggerIsBetter, trendLabel: title, valuesAreGrowth: valuesAreGrowth, valuesAreProportions: valuesAreProportions)
+
+        
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

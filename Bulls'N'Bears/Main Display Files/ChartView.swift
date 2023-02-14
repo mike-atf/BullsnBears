@@ -403,13 +403,13 @@ class ChartView: UIView {
         //MARK: - epsTTM line
         // uses different vertical scale!
         
-        if let historicEPSWithDates = share?.wbValuation?.epsqTTMWithDates() {
-            let hxEPSInChartRange = historicEPSWithDates.filter { dv in
-                if dv.date > (dateRange?.min()?.addingTimeInterval(-180*24*3600) ?? Date()) {
-                    return true
-                }
-                else { return false }
-            }
+        if let hxEPSInChartRange = share?.wbValuation?.annualEPS_TTM_DV(minDate: dateRange?.min()?.addingTimeInterval(-180*24*3600)) {
+//            let hxEPSInChartRange = historicEPSWithDates.filter { dv in
+//                if dv.date > (dateRange?.min()?.addingTimeInterval(-180*24*3600) ?? Date()) {
+//                    return true
+//                }
+//                else { return false }
+//            }
             
             if hxEPSInChartRange.count > 1 {
                 let minEPS = (hxEPSInChartRange.compactMap{ $0.value }.min()! * 0.9)
@@ -442,7 +442,8 @@ class ChartView: UIView {
         //MARK: - qEPS line
         // uses different vertical scale!
         
-        if let historicEPSWithDates = share?.wbValuation?.epsQWithDates(){
+        
+            if let historicEPSWithDates = share?.income_statement?.eps_quarter.datedValues(dateOrder: .ascending) { //share?.wbValuation?.epsQWithDates(){
 
             let qEPSInChartRange = historicEPSWithDates.filter { dv in
                 if dv.date > (dateRange?.min()?.addingTimeInterval(-180*24*3600) ?? Date()) {

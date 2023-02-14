@@ -14,6 +14,8 @@ class ValuationErrorsTVC: UITableViewController {
     var firstCellHeight: CGFloat?
     var otherCellHeight: CGFloat?
     var otherCellsFontSize: CGFloat = 15
+    
+    var otherInfoTexts: [TitleAndDetail]?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,53 +30,67 @@ class ValuationErrorsTVC: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return otherInfoTexts == nil ? 1 : 3
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-        return errors.count
+        if section == 0 {
+            return errors.count
+        } else if section == 1 {
+            return otherInfoTexts!.count
+        } else {
+            return 0
+        }
     }
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "valuationErrorListCell", for: indexPath)
 
-        if (firstCellHeight != nil) && indexPath.row == 0 {
-            if let label = cell.viewWithTag(10) as? UILabel {
-                label.numberOfLines = 0
-                label.text = errors[indexPath.row]
-                
-                if let label = cell.viewWithTag(20) as? UILabel {
+        if indexPath.section == 0 {
+            if (firstCellHeight != nil) && indexPath.row == 0 {
+                if let label = cell.viewWithTag(10) as? UILabel {
                     label.numberOfLines = 0
-                    label.text = ""
-                }
-
-                return cell
-            }
-        }
-        else {
-        
-            let details = errors[indexPath.row].split(separator: ":")
-            
-            if let label = cell.viewWithTag(10) as? UILabel {
-                label.numberOfLines = 0
-//                label.font = UIFont.systemFont(ofSize: otherCellsFontSize)
-                label.text = String(details.first ?? "")
-            }
-            if details.count > 1 {
-                if let label = cell.viewWithTag(20) as? UILabel {
-                    label.numberOfLines = 0
-//                    label.font = UIFont.systemFont(ofSize: otherCellsFontSize)
-                    label.text = String(details.last ?? "")
+                    label.text = errors[indexPath.row]
+                    
+                    if let label = cell.viewWithTag(20) as? UILabel {
+                        label.numberOfLines = 0
+                        label.text = ""
+                    }
+                    
+                    return cell
                 }
             }
             else {
-                if let label = cell.viewWithTag(20) as? UILabel {
+                
+                let details = errors[indexPath.row].split(separator: ":")
+                
+                if let label = cell.viewWithTag(10) as? UILabel {
                     label.numberOfLines = 0
-//                    label.font = UIFont.systemFont(ofSize: otherCellsFontSize)
-                    label.text = ""
+                    label.text = String(details.first ?? "")
                 }
+                if details.count > 1 {
+                    if let label = cell.viewWithTag(20) as? UILabel {
+                        label.numberOfLines = 0
+                        label.text = String(details.last ?? "")
+                    }
+                }
+                else {
+                    if let label = cell.viewWithTag(20) as? UILabel {
+                        label.numberOfLines = 0
+                        label.text = ""
+                    }
+                }
+            }
+        } else {
+            if let label = cell.viewWithTag(10) as? UILabel {
+                label.numberOfLines = 0
+                label.text = otherInfoTexts![indexPath.row].title
+            }
+            if let label = cell.viewWithTag(20) as? UILabel {
+                label.numberOfLines = 0
+                label.text = otherInfoTexts![indexPath.row].detail
             }
         }
 

@@ -13,22 +13,22 @@ struct WBVParameters {
     // when adding new parameter check impact in WBVValuationController and WBVValuationTVC and ValueListTVC
     // also adapt 'higherIsBetter' parameter in UserEvaluation
     // careful - the '/' characters are used in ValueListVC to determine the charts to show
-    let revenueGrowth = "Revenue with YoY growth"
-    let earnigsGrowth = "Net earnings with YoY growth"
-    let retEarningsGrowth = "Ret. earnings with YoY growth"
-    let epsGrowth = "EPS with YoY growth"
-    let incomeOfRevenueGrowth = "[Net income / revenue] with YoY growth"
-    let profitOfRevenueGrowth = "[Profit / revenue] with YoY growth"
-    let capExpendOfEarningsGrowth = "[Cap. expend / net income] with YoY growth"
-    let earningsToPERratio = "[Earnings / pe ratio] with YoY growth"
-    let debtOfIncomeGrowth = "[LT debt / net income] with YoY growth"
-    let opCashFlowGrowth = "Op. cash flow with YoY growth"
-    let roiGrowth = "Return on Investment"
-    let roeGrowth = "Return on Equity"
-    let roaGrowth = "Return on Assets"
-    let debtOfEqAndRtEarningsGrowth = "[LT debt / adj. equity] with YoY growth"
-    let sgaOfProfitGrowth = "[SGA / profit] with YoY growth"
-    let rAdOfProfitGrowth = "[R&D / profit]  with YoY growth"
+    let revenueGrowth = "Revenue and it's growth"
+    let earnigsGrowth = "Net earnings and it's  growth"
+    let retEarningsGrowth = "Ret. earnings and it's  growth"
+    let epsGrowth = "EPS and it's growth"
+    let incomeOfRevenueGrowth = "[Net income / revenue] and it's growth"
+    let profitOfRevenueGrowth = "[Profit / revenue] and it's growth"
+    let capExpendOfEarningsGrowth = "[Cap. expend / net income]and it's growth"
+    let earningsToPERratio = "[Earnings / pe ratio] and it's growth"
+    let debtOfIncomeGrowth = "[LT debt / net income] and it's growth"
+    let opCashFlowGrowth = "Op. cash flow and it's growth"
+    let roiGrowth = "Return on Investment and it's growth"
+    let roeGrowth = "Return on Equity and it's growth"
+    let roaGrowth = "Return on Assets and it's growth"
+    let debtOfEqAndRtEarningsGrowth = "[LT debt / adj. equity] and it's growth"
+    let sgaOfProfitGrowth = "[SGA / profit] and it's growth"
+    let rAdOfProfitGrowth = "[R&D / profit]  wand it's growth"
     
     func allParameters() -> [String] {
         return [earnigsGrowth,retEarningsGrowth, epsGrowth, incomeOfRevenueGrowth, profitOfRevenueGrowth, capExpendOfEarningsGrowth, debtOfIncomeGrowth, roeGrowth, roaGrowth ,debtOfEqAndRtEarningsGrowth, sgaOfProfitGrowth ,rAdOfProfitGrowth]
@@ -125,62 +125,71 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         self.share = share
         self.progressDelegate = progressDelegate
         
+        wbValuation = share.wbValuation ?? WBValuation(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+        wbValuation?.share = share
+        
+        r1Valuation = share.rule1Valuation ?? Rule1Valuation(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+        r1Valuation?.share = share
+        
+        dcfValuation = share.dcfValuation ?? DCFValuation(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
+        dcfValuation?.share = share
+        
         // 1 WBValuation
-        if let valuation = share.wbValuation {
-            self.wbValuation = valuation
-            self.valuationID = valuation.objectID
-        }
-        else if let valuation = WBValuationController.returnWBValuations(share: share) {
-            // find old disconnected valuations persisted after share was deleted
-            self.wbValuation = valuation
-            self.valuationID = valuation.objectID
-
-        }
-        else {
-            self.wbValuation = WBValuationController.createWBValuation(share: share)
-            // when deleting a WBValuation this doe NOT delete related UserEvaluations
-            // these are linked to a company (symbol) as well as wbValuation parameters
-            // when (re-)creating a WBValuation check whether there are any old userEvaluations
-            // and if so re-add the relationships to this WBValuation via parameters
-            self.valuationID = wbValuation?.objectID
-
-            if let ratings = WBValuationController.allUserRatings(for: share.symbol!) {
-                if ratings.count > 0 {
-                    let set = NSSet(array: ratings)
-                    wbValuation?.addToUserEvaluations(set)
-                }
-            }
-        }
+//        if let valuation = share.wbValuation {
+//            self.wbValuation = valuation
+//            self.valuationID = valuation.objectID
+//        }
+//        else if let valuation = WBValuationController.returnWBValuations(share: share) {
+//            // find old disconnected valuations persisted after share was deleted
+//            self.wbValuation = valuation
+//            self.valuationID = valuation.objectID
+//
+//        }
+//        else {
+//            self.wbValuation = WBValuationController.createWBValuation(share: share)
+//            // when deleting a WBValuation this doe NOT delete related UserEvaluations
+//            // these are linked to a company (symbol) as well as wbValuation parameters
+//            // when (re-)creating a WBValuation check whether there are any old userEvaluations
+//            // and if so re-add the relationships to this WBValuation via parameters
+//            self.valuationID = wbValuation?.objectID
+//
+//            if let ratings = WBValuationController.allUserRatings(for: share.symbol!) {
+//                if ratings.count > 0 {
+//                    let set = NSSet(array: ratings)
+//                    wbValuation?.addToUserEvaluations(set)
+//                }
+//            }
+//        }
         
         // 2 DCF Valuation
-        if let valuation = share.dcfValuation {
-            self.dcfValuation = valuation
-        }
-        else if let valuation = CombinedValuationController.returnDCFValuations(company: share.symbol!) {
-            // any orphan valuation belonging to this company left after deleting share
-            self.dcfValuation = valuation
-            share.dcfValuation = dcfValuation
-            wbValuation?.capExpend = valuation.capExpend
-        }
-        else {
-            self.dcfValuation = CombinedValuationController.createDCFValuation(company: share.symbol!)
-            share.dcfValuation = self.dcfValuation
-        }
+//        if let valuation = share.dcfValuation {
+//            self.dcfValuation = valuation
+//        }
+//        else if let valuation = CombinedValuationController.returnDCFValuations(company: share.symbol!) {
+//            // any orphan valuation belonging to this company left after deleting share
+//            self.dcfValuation = valuation
+//            share.dcfValuation = dcfValuation
+//            wbValuation?.capExpend = valuation.capExpend
+//        }
+//        else {
+//            self.dcfValuation = CombinedValuationController.createDCFValuation(company: share.symbol!)
+//            share.dcfValuation = self.dcfValuation
+//        }
 
         // 3 Rule1 Valuation
         
-        if let valuation = share.rule1Valuation {
-            self.r1Valuation = valuation
-        }
-        else if let valuation = CombinedValuationController.returnR1Valuations(company: share.symbol!) {
-            // any orphan valuation belonging to this company left after deleting share
-            share.rule1Valuation = valuation
-            self.r1Valuation = valuation
-        }
-        else {
-            self.r1Valuation = CombinedValuationController.createR1Valuation(company: share.symbol!)
-            share.rule1Valuation = self.r1Valuation
-        }
+//        if let valuation = share.rule1Valuation {
+//            self.r1Valuation = valuation
+//        }
+//        else if let valuation = CombinedValuationController.returnR1Valuations(company: share.symbol!) {
+//            // any orphan valuation belonging to this company left after deleting share
+//            share.rule1Valuation = valuation
+//            self.r1Valuation = valuation
+//        }
+//        else {
+//            self.r1Valuation = CombinedValuationController.createR1Valuation(company: share.symbol!)
+//            share.rule1Valuation = self.r1Valuation
+//        }
 
                 
         rowTitles = returnRowTitles()
@@ -300,13 +309,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
     public func value$(path: IndexPath) -> (String, UIColor?, [String]?) {
         
-        guard wbValuation != nil else {
-            return ("--", nil, ["no valuation"])
+        guard share.managedObjectContext != nil else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "WBV Controller unexpectedly did not find MOC of share \(share.symbol ?? "") when trying to return value$ for path \(path)")
+            return ("", UIColor.label, ["unexpectedly did not find MOC of share \(share.symbol ?? "") when trying to return value$ for path \(path)"])
         }
+        
+        let wbValuation = share.wbValuation ?? WBValuation(context: share.managedObjectContext!)
+        wbValuation.share = share
         
         var errors: [String]?
         var color: UIColor?
-        var emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
+        let emaPeriod = (UserDefaults.standard.value(forKey: userDefaultTerms.emaPeriodAnnualData) as? Int) ?? 7
         
         if path.section == 0 {
             var value$: String?
@@ -315,47 +328,56 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             case 0:
             //Moat
                 if let r1v = share.rule1Valuation {
-                    if let moat = r1v.moatScore() {
-                        value$ = percentFormatter0Digits.string(from: moat as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: moat, greenCutoff: 0.7, redCutOff: 0.5)
-                        
-                        if let trendData = share.trendValues(trendName: .moatScore) {
-                            let pastData = trendData.filter { datedValue in
-                                if datedValue.date < r1v.creationDate! { return true }
-                                else { return false }
-                            }
-                            if let mostRecent = pastData.first {
+                    
+                    let (moatErrors, moat) = r1v.moatScore()
+                    if moatErrors != nil {
+                        if errors == nil {
+                            errors = [String]()
+                        }
+                        errors!.append(contentsOf: moatErrors!)
+                    }
+                    //                    if let (errors, moat) = r1v.moatScore() {
+                    if moat != nil {
+                        value$ = percentFormatter0Digits.string(from: moat! as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: moat!, greenCutoff: 0.7, redCutOff: 0.5)
+                    }
+                    
+                    if let trendData = r1v.moatScoreTrend.datedValues(dateOrder: .ascending) { // share.trendValues(trendName: .moatScore) {
+                        let pastData = trendData.filter({ datedValue in
+                            if datedValue.date < r1v.creationDate! { return true }
+                            else { return false }
+                        })
+                        if let mostRecent = pastData.first {
+                            if value$ == nil {
+                                value$ = " (" + percentFormatter0Digits.string(from: mostRecent.value as NSNumber)! + ")"
+                            } else {
                                 value$! += " (" + percentFormatter0Digits.string(from: mostRecent.value as NSNumber)! + ")"
                             }
                         }
-                        let moatParams = r1v.r1MoatParameterCount() ?? 0
-                        
-                        if moatParams < 30 {
-                            if errors == nil {
-                                errors = ["Only \(moatParams)/50 numbers; reliability is limited"]
-                            } else {
-                                errors?.append("Only \(moatParams)/50 numbers; reliability is limited")
-                            }
-                        }
-
                     }
                 }
             case 1:
             // PE ratio
-                if share.peRatio != Double() {
-                    value$ = numberFormatter2Decimals.string(from: share.peRatio as NSNumber)
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: share.peRatio, greenCutoff: 10.0, redCutOff: 40.0)
+                if let pe = share.ratios?.pe_ratios.datedValues(dateOrder: .ascending)?.last {
+                    value$ = numberFormatter2Decimals.string(from: pe.value as NSNumber)
+                    if pe.value > 0 {
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: pe.value, greenCutoff: 10.0, redCutOff: 40.0)
+                    } else if pe.value < 0 {
+                        color = UIColor.systemRed
+                    } else {
+                        color = UIColor.label
+                    }
                 }
                 let sixMonthsAgo = Date().addingTimeInterval(-183*24*3600)
                 let twoYearsAgo = sixMonthsAgo.addingTimeInterval(-2*365*24*3600)
-                if let (min, _, max) = wbValuation?.minMeanMaxPER(from: twoYearsAgo, to: sixMonthsAgo) {
+                if let (min, _, max) = share.ratios?.minMeanMaxPERatioInDateRange(from: twoYearsAgo, to: sixMonthsAgo) {
                     let minMAxValue$ = " (" + numberFormatterNoFraction.string(from: min as NSNumber)! + " - " + numberFormatterNoFraction.string(from: max as NSNumber)! + ")"
                     value$?.append(minMAxValue$)
                 }
                 
             case 2:
             // BVPSP
-                if let values = wbValuation!.bookValuePerPrice() {
+                if let values = share.latestBookValuePerPrice() {
                     value$ = "-"
                     var t1$:String?
                     var t2$:String?
@@ -373,30 +395,37 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     else {
                         value$ = (t1$ ?? t2$) ?? "-"
                     }
-                    
                 }
             case 3:
             // Lynch ratio
-                if let ratio = wbValuation!.lynchRatio() {
+                let (lyncherrors, value) = share.lynchRatio()
+                if let le = lyncherrors {
+                    if errors == nil { errors = le }
+                    else {
+                        errors?.append(contentsOf: le)
+                    }
+                }
+                if let ratio = value {
                     value$ = numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "-"
                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10, value: ratio, greenCutoff: 2.0, redCutOff: 1.0)
                     
-                    if let trendData = share.trendValues(trendName: .lynchScore) {
-                        let pastData = trendData.filter { datedValue in
-                            if datedValue.date < wbValuation!.date! { return true }
+                    if let trendDVs = share.trendValues(trendName: .lynchScore) {
+                        
+                        if let pdv = trendDVs.filter({ dv in
+                            if dv.date < wbValuation.date! { return true }
                             else { return false }
-                        }
-                        if let mostRecent = pastData.first {
-                            value$! += " (" + numberFormatterWith1Digit.string(from: mostRecent.value as NSNumber)! + ")"
+                        }).first {
+                            value$! += " (" + numberFormatterWith1Digit.string(from: pdv.value as NSNumber)! + ")"
                         }
                     }
-
                 }
+                
+
             case 4:
             // Return 10/3 years
                 value$ = "-/-"
-                var v10$ = String()
-                var v3$ = String()
+                var v10$ = "-"
+                var v3$ = "-"
                 if share.return10y != Double() {
                     v10$ = (numberFormatter2Decimals.string(from: share.return10y as NSNumber) ?? "-") + "x"
                 }
@@ -406,8 +435,8 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 value$ = v10$ + "/" + v3$
             case 5:
             // beta
-                if share.beta != Double() {
-                    value$ = numberFormatter2Decimals.string(from: share.beta as NSNumber)
+                if let beta = share.key_stats?.beta.valuesOnly(dateOrdered: .ascending)?.last {
+                    value$ = numberFormatter2Decimals.string(from: beta as NSNumber)
                 }
             case 6:
             // R1 Price
@@ -431,33 +460,35 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                             }
                         }
                     }
-
                 }
             case 7:
             // DCF Price
                 if let dcfv = share.dcfValuation {
-                    let (price,es) = dcfv.returnIValue()
+                    let (price,es) = dcfv.returnIValueNew()
+                    if errors == nil {
+                        errors = [String]()
+                    }
+                    errors!.append(contentsOf: es)
                     if let iv = price {
                         value$ = currencyFormatterGapWithPence.string(from: iv as NSNumber)
-                        errors = es
-                    }
-                    
-                    if let trendData = share.trendValues(trendName: .dCFValue) {
-                        let pastData = trendData.filter { datedValue in
-                            if datedValue.date < dcfv.creationDate! { return true }
-                            else { return false }
+                        
+                        if let trendData = share.trendValues(trendName: .dCFValue) {
+                            let pastData = trendData.filter { datedValue in
+                                if datedValue.date < dcfv.creationDate! { return true }
+                                else { return false }
+                            }
+                            if let mostRecent = pastData.first {
+                                value$! += " (" + currencyFormatterNoGapWithPence.string(from: mostRecent.value as NSNumber)! + ")"
+                            }
                         }
-                        if let mostRecent = pastData.first {
-                            value$! += " (" + currencyFormatterNoGapWithPence.string(from: mostRecent.value as NSNumber)! + ")"
-                        }
                     }
-
                 }
             case 8:
             // WB intrinsic value
-                if share.peRatio != Double() {
+//                if let currentPE = share.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending)?.last {
+//                if share.peRatio_current != Double() {
 
-                    let (valid, es$) = wbValuation!.ivalue()
+                    let (valid, es$) = wbValuation.ivalue()
                     errors = es$
                     if valid != nil {
                         value$ = currencyFormatterGapWithPence.string(from: valid! as NSNumber)
@@ -465,15 +496,16 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     
                     if let trendData = share.trendValues(trendName: .intrinsicValue) {
                         let pastData = trendData.filter { datedValue in
-                            if datedValue.date < wbValuation!.date! { return true }
+                            if datedValue.date < wbValuation.date! { return true }
                             else { return false }
                         }
                         if let mostRecent = pastData.first {
+                            if value$ == nil { value$ = String() }
                             value$! += " (" + currencyFormatterNoGapWithPence.string(from: mostRecent.value as NSNumber)! + ")"
                         }
                     }
 
-                }
+//                }
             default:
                 ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "undefined row in path \(path)")
             }
@@ -483,69 +515,100 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         else if path.section == 1 {
             
             var value$ = "-"
+            
             switch path.row {
             case 0:
             // Revenue
-            
-                let sales = wbValuation?.revenue
-                if let growth = Calculator.growthRatesYoY(values: sales) {
-                    if let growthEMA = growth.ema(periods: emaPeriod) {
-                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0, redCutOff: 0)
+                
+                if let revenueDVs = share.income_statement?.revenue.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros() {
+                    
+                    if let growthrates = revenueDVs.growthRates(dateOrder: .descending)?.values() {
+                        if let growthEMA = growthrates.ema(periods: emaPeriod) {
+                            value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0, redCutOff: 0)
 
+                        }
                     }
                 }
+                
                 return (value$, color, errors)
                 
             case 1:
             // net income
                 
-                let netIncome = wbValuation?.netEarnings
-                if let growth = Calculator.growthRatesYoY(values: netIncome) {
-                    if let growthEMA = growth.ema(periods: emaPeriod) {
-                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0, redCutOff: 0)
+                if let datedValues = share.income_statement?.netIncome.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros() {
+                    
+                    if let growthrates = Calculator.reatesOfReturn(datedValues: datedValues) {
+                        if let growthEMA = growthrates.ema(periods: emaPeriod) {
+                            value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0, redCutOff: 0)
 
+                        }
                     }
                 }
+
                 return (value$, color, errors)
                 
             case 2:
             // Ret. earnings
-                let retEarningsGrowths = Calculator.growthRatesYoY(values: wbValuation?.equityRepurchased)// valuation?.equityRepurchased?.growthRates()
-                
-                if let meanGrowth = retEarningsGrowths?.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.05, redCutOff: 0.05)
+                if let datedValues = share.balance_sheet?.retained_earnings.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros() {
+                    
+                    if let growthrates = datedValues.growthRates(dateOrder: .descending)?.values() {
+                        if let growthEMA = growthrates.ema(periods: emaPeriod) {
+                            value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.05, redCutOff: 0.05)
+
+                        }
+                    }
                 }
 
                 return (value$, color, errors)
 
             case 3:
                 // EPS
-                if let growthRatesMean = Calculator.growthRatesYoY(values: wbValuation!.eps)?.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0DigitsPositive.string(from: growthRatesMean as NSNumber) ?? "-"
-                    color = growthRatesMean > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
+                if let datedValues = share.income_statement?.eps_annual.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros() {
+                    
+                    if let growthrates = Calculator.reatesOfReturn(datedValues: datedValues) {
+                        if let growthEMA = growthrates.ema(periods: emaPeriod) {
+                            value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.1, redCutOff: 0)
+                        }
+                    }
                 }
 
                 return (value$,color,errors)
 
            case 4:
             // profit margin
-                let (margins, es$) = wbValuation!.grossProfitMargins()
-                errors = es$
-                if let averageMargin = margins.ema(periods: emaPeriod) { //weightedMean()
-                    value$ = percentFormatter0Digits.string(from: averageMargin as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: averageMargin, greenCutoff: 0.4, redCutOff: 0.2)
+                
+                let (profitMargins, error) = share.grossProfitMargins() // values are harmonised in function - zeros removed
+                if error != nil {
+                    errors = [error!]
                 }
+                if let datedValues = profitMargins?.sortByDate(dateOrder: .ascending).dropZeros() {
+                    
+                    if let growthrates = Calculator.reatesOfReturn(datedValues: datedValues) {
+                        if let growthEMA = growthrates.ema(periods: emaPeriod) {
+                            value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: growthEMA, greenCutoff: 0.4, redCutOff: 0.2)
+
+                        }
+                    }
+                }
+
                 return (value$,color,errors)
             case 5:
             // op. cash flow
-                let fcfGrowth = Calculator.growthRatesYoY(values: wbValuation!.opCashFlow)
-                if let meanGrowth = fcfGrowth?.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: meanGrowth, greenCutoff: 0.15, redCutOff: 0.0)
+                if let datedValues = share.cash_flow?.opCashFlow.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros() {
+                    
+                    if let growthrates = Calculator.reatesOfReturn(datedValues: datedValues) {
+                        if let growthEMA = growthrates.ema(periods: emaPeriod) {
+                            value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: growthEMA, greenCutoff: 0.15, redCutOff: 0)
+                        }
+                    }
                 }
+
                 return (value$, color, errors)
             default:
                 ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "undefined row in path \(path)")
@@ -557,42 +620,68 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             switch path.row {
             case 0:
             // ROI
-                if let roic = wbValuation!.share!.rule1Valuation?.roic {
-                    let roiGrowths = Calculator.growthRatesYoY(values: roic)
-                    if roiGrowths?.count ?? 10 < emaPeriod {
-                        emaPeriod = roiGrowths?.count ?? 0
-                    }
-                    if let meanGrowth = roiGrowths?.ema(periods: emaPeriod) {
-                        value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.3, redCutOff: 0.1)
-                    } else {
-                        if errors == nil {
-                            errors = ["Can't calculate ROI EMA; maybe not enough years"]
-                        } else {
-                            errors?.append("Can't calculate ROI EMA; maybe not enough years")
+                
+                if let values = share.ratios?.roi.valuesOnly(dateOrdered: .ascending) {
+//                    if let growthrates = Calculator.reatesOfReturn(datedValues: datedValues) {
+                        if let growthEMA = values.ema(periods: emaPeriod) {
+                            value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
                         }
-                    }
-                    
-                    return (value$, color, errors)
-                }
+//                    }
+                 }
+                return (value$, color, errors)
+
+                
+//                if let roic = wbValuation.share!.rule1Valuation?.roic {
+//                    let roiGrowths = Calculator.growthRatesYoY(values: roic)
+//                    if roiGrowths?.count ?? 10 < emaPeriod {
+//                        emaPeriod = roiGrowths?.count ?? 0
+//                    }
+//                    if let meanGrowth = roiGrowths?.ema(periods: emaPeriod) {
+//                        value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
+//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.3, redCutOff: 0.1)
+//                    } else {
+//                        if errors == nil {
+//                            errors = ["Can't calculate ROI EMA; maybe not enough years"]
+//                        } else {
+//                            errors?.append("Can't calculate ROI EMA; maybe not enough years")
+//                        }
+//                    }
+//
+//                    return (value$, color, errors)
+//                }
             case 1:
             // ROE
-                let roeGrowths = Calculator.growthRatesYoY(values: wbValuation!.roe)
-                if let meanGrowth = roeGrowths?.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.3, redCutOff: 0.1)
-                }
+                
+                if let values = share.ratios?.roe.valuesOnly(dateOrdered: .ascending) {
+                    if let growthEMA = values.ema(periods: emaPeriod) {
+                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
+                    }
+                 }
+
+//                let roeGrowths = Calculator.growthRatesYoY(values: wbValuation.roe)
+//                if let meanGrowth = roeGrowths?.ema(periods: emaPeriod) {
+//                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
+//                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.3, redCutOff: 0.1)
+//                }
 
                 return (value$, color, errors)
 
-
             case 2:
             // ROA
-                let roaGrowths = Calculator.growthRatesYoY(values: wbValuation!.roa)
+                if let values = share.ratios?.roa.valuesOnly(dateOrdered: .ascending) {
+                    if let growthEMA = values.ema(periods: emaPeriod) {
+                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
+                    }
+                 }
 
-                if let meanGrowth = roaGrowths?.ema(periods: emaPeriod) {
-                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-                }
+//                let roaGrowths = Calculator.growthRatesYoY(values: wbValuation.roa)
+//
+//                if let meanGrowth = roaGrowths?.ema(periods: emaPeriod) {
+//                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
+//                }
 
                 return (value$, color, errors)
 
@@ -607,21 +696,37 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             switch path.row {
             case 0:
             // cap expend / earnings
-            
-                if let sumDiv = wbValuation!.netEarnings?.reduce(0, +) {
-                    // use 10 y sums / averages, not ema according to Book Ch 51
-                    if let sumDenom = wbValuation!.capExpend?.reduce(0, +) {
-                        let tenYAverages = abs(sumDenom / sumDiv)
-                        value$ = percentFormatter0Digits.string(from: tenYAverages as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 1, value: tenYAverages, greenCutoff: 0.25, redCutOff: 0.5)
+                
+                if let netIncome = share.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending) {
+                    if let capEx = share.cash_flow?.capEx.valuesOnly(dateOrdered: .ascending) {
+                        let sum = netIncome.reduce(0, +)
+                        let denom = capEx.reduce(0, +)
+                        if denom > 0 {
+                            let tyaverage = abs(sum/denom)
+                            value$ = percentFormatter0Digits.string(from: tyaverage as NSNumber) ?? "-"
+                            color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 1, value: tyaverage, greenCutoff: 0.25, redCutOff: 0.5)
+                        }
                     }
                 }
+            
+//                if let sumDiv = wbValuation.netEarnings?.reduce(0, +) {
+//                    // use 10 y sums / averages, not ema according to Book Ch 51
+//                    if let sumDenom = wbValuation.capExpend?.reduce(0, +) {
+//                        let tenYAverages = abs(sumDenom / sumDiv)
+//                        value$ = percentFormatter0Digits.string(from: tenYAverages as NSNumber) ?? "-"
+//                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 1, value: tenYAverages, greenCutoff: 0.25, redCutOff: 0.5)
+//                    }
+//                }
                 
                 return (value$,color,errors)
 
             case 1:
             // Lt debt / net income
-                let (proportions, es$) = wbValuation!.longtermDebtProportion()
+                
+                
+                
+                
+                let (proportions, es$) = wbValuation.longtermDebtProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
@@ -632,7 +737,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
  
             case 2:
             // SGA / profit
-                let (proportions, es$) = wbValuation!.sgaProportion()
+                let (proportions, es$) = wbValuation.sgaProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
@@ -642,7 +747,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 
             case 3:
             // R&D / profit
-                let (proportions, es$) = wbValuation!.rAndDProportion()
+                let (proportions, es$) = wbValuation.rAndDProportion()
                 errors = es$
                 if let average = proportions.ema(periods: emaPeriod) {
                     value$ = percentFormatter0Digits.string(from: average as NSNumber) ?? "-"
@@ -690,52 +795,106 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     }
         
     // MARK: - Data download functions
+    /// MUST be called  on main thread
+    func downloadAllValuationData() async {
+                     
+        guard let symbol = share.symbol else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "all data download reauested for \(String(describing: share)) but symbol not available")
+            return
+ 
+        }
+        guard let shortName = share.name_short else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "all data download reauested for \(symbol) but short name not available")
+            return
+        }
+        let shareID = share.objectID
+        
+            do {
+                progressDelegate?.allTasks = MacrotrendsScraper.countOfRowsToDownload(option: .allPossible) + YahooPageScraper.countOfRowsToDownload(option: .wbvOnly)
+
+                // TODO: non-US stocks  needs review
+                if symbol.contains(".") {
+                    
+                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .allPossible, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
+                    
+                    try Task.checkCancellation()
+
+                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allPossible, downloadRedirectDelegate: self)
+
+                }
+                // US stocks
+                else {
+
+                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .allPossible, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
+                    
+                    try Task.checkCancellation()
+
+                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allPossible, downloadRedirectDelegate: self)
+
+                }
+            } catch {
+                ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "all data download for \(symbol) failed.")
+                progressDelegate?.downloadError(error: error.localizedDescription)
+            }
+            
+            NotificationCenter.default.removeObserver(self)
+            progressDelegate?.downloadComplete()
+//            return nil
+//        }
+
+    }
+
+    
         
     /// MUST be called  on main thread
     func downloadWBValuationData() {
                      
         let symbol = share.symbol
         let shortName = share.name_short
-        let wbValuationID = wbValuation?.objectID
-        let dcfValuationID = dcfValuation?.objectID
+//        let wbValuationID = wbValuation?.objectID
+//        let dcfValuationID = dcfValuation?.objectID
 //        let r1ValuationID = r1Valuation?.objectID
         let shareID = share.objectID
         
         downloadTask = Task.init(priority: .background) {
             
             do {
-                try await WebPageScraper2.keyratioDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID)
+                try await YahooPageScraper.keyratioDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID)
                 try Task.checkCancellation()
-                if let validID = wbValuationID {
-                    progressDelegate?.allTasks += 1
-                    // non-US stocks
-                    if symbol?.contains(".") ?? false {
-                        
-                        try await WebPageScraper2.downloadAnalyseSaveWBValuationDataFromYahoo(shareSymbol: symbol, valuationID: validID, downloadRedirectDelegate: self)
-                        
-                    }
-                    // US stocks
-                    else {
-                        try await WebPageScraper2.downloadAnalyseSaveWBValuationDataFromMT(shareSymbol: symbol, shortName: shortName, valuationID: validID, downloadRedirectDelegate: self)
-                        
-                        progressDelegate?.taskCompleted()
-                    }
+//                if let validID = wbValuationID {
+                progressDelegate?.allTasks += 1
+                // non-US stocks
+                if symbol?.contains(".") ?? false {
+                    
+                    try await MacrotrendsScraper.wbvDataDownloadAnalyseSave(shareSymbol: symbol,  shortName: shortName, shareID: shareID,downloadRedirectDelegate: self)
+                    
                 }
+                // US stocks
+                else {
+                    try await MacrotrendsScraper.wbvDataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadRedirectDelegate: self)
+                    
+                    progressDelegate?.taskCompleted()
+                }
+//                }
                 try Task.checkCancellation()
                 
-                progressDelegate?.allTasks += 1
+                progressDelegate?.allTasks += 2
 
-                try await WebPageScraper2.r1DataDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
+                try await Rule1Valuation.downloadAnalyseAndSave(shareSymbol: symbol, shortName: shortName!, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
                 
                 progressDelegate?.taskCompleted()
 
                 try Task.checkCancellation()
-                if dcfValuationID != nil {
-                    progressDelegate?.allTasks += 1
-                    try await WebPageScraper2.dcfDataDownloadAndSave(shareSymbol: symbol, valuationID: dcfValuationID!, progressDelegate: nil)
-                    
-                    progressDelegate?.taskCompleted()
-                }
+                
+                try await YahooPageScraper.dcfDownloadAnalyseAndSave(shareSymbol: symbol, shareID: shareID, progressDelegate: nil)
+                progressDelegate?.taskCompleted()
+
+//                if dcfValuationID != nil {
+//                    progressDelegate?.allTasks += 1
+//                    try await YahooPageScraper.dcfDownloadAnalyseAndSave(shareSymbol: symbol, shareID: shareID, progressDelegate: nil)
+//
+//                    progressDelegate?.taskCompleted()
+//                }
                 try Task.checkCancellation()
 
             } catch let error {

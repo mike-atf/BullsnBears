@@ -2,7 +2,7 @@
 //  Share+CoreDataClass.swift
 //  Bulls'N'Bears
 //
-//  Created by aDav on 10/10/2021.
+//  Created by aDav on 10/01/2023.
 //
 //
 
@@ -20,8 +20,8 @@ public class Share: NSManagedObject {
     var sharePriceSplitCorrected = false
     
     public override func awakeFromInsert() {
-        eps = Double()
-        peRatio = Double()
+        eps_current = Double()
+        peRatio_current = Double()
         beta = Double()
         watchStatus = 2
 //        watchStatus = 0 // 0 watchList, 1 owned, 3 archived, 2 research
@@ -58,14 +58,14 @@ public class Share: NSManagedObject {
         
     }
     
-   func save() {
+    func save() {
     
        let context = wbValuation?.managedObjectContext
         if context?.hasChanges ?? false {
             context?.perform {
                 do {
                     try context?.save()
-                } catch let error {
+                } catch {
                     alertController.showDialog(title: "Fatal error", alertMessage: "The App can't save data due to \(error.localizedDescription)\nPlease quit and re-launch", viewController: nil, delegate: nil)
                 }
 
@@ -92,20 +92,9 @@ public class Share: NSManagedObject {
         case .healthScore:
             data = trend_healthScore
         }
-
        
         if let valid = data {
             do {
-//                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
-//                    var datedValues = [DatedValue]()
-//                    for element in dictionary {
-//                        datedValues.append(DatedValue(date: element.key, value: element.value))
-//                    }
-//                    return datedValues.sorted { (e0, e1) -> Bool in
-//                        if e0.date > e1.date { return true }
-//                        else { return false }
-//                    }
-//                }
                 
                 return try dataToDatedValues(data: valid)
             } catch let error {
@@ -118,9 +107,10 @@ public class Share: NSManagedObject {
             switch trendName {
             case  .moatScore:
                 if let r1v = self.rule1Valuation {
-                    if let moat = r1v.moatScore() {
+                    let (_, moat) = r1v.moatScore()
+                    if moat != nil {
                         let date = r1v.creationDate!
-                        datedValue = DatedValue(date:date, value: moat)
+                        datedValue = DatedValue(date:date, value: moat!)
                     }
                 }
             case .stickerPrice:
@@ -133,19 +123,19 @@ public class Share: NSManagedObject {
                 }
             case .dCFValue:
                 if let dcfv = self.dcfValuation {
-                    let (sp, _) = dcfv.returnIValue()
+                    let (sp, _) = dcfv.returnIValueNew()
                     if sp != nil {
                         let date = dcfv.creationDate!
                         datedValue = DatedValue(date:date, value: sp!)
                     }
                 }
             case .lynchScore:
-                if let wbv = self.wbValuation {
-                    if let sp = wbv.lynchRatio() {
-                        let date = wbv.date!
-                        datedValue = DatedValue(date:date, value: sp)
+//                if let wbv = self.wbValuation {
+                    let (_, sp) = lynchRatio()
+                    if let price = sp {
+                        datedValue = DatedValue(date:Date(), value: price)
                     }
-                }
+//                }
             case .intrinsicValue:
                 if let wbv = self.wbValuation {
                     let (sp, _) = wbv.ivalue()
@@ -209,9 +199,10 @@ public class Share: NSManagedObject {
             switch trendName {
             case  .moatScore:
                 if let r1v = self.rule1Valuation {
-                    if let moat = r1v.moatScore() {
+                    let (_, moat) = r1v.moatScore()
+                    if moat != nil {
                         let date = r1v.creationDate!
-                        dataSet = ChartDataSet(x:date, y: moat)
+                        dataSet = ChartDataSet(x:date, y: moat!)
                     }
                 }
             case .stickerPrice:
@@ -224,19 +215,25 @@ public class Share: NSManagedObject {
                 }
             case .dCFValue:
                 if let dcfv = self.dcfValuation {
-                    let (sp, _) = dcfv.returnIValue()
+                    let (sp, _) = dcfv.returnIValueNew()
                     if sp != nil {
                         let date = dcfv.creationDate!
                         dataSet = ChartDataSet(x:date, y: sp)
                     }
                 }
             case .lynchScore:
-                if let wbv = self.wbValuation {
-                    if let sp = wbv.lynchRatio() {
-                        let date = wbv.date!
-                        dataSet = ChartDataSet(x:date, y: sp)
-                    }
+                let (_, sp) = lynchRatio()
+                if let price = sp {
+//                    datedValue = DatedValue(date:Date(), value: price)
+                    dataSet = ChartDataSet(x:Date(), y: price)
                 }
+                
+//                if let wbv = self.wbValuation {
+//                    if let sp = wbv.lynchRatio() {
+//                        let date = wbv.date!
+//                        dataSet = ChartDataSet(x:date, y: sp)
+//                    }
+//                }
             case .intrinsicValue:
                 if let wbv = self.wbValuation {
                     let (sp, _) = wbv.ivalue()
@@ -257,7 +254,6 @@ public class Share: NSManagedObject {
         
         return nil
     }
-
     
     /// adds new data to existing trend Data
     func saveTrendsData(datedValuesToAdd: [DatedValue]?, trendName: ShareTrendNames, saveInContext:Bool?=true) {
@@ -369,10 +365,15 @@ public class Share: NSManagedObject {
         } catch let error {
             throw InternalError.init(location: #function, systemError: error, errorInfo: "error retrieving datedValue data")
 
-//            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving datedValue data")
         }
         return nil
 
+    }
+    
+    func averageAnnualPrices() -> [DatedValue]? {
+        
+        return self.avgAnnualPrices.datedValues(dateOrder: .ascending)
+        
     }
     
     func datedValuesToData(datedValues: [DatedValue]?) -> Data? {
@@ -444,6 +445,7 @@ public class Share: NSManagedObject {
         return nil
     }
     
+
     /// return PricePoint array in date ascending order
     func getDailyPrices(needRecalcDueToNew: Bool?=false) -> [PricePoint]? {
 
@@ -464,11 +466,19 @@ public class Share: NSManagedObject {
 //                    let ratio = Double(1/3)
 //                    return shareSplitPriceRecalculation(pricePoints: prices, splitDateString: "08/24/22" , newPerOldShares: ratio)
 //                }
-// once
-                return prices?.sorted(by: { p0, p1 in
+                // once
+
+                let nonZeroes = prices?.filter({ pp in
+                    if pp.close > 0 { return true }
+                    else { return false }
+                })
+                let sorted = nonZeroes?.sorted(by: { p0, p1 in
                     if p0.tradingDate < p1.tradingDate { return true }
                     else { return false }
                 })
+                
+                setDailyPrices(pricePoints: sorted)
+                return sorted
             }
         } catch let error {
             ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
@@ -476,6 +486,7 @@ public class Share: NSManagedObject {
         
         return nil
     }
+
     
     func shareSplitPriceRecalculation(pricePoints: [PricePoint]?, splitDateString: String, newPerOldShares: Double) -> [PricePoint]? {
                 
@@ -534,8 +545,19 @@ public class Share: NSManagedObject {
         
         return nil
     }
-
     
+    
+    func pe_currentDV() -> DatedValue? {
+        
+        return ratios?.pe_ratios.datedValues(dateOrder: .ascending)?.last
+    }
+    
+    func pe_current() -> Double? {
+        
+        return ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending)?.last
+    }
+
+
     func setUserAndValueScores() {
         
         var needsSaving = false
@@ -579,7 +601,15 @@ public class Share: NSManagedObject {
         }
         
         let lowPrices = pricesInRange.compactMap { $0.low }
-        return [lowPrices.min()!, lowPrices.max()!]
+        
+        guard let min = lowPrices.min() else {
+            return nil
+        }
+        
+        guard let max = lowPrices.max() else {
+            return nil
+        }
+        return [min, max]
     }
     
     public func lowestPrice(_ from: Date? = nil,_ to: Date? = nil) -> Double? {
@@ -700,7 +730,6 @@ public class Share: NSManagedObject {
         let beginningOfToday = DatesManager.beginningOfDay(of: Date())
         return [beginningOfToday, endOfToday.addingTimeInterval(week)]
     }
-
     
     func priceAtDate(date: Date, priceOption: PricePointOptions) -> Double? {
         
@@ -1119,7 +1148,7 @@ public class Share: NSManagedObject {
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Share - error trying to remove existing file \(atURL) in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }
@@ -1224,7 +1253,6 @@ public class Share: NSManagedObject {
         self.macd = convertMACDToData(macds: mac_ds)
         macds = mac_ds
     }
-
     
     /// returns array[0] = fast oscillator K%
     /// arrays[1] = slow oscillator D%
@@ -1623,165 +1651,6 @@ public class Share: NSManagedObject {
         return crossingPoints.reversed()
     }
     
-    /*
-    func priceIncreaseAfterMCDCrossings() {
-        
-        guard let aboveCrossingPoints = macDCrossings(aboveZero: true) else {
-            return
-        }
-        
-        var abovePriceIncreases = [Double]()
-        
-        var firstPositiveCrossingIndex = 0
-        for crossing in aboveCrossingPoints {
-            if crossing.signal > 0 {
-                break
-            }
-            firstPositiveCrossingIndex += 1
-        }
-
-        var lastCrossing = aboveCrossingPoints[firstPositiveCrossingIndex]
-        for i in (firstPositiveCrossingIndex+1)..<aboveCrossingPoints.count {
-            
-            if aboveCrossingPoints[i].crossingPrice != nil && lastCrossing.crossingPrice != nil {
-                let percentIncrease = (aboveCrossingPoints[i].crossingPrice! - lastCrossing.crossingPrice!) / lastCrossing.crossingPrice!
-                abovePriceIncreases.append(percentIncrease)
-            }
-            
-            lastCrossing = aboveCrossingPoints[i]
-        }
-        
-        guard let belowCrossingPoints = macDCrossings(aboveZero: false) else {
-            return
-        }
-        
-        var belowPriceIncreases = [Double]()
-        
-        firstPositiveCrossingIndex = 0
-        for crossing in aboveCrossingPoints {
-            if crossing.signal > 0 {
-                break
-            }
-            firstPositiveCrossingIndex += 1
-        }
-
-        lastCrossing = belowCrossingPoints[firstPositiveCrossingIndex]
-        for i in (firstPositiveCrossingIndex+1)..<belowCrossingPoints.count {
-            
-            if belowCrossingPoints[i].crossingPrice != nil && lastCrossing.crossingPrice != nil {
-                let percentIncrease = (belowCrossingPoints[i].crossingPrice! - lastCrossing.crossingPrice!) / lastCrossing.crossingPrice!
-                belowPriceIncreases.append(percentIncrease)
-            }
-            
-            lastCrossing = belowCrossingPoints[i]
-        }
-
-        let actualIncreasesAbove = abovePriceIncreases.filter { (increase) -> Bool in
-            if increase > 0 { return true }
-            else { return false }
-        }
-        let actualIncreasesBelow = belowPriceIncreases.filter { (increase) -> Bool in
-            if increase > 0 { return true }
-            else { return false }
-        }
-
-        
-        let above$ = percentFormatter2Digits.string(from: abovePriceIncreases.mean()! as NSNumber) ?? ""
-        let below$ = percentFormatter2Digits.string(from: belowPriceIncreases.mean()! as NSNumber) ?? ""
-        
-        let abovePct = Double(actualIncreasesAbove.count) / Double(abovePriceIncreases.count)
-        let belowPct = Double(actualIncreasesBelow.count) / Double(belowPriceIncreases.count)
-        
-        let abovePct$ = percentFormatter2Digits.string(from: abovePct as NSNumber) ?? ""
-        let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
-
-    }
-    */
-    
-    /*
-    func priceIncreaseAfterOscCrossings() {
-        
-        guard let aboveCrossingPoints = oscCrossings(oversold: true) else {
-            return
-        }
-        
-        var abovePriceIncreases = [Double]()
-        
-        var firstPositiveCrossingIndex = 0
-        for crossing in aboveCrossingPoints {
-            if crossing.signal > 0 {
-                break
-            }
-            firstPositiveCrossingIndex += 1
-        }
-
-        var lastCrossing = aboveCrossingPoints[firstPositiveCrossingIndex]
-        for i in (firstPositiveCrossingIndex+1)..<aboveCrossingPoints.count {
-            
-            if aboveCrossingPoints[i].crossingPrice != nil && lastCrossing.crossingPrice != nil {
-                let percentIncrease = (aboveCrossingPoints[i].crossingPrice! - lastCrossing.crossingPrice!) / lastCrossing.crossingPrice!
-                abovePriceIncreases.append(percentIncrease)
-            }
-            
-            lastCrossing = aboveCrossingPoints[i]
-        }
-        
-        guard let belowCrossingPoints = oscCrossings(oversold: false) else {
-            return
-        }
-        
-        var belowPriceIncreases = [Double]()
-        
-        firstPositiveCrossingIndex = 0
-        for crossing in aboveCrossingPoints {
-            if crossing.signal > 0 {
-                break
-            }
-            firstPositiveCrossingIndex += 1
-        }
-
-        lastCrossing = belowCrossingPoints[firstPositiveCrossingIndex]
-        for i in (firstPositiveCrossingIndex+1)..<belowCrossingPoints.count {
-            
-            if belowCrossingPoints[i].crossingPrice != nil && lastCrossing.crossingPrice != nil {
-                let percentIncrease = (belowCrossingPoints[i].crossingPrice! - lastCrossing.crossingPrice!) / lastCrossing.crossingPrice!
-                belowPriceIncreases.append(percentIncrease)
-            }
-            
-            lastCrossing = belowCrossingPoints[i]
-        }
-
-        let actualIncreasesAbove = abovePriceIncreases.filter { (increase) -> Bool in
-            if increase > 0 { return true }
-            else { return false }
-        }
-        let actualIncreasesBelow = belowPriceIncreases.filter { (increase) -> Bool in
-            if increase > 0 { return true }
-            else { return false }
-        }
-
-        
-//        let above$ = percentFormatter2Digits.string(from: (abovePriceIncreases.mean() ?? 0) as NSNumber) ?? ""
-//        let below$ = percentFormatter2Digits.string(from: (belowPriceIncreases.mean() ?? 0) as NSNumber) ?? ""
-//
-//        let abovePct = Double(actualIncreasesAbove.count) / Double(abovePriceIncreases.count)
-//        let belowPct = Double(actualIncreasesBelow.count) / Double(belowPriceIncreases.count)
-//
-//        let abovePct$ = percentFormatter2Digits.string(from: abovePct as NSNumber) ?? ""
-//        let belowPct$ = percentFormatter2Digits.string(from: belowPct as NSNumber) ?? ""
-
-//        print()
-//        print("\(symbol!) mean price increase after OSC crossings in oversold area (>80) " + above$)
-//        print( abovePct$ + " of \(abovePriceIncreases.count) are actual increases")
-//        print(abovePriceIncreases)
-//        print("\(symbol!) mean price increase after OSC crossings in undersold area (<20) " +  below$)
-//        print( belowPct$ + " of \(belowPriceIncreases.count) are actual increases")
-//        print(belowPriceIncreases)
-//        print()
-
-    }
-    */
-    
     func buyTriggersThreeAnywhere() {
         
         guard let smaCrossings = sma10Crossings() else {
@@ -1867,7 +1736,6 @@ public class Share: NSManagedObject {
         
     }
 
-
     func quantityOwned() -> Double? {
         
         guard let transactions = self.transactions else { return  nil }
@@ -1909,5 +1777,562 @@ public class Share: NSManagedObject {
         return sortedTA
         
     }
+    
+    public func lynchRatio() -> ([String]?, Double?) {
+        
+        // can be zero, so don't drop zeros
+        guard let divYieldDV = key_stats?.dividendYield.datedValues(dateOrder: .ascending, oneForEachYear: true)?.last else {
+            return (["missing dividend yield value"],nil)
+        }
+        
+        guard let currentPEdv = ratios?.pe_ratios.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros().last else {
+            return (["missing current P/E ratio"],nil)
+        }
+        
+        var errors = [String]()
+        let currentPE = currentPEdv.value
+        if Date().timeIntervalSince(currentPEdv.date) > 365*24*3600/4 {
+            let dateFormatter: DateFormatter = {
+                let formatter = DateFormatter()
+                formatter.locale = NSLocale.current
+                formatter.timeZone = NSTimeZone.local
+                formatter.dateFormat = "MM.yy"
+                return formatter
+            }()
+            errors = ["last valid P/E ratio is from " + dateFormatter.string(from: currentPEdv.date)]
+        }
+        
+        if let netIncome = income_statement?.netIncome.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros() { // ema(periods: emaPeriod)
+            if let meanGrowth = netIncome.growthRates(dateOrder: .ascending)?.values().mean(){
+            // use 10 y sums / averages, not ema according to Book Ch 51
+                let denominator = meanGrowth * 100 + divYieldDV.value * 100
+                    if currentPE > 0 {
+                        return (errors, (denominator / currentPE))
+                    } else {
+                        errors.append("current P/E ratio is 0 or negative")
+                        return (errors,nil)
+                    }
+            }
+        }
+        
+        errors.append("missing net income growth rates")
+        return (errors,nil)
+
+    }
+    
+    public func latestBookValuePerPrice() -> [Double?]? {
+        
+        
+        if let latestStockPrice =  getDailyPrices()?.last?.close {//stock.dailyPrices.last?.close}
+            if let valid = ratios?.bvps.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+                let percent = valid / latestStockPrice
+                let price = valid
+                return [percent, price]
+            }
+        }
+        
+        return nil
+
+    }
+    
+    func mergeInDownloadedTexts(ldTexts: [Labelled_DatedTexts], replace:Bool=false) async throws {
+        
+        //DEBUG only
+//        let dateFormatter: DateFormatter = {
+//            let formatter = DateFormatter()
+//            formatter.timeZone = TimeZone(identifier: "UTC")!
+//            formatter.dateFormat = "d.M.YY"
+//            return formatter
+//        }()
+//
+//
+//        print()
+//        print("\(symbol ?? "") has received downloaded Dated Texts for merge:")
+//        for ldv in ldTexts {
+//            print(ldv.label)
+//            for dvs in  ldv.datedTexts {
+//                let date$ = dateFormatter.string(from: dvs.date)
+//                print(date$, ": " ,dvs.text)
+//            }
+//            print()
+//        }
+        //DEBUG only
+        
+        guard let backgroundMoc = self.managedObjectContext else {
+            throw InternalError(location: #function, errorInfo: "savings downloaded data in background share's own context FAILED!")
+        }
+        
+        do {
+            
+            let research = self.research ?? StockResearch(context: backgroundMoc)
+            research.share = self
+            
+            for result in ldTexts {
+                
+                switch result.label.lowercased() {
+                    
+                case "sector":
+                    self.sector = result.datedTexts[0].text
+                case "industry":
+                    self.industry = result.datedTexts[0].text
+                case "description":
+                    research.businessDescription = result.datedTexts[0].text
+                case "currency":
+                    self.currency = result.datedTexts[0].text
+                case "exchange":
+                    self.exchange = result.datedTexts[0].text
+                default:
+                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "received unexpected labelled result \(result)")
+                }
+                
+            }
+            try self.managedObjectContext?.save()
+        
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil, userInfo: nil)
+        }  catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error saving \(self.symbol!) data download")
+            throw error
+        }
+
+
+
+    }
+
+    
+    // for MOST but not all integrates into existing value; does NOT convert numbers from throusands or millions inot proper numbers!
+    func mergeInDownloadedData(labelledDatedValues: [Labelled_DatedValues],replace:Bool=false) async throws {
+        
+        //DEBUG only
+//        let numberFormatter: NumberFormatter = {
+//            let formatter = NumberFormatter()
+//            formatter.numberStyle = .decimal
+//            formatter.usesGroupingSeparator = true
+//            formatter.groupingSize = 3
+//            return formatter
+//        }()
+//        let dateFormatter: DateFormatter = {
+//            let formatter = DateFormatter()
+//            formatter.timeZone = TimeZone(identifier: "UTC")!
+//            formatter.dateFormat = "d.M.YY"
+//            return formatter
+//        }()
+//
+//
+//        print()
+//        print("\(symbol ?? "") has received downloaded Dated Values for merge:")
+//        for ldv in labelledDatedValues {
+//            print(ldv.label)
+//            for dvs in  ldv.datedValues {
+//                let date$ = dateFormatter.string(from: dvs.date)
+//                let value$ = numberFormatter.string(from: dvs.value as NSNumber) ?? "-'"
+//                print(date$, ": " ,value$)
+//            }
+//            print()
+//        }
+        //DEBUG only
+        
+        guard let backgroundMoc = self.managedObjectContext else {
+            throw InternalError(location: #function, errorInfo: "savings downloaded data in background share's own context FAILED!")
+        }
+        
+        do {
+            
+            let incomeStatement = self.income_statement ?? Income_statement(context: backgroundMoc)
+            incomeStatement.share = self
+            
+            let ratios = self.ratios ?? Ratios(context: backgroundMoc)
+            ratios.share = self
+            
+            let cashFlowStatement = self.cash_flow ?? Cash_flow(context: backgroundMoc)
+            cashFlowStatement.share = self
+            
+            let balanceSheet = self.balance_sheet ?? Balance_sheet(context: backgroundMoc)
+            balanceSheet.share = self
+            
+            let analysis = self.analysis ?? Analysis(context: backgroundMoc)
+            analysis.share = self
+            
+            let keyStats = self.key_stats ?? Key_stats(context: backgroundMoc)
+            keyStats.share = self
+            
+            let r1v = self.rule1Valuation ?? Rule1Valuation(context: backgroundMoc)
+            r1v.share = self
+            
+            let dcfv = self.dcfValuation ?? DCFValuation(context: backgroundMoc)
+            dcfv.share = self
+
+            let wbv = self.wbValuation ?? WBValuation(context: backgroundMoc)
+            wbv.share = self
+
+            
+            // save new value with date in a share trend
+            let (_, moat) = r1v.moatScore()
+            
+            if moat != nil {
+                r1v.addMoatTrend(date: Date(), moat: moat!)
+            }
+            
+            let (price,_) = r1v.stickerPrice()
+            if price != nil {
+                r1v.addStickerPriceTrend(date: Date(), price: price!)
+            }
+            
+            // calculate FCF from OCF and netPPEChange
+//            let ocf = labelledDatedValues.filter { ldv in
+//                if ldv.label.lowercased().contains("operating activities") { return true }
+//                else { return false }
+//            }.first?.datedValues
+//            
+//            let netPPE = labelledDatedValues.filter { ldv in
+//                if ldv.label.lowercased() == ("net change in property, plant, and equipment") { return true }
+//                else { return false }
+//            }.first?.datedValues
+            
+            // prefer FCF from Yahoo
+//            if let  fcfDV = cashFlowStatement.calculateFCF(ocf: ocf, netPPEChange: netPPE) {
+//                let millions: [DatedValue] = fcfDV.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
+//                cashFlowStatement.freeCashFlow = millions.convertToData()
+//            }
+            
+            for result in labelledDatedValues {
+                                
+                switch result.label.lowercased() {
+                case "revenue":
+                    if let existingDVs = incomeStatement.revenue.datedValues(dateOrder: .ascending) {
+                        incomeStatement.revenue = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        incomeStatement.revenue = result.datedValues.convertToData()
+                    }
+                case "eps - earnings per share":
+                    if let existingDVs = incomeStatement.eps_annual.datedValues(dateOrder: .ascending) {
+                        incomeStatement.eps_annual = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        incomeStatement.eps_annual = result.datedValues.convertToData()
+                    }
+                case "diluted eps":
+                    if let existingDVs = incomeStatement.eps_annual.datedValues(dateOrder: .ascending) {
+                        incomeStatement.eps_annual = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        incomeStatement.eps_annual = result.datedValues.convertToData()
+                    }
+                case "quarterly eps":
+                    if let existingDVs = incomeStatement.eps_quarter.datedValues(dateOrder: .ascending) {
+                        incomeStatement.eps_quarter = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        incomeStatement.eps_quarter = result.datedValues.convertToData()
+                    }
+
+                case "basic eps":
+                    if let existingDVs = incomeStatement.eps_annual.datedValues(dateOrder: .ascending) {
+                        incomeStatement.eps_annual = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        incomeStatement.eps_annual = result.datedValues.convertToData()
+                    }
+
+                case "net income":
+//                    let millions: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
+                    if let existingDVs = incomeStatement.netIncome.datedValues(dateOrder: .ascending) {
+                        incomeStatement.netIncome = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        incomeStatement.netIncome = result.datedValues.convertToData()
+                    }
+                case "roi - return on investment":
+//                    let percent: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value / 100) }
+                    if let existingDVs = ratios.roi.datedValues(dateOrder: .ascending) {
+                        ratios.roi = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        ratios.roi = result.datedValues.convertToData()
+                    }
+                    r1v.creationDate = Date()
+                case "book value per share":
+                    if let existingDVs = ratios.bvps.datedValues(dateOrder: .ascending) {
+                        ratios.bvps = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        ratios.bvps = result.datedValues.convertToData()
+                    }
+                case "cash flow from operating activities":
+//                    let millions: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
+                    if let existingDVs = cashFlowStatement.opCashFlow.datedValues(dateOrder: .ascending) {
+                        cashFlowStatement.opCashFlow = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        cashFlowStatement.opCashFlow = result.datedValues.convertToData()
+                    }
+                case "free cash flow":
+                    if let existingDVs = cashFlowStatement.freeCashFlow.datedValues(dateOrder: .ascending) {
+                        cashFlowStatement.freeCashFlow = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        cashFlowStatement.freeCashFlow = result.datedValues.convertToData()
+                    }
+                case "free cash flow per share":
+                    if let existingDVs = ratios.fcfPerShare.datedValues(dateOrder: .ascending) {
+                        ratios.fcfPerShare = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        ratios.fcfPerShare = result.datedValues.convertToData()
+                    }
+                case "operating cash flow per share":
+                    if let existingDVs = ratios.ocfPerShare.datedValues(dateOrder: .ascending) {
+                        ratios.ocfPerShare = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        ratios.ocfPerShare = result.datedValues.convertToData()
+                    }
+               case "long term debt":
+                    if let existingDVs = balanceSheet.debt_longTerm.datedValues(dateOrder: .ascending) {
+                        balanceSheet.debt_longTerm = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        balanceSheet.debt_longTerm = result.datedValues.convertToData()
+                    }
+                case "long-term debt":
+                     if let existingDVs = balanceSheet.debt_longTerm.datedValues(dateOrder: .ascending) {
+                         balanceSheet.debt_longTerm = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                     } else {
+                         balanceSheet.debt_longTerm = result.datedValues.convertToData()
+                     }
+                case "pe ratio historical data":
+                    if let existingDVs = ratios.pe_ratios.datedValues(dateOrder: .ascending)?.dropZeros() {
+                        ratios.pe_ratios = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        ratios.pe_ratios = result.datedValues.convertToData()
+                    }
+                case "pe ratio (ttm)":
+                    if let existingDVs = ratios.pe_ratios.datedValues(dateOrder: .ascending)?.dropZeros() {
+                        ratios.pe_ratios = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        ratios.pe_ratios = result.datedValues.convertToData()
+                    }
+               case "sales growth (year/est)":
+                    // save only last two
+                    let count = result.datedValues.count
+                    var lastTwo = [DatedValue]()
+                    if count == 2 {
+                        lastTwo = result.datedValues
+                    } else if count > 2 {
+                        let last = result.datedValues[count-1]
+                        let previous = result.datedValues[count-2]
+                        lastTwo = [previous, last]
+                    }
+                    
+                    if let existingDVs = analysis.future_revenueGrowthRate.datedValues(dateOrder: .ascending) {
+                        analysis.future_revenueGrowthRate = existingDVs.mergeIn(newDV: lastTwo)?.convertToData()
+                    } else {
+                        analysis.future_revenueGrowthRate = lastTwo.convertToData()
+                    }
+                case "purchases":
+                    if let r0 = result.datedValues.first { // first or last?
+                        keyStats.insiderPurchases = [r0].convertToData()
+                    }
+                case "sales":
+                    if let r0 = result.datedValues.first { // first or last?
+                        keyStats.insiderSales = [r0].convertToData()
+                    }
+                case "total insider shares held":
+                    if let r0 = result.datedValues.first { // first or last?
+                        keyStats.insiderShares =  [r0].convertToData()
+                    }
+                case "forward p/e":
+                    if let r0 = result.datedValues.first { // first or last?
+                        if r0.value != 0 {
+                            analysis.forwardPE = [r0].convertToData()
+                        }
+                    }
+                case "rdexpense":
+                    if let existingDVs = incomeStatement.rdExpense.datedValues(dateOrder: .ascending) {
+                        incomeStatement.rdExpense = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        incomeStatement.rdExpense = result.datedValues.convertToData()
+                    }
+                case "research and development expenses":
+                    if let existingDVs = incomeStatement.rdExpense.datedValues(dateOrder: .ascending) {
+                        incomeStatement.rdExpense = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        incomeStatement.rdExpense = result.datedValues.convertToData()
+                    }
+                case "beta":
+                    if let value = result.datedValues.values().first {
+                        if value != 0 {
+                            keyStats.beta = result.datedValues.convertToData()
+                        }
+                    }
+                    dcfv.creationDate = Date()
+                 case "trailing p/e":
+                    // fetched NEWEST/ current PE
+                    if let existingDVs = ratios.pe_ratios.datedValues(dateOrder: .ascending)?.dropZeros() {
+                        ratios.pe_ratios = existingDVs.addOrReplaceNewest(newDV: result.datedValues.last)?.convertToData()
+                    } else {
+                        ratios.pe_ratios = result.datedValues.convertToData()
+                    }
+                case "diluted eps (ttm)":
+                    let ascending = result.datedValues.sortByDate(dateOrder: .ascending)
+                        if var existingEPS = incomeStatement.eps_annual.datedValues(dateOrder: .ascending) {
+                            if existingEPS.last!.date < ascending.last!.date {
+                                existingEPS.append(ascending.last!)
+                                incomeStatement.eps_annual = existingEPS.convertToData()
+                            }
+                        }
+//                            bgShare.eps_current = result.values.first ?? Double()
+                case "trailing annual dividend yield":
+                        keyStats.dividendYield = result.datedValues.convertToData()
+//                            bgShare.divYieldCurrent = result.values.
+                    
+                case "gross profit":
+                    incomeStatement.grossProfit = result.datedValues.convertToData()
+                case "sg&a expenses":
+                    incomeStatement.sgaExpense = result.datedValues.convertToData()
+                case "operating income":
+                    incomeStatement.operatingIncome = result.datedValues.convertToData()
+                case "retained earnings (accumulated deficit)":
+                    balanceSheet.retained_earnings = result.datedValues.convertToData()
+                    wbv.share?.creationDate = Date()
+                case "share holder equity":
+                    balanceSheet.sh_equity = result.datedValues.convertToData()
+                case "roe - return on equity":
+                    ratios.roe = result.datedValues.convertToData()
+                case "roa - return on assets":
+                    ratios.roa = result.datedValues.convertToData()
+                    
+// DCF Data
+                case "market cap (intra-day)":
+                    if let value = result.datedValues.values().first {
+                        if value != 0 {
+                            keyStats.marketCap = result.datedValues.convertToData()
+                        }
+                    }
+                case "market cap":
+                    if let value = result.datedValues.values().first {
+                        if value != 0 {
+                            keyStats.marketCap = result.datedValues.convertToData()
+                        }
+                    }
+                case "beta (5y monthly)":
+                    if let value = result.datedValues.values().first {
+                        if value != 0 {
+                            keyStats.beta = result.datedValues.convertToData()
+                        }
+                    }
+                case "shares outstanding":
+                    for dv in result.datedValues {
+                        print(dv)
+                    }
+                    keyStats.sharesOutstanding = [result.datedValues.last!].convertToData()
+                case "total revenue":
+                    // don't replace any existing macrotrends data as Yahoo only has last four years
+                    if !(incomeStatement.revenue.datedValues(dateOrder: .ascending)?.count ?? 0 > result.datedValues.count) {
+                        incomeStatement.revenue = result.datedValues.convertToData()
+                    }
+                case "interest expense":
+                    incomeStatement.interestExpense = result.datedValues.convertToData()
+                case "income before tax":
+                    // don't replace any existing macrotrends data as Yahoo only has last four years
+                    if !(incomeStatement.preTaxIncome.datedValues(dateOrder: .ascending)?.count ?? 0 > result.datedValues.count) {
+                        incomeStatement.preTaxIncome = result.datedValues.convertToData()
+                    }
+                case "income tax expense":
+                    incomeStatement.incomeTax = [result.datedValues.last!].convertToData()
+                case "current debt":
+                    balanceSheet.debt_shortTerm = [result.datedValues.last!].convertToData()
+                case "total liabilities":
+                    balanceSheet.debt_total = [result.datedValues.last!].convertToData()
+                case "operating cash flow":
+                    // don't replace any existing macrotrends data as Yahoo only has last four years
+                    if !(cashFlowStatement.opCashFlow.datedValues(dateOrder: .ascending)?.count ?? 0 > result.datedValues.count) {
+                        cashFlowStatement.opCashFlow = result.datedValues.convertToData()
+                    }
+                case "capital expenditure":
+                    if !(cashFlowStatement.capEx.datedValues(dateOrder: .ascending)?.count ?? 0 > result.datedValues.count) {
+                        cashFlowStatement.capEx = result.datedValues.convertToData()
+                    }
+                    cashFlowStatement.capEx = result.datedValues.convertToData()
+                case "avg. estimate":
+                    // save only last two
+                    let count = result.datedValues.count
+                    if count == 2 {
+                        analysis.future_revenue = result.datedValues.convertToData()
+                    } else if count > 2 {
+                        let last = result.datedValues[count-1]
+                        let previous = result.datedValues[count-2]
+                        analysis.future_revenue = [previous, last].convertToData()
+                    }
+                case "next year":
+                    analysis.future_growthNextYear = result.datedValues.convertToData()
+                case "next 5 years (per annum)":
+                    analysis.future_growthNext5pa = result.datedValues.convertToData()
+                case "debt issuance/retirement net - total":
+                    analysis.share?.cash_flow?.netBorrowings = result.datedValues.convertToData()
+                case "payout ratio":
+                    analysis.share?.key_stats?.dividendPayoutRatio = result.datedValues.convertToData()
+                case "historical average annual stock prices":
+                    if let existingDVs = avgAnnualPrices.datedValues(dateOrder: .ascending) {
+                        avgAnnualPrices = existingDVs.addOrReplaceNewest(newDV: result.datedValues.last)?.convertToData()
+                    } else {
+                        avgAnnualPrices = result.datedValues.convertToData()
+                    }
+                case "employees":
+                    self.employees = result.datedValues.first?.value ?? 0.0
+                default:
+                    ErrorController.addInternalError(errorLocation: "Share.mergeInData", systemError: nil, errorInfo: "unspecified result label \(result.label)")
+                }                
+            }
+            
+            r1v.creationDate = Date()
+            
+            try self.managedObjectContext?.save()
+            
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil, userInfo: nil)
+
+        }
+        catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error saving \(self.symbol!) data download")
+            throw error
+        }
+
+    }
+    
+    func grossProfitMargins() -> ([DatedValue]?, String?) {
+        
+        guard let revenueDVs = income_statement?.revenue.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros() else {
+            return (nil, "missing revenue data")
+        }
+        
+        guard let grossProfitDVs = income_statement?.grossProfit.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros() else {
+            return (nil, "missing gross profit data")
+        }
+        
+        guard let harmonisedArrays = ValuationDataCleaner.harmonizeDatedValues(arrays: [revenueDVs, grossProfitDVs]) else {
+            return (nil, "failure to harmonise revenue and gross profit data")
+        }
+        
+        let revenue = harmonisedArrays[0]
+        let grossProfit = harmonisedArrays[1]
+        
+        var profitMargins = [DatedValue]()
+        
+        for i in 0..<revenue.count {
+            let margin = grossProfit[i].value / revenue[i].value
+            profitMargins.append(DatedValue(date: revenue[i].date, value: margin))
+        }
+    
+        return (profitMargins, nil)
+
+        
+        // OLD
+//        guard revenue != nil && grossProfit != nil else {
+//            return ([Double()], ["there are no revenue and/or gross profit data"])
+//        }
+//
+//        let rawData = [revenue!, grossProfit!]
+//
+//        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+//
+//        var margins = [Double]()
+//        var errors: [String]?
+//        for i in 0..<cleanedData[0].count {
+//            margins.append(cleanedData[1][i] / cleanedData[0][i])
+//        }
+//
+//        if let validError = error {
+//            errors = [validError]
+//        }
+//        return (margins, errors)
+    }
+
     
 }

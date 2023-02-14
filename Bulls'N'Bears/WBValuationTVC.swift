@@ -19,6 +19,7 @@ enum WBVInfoSection {
 class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     var downloadButton: UIBarButtonItem!
+    var downloadButtonConfiguration: UIButton.Configuration!
     var controller: WBValuationController?
     var share: Share!
     var fromIndexPath: IndexPath!
@@ -31,13 +32,25 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     var progressView: DownloadProgressView?
     var allDownloadTasks = 0
     var completedDownloadTasks = 0
-
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        downloadButton = UIBarButtonItem(title: "Download", style: .plain, target: self, action: #selector(startDownload))
+        downloadButtonConfiguration = UIButton.Configuration.filled()
+        downloadButtonConfiguration.title = "Download"
+//        downloadButtonConfiguration.attributedTitle = AttributedString("Download")
+//        downloadButtonConfiguration.attributedTitle?.font = UIFont.systemFont(ofSize: 14)
+        downloadButtonConfiguration.buttonSize = .small
+        downloadButtonConfiguration.titleAlignment = .center
+        downloadButtonConfiguration.cornerStyle = .small
+        let db = UIButton(configuration: downloadButtonConfiguration, primaryAction: UIAction() {_ in
+//            self.downloadButtonConfiguration.showsActivityIndicator = true
+            self.startDownload()
+        })
+        
+        downloadButton = UIBarButtonItem(customView: db)
          self.navigationItem.rightBarButtonItem = downloadButton
+        
         
         setValuationInfoTexts()
         
@@ -50,6 +63,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        
         if r1DataReload {
             r1DataReload = false
             tableView.reloadRows(at: [IndexPath(row: 0, section: 0),IndexPath(row: 6, section: 0) ], with: .automatic)
@@ -192,9 +206,15 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
 
         progressView?.delegate = self
-        progressView?.title.text = "Downloading..."
+        progressView?.title.text = "Downloading data ..."
 
-        controller?.downloadWBValuationData()
+        Task {
+            await controller?.downloadAllValuationData()
+        
+//            DispatchQueue.main.async {
+//                self.downloadButtonConfiguration.showsActivityIndicator = false
+//            }
+        }
     }
     
     @objc
@@ -214,13 +234,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             // DCF and R1 valuations display 'ValuationListVC'
             performSegue(withIdentifier: "showDCFR1DetailsSegue", sender: nil)
         }
-//        else if indexPath == IndexPath(row: 4, section: 0) {
-//            // Return over 10 and 3 years
-//            //TODO: - show CAGR values for 10 and 3 years
-//            // using share.returnRateCAGR(years: <#T##Int#>)
-//
-//            performSegue(withIdentifier: "valueListSegue", sender: nil)
-//        }
+
         else if indexPath.section > 0 {
             // WBV valuation details
             performSegue(withIdentifier: "valueListSegue", sender: nil)
@@ -251,13 +265,10 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         guard let selectedPath = self.tableView.indexPathForSelectedRow else {
             return
         }
-                
-        guard let wbVal = controller?.wbValuation else {
-            return
-        }
-        
-        
+         
         if let destination = segue.destination as? ValueListTVC {
+            
+//            destination.delegate = self
             
             guard let validController = controller else {
                 return
@@ -268,93 +279,95 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             destination.loadViewIfNeeded()
             
             destination.controller = controller
-            destination.indexPath = selectedPath
+//            destination.indexPath = selectedPath
             let titles = validController.wbvParameters.structuredTitlesParameters()[selectedPath.section-1][selectedPath.row]
             destination.sectionTitles.append(contentsOf: titles)
             destination.cellLegendTitles = validController.valueListChartLegendTitles[selectedPath.section-1][selectedPath.row]
             
-            let arrays = arraysForValueListTVC(indexPath: selectedPath)
+//            let arrays = arraysForValueListTVC(indexPath: selectedPath)
+            destination.datedValues = datedValuesForValueListTVC(indexPath: selectedPath)
             
             if selectedPath.section == 1 {
                 if selectedPath.row == 0 {
                 // Revenue
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                 }
                 else if selectedPath.row == 1 {
                 // Net income
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapWithPence
                 }
                 else if selectedPath.row == 2 {
                 // Ret earnings
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                 }
                 else if selectedPath.row == 3 {
                 // EPS
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                 }
                else if selectedPath.row == 4 {
                 // Profit margin
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = validController.wbValuation!.grossProfitMargins()
-                    destination.proportions = margins
-                
+                    destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
+//                   let (dvs, _) = validController.wbValuation!.grossProfitMargins()
+//                   let margins = dvs.values(dateOrdered: .ascending)
+//                    destination.proportions = margins
                 }
                else if selectedPath.row == 5 {
                 // Op. cash flow
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = validController.wbValuation!.longtermDebtProportion()
-                    destination.proportions = margins
+//                    let (margins, _) = validController.wbValuation!.longtermDebtProportion()
+//                    destination.proportions = margins
                 }
 
             }
             else if selectedPath.section == 2 {
                 if selectedPath.row == 0 {
                 // ROE
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = percentFormatter0Digits
                 }
                 else if selectedPath.row == 1 {
                 // ROA
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = percentFormatter0Digits
                 }
             }
             else if selectedPath.section == 3 {
                 if selectedPath.row == 0 {
                 // CapEx / earnings
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = percentFormatter0Digits
-                    let (prop, _) = validController.wbValuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
-                    destination.proportions = prop
+//                    let (prop, _) = validController.wbValuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
+//                    destination.proportions = prop
+                    destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
                     destination.higherGrowthIsBetter = false
                 }
                 else if selectedPath.row == 1 {
                 // Lt debt / net income
-                    destination.values = arrays
-                    let (margins, _) = validController.wbValuation!.longtermDebtProportion()
-                    destination.proportions = margins
+//                    destination.values = arrays
+//                    let (margins, _) = validController.wbValuation!.longtermDebtProportion()
+                    destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
                     destination.higherGrowthIsBetter = false
                 }
                 else if selectedPath.row == 2 {
                 // SGA / profit
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = validController.wbValuation!.sgaProportion()
-                    destination.proportions = margins
+                    destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
                     destination.higherGrowthIsBetter = false
                 }
                 else if selectedPath.row == 3 {
                 // R&D / profit
-                    destination.values = arrays
+//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-                    let (margins, _) = validController.wbValuation!.rAndDProportion()
-                    destination.proportions = margins
+//                    let (margins, _) = validController.wbValuation!.rAndDProportion()
+                    destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
                     destination.higherGrowthIsBetter = false
                 }
             }
@@ -382,6 +395,51 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 headerText += "the BVPS / Price ratio?"
             case 3:
                 destination.errors = [valuationInfosTexts[.Lynch]!]
+                
+                var score = "NA"
+                var yield$ = String()
+                var currentPE$ = String()
+                var incomeGrowth = String()
+                
+                let (_,lynch) = share.lynchRatio()
+                if lynch != nil {
+                    score = numberFormatterWith1Digit.string(from: lynch! as NSNumber) ?? "NA"
+                }
+                
+                if let divYieldDV = share.key_stats?.dividendYield.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+                    yield$ += percentFormatter2Digits.string(from: divYieldDV as NSNumber)!
+                } else {
+                    yield$ += "NA"
+                }
+                
+                if let currentPEdv = share.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+                    currentPE$ += numberFormatter2Decimals.string(from: currentPEdv as NSNumber)!
+                }
+                else {
+                    currentPE$ += "NA"
+                }
+                if let netIncome = share.income_statement?.netIncome.datedValues(dateOrder: .ascending)?.dropZeros() { // ema(periods: emaPeriod)
+                    if let growth = netIncome.growthRates(dateOrder: .ascending)?.values() {
+                        if let mean = growth.mean() {
+                            incomeGrowth += percentFormatter2Digits.string(from: mean as NSNumber)!
+                        }
+                        else {
+                            incomeGrowth += "NA"
+                        }
+                    }
+                    else {
+                        incomeGrowth += "NA"
+                    }
+                }
+                else {
+                    incomeGrowth += "NA"
+                }
+                
+                destination.otherInfoTexts = [TitleAndDetail]()
+                destination.otherInfoTexts?.append(TitleAndDetail(title: "Lynch ratio", detail: score))
+                destination.otherInfoTexts?.append(TitleAndDetail(title: "Dividend yield", detail: yield$))
+                destination.otherInfoTexts?.append(TitleAndDetail(title: "Current P/E", detail: currentPE$))
+                destination.otherInfoTexts?.append(TitleAndDetail(title: "Mean Income growth", detail: incomeGrowth))
                 headerText += "the 'Lynch' score?"
             case 4:
                 destination.errors = [valuationInfosTexts[.Returns]!]
@@ -426,61 +484,139 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         if indexPath.section == 1 {
             if indexPath.row == 0 {
             // Revenue
-                arrays = [controller?.wbValuation?.revenue ?? []]
+//                arrays = [controller?.wbValuation?.revenue ?? []]
+                arrays = [share.income_statement?.revenue.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
             else if indexPath.row == 1 {
             // net income
-                arrays = [controller?.wbValuation?.netEarnings ?? []]
+//                arrays = [controller?.wbValuation?.netEarnings ?? []]
+                arrays = [share.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
             else if indexPath.row == 2 {
             // Ret. earnings
-                arrays = [controller?.wbValuation?.equityRepurchased ?? []]
+//                arrays = [controller?.wbValuation?.equityRepurchased ?? []]
+                arrays = [share.balance_sheet?.retained_earnings.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
             else if indexPath.row == 3 {
             // EPS
-                arrays = [controller?.wbValuation?.eps ?? []]
+//                arrays = [controller?.wbValuation?.eps ?? []]
+                arrays = [share.income_statement?.eps_annual.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
             else if indexPath.row == 4 {
             // Profit margin
-                arrays = [controller?.wbValuation?.grossProfit ?? [], controller?.wbValuation?.revenue ?? []]
+//                arrays = [controller?.wbValuation?.grossProfit ?? [], controller?.wbValuation?.revenue ?? []]
+                arrays = [share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
             else if indexPath.row == 5 {
             // op. cash flow
-                arrays = [controller?.wbValuation?.opCashFlow ?? []]
+//                arrays = [controller?.wbValuation?.opCashFlow ?? []]
+                arrays = [share.cash_flow?.opCashFlow.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
         }
         else if indexPath.section == 2 {
             if indexPath.row == 0 {
             // ROE
-                arrays = [controller?.wbValuation?.roe ?? []]
+//                arrays = [controller?.wbValuation?.roe ?? []]
+                arrays = [share.ratios?.roe.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
             else if indexPath.row == 1 {
             // ROA
-                arrays = [controller?.wbValuation?.roa ?? []]
+//                arrays = [controller?.wbValuation?.roa ?? []]
+                arrays = [share.ratios?.roa.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
         }
         else if indexPath.section == 3 {
             if indexPath.row == 0 {
             // capEx / net income
-                arrays = [controller?.wbValuation?.capExpend ?? [], controller?.wbValuation?.netEarnings ?? []]
+//                arrays = [controller?.wbValuation?.capExpend ?? [], controller?.wbValuation?.netEarnings ?? []]
+                arrays = [share.cash_flow?.capEx.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? [], share.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
             else if indexPath.row == 1 {
             // Lt debt / net income
-                arrays = [controller?.wbValuation?.debtLT ?? [], controller?.wbValuation?.netEarnings ?? []]
+//                arrays = [controller?.wbValuation?.debtLT ?? [], controller?.wbValuation?.netEarnings ?? []]
+                arrays = [share.balance_sheet?.debt_longTerm.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? [], share.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
             else if indexPath.row == 2 {
             // sga / profit
-                arrays = [controller?.wbValuation?.sgaExpense ?? [], controller?.wbValuation?.grossProfit ?? []]
+//                arrays = [controller?.wbValuation?.sgaExpense ?? [], controller?.wbValuation?.grossProfit ?? []]
+                arrays = [share.income_statement?.sgaExpense.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? [], share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
             else if indexPath.row == 3 {
             // R&D / profit
-                arrays = [controller?.wbValuation?.rAndDexpense ?? [], controller?.wbValuation?.grossProfit ?? []]
+//                arrays = [controller?.wbValuation?.rAndDexpense ?? [], controller?.wbValuation?.grossProfit ?? []]
+                arrays = [share.income_statement?.rdExpense.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? [], share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
             }
         }
 
        return arrays
 
     }
+    
+    func datedValuesForValueListTVC(indexPath: IndexPath) -> [[DatedValue]]? {
+        
+        var datedValues:[[DatedValue]]?
+        let defaultDV = [DatedValue]()
+        
+        if indexPath.section == 1 {
+            if indexPath.row == 0 {
+            // Revenue
+                datedValues = [share.income_statement?.revenue.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+//                arrays = [share.income_statement?.revenue.valuesOnly(dateOrdered: .ascending, oneElementPerYear: true) ?? []]
+            }
+            else if indexPath.row == 1 {
+            // net income
+                datedValues = [share.income_statement?.netIncome.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+            else if indexPath.row == 2 {
+            // Ret. earnings
+                datedValues = [share.balance_sheet?.retained_earnings.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+            else if indexPath.row == 3 {
+            // EPS
+                datedValues = [share.income_statement?.eps_annual.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+            else if indexPath.row == 4 {
+            // Profit margin
+                datedValues = [share.income_statement?.grossProfit.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV, share.income_statement?.revenue.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? []]
+            }
+            else if indexPath.row == 5 {
+            // op. cash flow
+                datedValues = [share.cash_flow?.opCashFlow.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+        }
+        else if indexPath.section == 2 {
+            if indexPath.row == 0 {
+            // ROE
+                datedValues = [share.ratios?.roe.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+            else if indexPath.row == 1 {
+            // ROA
+                datedValues = [share.ratios?.roa.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+        }
+        else if indexPath.section == 3 {
+            if indexPath.row == 0 {
+            // capEx / net income
+                datedValues = [share.cash_flow?.capEx.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV, share.income_statement?.netIncome.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+            else if indexPath.row == 1 {
+            // Lt debt / net income
+                datedValues = [share.balance_sheet?.debt_longTerm.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV, share.income_statement?.netIncome.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+            else if indexPath.row == 2 {
+            // sga / profit
+                datedValues = [share.income_statement?.sgaExpense.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV, share.income_statement?.grossProfit.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+            else if indexPath.row == 3 {
+            // R&D / profit
+                datedValues = [share.income_statement?.rdExpense.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV, share.income_statement?.grossProfit.datedValues(dateOrder: .ascending, oneForEachYear: true) ?? defaultDV]
+            }
+        }
+
+       return datedValues
+
+    }
+
     
     //MARK: - ProgressViewDelegate functions
     
@@ -514,8 +650,9 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
     func downloadError(error: String) {
         
-        allDownloadTasks -= 1
+//        allDownloadTasks -= 1
         completedTasks += 1
+        self.progressUpdate(allTasks: allDownloadTasks, completedTasks: completedTasks)
 
         DispatchQueue.main.async {
             self.progressView?.title.font = UIFont.systemFont(ofSize: 14)
@@ -527,6 +664,9 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     func progressUpdate(allTasks: Int, completedTasks: Int) {
         DispatchQueue.main.async {
             self.progressView?.updateProgress(tasks: allTasks, completed: completedTasks)
+            if completedTasks >= allTasks {
+                self.downloadComplete()
+            }
         }
     }
     
@@ -556,7 +696,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
 extension WBValuationTVC: WBValuationCellDelegate {
         
-    func infoButtonAction(errors: [String]?, sender: UIView) {
+    func infoButtonAction(errors: [String]?, otherInfo: [TitleAndDetail]? ,sender: UIView) {
         
         if let errorsView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationErrorsTVC") as? ValuationErrorsTVC {
             
@@ -569,6 +709,7 @@ extension WBValuationTVC: WBValuationCellDelegate {
             errorsView.loadViewIfNeeded()
             
             errorsView.errors = errors ?? ["no errors occurred"]
+            errorsView.otherInfoTexts = otherInfo
             errorsView.firstCellHeight = errorsView.preferredContentSize.height
             
             present(errorsView, animated: true, completion:  nil)

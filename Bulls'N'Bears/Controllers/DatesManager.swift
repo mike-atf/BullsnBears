@@ -67,6 +67,11 @@ class DatesManager {
         return Calendar.current.date(from: dateComponents)!.addingTimeInterval(-1)
 
     }
+    
+    class func ttmDate() -> Date {
+        
+        return Date().addingTimeInterval(-365*24*3600)
+    }
 
     
     class func timeIntervalOfThisMonth(date:Date) -> TimeInterval {
@@ -242,7 +247,36 @@ class DatesManager {
         
         return Calendar.current.date(from: dateComponents)!
     }
+    
+    class func yearOnly(date: Date) -> Int {
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = NSLocale.current
+            formatter.timeZone = NSTimeZone.local
+            formatter.dateFormat = "yyyy"
+            return formatter
+        }()
 
+               
+        return Int(dateFormatter.string(from: date))!
+    }
+
+    
+    /// send date in 'd.M.yyyy' format
+    class func dateFromAString(dateString: String) -> Date? {
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = NSLocale.current
+            formatter.timeZone = NSTimeZone.local
+            formatter.dateFormat = "d.M.yyyy"
+            return formatter
+        }()
+        
+        return dateFormatter.date(from: dateString)
+
+    }
 
     
     class func beginningOfDay(of date: Date) -> Date {

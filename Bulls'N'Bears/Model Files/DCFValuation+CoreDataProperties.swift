@@ -16,24 +16,25 @@ extension DCFValuation {
         return NSFetchRequest<DCFValuation>(entityName: "DCFValuation")
     }
 
-    @NSManaged public var tFCFo: [Double]?
-    @NSManaged public var capExpend: [Double]?
-    @NSManaged public var netIncome: [Double]?
-    @NSManaged public var tRevenueActual: [Double]?
-    @NSManaged public var tRevenuePred: [Double]?
-    @NSManaged public var revGrowthPred: [Double]?
-    @NSManaged public var revGrowthPredAdj: [Double]?
-    @NSManaged public var expenseInterest: Double
-    @NSManaged public var debtST: Double
-    @NSManaged public var debtLT: Double
-    @NSManaged public var totalDebt: Double
-    @NSManaged public var incomePreTax: Double
-    @NSManaged public var expenseIncomeTax: Double
-    @NSManaged public var marketCap: Double
-    @NSManaged public var beta: Double
-    @NSManaged public var sharesOutstanding: Double
-    @NSManaged public var company: String?
+//    @NSManaged public var tFCFo: [Double]?
+//    @NSManaged public var capExpend: [Double]?
+//    @NSManaged public var netIncome: [Double]?
+//    @NSManaged public var tRevenueActual: [Double]?
+//    @NSManaged public var tRevenuePred: [Double]?
+//    @NSManaged public var revGrowthPred: [Double]?
+//    @NSManaged public var revGrowthPredAdj: [Double]?
+//    @NSManaged public var expenseInterest: Double
+//    @NSManaged public var debtST: Double
+//    @NSManaged public var debtLT: Double
+//    @NSManaged public var totalDebt: Double
+//    @NSManaged public var incomePreTax: Double
+//    @NSManaged public var expenseIncomeTax: Double
+//    @NSManaged public var marketCap: Double
+//    @NSManaged public var beta: Double
+//    @NSManaged public var sharesOutstanding: Double
+//    @NSManaged public var company: String?
     @NSManaged public var creationDate: Date?
+    @NSManaged public var ivalueTrend: Data?
     @NSManaged public var share: Share?
     @NSManaged public var alerts: [String]?
 

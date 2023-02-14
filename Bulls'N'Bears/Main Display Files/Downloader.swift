@@ -62,6 +62,36 @@ class Downloader: NSObject {
         
         return nil
     }
+    
+    func downloadDataWithRedirectionOption(url: URL?) async -> String? {
+        
+        guard url != nil else {
+            return nil
+        }
+        
+        let request = URLRequest(url: url!)
+        do {
+            
+            let (data,urlResponse) = try await URLSession.shared.data(for: request,delegate: self)
+            
+            if let response = urlResponse as? HTTPURLResponse {
+                if response.statusCode == 200 {
+                    if response.mimeType == "text/html" {
+                        return String(data: data, encoding: .utf8) ?? ""
+                    }
+                    else {
+                        print(#function, "download response error for \(url!), mimeType not text but \(String(describing: response.mimeType))")
+                        return nil
+                    }
+                }
+            }
+        } catch {
+            ErrorController.addInternalError(errorLocation: #function,errorInfo: error.localizedDescription)
+        }
+        
+        return nil
+    }
+
 
     //MARK: - class functions
     
@@ -107,6 +137,43 @@ class Downloader: NSObject {
         
         return htmlText
     }
+    
+    class func downloadDataNoThrow(url: URL?) async -> String? {
+        
+        guard url != nil else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "url is nil")
+            return nil
+        }
+        
+        let request = URLRequest(url: url!)
+            
+        do {
+            let (data,urlResponse) = try await URLSession.shared.data(for: request)
+            
+            if let response = urlResponse as? HTTPURLResponse {
+                if response.statusCode == 200 {
+                    if response.mimeType == "text/html" {
+                        return String(data: data, encoding: .utf8) ?? ""
+                    }
+                    else {
+                        ErrorController.addInternalError(errorLocation: #function, errorInfo: "non-text response")
+                        return nil
+                    }
+                }
+                else {
+                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "unexpected download response")
+                    return nil
+                }
+            }
+        } catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "download error for \(url!)")
+            return nil
+        }
+        
+        return nil
+        
+    }
+
     
     /// call this method when the caller provides a DownloadRedirectionDelegate with functions; this comes without the option of specific taks redirection
     /// otherwise use instance method 'downloadDataWithRedirection' after initialising Downloader with a specific downloadTask for redirection
@@ -359,7 +426,7 @@ class Downloader: NSObject {
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error trying to remove existing file \(atURL) in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Downloader - error trying to remove existing file \(atURL) in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }

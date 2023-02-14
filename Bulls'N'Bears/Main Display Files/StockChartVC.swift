@@ -30,20 +30,41 @@ class StockChartVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         if share != nil {
             configure(share: share)
         }
         
+        let titleText = share?.name_long ?? "missing company"
+        var currencyText = String()
+        var exchangeText = String()
+        
+        
+        if let currency = share?.currency {
+            currencyText = " (" + currency + ")"
+        }
+        
+        if let exchange = share?.exchange {
+            exchangeText = ", " + exchange
+        }
+        
+        var title$ = NSMutableAttributedString(string: titleText, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3)])
+        let currency$ = NSMutableAttributedString(string: currencyText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 11), NSAttributedString.Key.foregroundColor: UIColor.gray])
+        let exchange$ = NSMutableAttributedString(string: exchangeText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 11), NSAttributedString.Key.foregroundColor: UIColor.gray])
+        
+        title$.append(currency$)
+        title$.append(exchange$)
+        
         let newLabel: UILabel = {
             let label = UILabel()
-            label.font = UIFont.preferredFont(forTextStyle: .title3)
-            label.text = share?.name_long
+//            label.font = UIFont.preferredFont(forTextStyle: .title3)
+//            label.text = titleText + currencyText + exchangeText
+            label.attributedText = title$
             label.adjustsFontSizeToFitWidth = true
             label.preferredMaxLayoutWidth = self.view.frame.width * 0.5
             return label
         }()
-        
+
         
         barTitleButton = UIBarButtonItem(customView: newLabel)
         spinner = UIActivityIndicatorView()

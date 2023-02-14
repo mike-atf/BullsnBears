@@ -43,6 +43,7 @@ extension WBValuation {
     @NSManaged public var perDates: Data? // these are usually quarterly P/E from MacroTrends
     @NSManaged public var epsDates: Data? // qEPS TTM
     @NSManaged public var epsDatesq: Data? // qEPS
+    @NSManaged public var intrinsicValueTrend: Data?
     @NSManaged public var share: Share?
 
 }

@@ -8,7 +8,7 @@
 import UIKit
 
 protocol WBValuationCellDelegate: NSObject {
-    func infoButtonAction(errors: [String]?, sender: UIView)
+    func infoButtonAction(errors: [String]?, otherInfo: [TitleAndDetail]? ,sender: UIView)
     
 }
 
@@ -91,7 +91,7 @@ class WBValuationCell: UITableViewCell {
     }
     
     @IBAction func infoButtonAction(_ sender: UIButton) {
-        delegate?.infoButtonAction(errors: self.errors, sender: sender)
+        delegate?.infoButtonAction(errors: self.errors, otherInfo: nil, sender: sender)
     }
     
 }

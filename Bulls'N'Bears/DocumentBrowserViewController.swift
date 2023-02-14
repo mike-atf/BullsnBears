@@ -31,10 +31,10 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         guard let sourceURL = documentURLs.first else { return }
         
         if sourceURL.startAccessingSecurityScopedResource() {
-            let localURL = copyFileToDocumentDirectory(url: sourceURL)
+//            let localURL = copyFileToDocumentDirectory(url: sourceURL)
             sourceURL.stopAccessingSecurityScopedResource()
             
-            if let validStockList = stockListVC {
+            if stockListVC != nil {
 //                if let validUrl = localURL {
 //                    validStockList.addShare(fileURL: validUrl)
 //                }
@@ -72,7 +72,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didImportDocumentAt sourceURL: URL, toDestinationURL destinationURL: URL) {
         
-        if let validStockList = stockListVC {
+        if stockListVC != nil {
 //            validStockList.addShare(fileURL: sourceURL)
             self.dismiss(animated: true, completion: nil)
         }
@@ -92,9 +92,9 @@ extension DocumentBrowserViewController {
         self.revealDocument(at: inboundURL, importIfNeeded: importIfNeeded) { (url, error) in
             if let error = error {
                 ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "File import failure error")
-            } else if let url = url {
+            } else if url != nil {
               
-                if let validStockList = self.stockListVC {
+                if self.stockListVC != nil {
 //                    validStockList.addShare(fileURL: url)
                     self.dismiss(animated: true, completion: nil)
                 }

@@ -32,7 +32,8 @@ class ErrorListVC: UITableViewController {
         if errorLog?.count ?? 0 > indexPath.row {
             let log = errorLog![indexPath.row]
             cell.locationLabel.text = log.location
-            cell.infoLabel.text = log.errorDescription()
+//            cell.infoLabel.text = log.errorDescription()
+            cell.infoLabel.text = log.errorInfo
             cell.sysErrLabel.text = log.systemError?.localizedDescription
         }
         return cell

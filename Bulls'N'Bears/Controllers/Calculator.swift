@@ -50,6 +50,83 @@ class Calculator {
         return rates
     }
     
+    /// can be sent in ANY date order, returns rates in DESCENDING order
+    class func reatesOfReturn(datedValues: [DatedValue]) -> [Double]? {
+        
+        guard datedValues.count > 1 else { return nil }
+        
+        var descending = datedValues.sortByDate(dateOrder: .descending)
+        
+        
+        
+        
+        var futureValue = descending.first!.value
+        if futureValue <= 0 {
+            // doesn't work with negative FV
+            // find next, and if positive continue, if not abandon as too far back in past
+            descending.removeFirst()
+            guard descending.count > 1 else { return nil }
+            futureValue = descending.first!.value
+            if futureValue <= 0 { return nil }
+        }
+        let futureDate = descending.first!.date
+        
+        var returns = [Double]()
+        
+        for i in 1..<descending.count {
+            let years = futureDate.timeIntervalSince(descending[i].date) / (365*24*3600)
+
+            if let ret = rateOfReturn(years: years, presentValue: descending[i].value, futureValue: futureValue) {
+                returns.append(ret)
+            }
+        }
+        
+        return returns.filter { d in
+            if d != 0.0 { return true }
+            else { return false }
+        }
+        
+    }
+    
+    /// can be sent in ANY date order
+    class func ratesOfGrowthWithDate(datedValues: [DatedValue]) -> [DatedValue]? {
+        
+        guard datedValues.count > 1 else { return nil }
+        
+        let descending = datedValues.sortByDate(dateOrder: .descending)
+        
+//        let timeSpan = descending.first!.date.timeIntervalSince(descending.last!.date)
+        
+        let futureValue = descending.first!.value
+        let futureDate = descending.first!.date
+        
+        var returns = [DatedValue]()
+        
+        for i in 1..<descending.count {
+            let years = futureDate.timeIntervalSince(descending[i].date) / (365*24*3600)
+
+            if let ret = rateOfReturn(years: years, presentValue: descending[i].value, futureValue: futureValue) {
+                let dv = DatedValue(date: descending[i].date, value: ret)
+                returns.append(dv)
+            }
+        }
+        
+        return returns
+    }
+
+    
+    class func rateOfReturn(years: Double, presentValue: Double, futureValue: Double) -> Double? {
+        
+        guard years > 0 else { return nil }
+        
+        let ratio = futureValue / presentValue
+        let exponent = 1.0 / years
+        
+        let rate = pow(ratio, exponent) - 1
+        
+        return !rate.isNaN ? rate : nil
+    }
+    
     /// returns a time-DESCENDING array (n-1 elements) of the year-on-year / element to next element  growth rates
     /// the array should be in time DESCENDING order and the time between each element is assumed to one year
     /// any placeholder (Double()) element will return a growthRate placeholder element (0.0)
@@ -193,6 +270,167 @@ class Calculator {
 
         return Correlation(m: m, b: b, r: r, xElements: cleanedArrayX.count)
     }
+    
+    /*
+    /// arrays can be sent in ANY date order
+    class func correlationForDVs(xArray: [DatedValue]?, yArray: [DatedValue]?) -> Correlation? {
+        
+        guard (yArray ?? []).count > 0 else {
+            return nil
+        }
+        
+        guard (xArray ?? []).count > 0 else {
+            return nil
+        }
+        
+        guard (xArray ?? []).count == (yArray ?? []).count else {
+            ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "Error in trend correlation: y.count != x.count")
+            return nil
+        }
+        
+        let ascendingX = xArray?.sortByDate(dateOrder: .ascending)
+        let ascendingY = yArray?.sortByDate(dateOrder: .ascending)
+        
+        // Removing any empty Double() or NaN elements
+        
+        var elementsToRemove = [Int]()
+        for i in 0..<ascendingX!.count {
+            if ascendingX![i].value == Double() || ascendingY![i].value == Double() {
+                elementsToRemove.append(i)
+            }
+            else if ascendingX![i].value.isNaN || ascendingY![i].value.isNaN {
+                elementsToRemove.append(i)
+            }
+        }
+        
+        let cleanedArrayX = ascendingX?.enumerated().filter { !elementsToRemove.contains($0.offset) }.map { $0.element} ?? []
+        let cleanedArrayY = ascendingY?.enumerated().filter { !elementsToRemove.contains($0.offset) }.map { $0.element} ?? []
+        
+        let ySum = cleanedArrayY.compactMap{ $0.value }.reduce(0,+)
+        let xSum = cleanedArrayX.compactMap{ $0.value }.reduce(0,+)
+        var xyProductArray = [Double]()
+        var x2Array = [Double]()
+        var y2Array = [Double]()
+        var xySumArray = [Double]()
+        let n: Double = Double(cleanedArrayY.count)
+
+        var count = 0
+        for y in cleanedArrayY {
+            xyProductArray.append(y * cleanedArrayX[count])
+            x2Array.append(cleanedArrayX[count] * cleanedArrayX[count])
+            xySumArray.append(y + cleanedArrayX[count])
+            y2Array.append(y * y)
+            count += 1
+        }
+        
+        let xyProductSum = xyProductArray.reduce(0,+)
+        let x2Sum = x2Array.reduce(0,+)
+        let y2Sum = y2Array.reduce(0,+)
+        
+        let numerator = n * xyProductSum - xSum * ySum
+        let denom = (n * x2Sum - (xSum * xSum)) * (n * y2Sum - (ySum * ySum))
+
+// Pearson correlation coefficient
+        let  r = numerator / sqrt(denom)
+        
+        let xMean = xSum / n
+        let yMean = ySum / n
+        
+        var xdiff2Sum = Double()
+        var ydiff2Sum = Double()
+        
+        for y in cleanedArrayY {
+            let ydiff = y - yMean
+            ydiff2Sum += (ydiff * ydiff)
+        }
+        for x in cleanedArrayX {
+            let xdiff = x - xMean
+            xdiff2Sum += (xdiff * xdiff)
+        }
+        
+        let xSD = sqrt(xdiff2Sum / n)
+        let ySD = sqrt(ydiff2Sum / n)
+        
+// m = incline of regression line
+        let m = r * (ySD / xSD)
+        
+// b = y axis intercept of regression line
+        let b = yMean - m * xMean
+
+        return Correlation(m: m, b: b, r: r, xElements: cleanedArrayX.count)
+    }
+    */
+    class func correlationDatesToValues(array: [DatedValue]?) -> Correlation? {
+        
+        guard (array ?? []).count > 0 else {
+            return nil
+        }
+                
+        guard let descendingDVs = array?.sortByDate(dateOrder: .descending) else {
+            return nil
+        }
+        
+        var timesInYears = [TimeInterval]()
+        for i in 0..<descendingDVs.count - 1 {
+            timesInYears.append(descendingDVs[i].date.timeIntervalSince(descendingDVs[i+1].date) / (365*24*3600))
+        }
+        
+        let descendingValues = descendingDVs.dropLast(1).compactMap{ $0 .value } // drop last element as is has no previous time
+        
+        let ySum = timesInYears.reduce(0,+)
+        let xSum = descendingValues.reduce(0,+)
+        var xyProductArray = [Double]()
+        var x2Array = [Double]()
+        var y2Array = [Double]()
+        var xySumArray = [Double]()
+        let n: Double = Double(timesInYears.count)
+
+        var count = 0
+        for y in timesInYears {
+            xyProductArray.append(y * descendingValues[count])
+            x2Array.append(descendingValues[count] * descendingValues[count])
+            xySumArray.append(y + descendingValues[count])
+            y2Array.append(y * y)
+            count += 1
+        }
+        
+        let xyProductSum = xyProductArray.reduce(0,+)
+        let x2Sum = x2Array.reduce(0,+)
+        let y2Sum = y2Array.reduce(0,+)
+        
+        let numerator = n * xyProductSum - xSum * ySum
+        let denom = (n * x2Sum - (xSum * xSum)) * (n * y2Sum - (ySum * ySum))
+
+// Pearson correlation coefficient
+        let  r = numerator / sqrt(denom)
+        
+        let xMean = xSum / n
+        let yMean = ySum / n
+        
+        var xdiff2Sum = Double()
+        var ydiff2Sum = Double()
+        
+        for y in timesInYears {
+            let ydiff = y - yMean
+            ydiff2Sum += (ydiff * ydiff)
+        }
+        for x in descendingValues {
+            let xdiff = x - xMean
+            xdiff2Sum += (xdiff * xdiff)
+        }
+        
+        let xSD = sqrt(xdiff2Sum / n)
+        let ySD = sqrt(ydiff2Sum / n)
+        
+// m = incline of regression line
+        let m = r * (ySD / xSD)
+        
+// b = y axis intercept of regression line
+        let b = yMean - m * xMean
+
+        return Correlation(m: m, b: b, r: r, xElements: descendingValues.count)
+    }
+
     
     /// returns the proportions of array1 /  array0
     class func proportions(array1: [Double]?, array0: [Double]?) -> [Double]? {

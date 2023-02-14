@@ -47,8 +47,17 @@ class StockListCellTableViewCell: UITableViewCell {
         self.indexPath = indexPath
         self.stock = stock
         
-        if stock.peRatio != Double() {
-            title.textColor = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: stock.peRatio, greenCutoff: 10.0, redCutOff: 40.0)
+        if let currentPE = stock.pe_current() {
+            
+            if currentPE > 0 {
+                title.textColor = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: currentPE, greenCutoff: 10.0, redCutOff: 40.0)
+            } else if currentPE < 0 {
+                title.textColor = UIColor.systemRed
+            } else {
+                title.textColor = UIColor.label
+            }
+
+//            title.textColor = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: currentPE, greenCutoff: 10.0, redCutOff: 40.0)
         }
         title.text = stock.symbol
 

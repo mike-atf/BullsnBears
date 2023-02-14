@@ -22,3 +22,22 @@ struct ValuationListCellInfo {
     }
 
 }
+
+struct Rule1DCFCellData {
+    
+    var value$ = String()
+    var title$ = String()
+    var detail$ = String()
+    var detailColor = UIColor.label
+    
+    init(value$: String, title: String, detail$: String, detailColor: UIColor?=nil) {
+        self.value$ = value$
+        self.title$ = title
+        self.detail$ = detail$
+        if let c = detailColor {
+            self.detailColor = c
+        }
+    }
+
+}
+

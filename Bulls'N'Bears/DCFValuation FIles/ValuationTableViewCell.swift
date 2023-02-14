@@ -43,7 +43,7 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
         textField.isEnabled = true
     }
     
-    
+    /*
     public func configure(info: ValuationListCellInfo,  indexPath: IndexPath, method: ValuationMethods, delegate: ValuationDelegate) {
         
         self.method = method
@@ -61,7 +61,19 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
                 textField.isEnabled = false
             }
         }
-
+    }
+    */
+    
+    public func configureNew(indexPath: IndexPath, data: Rule1DCFCellData ,method: ValuationMethods, delegate: ValuationDelegate) {
+        
+        self.method = method
+        self.delegate = delegate
+        self.indexPath = indexPath
+        self.title.text = data.title$
+        self.detail.text = data.detail$
+        self.detail.textColor = data.detailColor
+        self.textField.text = data.value$
+        
     }
     
     public func enterTextField() {

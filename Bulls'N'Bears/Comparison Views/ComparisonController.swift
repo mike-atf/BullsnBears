@@ -93,9 +93,16 @@ class ComparisonController {
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if let moat = share.rule1Valuation?.moatScore() {
-                        text = percentFormatter0Digits.string(from: moat as NSNumber) ?? "-"
-                        color = findCategoryColor(biggerIsBetter: true, consistency: moat, growth: 1.0, primaryGreenCutoff: 0.75, primaryRedCutOff: 0.5)
+                    if let (errors, moat) = share.rule1Valuation?.moatScore() {
+                        if moat != nil && errors == nil {
+                            text = percentFormatter0Digits.string(from: moat! as NSNumber) ?? "-"
+                            color = findCategoryColor(biggerIsBetter: true, consistency: moat!, growth: 1.0, primaryGreenCutoff: 0.75, primaryRedCutOff: 0.5)
+                        }
+                        else if moat != nil && errors != nil {
+                            text = "(" + (percentFormatter0Digits.string(from: moat! as NSNumber) ?? "-") + "!)"
+                            color = findCategoryColor(biggerIsBetter: true, consistency: moat!, growth: 1.0, primaryGreenCutoff: 0.75, primaryRedCutOff: 0.5)
+                        }
+
                     }
                     texts.append(text)
                     colors.append(color)
@@ -119,7 +126,7 @@ class ComparisonController {
                 for share in  shares ?? [] {
                     var text = "-"
                     if share.dcfValuation != nil {
-                        let (price,_) = share.dcfValuation!.returnIValue()
+                        let (price,_) = share.dcfValuation!.returnIValueNew()
                         if let validPrice = price {
                             let ratio = share.latestPrice(option: .close)! / validPrice
                             text = percentFormatter0Digits.string(from: ratio as NSNumber) ?? "-"
@@ -147,9 +154,9 @@ class ComparisonController {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if share.peRatio != 0 {
-                        text = numberFormatterWith1Digit.string(from: share.peRatio as NSNumber) ?? "-"
-                        color = findCategoryColor(biggerIsBetter: true, consistency: 100.0 - share.peRatio, growth: 1.0, primaryGreenCutoff: 90, primaryRedCutOff: 60)
+                    if share.peRatio_current != 0 {
+                        text = numberFormatterWith1Digit.string(from: share.peRatio_current as NSNumber) ?? "-"
+                        color = findCategoryColor(biggerIsBetter: true, consistency: 100.0 - share.peRatio_current, growth: 1.0, primaryGreenCutoff: 90, primaryRedCutOff: 60)
 //                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 10000, value: share.peRatio, greenCutoff: 40, redCutOff: 0)
                     }
                     texts.append(text)
@@ -160,9 +167,10 @@ class ComparisonController {
                 for share in  shares ?? [] {
                     var text = "-"
                     if share.wbValuation != nil {
-                        if let ratio = share.wbValuation!.lynchRatio() {
-                            text = numberFormatterWith1Digit.string(from: ratio as NSNumber) ?? "-"
-                            color = findCategoryColor(biggerIsBetter: true, consistency: ratio, growth: 1.0, primaryGreenCutoff: 3.0, primaryRedCutOff: 1.0)
+                        let (_, ratio) = share.lynchRatio()
+                        if ratio != nil {
+                            text = numberFormatterWith1Digit.string(from: ratio! as NSNumber) ?? "-"
+                            color = findCategoryColor(biggerIsBetter: true, consistency: ratio!, growth: 1.0, primaryGreenCutoff: 3.0, primaryRedCutOff: 1.0)
 //                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 10000, value: ratio, greenCutoff: 3, redCutOff: 1)
                         }
                     }
@@ -174,7 +182,7 @@ class ComparisonController {
                 for share in  shares ?? [] {
                     var text = "-"
                     if share.wbValuation != nil {
-                        if let values = share.wbValuation!.bookValuePerPrice() {
+                        if let values = share.latestBookValuePerPrice(){
                             var t1$:String?
                             var t2$:String?
                             if let value1 = values[0] {

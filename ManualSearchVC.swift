@@ -240,7 +240,7 @@ class ManualSearchVC: UIViewController, UITextFieldDelegate {
             try FileManager.default.removeItem(at: atURL)
         } catch let error {
             DispatchQueue.main.async {
-                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error trying to remove existing file in the Document folder to be able to move new file of same name from Inbox folder ")
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "ManualSearch - error trying to remove existing file \(atURL) in the Document folder to be able to move new file of same name from Inbox folder ")
             }
         }
     }

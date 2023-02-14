@@ -14,123 +14,92 @@ public class WBValuation: NSManagedObject {
     
     override public func awakeFromInsert() {
         
-        opCashFlow = [Double]()
-        bvps = [Double]()
-        avAnStockPrice = [Double]()
-        eps = [Double]()
-        revenue = [Double]()
-        grossProfit = [Double]()
-        sgaExpense = [Double]()
-        rAndDexpense = [Double]()
-        interestExpense = [Double]()
-        netEarnings = [Double]()
-        roe = [Double]()
-        capExpend = [Double]()
-        debtLT = [Double]()
-        shareholdersEquity = [Double]()
-        roa = [Double]()
-        ppe = [Double]()
-        operatingIncome = [Double]()
-        equityRepurchased = [Double]()
-        date = Date()
-        
-        if let dcf = share?.dcfValuation {
-            if (dcf.capExpend ?? [Double]()).reduce(0, +) != 0 {
-                self.capExpend = dcf.capExpend
-            }
-            
-            if (dcf.netIncome ?? [Double]()).reduce(0, +) != 0 {
-                self.netEarnings = dcf.netIncome
-            }
-
-        }
-        
-        if let r1 = share?.rule1Valuation {
-            if (r1.bvps ?? [Double]()).reduce(0, +) != 0 {
-                self.bvps = r1.bvps
-            }
-            
-            if (r1.revenue ?? [Double]()).reduce(0, +) != 0 {
-                self.revenue = r1.revenue
-            }
-            
-            if (r1.eps ?? [Double]()).reduce(0, +) != 0 {
-                self.eps = r1.eps
-            }
-
-
-        }
+//        opCashFlow = [Double]()
+//        bvps = [Double]()
+//        avAnStockPrice = [Double]()
+//        eps = [Double]()
+//        revenue = [Double]()
+//        grossProfit = [Double]()
+//        sgaExpense = [Double]()
+//        rAndDexpense = [Double]()
+//        interestExpense = [Double]()
+//        netEarnings = [Double]()
+//        roe = [Double]()
+//        capExpend = [Double]()
+//        debtLT = [Double]()
+//        shareholdersEquity = [Double]()
+//        roa = [Double]()
+//        ppe = [Double]()
+//        operatingIncome = [Double]()
+//        equityRepurchased = [Double]()
+//        date = Date()
+//        
+//        if let dcf = share?.dcfValuation {
+//            if (dcf.capExpend ?? [Double]()).reduce(0, +) != 0 {
+//                self.capExpend = dcf.capExpend
+//            }
+//            
+//            if (dcf.netIncome ?? [Double]()).reduce(0, +) != 0 {
+//                self.netEarnings = dcf.netIncome
+//            }
+//
+//        }
+//        
+//        if let r1 = share?.rule1Valuation {
+//            if (r1.bvps ?? [Double]()).reduce(0, +) != 0 {
+//                self.bvps = r1.bvps
+//            }
+//            
+//            if (r1.revenue ?? [Double]()).reduce(0, +) != 0 {
+//                self.revenue = r1.revenue
+//            }
+//            
+//            if (r1.eps ?? [Double]()).reduce(0, +) != 0 {
+//                self.eps = r1.eps
+//            }
+//
+//
+//        }
         
     }
-    
-    func peRatiosWithDates() -> [DatedValue]? {
+    /// qEPS_TTM, returns date ascending Datedvalue within TTM or minDate
+    func annualEPS_TTM_DV(minDate:Date?=nil) -> [DatedValue]? {
         
-        if let valid = perDates {
-            do {
-                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
-                    var datedValues = [DatedValue]()
-                    for element in dictionary {
-                        datedValues.append(DatedValue(date: element.key, value: element.value))
-                    }
-                    return datedValues
-                }
-            } catch let error {
-                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored EPS historical data")
-            }
-        }
+        let annualEPS = share?.income_statement?.eps_annual.datedValues(dateOrder: .ascending)?.dropZeros()
         
-        return nil
-    }
-    
-    /// qEPS_TTM, returns sorted date-value pairs ascending by date
-    func epsqTTMWithDates() -> [DatedValue]? {
+        let ttmDate = minDate ?? DatesManager.ttmDate()
         
-        if let valid = epsDates {
-            do {
-                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
-                    var datedValues = [DatedValue]()
-                    for element in dictionary {
-                        if element.value != 0 {
-                            datedValues.append(DatedValue(date: element.key, value: element.value))
-                        }
-                    }
-                    return datedValues.sorted { dv0, dv1 in
-                        if dv1.date < dv0.date { return false }
-                        else { return true}
-                    }
-                }
-            } catch let error {
-                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
-            }
-        }
+        return annualEPS?.filter({ dv in
+            if dv.date < ttmDate { return false }
+            else { return true }
+        }).sortByDate(dateOrder: .ascending)
         
-        return nil
     }
 
     /// qEPS, returns sorted date-value pairs ascending by date
-    func epsQWithDates() -> [DatedValue]? {
-        
-        if let valid = epsDatesq {
-            do {
-                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
-                    var datedValues = [DatedValue]()
-                    for element in dictionary {
-                        if element.value != 0 {
-                            datedValues.append(DatedValue(date: element.key, value: element.value))
-                        }
-                    }
-                    return datedValues.sorted { dv0, dv1 in
-                        if dv1.date < dv0.date { return false }
-                        else { return true}
-                    }
-                }
-            } catch let error {
-                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
-            }
-        }
-        
-        return nil
-    }
+//    func epsQWithDates() -> [DatedValue]? {
+//
+//        if let valid = epsDatesq {
+//            do {
+//                if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? [Date: Double] {
+//                    var datedValues = [DatedValue]()
+//                    for element in dictionary {
+//                        if element.value != 0 {
+//                            datedValues.append(DatedValue(date: element.key, value: element.value))
+//                        }
+//                    }
+//                    return datedValues.sorted { dv0, dv1 in
+//                        if dv1.date < dv0.date { return false }
+//                        else { return true}
+//                    }
+//                }
+//            } catch let error {
+//                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+//            }
+//        }
+//
+//        return nil
+//    }
     
     
     /// returns past PE ratios in date descending order
@@ -179,6 +148,7 @@ public class WBValuation: NSManagedObject {
         
     }
     
+    /// takes last four qEPS to calculate annual EPS ttm
     func epsTTMFromQEPSArray(datedValues: [DatedValue]?, saveToMOC: Bool?=true) -> [DatedValue]? {
         
         guard var validArray = datedValues else { return nil }
@@ -224,48 +194,51 @@ public class WBValuation: NSManagedObject {
         
     }
     
-    func saveQEPSWithDateArray(datesValuesArray: [DatedValue]?, saveToMOC: Bool?=true) {
-                
-        guard let datedValues = datesValuesArray else { return }
+//    func saveQEPSWithDateArray(datesValuesArray: [DatedValue]?, saveToMOC: Bool?=true) {
+//
+//        guard let datedValues = datesValuesArray else { return }
+//
+//        let ldv = Labelled_DatedValues(label: "Quarterly EPS", datedValues: datedValues)
+//
+//
+//        var array = [Date: Double]()
+//
+//        for element in datedValues {
+//            array[element.date] = element.value
+//        }
+//
+//        do {
+//            let data = try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
+//            epsDatesq = data
+//
+//            if saveToMOC ?? true {
+//                try self.managedObjectContext?.save()
+//            }
+//        } catch let error {
+//            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
+//        }
         
-        var array = [Date: Double]()
-
-        for element in datedValues {
-            array[element.date] = element.value
-        }
-
-        do {
-            let data = try NSKeyedArchiver.archivedData(withRootObject: array, requiringSecureCoding: false)
-            epsDatesq = data
-            
-            if saveToMOC ?? true {
-                try self.managedObjectContext?.save()
-            }
-        } catch let error {
-            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing stored P/E ratio historical data")
-        }
-        
-    }
+//    }
 
     
-    func historicPEratio(for date: Date) -> Double? {
-        
-        guard let datedValues = peRatiosWithDates() else {
-            return nil
-        }
-        
-        let timesToDate = datedValues.sorted(by: { e0, e1 in
-            if abs(e1.date.timeIntervalSince(date)) < abs(e0.date.timeIntervalSince(date)) { return false }
-            else { return true }
-        })
-
-        let nearest = [timesToDate[0], timesToDate[1]]
-        return nearest.compactMap{ $0.value }.mean()
-    }
+//    func historicPEratio(for date: Date) -> Double? {
+//        
+//        guard let datedValues = peRatiosWithDates() else {
+//            return nil
+//        }
+//        
+//        let timesToDate = datedValues.sorted(by: { e0, e1 in
+//            if abs(e1.date.timeIntervalSince(date)) < abs(e0.date.timeIntervalSince(date)) { return false }
+//            else { return true }
+//        })
+//
+//        let nearest = [timesToDate[0], timesToDate[1]]
+//        return nearest.compactMap{ $0.value }.mean()
+//    }
     
     func historicEPSratio(for date: Date) -> Double? {
         
-        guard let datedValues = epsqTTMWithDates() else {
+        guard let datedValues = annualEPS_TTM_DV() else {
             return nil
         }
         
@@ -279,42 +252,42 @@ public class WBValuation: NSManagedObject {
     }
 
     
-    func minMeanMaxPER(from:Date, to: Date?=nil) -> (Double, Double, Double)? {
-        
-        guard let datedValues = peRatiosWithDates() else {
-            return nil
-        }
-        
-        let end = to ?? Date()
-        
-        let inDateRange = datedValues.filter { (element) -> Bool in
-            if element.date < from { return false }
-            else if element.date > end { return false }
-            return true
-        }
-        
-        let valuesInDateRange = inDateRange.compactMap { $0.value }
-        if let mean = valuesInDateRange.mean() {
-            if let min = valuesInDateRange.min() {
-                if let max = valuesInDateRange.max() {
-                    return (min, mean, max)
-                }
-            }
-        }
-        
-        return nil
-        
-    }
-    
-    func save() {
-        
-       do {
-            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error in WBValuation.save function \(nserror), \(nserror.userInfo)")
-        }
-    }
+//    func minMeanMaxPER(from:Date, to: Date?=nil) -> (Double, Double, Double)? {
+//        
+//        guard let datedValues = peRatiosWithDates() else {
+//            return nil
+//        }
+//        
+//        let end = to ?? Date()
+//        
+//        let inDateRange = datedValues.filter { (element) -> Bool in
+//            if element.date < from { return false }
+//            else if element.date > end { return false }
+//            return true
+//        }
+//        
+//        let valuesInDateRange = inDateRange.compactMap { $0.value }
+//        if let mean = valuesInDateRange.mean() {
+//            if let min = valuesInDateRange.min() {
+//                if let max = valuesInDateRange.max() {
+//                    return (min, mean, max)
+//                }
+//            }
+//        }
+//        
+//        return nil
+//        
+//    }
+//    
+//    func save() {
+//        
+//       do {
+//            try  (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
+//        } catch {
+//            let nserror = error as NSError
+//            fatalError("Unresolved error in WBValuation.save function \(nserror), \(nserror.userInfo)")
+//        }
+//    }
     
     func delete() {
        
@@ -364,54 +337,79 @@ public class WBValuation: NSManagedObject {
     }
 
         
-    public func grossProfitMargins() -> ([Double], [String]?) {
+    func grossProfitMargins() -> ([DatedValue]?, String?) {
         
-        guard revenue != nil && grossProfit != nil else {
-            return ([Double()], ["there are no revenue and/or gross profit data"])
-        }
+        return share!.grossProfitMargins()
         
-        let rawData = [revenue!, grossProfit!]
-        
-        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
-        
-        var margins = [Double]()
-        var errors: [String]?
-        for i in 0..<cleanedData[0].count {
-            margins.append(cleanedData[1][i] / cleanedData[0][i])
-        }
-        
-        if let validError = error {
-            errors = [validError]
-        }
-        return (margins, errors)
+       
+        // OLD
+//        guard revenue != nil && grossProfit != nil else {
+//            return ([Double()], ["there are no revenue and/or gross profit data"])
+//        }
+//
+//        let rawData = [revenue!, grossProfit!]
+//
+//        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+//
+//        var margins = [Double]()
+//        var errors: [String]?
+//        for i in 0..<cleanedData[0].count {
+//            margins.append(cleanedData[1][i] / cleanedData[0][i])
+//        }
+//
+//        if let validError = error {
+//            errors = [validError]
+//        }
+//        return (margins, errors)
     }
     
     public func sgaProportion() -> ([Double], [String]?) {
         
-        guard grossProfit != nil && sgaExpense != nil else {
-            return ([Double()], ["there are no gross profit and/or SGA expense data"])
+        guard let sga = share?.income_statement?.sgaExpense.datedValues(dateOrder: .ascending, oneForEachYear: true), let grossProfit = share?.income_statement?.grossProfit.datedValues(dateOrder: .ascending, oneForEachYear: true) else {
+            return ([Double()], ["there are no gross profit and/or SG&A data"])
         }
         
-        let rawData = [grossProfit!, sgaExpense!]
+        let rawData = [grossProfit, sga]
         
-        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
-        
-        guard cleanedData[0].count == cleanedData[1].count else {
-            return ([Double()], ["insufficient gross profit and SGA expense data"])
+        guard let cleanedData = ValuationDataCleaner.harmonizeDatedValues(arrays: rawData) else {
+            return ([Double()], [#function + " - harmonisation failed"])
         }
-        
-        var margins = [Double]()
-        var errorList: [String]?
-        for i in 0..<cleanedData[0].count {
-            margins.append(cleanedData[1][i] / cleanedData[0][i])
-        }
-        
-        if let validError = error {
-            errorList = [validError]
+ 
+        let grossProfitValues = cleanedData[0].values()
+        let sgaValues = cleanedData[1].values()
+
+        var proportions = [Double]()
+//        var errorList: [String]?
+        for i in 0..<grossProfitValues.count {
+            proportions.append(sgaValues[i] / grossProfitValues[i])
         }
 
+
+        // OLD
+//        guard grossProfit != nil && sgaExpense != nil else {
+//            return ([Double()], ["there are no gross profit and/or SGA expense data"])
+//        }
+//
+//        let rawData = [grossProfit!, sgaExpense!]
+//
+//        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+//
+//        guard cleanedData[0].count == cleanedData[1].count else {
+//            return ([Double()], ["insufficient gross profit and SGA expense data"])
+//        }
+//
+//        var margins = [Double]()
+//        var errorList: [String]?
+//        for i in 0..<cleanedData[0].count {
+//            margins.append(cleanedData[1][i] / cleanedData[0][i])
+//        }
+//
+//        if let validError = error {
+//            errorList = [validError]
+//        }
+
         
-        return (margins, errorList)
+        return (proportions, nil)
 
     }
     
@@ -484,31 +482,53 @@ public class WBValuation: NSManagedObject {
     
     public func rAndDProportion() -> ([Double], [String]?) {
         
-        guard grossProfit != nil && rAndDexpense != nil else {
-            return ([Double()], ["there are no gross profit and/or R&D expense data"])
+        guard let rANDd = share?.income_statement?.rdExpense.datedValues(dateOrder: .ascending, oneForEachYear: true), let grossProfit = share?.income_statement?.grossProfit.datedValues(dateOrder: .ascending, oneForEachYear: true) else {
+            return ([Double()], ["there are no gross profit and/or SG&A data"])
         }
         
-        let rawData = [grossProfit!, rAndDexpense!]
+        let rawData = [grossProfit, rANDd]
         
-        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
-        
-        guard cleanedData[0].count == cleanedData[1].count else {
-            return ([Double()], ["insufficient gross profit and R&D expense data"])
+        guard let cleanedData = ValuationDataCleaner.harmonizeDatedValues(arrays: rawData) else {
+            return ([Double()], [#function + " - harmonisation failed"])
         }
-        
+ 
+        let grossProfitValues = cleanedData[0].values()
+        let rANDdValues = cleanedData[1].values()
+
         var proportions = [Double]()
-        var errorList: [String]?
-        for i in 0..<cleanedData[0].count {
-            proportions.append(cleanedData[1][i] / cleanedData[0][i])
+//        var errorList: [String]?
+        for i in 0..<grossProfitValues.count {
+            proportions.append(rANDdValues[i] / grossProfitValues[i])
         }
+
         
-        if let validError = error {
-            errorList = [validError]
-        }
-        return (proportions, errorList)
+        //
+//        guard grossProfit != nil && rAndDexpense != nil else {
+//            return ([Double()], ["there are no gross profit and/or R&D expense data"])
+//        }
+//
+//        let rawData = [grossProfit!, rAndDexpense!]
+//
+//        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
+//
+//        guard cleanedData[0].count == cleanedData[1].count else {
+//            return ([Double()], ["insufficient gross profit and R&D expense data"])
+//        }
+//
+//        var proportions = [Double]()
+//        var errorList: [String]?
+//        for i in 0..<cleanedData[0].count {
+//            proportions.append(cleanedData[1][i] / cleanedData[0][i])
+//        }
+//
+//        if let validError = error {
+//            errorList = [validError]
+//        }
+        return (proportions, nil)
 
     }
     
+    /*
     public func netIncomeProportion() -> ([Double], [String]?) {
         
         guard revenue != nil && netEarnings != nil else {
@@ -534,41 +554,43 @@ public class WBValuation: NSManagedObject {
         }
         return (proportions, errorList)
     }
+    */
     
     public func longtermDebtProportion() -> ([Double], [String]?) {
         
-        guard debtLT != nil && netEarnings != nil else {
+        guard let ltDebt = share?.balance_sheet?.debt_longTerm.datedValues(dateOrder: .ascending, oneForEachYear: true), let netIncome = share?.income_statement?.netIncome.datedValues(dateOrder: .ascending, oneForEachYear: true) else {
             return ([Double()], ["there are no net income and/or long-term debt data"])
         }
         
-        let rawData = [netEarnings!, debtLT!]
+        let rawData = [netIncome, ltDebt]
         
-        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
-        
-        guard cleanedData[0].count == cleanedData[1].count else {
-            return ([Double()], ["insufficient net income and long-term debt data"])
+        guard let cleanedData = ValuationDataCleaner.harmonizeDatedValues(arrays: rawData) else {
+            return ([Double()], ["harmonisation failed"])
         }
-        
+ 
+        let netIncomeValues = cleanedData[0].values()
+        let ltDebtvalues = cleanedData[1].values()
+
         var proportions = [Double]()
         var errorList: [String]?
-        for i in 0..<cleanedData[0].count {
-            if cleanedData[0][i] > 0 {
-                proportions.append(cleanedData[1][i] / cleanedData[0][i])
+        for i in 0..<netIncomeValues.count {
+            if netIncomeValues[i] > 0 {
+                proportions.append(ltDebtvalues[i] / netIncomeValues[i])
             }
             else {
                 proportions.append(Double())
-                if cleanedData[1][i] > 0 {
+                if ltDebtvalues[i] > 0 {
                     errorList = ["company made losses and had long term debt!"]
                 }
             }
         }
         
-        if let validError = error {
-            if errorList == nil {
-                errorList = [String]()
-            }
-            errorList!.append(validError)
-        }
+//        if let validError = error {
+//            if errorList == nil {
+//                errorList = [String]()
+//            }
+//            errorList!.append(validError)
+//        }
         return (proportions, errorList)
 
     }
@@ -862,11 +884,11 @@ public class WBValuation: NSManagedObject {
             return 0
         }
         
-        guard !(validShare.peRatio <= 0) else {
+        guard !(validShare.peRatio_current <= 0) else {
             return 0
         }
         
-        return ((40 - (abs(validShare.peRatio) > 40 ? 40.0 : validShare.peRatio)) / 40)
+        return ((40 - (abs(validShare.peRatio_current) > 40 ? 40.0 : validShare.peRatio_current)) / 40)
     }
     
     /// for 'higherIsBetter' values; for 'higherIsWorse' use inverseValueFactor()
@@ -963,109 +985,123 @@ public class WBValuation: NSManagedObject {
     }
     
     /// [precent, price] as [Double?, Double?]
-    public func bookValuePerPrice() -> [Double?]? {
-        
-        guard let validShare = share else {
-            return nil
-        }
-
-        
-        let lastStockPrice =  validShare.getDailyPrices()?.last?.close //stock.dailyPrices.last?.close
-        if let valid = bvps?.first {
-            if lastStockPrice != nil {
-                let percent = valid / lastStockPrice!
-                let price = valid
-                return [percent, price]
-            }
-        }
-        
-        return nil
-
-    }
+//    public func bookValuePerPrice() -> [Double?]? {
+//        
+//        guard let validShare = share else {
+//            return nil
+//        }
+//
+//        
+//        let lastStockPrice =  validShare.getDailyPrices()?.last?.close //stock.dailyPrices.last?.close
+//        if let valid = bvps?.first {
+//            if lastStockPrice != nil {
+//                let percent = valid / lastStockPrice!
+//                let price = valid
+//                return [percent, price]
+//            }
+//        }
+//        
+//        return nil
+//
+//    }
     
-    public func lynchRatio() -> Double? {
+    public func lynchRatio() -> ([String]?, Double?) {
         
-        guard let validShare = share else {
-            return nil
+        if share != nil {
+            return share!.lynchRatio()
+        } else {
+            return (nil, nil)
         }
         
-        if let earningsGrowth = netEarnings?.growthRates()?.mean() { // ema(periods: emaPeriod)
-            // use 10 y sums / averages, not ema according to Book Ch 51
-            let denominator = earningsGrowth * 100 + validShare.divYieldCurrent * 100
-            if validShare.peRatio > 0 {
-                return (denominator / validShare.peRatio)
-            }
-        }
+//        guard let validShare = share else {
+//            return nil
+//        }
+//
+//        guard let divYield = validShare.key_stats?.dividendYield.valuesOnly(dateOrdered: .ascending)?.last else { return nil }
+//
+//        guard let currentPE = validShare.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending)?.last else { return nil }
+//
+//        if let earningsGrowth = validShare.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending)?.growthRates()?.mean() { // ema(periods: emaPeriod)
+//            // use 10 y sums / averages, not ema according to Book Ch 51
+//            let denominator = earningsGrowth * 100 + divYield * 100
+//            if currentPE > 0 {
+//                return (denominator / currentPE)
+//            }
+//        }
+
         
-        return nil
+//        if let earningsGrowth = netEarnings?.growthRates()?.mean() { // ema(periods: emaPeriod)
+//            // use 10 y sums / averages, not ema according to Book Ch 51
+//            let denominator = earningsGrowth * 100 + validShare.divYieldCurrent * 100
+//            if validShare.peRatio_current > 0 {
+//                return (denominator / validShare.peRatio_current)
+//            }
+//        }
+        
+//        return nil
 
     }
     
     public func ivalue() -> (Double?, [String] ){
         
+        // latest Price
+        // latest pe ratio
+        // net income
+        // eps
+        
         guard let price = share?.getDailyPrices()?.last?.close else {
-            return (nil, ["no current price available for \(company!)"])
+            return (nil, ["no current price available for \(share?.symbol ?? "missing symbol")"])
         }
         
         guard price > 0 else {
-            return (nil, ["current price for \(company!) = 0"])
+            return (nil, ["current price for \(share?.symbol ?? "missing symbol") = 0"])
         }
               
         
-        guard (share?.peRatio ?? 0) > 0 else {
-            return (nil, ["P/E ratio for \(company!) is negative \(share!.peRatio)"])
+        guard let latestPERDV = share?.ratios?.pe_ratios.datedValues(dateOrder: .ascending)?.dropZeros().last else {
+            return (nil, ["latest P/E ratio for \(share?.symbol ?? "missing symbol") is missing"])
+        }
+        
+        guard latestPERDV.value > 0 else {
+            return (nil, ["latest P/E ratio for \(share?.symbol ?? "missing symbol") is negative"])
+        }
+        
+        
+        guard let incomeDV = share?.income_statement?.netIncome.datedValues(dateOrder: .ascending) else {
+            return (nil, ["Missing net income for \(company!)"])
         }
         
         var errors = [String]()
-//        var epsGrowthRates = netEarnings?.growthRates()?.excludeQuartiles()
-//        if epsGrowthRates == nil {
-//            errors.append("can't calculate earnigs growth rates; trying EPS growth rates instead")
-//            epsGrowthRates = eps?.growthRates()
-//            if epsGrowthRates == nil {
-//                errors.append("can't calculate EPS growth rates either")
-//                return (nil, errors)
-//            }
-//        }
-//
-//        guard let meanEPSGrowth = epsGrowthRates?.mean() else {
-//            errors.append("can't calculate mean EPS growth rate")
-//            return (nil, errors)
-//        }
+
+        if latestPERDV.date.timeIntervalSinceNow > 365*24*3600/4 {
+            let date$ = dateFormatter.string(from: latestPERDV.date)
+            errors.append("latest P/E ratio is from \(date$)")
+        }
         
-        let epsGrowthRates = Calculator.compoundGrowthRates(values: netEarnings) //netEarnings?.growthRates() // compoundGrowth??!
-        guard let meanEPSGrowth = epsGrowthRates?.median() else {
+        let incomeGrowthRateDVs = incomeDV.growthRates(dateOrder: .ascending)
+        guard let meanEPSGrowth = incomeGrowthRateDVs?.compactMap({ $0.value }).median() else {
             errors.append("can't calculate median EPS growth rate")
             return (nil, errors)
         }
-
-        var years = [Double]()
-        for i in 0..<(epsGrowthRates?.count ?? 0) {
-            years.append(Double(epsGrowthRates!.count - i))
-        }
-        let correlation = Calculator.correlation(xArray: years, yArray: epsGrowthRates)
+        let correlation = Calculator.correlationDatesToValues(array: incomeGrowthRateDVs)
         if let r2 = correlation?.r2() {
-            if r2 < 0.5 {
-                errors.append("highly variable past earnings growth rates. Resulting intrinsic value is unreliable")
+            if r2 < 0.64 {
+                let r2$ = percentFormatter2Digits.string(from: r2 as NSNumber) ?? "?"
+                errors.append("highly variable past earnings growth rates, R2 \(r2$). Resulting intrinsic value is unreliable")
 
             }
         }
         
-//        if let stdVariation = epsGrowthRates?.stdVariation() {
-//            if (stdVariation / meanEPSGrowth) > 1.0 {
-//                errors.append("highly variable past earnings growth rates. Resulting intrinsic value is unreliable")
-//            }
-//        }
-        
-        guard eps?.first != nil else {
+        guard let latestEPS = share?.income_statement?.eps_annual.valuesOnly(dateOrdered: .descending)?.first else {
             return (nil, ["iValue lacks EPS values"])
         }
         
-        let futureEPS = Calculator.futureValue(present: eps!.first!, growth: meanEPSGrowth, years: 10.0)
+        let futureEPS = Calculator.futureValue(present: latestEPS, growth: meanEPSGrowth, years: 10.0)
         
         let discountRate = UserDefaults.standard.value(forKey: UserDefaultTerms().longTermCoporateInterestRate) as? Double ?? 0.021
         let discountedCurrentEPS = Calculator.presentValue(growth: discountRate, years: 10.0, endValue: futureEPS)
         let dcCurrentEPSReturn = discountedCurrentEPS / price
-        let ivalue = dcCurrentEPSReturn * share!.peRatio
+        let ivalue = dcCurrentEPSReturn * latestPERDV.value
         
         
         return (ivalue, errors)
@@ -1079,6 +1115,22 @@ public class WBValuation: NSManagedObject {
         
         return nil
     }
+    
+    func addIntrinsicValueTrend(date: Date, value: Double) {
+        
+        var existingTrendDv = intrinsicValueTrend.datedValues(dateOrder: .ascending)
+        
+        if let latest = existingTrendDv?.last?.date {
+            if date.timeIntervalSince(latest) > (365/12 * 24 * 3600) {
+                existingTrendDv?.append((DatedValue(date: date, value: value)))
+                intrinsicValueTrend = existingTrendDv?.convertToData()
+            }
+        }
+        else {
+            intrinsicValueTrend = [DatedValue(date: date, value: value)].convertToData()
+        }
+    }
+
 
 
 }

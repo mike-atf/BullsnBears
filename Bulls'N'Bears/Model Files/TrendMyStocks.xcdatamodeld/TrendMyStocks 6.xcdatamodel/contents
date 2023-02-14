@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="18154" systemVersion="20E241" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21279" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="CompanyNews" representedClassName="CompanyNews" syncable="YES">
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="newsText" optional="YES" attributeType="String"/>
@@ -52,7 +52,7 @@
         <attribute name="dailyPrices" optional="YES" attributeType="Binary"/>
         <attribute name="divYieldCurrent" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="employees" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="eps" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="eps_current" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="growthSubType" optional="YES" attributeType="String"/>
         <attribute name="growthType" optional="YES" attributeType="String"/>
         <attribute name="industry" optional="YES" attributeType="String"/>
@@ -61,7 +61,7 @@
         <attribute name="macd" optional="YES" attributeType="Binary"/>
         <attribute name="name_long" optional="YES" attributeType="String"/>
         <attribute name="name_short" optional="YES" attributeType="String"/>
-        <attribute name="peRatio" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="peRatio_current" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="purchaseStory" optional="YES" attributeType="String"/>
         <attribute name="sector" optional="YES" attributeType="String"/>
         <attribute name="symbol" optional="YES" attributeType="String"/>
@@ -124,13 +124,4 @@
         <relationship name="share" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Share" inverseName="wbValuation" inverseEntity="Share"/>
         <relationship name="userEvaluations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserEvaluation" inverseName="wbValuation" inverseEntity="UserEvaluation"/>
     </entity>
-    <elements>
-        <element name="CompanyNews" positionX="-225" positionY="-90" width="128" height="74"/>
-        <element name="DCFValuation" positionX="-443.6231079101562" positionY="-30.79808044433594" width="128" height="313"/>
-        <element name="Rule1Valuation" positionX="-194.4807128906249" positionY="573.2761535644531" width="128" height="314"/>
-        <element name="Share" positionX="-233.677978515625" positionY="114.121826171875" width="128" height="404"/>
-        <element name="StockResearch" positionX="-200.3316650390625" positionY="-256.4151153564453" width="128" height="254"/>
-        <element name="UserEvaluation" positionX="187.350341796875" positionY="352.4636840820313" width="128" height="148"/>
-        <element name="WBValuation" positionX="-37.604248046875" positionY="-7.48974609375" width="128" height="374"/>
-    </elements>
 </model>

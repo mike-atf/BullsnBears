@@ -86,18 +86,21 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var refreshControl: UIRefreshControl!
     
     var searchController: UISearchController?
+    
+    var progressView: DownloadProgressView?
+    var allDownloadTasks = 0
+    var completedDownloadTasks = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.register(UINib(nibName: "StockListCellTableViewCell", bundle: nil), forCellReuseIdentifier: "stockListCell")
         
-//        NotificationCenter.default.addObserver(self, selector: #selector(filesReceivedInBackground(notification:)), name: Notification.Name(rawValue: "NewFilesArrived"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(userChangedValuationWeights), name: Notification.Name(rawValue: "userChangedValuationWeights"), object: nil)
         
-//        NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded(_:)), name: Notification.Name(rawValue: "FileDownloadComplete"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateShares), name: Notification.Name(rawValue: "ActivatedFromBackground"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateSingleShare(notification:)), name: Notification.Name(rawValue: "SingleShareUpdateRequest"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(saveCurrency(notification:)), name: Notification.Name(rawValue: "CurrencyFound"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(downloadEnded(notification:)), name: Notification.Name(rawValue: "DownloadEnded"), object: nil) // called after new share created and dta downloads finished on a background thread. TVC UI nneds updating on the man thread, which this notification should action
         
         controller.delegate = self
@@ -112,12 +115,14 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.refreshControl = UIRefreshControl()
         tableView.refreshControl?.addTarget(self, action: #selector(updateShares), for: .valueChanged)
         
+        
+        
         if controller.fetchedObjects?.count ?? 0 > 0 {
             if tableView.indexPathForSelectedRow == nil {
                 tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: .none)
             }
             performSegue(withIdentifier: "showChartSegue", sender: nil)
-            updateShares() //call here NOT necessary as TVC acts as observer to "ActivatedFromBackground" even if launching (?)
+            updateShares()
         }
         else {
             showWelcomeView()
@@ -130,6 +135,11 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         searchController?.searchBar.delegate = self
         navigationItem.searchController = searchController
         definesPresentationContext = true
+        
+//        print("update model...")
+//        UpdateManager.updateModelData(shares: controller.fetchedObjects)
+//        UpdateManager.transferValuationTrendData(shares: controller.fetchedObjects)
+//        print("... model updated")
         
     }
     
@@ -155,26 +165,11 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC
-        
-//        for share in controller.fetchedObjects ?? [] {
-//            
-//                if share.watchStatus == 2 {
-//                    print("\(String(describing: share.symbol)) is \(share.watchStatus)")
-//                    share.watchStatus = 3
-//                    print("\(String(describing: share.symbol)) changed to \(share.watchStatus)")
-//                    do {
-//                        try share.managedObjectContext?.save()
-//                    } catch {
-//                        ErrorController.addInternalError(errorLocation: #function, systemError: error as NSError, errorInfo: "can;t save")
-//                    }
-//                }
-//
-//        }
-        
+//        wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC
+                
     }
     
-
+    /*
     func deleteOldDCFValuations() {
         
         let fetchRequest = NSFetchRequest<DCFValuation>(entityName: "DCFValuation")
@@ -194,7 +189,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         
     }
-
+    */
+    
     @objc
     func updateShares() {
                 
@@ -300,7 +296,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
         
         
-// 2 correct short- and long company names
+        // 2 correct short- and long company names
         var longName: String?
         var shortName: String?
         if let dictionary = stockTickerDictionary {
@@ -345,32 +341,51 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         newShare.creationDate = Date()
         newShare.dailyPrices = newShare.convertDailyPricesToData(dailyPrices: validPricePoints)
         
-        newShare.wbValuation = WBValuationController.returnWBValuations(share: newShare)
-        newShare.wbValuation?.date = Date().addingTimeInterval(-(controller.renewInterval+1))
-        newShare.dcfValuation = CombinedValuationController.returnDCFValuations(company: newShare.symbol!)
-        newShare.dcfValuation?.creationDate = Date().addingTimeInterval(-(controller.renewInterval+1))
-        newShare.rule1Valuation = CombinedValuationController.returnR1Valuations(company: newShare.symbol)
-        newShare.rule1Valuation?.creationDate = Date().addingTimeInterval(-(controller.renewInterval+1))
-        newShare.research = StockResearch(context: moc)
-        newShare.research?.share = newShare
-        newShare.research?.creationDate = Date()
+        let macds = newShare.calculateMACDs(shortPeriod: 8, longPeriod: 17)
+        newShare.macd = newShare.convertMACDToData(macds: macds)
+        
+//        newShare.wbValuation = WBValuationController.returnWBValuations(share: newShare)
+//        newShare.wbValuation?.date = Date().addingTimeInterval(-(controller.renewInterval+1))
+//        newShare.dcfValuation = CombinedValuationController.returnDCFValuations(company: newShare.symbol!)
+//        newShare.dcfValuation?.creationDate = Date().addingTimeInterval(-(controller.renewInterval+1))
+//        newShare.rule1Valuation = CombinedValuationController.returnR1Valuations(company: newShare.symbol)
+//        newShare.rule1Valuation?.creationDate = Date().addingTimeInterval(-(controller.renewInterval+1))
+//        newShare.research = StockResearch(context: moc)
+//        newShare.research?.share = newShare
+//        newShare.research?.creationDate = Date()
 
         do {
-            try newShare.managedObjectContext?.save()
+            try newShare.managedObjectContext?.save() // TODO: - does this refresh to UI/TVC??
         } catch {
             ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "failure trying to save new share in mainthread MOC")
         }
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(receivedISINandCurrencyInfo(notification: )), name: Notification.Name(rawValue: "ISIN and CURRENCY INFO"), object: nil)
+//
+//        NotificationCenter.default.addObserver(self, selector: #selector(receivedISINandCurrencyInfo(notification: )), name: Notification.Name(rawValue: "ISIN and CURRENCY INFO"), object: nil)
 
 // 4 slower download tasks for more data do on a background thread, using NSManagedObjectID
         let newShareID = newShare.objectID
         
+        progressView = DownloadProgressView.instanceFromNib()
+        progressView?.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(progressView!)
+        
+        let margins = view.layoutMarginsGuide
+
+        progressView?.widthAnchor.constraint(equalTo: margins.widthAnchor, multiplier: 0.8).isActive = true
+        progressView?.centerXAnchor.constraint(equalTo: margins.centerXAnchor).isActive = true
+        progressView?.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.2).isActive = true
+        progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+
+        progressView?.delegate = self
+        progressView?.title.text = "Downloading \(newShare.symbol ?? "no symbol")..."
+
+//        controller?.downloadWBValuationData()
+        
         // then pass shareID to background process to get all other details. Creating the share in a background task fails to trigger FRC didChange function, so will not make the new share visible right away.
         Task.init() {
             do {
-                try await WebPageScraper2.keyratioDownloadAndSave(shareSymbol: symbol, shortName: newShare.name_short, shareID: newShareID)
-                try await controller.getDataForNewShare(objectID: newShareID, url: url, symbol: symbol)
+                try await controller.getDataForNewShare(objectID: newShareID, url: url, symbol: symbol, progressDelegate: self)
+                
                         DispatchQueue.main.async {
                             do {
                                 try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
@@ -378,13 +393,13 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                                 ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Failure to save main background context after creating new share on background context")
                             }
                             
-                            if let indexPath = self.controller.indexPath(forObject: newShare) {
-                                self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                                self.performSegue(withIdentifier: "showChartSegue", sender: nil)
-
-                            } else {
-                                self.tableView.reloadData()
-                            }
+//                            if let indexPath = self.controller.indexPath(forObject: newShare) {
+//                                self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+//                                self.performSegue(withIdentifier: "showChartSegue", sender: nil)
+//
+//                            } else {
+//                                self.tableView.reloadData()
+//                            }
                        }
 
             } catch {
@@ -421,6 +436,13 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @objc
     func downloadEnded(notification: Notification) {
         
+        let moc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        do {
+            try moc.save()
+        } catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Stocks list TVC moc save error after download ended")
+        }
+        
         if let shareID = notification.object as? NSManagedObjectID {
             if let share = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: shareID) as? Share {
                 if let indexPath = controller.indexPath(forObject: share) {
@@ -428,11 +450,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                         self.tableView.reloadRows(at: [indexPath], with: .automatic)
                     }
                 }
-                else {
-                    print("can't find indexPath for \(share.symbol!)")
-                    print()
-                }
-            }
+           }
         } else {
             DispatchQueue.main.async {
                 self.tableView.reloadData()
@@ -445,6 +463,23 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         tableView.reloadData()
     }
     
+    @objc
+    func saveCurrency(notification: Notification) {
+        
+        if let symbol = notification.userInfo?["symbol"] as? String {
+            if let currency = notification.object as? String {
+                //TODO: - this always thorws error
+                if let share = controller.fetchShare(symbol: symbol) {
+                    share.currency = currency
+                    do {
+                        try share.managedObjectContext?.save()
+                    } catch {
+                        ErrorController.addInternalError(errorLocation: #function, systemError: error)
+                    }
+                }
+            }
+        }
+    }
     
     // MARK: - TableView functions
     
@@ -614,6 +649,8 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
 
         DispatchQueue.main.async {
+            
+            self.wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC
                         
             self.wbValuationView?.share = self.controller.object(at: indexPath)
             self.wbValuationView?.fromIndexPath = indexPath
@@ -762,34 +799,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 }
 
 extension StocksListTVC: SortDelegate {
-    
-    /*
-    func addNewShare(symbol: String, prices: [PricePoint]?) {
-        
-        Task {
-            do {
-                try await controller.newShare(from: nil, with: prices, symbol: symbol)  // createShare(with: prices, symbol: symbol)
-//                    try (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.save()
-//
-//                    Task.init(priority: .background) {
-//                        try await controller.downloadProfile(symbol: share.symbol!, shareID: share.objectID)
-//                    }
 
-                    tableView.reloadData()
-//                    if let indexPath = controller.indexPath(forObject: share) {
-//                        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-//                        performSegue(withIdentifier: "showChartSegue", sender: nil)
-//                    } else {
-//                        print("indexpath for new shre not found")
-//                    }
-
-            } catch let error {
-                ErrorController.addInternalError(errorLocation: #file + #function, systemError: nil, errorInfo: "Failure to add new share from pricepoint data \(symbol) \(error)")
-            }
-        }
-                
-    }
-    */
     
     func sortParameterChanged() {
         
@@ -863,12 +873,12 @@ extension StocksListTVC: SortDelegate {
 
 extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
     
-    func shareUpdateComplete(atPath: IndexPath) {
+    func singleShareUpdateComplete(atPath: IndexPath) {
                 
         // only these two steps seem to be able to move changes saved to background moc to mainThread moc
         let share = controller.object(at: atPath)
         let _ = share.getDailyPrices(needRecalcDueToNew: true)
-        let _ = share.wbValuation?.epsQWithDates()
+//        let _ = share.wbValuation?.epsQWithDates()
         
         if navigationController?.visibleViewController == self {
             tableView.reloadRows(at: [atPath], with: .none)
@@ -1033,6 +1043,7 @@ extension StocksListTVC: UISearchBarDelegate, UISearchResultsUpdating, UISearchC
         self.navigationItem.leftBarButtonItem?.isEnabled = true
         tableView.reloadData()
         controller.delegate = self
+        
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -1048,7 +1059,86 @@ extension StocksListTVC: UISearchBarDelegate, UISearchResultsUpdating, UISearchC
         searchController?.isActive = false
         
     }
+}
 
+extension StocksListTVC: ProgressViewDelegate {
     
+    var completedTasks: Int {
+        get {
+            self.completedDownloadTasks
+        }
+        set (newValue) {
+            self.completedDownloadTasks = newValue
+        }
+    }
+    
+    
+    func taskCompleted() {
+        completedTasks += 1
+        if allDownloadTasks < completedTasks {
+            completedTasks = allDownloadTasks
+        }
+        
+        self.progressUpdate(allTasks: allDownloadTasks, completedTasks: completedTasks)
+    }
+    
+    var allTasks: Int {
+        get {
+            return allDownloadTasks
+        }
+        set (newValue) {
+            allDownloadTasks = newValue
+        }
+    }
+
+    func downloadError(error: String) {
+        
+//        allDownloadTasks -= 1
+        completedTasks += 1
+        self.progressUpdate(allTasks: allDownloadTasks, completedTasks: completedTasks)
+
+        DispatchQueue.main.async {
+            self.progressView?.title.font = UIFont.systemFont(ofSize: 14)
+            self.progressView?.title.text = error
+            self.progressView?.cancelButton.setTitle("OK", for: .normal)
+        }
+    }
+    
+    func progressUpdate(allTasks: Int, completedTasks: Int) {
+        DispatchQueue.main.async {
+            self.progressView?.updateProgress(tasks: allTasks, completed: completedTasks)
+            if completedTasks >= allTasks {
+                self.downloadComplete()
+            }
+        }
+    }
+    
+    func cancelRequested() {
+        DispatchQueue.main.async {
+//            self.controller?.stopDownload()
+            self.progressView?.delegate = nil
+            self.progressView?.removeFromSuperview()
+            self.progressView = nil
+        }
+    }
+    
+    func downloadComplete() {
+        
+        DispatchQueue.main.async {
+            self.progressView?.delegate = nil
+            self.progressView?.removeFromSuperview()
+            self.progressView = nil
+//            self.controller?.updateData()
+            self.tableView.reloadData()
+            
+            let moc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+            do {
+                try moc.save()
+            } catch {
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Stocks list TVC moc save error after download completed")
+            }
+        }
+        
+    }
 }
 

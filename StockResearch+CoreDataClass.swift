@@ -124,7 +124,6 @@ public class StockResearch: NSManagedObject {
             ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error retrieving research share price predictions")
         }
 
-        1
         // OLD
 //        if let predictions = self.pricePredictions {
 //
