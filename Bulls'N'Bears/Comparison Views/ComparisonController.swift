@@ -154,9 +154,9 @@ class ComparisonController {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if share.peRatio_current != 0 {
-                        text = numberFormatterWith1Digit.string(from: share.peRatio_current as NSNumber) ?? "-"
-                        color = findCategoryColor(biggerIsBetter: true, consistency: 100.0 - share.peRatio_current, growth: 1.0, primaryGreenCutoff: 90, primaryRedCutOff: 60)
+                    if let per = share.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+                        text = numberFormatterWith1Digit.string(from: per as NSNumber) ?? "-"
+                        color = findCategoryColor(biggerIsBetter: true, consistency: 100.0 - per, growth: 1.0, primaryGreenCutoff: 90, primaryRedCutOff: 60)
 //                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 10000, value: share.peRatio, greenCutoff: 40, redCutOff: 0)
                     }
                     texts.append(text)
@@ -210,14 +210,14 @@ class ComparisonController {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if let retE = share.wbValuation?.equityRepurchased { // MT.com row-based data are stored in time-DESCENDING order
+                    if let retE = share.balance_sheet?.retained_earnings.valuesOnly(dateOrdered: .descending, withoutZeroes: true) { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = retE.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
                                 color = UIColor.systemRed
                             }
                             else {
-                                let cGrowth = Calculator.compoundGrowthRates(values: retE)
+                                let cGrowth = retE.growthRates(dateOrder: .descending)
                                 if let ema = cGrowth?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
                                     color = findCategoryColor(biggerIsBetter: true, consistency: ema, growth: 1.0, secondaryGreenCutoff: 0.15, secondaryRedCutOff: 0.0)
@@ -233,14 +233,14 @@ class ComparisonController {
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if let values = share.wbValuation?.revenue { // MT.com row-based data are stored in time-DESCENDING order
+                    if let values = share.income_statement?.revenue.valuesOnly(dateOrdered: .descending,withoutZeroes: true) {
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
                                 color = UIColor.systemRed
                             }
                             else {
-                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
+                                if let ema = values.growthRates(dateOrder: .descending)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
                                     color = findCategoryColor(biggerIsBetter: true, consistency: ema, growth: 1.0, secondaryGreenCutoff: 0.15, secondaryRedCutOff: 0.0)
 //                                   color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0, redCutOff: 0)
@@ -255,14 +255,14 @@ class ComparisonController {
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if let values = share.wbValuation?.netEarnings { // MT.com row-based data are stored in time-DESCENDING order
+                    if let values = share.income_statement?.netIncome.valuesOnly(dateOrdered: .descending, withoutZeroes: true) { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
                                 color = UIColor.systemRed
                             }
                             else {
-                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
+                                if let ema = values.growthRates(dateOrder: .descending)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
                                     color = findCategoryColor(biggerIsBetter: true, consistency: ema, growth: 1.0, secondaryGreenCutoff: 0.15, secondaryRedCutOff: 0.0)
 //                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: ema, greenCutoff: 0, redCutOff: 0)
@@ -277,14 +277,14 @@ class ComparisonController {
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if let values = share.wbValuation?.opCashFlow { // MT.com row-based data are stored in time-DESCENDING order
+                    if let values = share.cash_flow?.opCashFlow.valuesOnly(dateOrdered: .descending, withoutZeroes: true) { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
                                 color = UIColor.systemRed
                             }
                             else {
-                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
+                                if let ema = values.growthRates(dateOrder: .descending)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
                                     color = findCategoryColor(biggerIsBetter: true, consistency: ema, growth: 1.0, secondaryGreenCutoff: 0.15, secondaryRedCutOff: 0.0)
 //                                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: ema, greenCutoff: 0.15, redCutOff: 0.0)
@@ -299,14 +299,14 @@ class ComparisonController {
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if let values = share.wbValuation?.grossProfit { // MT.com row-based data are stored in time-DESCENDING order
+                    if let values = share.income_statement?.grossProfit.valuesOnly(dateOrdered: .descending, withoutZeroes: true) { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
                                 color = UIColor.systemRed
                             }
                             else {
-                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
+                                if let ema = values.growthRates(dateOrder: .descending)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
                                     color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 40, value: ema, greenCutoff: 0.0, redCutOff: 0.0)
                                 }
@@ -320,14 +320,14 @@ class ComparisonController {
             else if forPath.row == 5 {
                 for share in  shares ?? [] {
                     var text = "-"
-                    if let values = share.wbValuation?.eps { // MT.com row-based data are stored in time-DESCENDING order
+                    if let values = share.income_statement?.eps_annual.valuesOnly(dateOrdered: .descending, withoutZeroes: true) { // MT.com row-based data are stored in time-DESCENDING order
                         if let lastRetEarnings = values.first {
                             if lastRetEarnings < 0 {
                                 text = "last neg."
                                 color = UIColor.systemRed
                             }
                             else {
-                                if let ema = Calculator.compoundGrowthRates(values: values)?.ema(periods: 7) {
+                                if let ema = values.growthRates(dateOrder: .descending)?.ema(periods: 7) {
                                     text = percentFormatter0Digits.string(from: ema as NSNumber) ?? "-"
                                     color = ema > 0 ? GradientColorFinder.greenGradientColor() : GradientColorFinder.redGradientColor()
                                 }
@@ -358,42 +358,42 @@ class ComparisonController {
         if forPath.section == 3 {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.equityRepurchased,cutOffGreen: 0.15, cutOffRed: 0.00)
+                    let (texts, textColor) = singleFinancialText(values: share.balance_sheet?.retained_earnings.valuesOnly(dateOrdered: .ascending),cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.revenue, cutOffGreen: 0.15, cutOffRed: 0.00)
+                    let (texts, textColor) = singleFinancialText(values: share.income_statement?.revenue.valuesOnly(dateOrdered: .ascending), cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.netEarnings,cutOffGreen: 0.15, cutOffRed: 0.00)
+                    let (texts, textColor) = singleFinancialText(values: share.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending,withoutZeroes: true),cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.opCashFlow, cutOffGreen: 0.15, cutOffRed: 0.00)
+                    let (texts, textColor) = singleFinancialText(values: share.cash_flow?.opCashFlow.valuesOnly(dateOrdered: .ascending,withoutZeroes: true), cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.grossProfit, cutOffGreen: 0.15, cutOffRed: 0.00)
+                    let (texts, textColor) = singleFinancialText(values: share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending, withoutZeroes: true), cutOffGreen: 0.15, cutOffRed: 0.00)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 5 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.eps, cutOffGreen: 0.15, cutOffRed: 0.0)
+                    let (texts, textColor) = singleFinancialText(values: share.income_statement?.eps_annual.valuesOnly(dateOrdered: .ascending,withoutZeroes: true), cutOffGreen: 0.15, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
@@ -402,14 +402,14 @@ class ComparisonController {
         else if forPath.section == 4 {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.grossProfit, cutOffGreen: 0.05, cutOffRed: 0.0)
+                    let (texts, textColor) = twoFinancialsText(values0: share.income_statement?.revenue.valuesOnly(dateOrdered: .ascending), values1: share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending), cutOffGreen: 0.05, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 1 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.revenue, values1: share.wbValuation?.netEarnings, cutOffGreen: 0.05, cutOffRed: 0.0)
+                    let (texts, textColor) = twoFinancialsText(values0: share.income_statement?.revenue.valuesOnly(dateOrdered: .ascending), values1: share.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending), cutOffGreen: 0.05, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
@@ -418,21 +418,21 @@ class ComparisonController {
         else if forPath.section == 5 { // outgoings - positive increase = BAD
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.rule1Valuation?.roic, cutOffGreen: 0.10, cutOffRed: 0.0)
+                    let (texts, textColor) = singleFinancialText(values: share.ratios?.roi.valuesOnly(dateOrdered: .ascending,withoutZeroes: true), cutOffGreen: 0.10, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             if forPath.row == 1 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.roe, cutOffGreen: 0.10, cutOffRed: 0.0)
+                    let (texts, textColor) = singleFinancialText(values: share.ratios?.roe.valuesOnly(dateOrdered: .ascending,withoutZeroes: true), cutOffGreen: 0.10, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             if forPath.row == 2 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.roa, cutOffGreen: 0.10, cutOffRed: 0.0)
+                    let (texts, textColor) = singleFinancialText(values: share.ratios?.roa.valuesOnly(dateOrdered: .ascending,withoutZeroes: true), cutOffGreen: 0.10, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
@@ -441,7 +441,7 @@ class ComparisonController {
         else if forPath.section == 6 {
             if forPath.row == 0 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.netEarnings, values1: share.wbValuation?.debtLT, biggerIsBetter: false, cutOffGreen: 0.0, cutOffRed: 0.0)
+                    let (texts, textColor) = twoFinancialsText(values0: share.income_statement?.netIncome.valuesOnly(dateOrdered: .descending), values1: share.balance_sheet?.debt_longTerm.valuesOnly(dateOrdered: .descending), biggerIsBetter: false, cutOffGreen: 0.0, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
@@ -457,21 +457,21 @@ class ComparisonController {
             }
             else if forPath.row == 2 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = singleFinancialText(values: share.wbValuation?.capExpend, growthCutOffRate: 0.0, biggerIsBetter: false, cutOffGreen: 0.0, cutOffRed: 0.0)
+                    let (texts, textColor) = singleFinancialText(values: share.cash_flow?.capEx.valuesOnly(dateOrdered: .ascending), growthCutOffRate: 0.0, biggerIsBetter: false, cutOffGreen: 0.0, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 3 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.grossProfit, values1: share.wbValuation?.sgaExpense, biggerIsBetter: false, cutOffGreen: 0, cutOffRed: 0.0)
+                    let (texts, textColor) = twoFinancialsText(values0: share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending), values1: share.income_statement?.sgaExpense.valuesOnly(dateOrdered: .ascending), biggerIsBetter: false, cutOffGreen: 0, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
             }
             else if forPath.row == 4 {
                 for share in  shares ?? [] {
-                    let (texts, textColor) = twoFinancialsText(values0: share.wbValuation?.grossProfit, values1: share.wbValuation?.rAndDexpense, biggerIsBetter: false, cutOffGreen: 0, cutOffRed: 0.0)
+                    let (texts, textColor) = twoFinancialsText(values0: share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending), values1: share.income_statement?.rdExpense.valuesOnly(dateOrdered: .ascending), biggerIsBetter: false, cutOffGreen: 0, cutOffRed: 0.0)
                     finStrings.append(texts)
                     colors.append(textColor)
                 }
@@ -553,15 +553,15 @@ class ComparisonController {
         return categoryColor
     }
 
-    func lastestDataDate(forPath: IndexPath) -> Date? {
-        
-        guard forPath.section > 2 else {
-            return nil
-        }
-
-        return shares?[forPath.section].wbValuation?.latestDataDate
-        
-    }
+//    func lastestDataDate(forPath: IndexPath) -> Date? {
+//
+//        guard forPath.section > 2 else {
+//            return nil
+//        }
+//
+//        return shares?[forPath.section].wbValuation?.latestDataDate
+//
+//    }
     
     func valuationDate(forPath: IndexPath) -> Date? {
         
@@ -586,7 +586,7 @@ class ComparisonController {
         if forPath.section == 3 {
             if forPath.row == 0 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.equityRepurchased)
+                    valueArray.append(share.balance_sheet?.retained_earnings.valuesOnly(dateOrdered: .descending))
 //                    let proportions = proportions(values: [share.wbValuation?.equityRepurchased])
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.equityRepurchased)
 //                    valueArray.append(cpGrowth)
@@ -595,7 +595,7 @@ class ComparisonController {
             }
             else if forPath.row == 1 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.revenue)
+                    valueArray.append(share.income_statement?.revenue.valuesOnly(dateOrdered: .descending))
 //                    let proportions = proportions(values: [share.wbValuation?.revenue])
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.revenue)
 //                    valueArray.append(cpGrowth)
@@ -605,7 +605,7 @@ class ComparisonController {
             }
             else if forPath.row == 2 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.netEarnings)
+                    valueArray.append(share.income_statement?.netIncome.valuesOnly(dateOrdered: .descending))
 //                    let proportions = proportions(values: [share.wbValuation?.netEarnings])
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.netEarnings)
 //                    valueArray.append(cpGrowth)
@@ -615,7 +615,7 @@ class ComparisonController {
             }
             else if forPath.row == 3 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.opCashFlow)
+                    valueArray.append(share.cash_flow?.opCashFlow.valuesOnly(dateOrdered: .descending))
 //                    let proportions = proportions(values: [share.wbValuation?.opCashFlow])
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.opCashFlow)
 //                    valueArray.append(cpGrowth)
@@ -625,7 +625,7 @@ class ComparisonController {
             }
             else if forPath.row == 4 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.grossProfit)
+                    valueArray.append(share.income_statement?.grossProfit.valuesOnly(dateOrdered: .descending))
 //                    let proportions = proportions(values: [share.wbValuation?.grossProfit])
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.grossProfit)
 //                    valueArray.append(cpGrowth)
@@ -635,7 +635,7 @@ class ComparisonController {
             }
             else if forPath.row == 5 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.eps)
+                    valueArray.append(share.income_statement?.eps_annual.valuesOnly(dateOrdered: .descending))
 //                    let proportions = proportions(values: [share.wbValuation?.eps])
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.eps)
 //                    valueArray.append(cpGrowth)
@@ -647,7 +647,7 @@ class ComparisonController {
         else if forPath.section == 4 {
             if forPath.row == 0 {
                 for share in shares ?? [] {
-                    let proportions = proportions(values: [share.wbValuation?.grossProfit, share.wbValuation?.revenue])
+                    let proportions = proportions(values: [share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending, withoutZeroes: true), share.income_statement?.revenue.valuesOnly(dateOrdered: .ascending)])
                     valueArray.append(proportions)
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
 //                    valueArray.append(cpGrowth)
@@ -656,7 +656,7 @@ class ComparisonController {
             }
             else if forPath.row == 1 {
                 for share in shares ?? [] {
-                    let proportions = proportions(values: [share.wbValuation?.netEarnings, share.wbValuation?.revenue])
+                    let proportions = proportions(values: [share.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending, withoutZeroes: true), share.income_statement?.revenue.valuesOnly(dateOrdered: .ascending)])
                     valueArray.append(proportions)
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
 //                    valueArray.append(cpGrowth)
@@ -667,7 +667,7 @@ class ComparisonController {
         else if forPath.section == 5 {
             if forPath.row == 0 {
                 for share in shares ?? [] {
-                    valueArray.append(share.rule1Valuation?.roic)
+                    valueArray.append(share.ratios?.roi.valuesOnly(dateOrdered: .ascending, withoutZeroes: true))
 //                    let proportions = proportions(values: [share.rule1Valuation?.roic])
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: share.rule1Valuation?.roic)
 //                    valueArray.append(cpGrowth)
@@ -676,7 +676,7 @@ class ComparisonController {
             }
             else if forPath.row == 1 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.roe)
+                    valueArray.append(share.ratios?.roe.valuesOnly(dateOrdered: .ascending, withoutZeroes: true))
 //                    let proportions = proportions(values: [share.wbValuation?.roe])
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.roe)
 //                    valueArray.append(cpGrowth)
@@ -685,7 +685,7 @@ class ComparisonController {
             }
             else if forPath.row == 2 {
                 for share in shares ?? [] {
-                    valueArray.append(share.wbValuation?.roa)
+                    valueArray.append(share.ratios?.roa.valuesOnly(dateOrdered: .ascending, withoutZeroes: true))
 //                    let proportions = proportions(values: [share.wbValuation?.roa])
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: share.wbValuation?.roa)
 //                    valueArray.append(cpGrowth)
@@ -717,7 +717,7 @@ class ComparisonController {
             else if forPath.row == 2 {
                 for share in shares ?? [] {
 //                    valueArray.append(share.wbValuation?.capExpend)
-                    let proportions = proportions(values: [share.wbValuation?.capExpend, share.wbValuation?.netEarnings])
+                    let proportions = proportions(values: [share.cash_flow?.capEx.valuesOnly(dateOrdered: .ascending), share.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending)])
                     valueArray.append(proportions)
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
 //                    valueArray.append(cpGrowth)
@@ -727,7 +727,7 @@ class ComparisonController {
             else if forPath.row == 3 {
                 for share in shares ?? [] {
 //                    valueArray.append(share.wbValuation?.sgaExpense)
-                    let proportions = proportions(values: [share.wbValuation?.sgaExpense, share.wbValuation?.grossProfit])
+                    let proportions = proportions(values: [share.income_statement?.sgaExpense.valuesOnly(dateOrdered: .ascending), share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending)])
                     valueArray.append(proportions)
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
 //                    valueArray.append(cpGrowth)
@@ -736,7 +736,7 @@ class ComparisonController {
             }
             else if forPath.row == 4 {
                 for share in shares ?? [] {
-                    let proportions = proportions(values: [share.wbValuation?.rAndDexpense, share.wbValuation?.grossProfit])
+                    let proportions = proportions(values: [share.income_statement?.rdExpense.valuesOnly(dateOrdered: .ascending), share.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending)])
                     valueArray.append(proportions)
 //                    let cpGrowth = Calculator.compoundGrowthRates(values: proportions)
 //                    valueArray.append(cpGrowth)

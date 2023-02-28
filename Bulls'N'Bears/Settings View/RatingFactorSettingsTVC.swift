@@ -28,20 +28,20 @@ class RatingFactorSettingsTVC: UITableViewController {
         self.navigationItem.leftBarButtonItem = leftButton
         self.navigationItem.rightBarButtonItem = rightButton
         
-        factorTitles = valuationWeightsSingleton.propertyNameList()
-        max = valuationWeightsSingleton.maxWeightValue() ?? 1.0
-        min = valuationWeightsSingleton.minWeightValue() ?? 0.0
+        factorTitles = valuationFactors.propertyNameList()
+        max = valuationFactors.maxWeightValue() ?? 1.0
+        min = valuationFactors.minWeightValue() ?? 0.0
         range = max - min
         
-        originalWeights = valuationWeightsSingleton
-        combinedValue =  valuationWeightsSingleton.weightsSum()
+        originalWeights = valuationFactors
+        combinedValue =  valuationFactors.weightsSum()
         
     }
     
     @objc
     func saveAndBackToRootView() {
         self.dismiss(animated: true) {
-            valuationWeightsSingleton.saveUserDefaults()
+            valuationFactors.saveUserDefaults()
             let notification = Notification(name: Notification.Name(rawValue: "userChangedValuationWeights"), object: nil, userInfo: nil)
             NotificationCenter.default.post(notification)
         }
@@ -50,7 +50,7 @@ class RatingFactorSettingsTVC: UITableViewController {
     @objc
     func cancelAndBackToRootView() {
         self.dismiss(animated: true, completion: {
-            valuationWeightsSingleton = self.originalWeights
+            valuationFactors = self.originalWeights
         })
     }
 
@@ -70,7 +70,7 @@ class RatingFactorSettingsTVC: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ratingFactorCell", for: indexPath) as! RatingFactorCell
         
-        let value = valuationWeightsSingleton.getValue(forVariable: factorTitles[indexPath.row])
+        let value = valuationFactors.getValue(forVariable: factorTitles[indexPath.row])
         cell.configure(value: value, totalValue: combinedValue, title: factorTitles[indexPath.row], indexPath: indexPath, delegate: self)
 
         return cell
@@ -85,7 +85,7 @@ class RatingFactorSettingsTVC: UITableViewController {
 extension RatingFactorSettingsTVC: RatingFactorCellDelegate {
     
     func userChangedSetting(value: Double, path: IndexPath) {
-        valuationWeightsSingleton.setValue(value: value, parameter: factorTitles[path.row])
+        valuationFactors.setValue(value: value, parameter: factorTitles[path.row])
         
         if let cell = tableView.cellForRow(at: IndexPath(row: path.row, section: 0)) as? RatingFactorCell {
             cell.adjustValue(value: value)
@@ -95,8 +95,8 @@ extension RatingFactorSettingsTVC: RatingFactorCellDelegate {
     func userCompletedSetting(value: Double, path: IndexPath) {
         let factorTitle = factorTitles[path.row]
         
-        valuationWeightsSingleton.setValue(value: value, parameter: factorTitle)
-        combinedValue = valuationWeightsSingleton.weightsSum()
+        valuationFactors.setValue(value: value, parameter: factorTitle)
+        combinedValue = valuationFactors.weightsSum()
         tableView.reloadData()
 
     }

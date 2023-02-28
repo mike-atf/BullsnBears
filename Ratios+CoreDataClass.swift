@@ -156,10 +156,15 @@ public class Ratios: NSManagedObject {
             return nil
         }
         
+        
         let timesToDate = datedValues.sorted(by: { e0, e1 in
             if abs(e1.date.timeIntervalSince(date)) < abs(e0.date.timeIntervalSince(date)) { return false }
             else { return true }
         })
+        
+        guard timesToDate.count > 1 else {
+            return nil
+        }
 
         let nearest = [timesToDate[0], timesToDate[1]]
         return nearest.compactMap{ $0.value }.mean()

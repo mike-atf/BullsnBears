@@ -8,6 +8,8 @@
 import UIKit
 import CoreData
 
+//financialsScore [adj/futureGrowthRate,revenue, retEarnings, EPS_annual, grossProfit, netIncome, divYield, pe ratios, capEx, ROE, opCashFLow, LTdebt, SGA, R&D]
+
 enum DownloadOptions {
     case allPossible
     case rule1Only
@@ -16,7 +18,12 @@ enum DownloadOptions {
     case yahooKeyStatistics
     case yahooProfile
     case lynchParameters
+    case moatScore
     case wbvIntrinsicValue
+    case allValuationDataOnly
+    case researchDataOnly
+    case mainIndicatorsOnly // lynch [netIncome, PE ratio TTM from yahoo, current divYield from Yahoo], moat [bvps, eps_annual, revenue, opCFs, roi]
+    case screeningInfos
 }
 
 struct MTDownloadJobs {
@@ -43,6 +50,7 @@ struct MTDownloadJobs {
 class MacrotrendsScraper {
     
     class func mtDownloadJobs(symbol: String, shortName: String, option: DownloadOptions) -> [MTDownloadJobs]? {
+        
         
         let pages = mtPageNames(options: option)
         let mtRowTitles = mtAnnualDataRowTitles(options: option)
@@ -77,11 +85,19 @@ class MacrotrendsScraper {
         case .rule1Only:
             pageNames =  ["financial-statements", "balance-sheet","financial-ratios","pe-ratio"]
         case .lynchParameters:
-            pageNames = ["financial-statements", "pe-ratio"]
+            pageNames = ["financial-statements"]
+        case .moatScore:
+            pageNames = ["financial-statements", "financial-ratios"]
         case .wbvIntrinsicValue:
             pageNames = ["financial-statements", "pe-ratio"]
+        case .allValuationDataOnly:
+            pageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios", "pe-ratio"]
+        case .mainIndicatorsOnly:
+            pageNames = mtPageNames(options: .moatScore)
+        case .screeningInfos:
+            pageNames = mtPageNames(options: .mainIndicatorsOnly)
         default:
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "MacrotrendScraper has been asked to download Yahoo KeyStats data")
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "MacrotrendsScraper has been asked to download unknown job \(options)")
         }
         
         return pageNames
@@ -117,11 +133,23 @@ class MacrotrendsScraper {
              ["ROI - Return On Investment","Book Value Per Share","Free Cash Flow Per Share"],
             ["none"]]
         case .lynchParameters:
-            rowTitles = [["Net Income"],["pe-ratio"]] // 'pre-ratio' irrelavant here but rowTitle.count must match pageTitle.count
+            rowTitles = [["Net Income"]] // 'pre-ratio' irrelavant here but rowTitle.count must match pageTitle.count
+        case .moatScore:
+            rowTitles = [["Revenue","EPS - Earnings Per Share"], ["Book Value Per Share","ROI - Return On Investment","Operating Cash Flow Per Share"]]
         case .wbvIntrinsicValue:
             rowTitles = [["Net Income", "EPS - Earnings Per Share"],["pe-ratio"]]
+        case .allValuationDataOnly:
+            rowTitles = [["Revenue","Gross Profit","Research And Development Expenses","SG&A Expenses","Net Income", "Operating Income", "EPS - Earnings Per Share"],
+             ["Long Term Debt", "Retained Earnings (Accumulated Deficit)", "Share Holder Equity"],
+             ["Cash Flow From Operating Activities"],
+             ["ROE - Return On Equity", "ROA - Return On Assets", "ROI - Return On Investment","Book Value Per Share","Operating Cash Flow Per Share", "Free Cash Flow Per Share"], ["pe-ratio"]]
+        case .mainIndicatorsOnly:
+            rowTitles = mtAnnualDataRowTitles(options: .moatScore)
+            rowTitles[0].append(contentsOf: mtAnnualDataRowTitles(options: .lynchParameters)[0])
+        case .screeningInfos:
+            rowTitles = mtAnnualDataRowTitles(options: .mainIndicatorsOnly)
         default:
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "MacrotrendScraper has been asked to download Yahoo KeyStats data")
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "MacrotrendsScraper has been asked to download unknown job \(options)")
 
         }
 
@@ -293,307 +321,6 @@ class MacrotrendsScraper {
         
         await dataDownloadAnalyseSave(shareSymbol: symbol, shortName: sn, shareID: shareID, downloadOption: .wbvOnly, progressDelegate: progressDelegate ,downloadRedirectDelegate: downloadRedirectDelegate)
 
-        /*
-        var downloadErrors = [RunTimeError]()
-        
-        let webPageNames = ["financial-statements", "balance-sheet", "cash-flow-statement" ,"financial-ratios"]
-        
-        let rowNames = [["Revenue","Gross Profit","Research And Development Expenses","SG&A Expenses","Net Income", "Operating Income", "EPS - Earnings Per Share"],["Long Term Debt","Property, Plant, And Equipment","Retained Earnings (Accumulated Deficit)", "Share Holder Equity"],["Cash Flow From Operating Activities"],["ROE - Return On Equity", "ROA - Return On Assets", "Book Value Per Share"]]
-        
-//        var results = [LabelledValues]()
-        var labelledDatedResults = [Labelled_DatedValues]()
-        var resultDates = [Date]()
-        var sectionCount = 0
-        let downloader: Downloader? = Downloader(task: .wbValuation)
-        for section in webPageNames {
-            
-            if let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(sn)/\(section)")  {
-                if let url = components.url  {
-                    
-                    NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
-
-                    guard let htmlText = await downloader?.downloadDataWithRedirectionOption(url: url) else {
-                        downloadErrors.append(RunTimeError.specificError(description: "downloaded empty page/ failure for section \(section)"))
-                        continue
-                    }
-                                                                    
-                    if let labelledDatedValues = await MacrotrendsScraper.extractDatedValuesFromTable(htmlText: htmlText, rowTitles: rowNames[sectionCount]) {
-                        
-                        labelledDatedResults.append(contentsOf: labelledDatedValues)
-                        var dates = [Date]()
-                        for ldv in labelledDatedValues {
-                            let extractedDates = ldv.datedValues.compactMap { $0.date }
-                            dates.append(contentsOf: extractedDates)
-                        }
-                        resultDates.append(contentsOf: dates)
-                    }
-
-                    sectionCount += 1
-                }
-            }
-        }
-        
-        // capEx = net PPE for capEx from Yahoo
-        var components = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(symbol)/balance-sheet")
-        components?.queryItems = [URLQueryItem(name: "p", value: symbol)]
-        
-        if let url = components?.url  {
-            
-            let netPPE = "Net property, plant and equipment"
-            let htmlText = try await Downloader.downloadData(url: url)
-            
-            if let extractionResults = YahooPageScraper.extractPageData(html: htmlText, pageType: .balance_sheet, tableHeaders: ["Balance sheet"], rowTitles: [[netPPE]]) {
-                labelledDatedResults.append(contentsOf: extractionResults)
-            }
-        }
-        
-        
-// Historical PE and EPS with dates
-//        var perAndEPSvalues: [Dated_EPS_PER_Values]?
-        var pe_datedValues: [DatedValue]?
-        var eps_datedValues: [DatedValue]?
-        if let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(sn)/pe-ratio") {
-            if let url = components.url {
-                let perAndEPSvalues = await MacrotrendsScraper.getHxEPSandPEData(url: url, companyName: sn, until: nil, downloadRedirectDelegate: downloadRedirectDelegate)
-                pe_datedValues = perAndEPSvalues?.compactMap({ element in
-                    return DatedValue(date: element.date, value: element.peRatio)
-                })
-                if pe_datedValues?.count ?? 0 > 0 {
-                    labelledDatedResults.append(Labelled_DatedValues(label: "PE Ratio Historical data", datedValues: pe_datedValues!))
-                }
-                eps_datedValues = perAndEPSvalues?.compactMap({ element in
-                    return DatedValue(date: element.date, value: element.epsTTM)
-                })
-                if eps_datedValues?.count ?? 0 > 0 {
-                    labelledDatedResults.append(Labelled_DatedValues(label: "eps - earnings per share", datedValues: eps_datedValues!))
-                }
-
-            }
-        }
-            
-// Historical stock prices
-//        var hxPriceDatedValues: Labelled_DatedValues?
-//
-        if let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(sn)/stock-price-history") {
-            if let url = components.url {
-                
-                var htmlText = String()
-                do {
-                    htmlText = try await Downloader.downloadData(url: url)
-
-                    if let datedValues = numbersFromColumn(html$: htmlText, tableHeader: "Historical Annual Stock Price Data</th>", targetColumnsFromLeft: [1]) {
-                        labelledDatedResults.append(Labelled_DatedValues(label: "Historical average annual stock prices", datedValues: datedValues))
-                    }
-                } catch let error as InternalErrorType {
-                    if error == .generalDownloadError {
-                        
-                        let info = ["Redirection": "Object"]
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: "Redirection"), object: info)
-                        return
-                    } else {
-                        ErrorController.addInternalError(errorLocation: "WPS2.downloadAnalyseSaveWBValuationData", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
-                    }
-                }
-            }
-        }
-        
-        let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
-        backgroundMoc.automaticallyMergesChangesFromParent = true
-        
-        do {
-            if let bgShare = backgroundMoc.object(with: shareID) as? Share {
-                try await bgShare.mergeInDownloadedData(labelledDatedValues: labelledDatedResults)
-            }
-        } catch {
-            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "couldn't save background MOC")
-        }
-        */
-        /*
-        let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
-        backgroundMoc.automaticallyMergesChangesFromParent = true
-
-        try await backgroundMoc.perform {
-
-            do {
-
-                if let share = backgroundMoc.object(with: shareID) as? Share {
-                    
-// OLD - replace eventually
-                    let wbv = share.wbValuation ?? WBValuation(context: backgroundMoc)
-                    wbv.share = share
-                    for result in results {
-                        switch result.label {
-                        case "Revenue":
-                            wbv.revenue = result.values
-                        case "Gross Profit":
-                            wbv.grossProfit = result.values
-                        case "Research And Development Expenses":
-                            wbv.rAndDexpense = result.values
-                        case "SG&A Expenses":
-                            wbv.sgaExpense = result.values
-                        case "Net Income":
-                            wbv.netEarnings = result.values
-                        case "Operating Income":
-                            wbv.operatingIncome = result.values
-                        case "EPS - Earnings Per Share":
-                            wbv.eps = result.values
-                        case "Long Term Debt":
-                            wbv.debtLT = result.values
-                        case "Property, Plant, And Equipment":
-                            wbv.ppe = result.values
-                        case "Retained Earnings (Accumulated Deficit)":
-                            wbv.equityRepurchased = result.values
-                        case "Share Holder Equity":
-                            wbv.shareholdersEquity = result.values
-                        case "Net property, plant and equipment":
-                            var capEx = [Double]()
-                            for i in 0..<result.values.count-1 {
-                                // assumes time DESCENDING values, as is the case on MT financials pages
-                                // proper CapEx is yoy-delta-PPE + depreciation (pr net PPE) - NA on MT
-                                capEx.append(result.values[i] - result.values[i+1])
-                            }
-                            wbv.capExpend = capEx
-                        case "Cash Flow From Operating Activities":
-                            wbv.opCashFlow = result.values
-                        case "ROE - Return On Equity":
-                            wbv.roe = result.values
-                        case "ROA - Return On Assets":
-                            wbv.roa = result.values
-                        case "Book Value Per Share":
-                            wbv.bvps = result.values
-                        default:
-                            ErrorController.addInternalError(errorLocation: "WebScraper2.downloadAndAnalyseWBVData", systemError: nil, errorInfo: "undefined download result with title \(result.label)")
-                        }
-                    
-                        
-                    wbv.latestDataDate = resultDates.max()
-                    wbv.savePERWithDateArray(datesValuesArray: pe_datedValues, saveInContext: false)
-                    wbv.saveEPSTTMWithDateArray(datesValuesArray: eps_datedValues, saveToMOC: false)
-                    wbv.avAnStockPrice = hxPriceDatedValues?.extractValuesOnly(dateOrder: .ascending)
-                    wbv.date = Date()
-                    
-                    if let vShare = wbv.share {
-                        if let lynch = wbv.lynchRatio() {
-                            let dv = DatedValue(date:wbv.date!, value: lynch)
-                            vShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .lynchScore)
-                        }
-                        let (ivalue,_) = wbv.ivalue()
-                        if ivalue != nil {
-                            let dv = DatedValue(date:wbv.date!, value: ivalue!)
-                            vShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .intrinsicValue)
-                        }
-                    }
-                }
-                    
-// NEW
-                    // 1 save current values for internal trends
-                    if let wbv = share.wbValuation {
-                        if let lynch = wbv.lynchRatio() {
-                            let dv = DatedValue(date:wbv.date!, value: lynch) // value so far
-                            share.saveTrendsData(datedValuesToAdd: [dv], trendName: .lynchScore)
-                        }
-                        let (ivalue,_) = wbv.ivalue()
-                        if ivalue != nil {
-                            let dv = DatedValue(date:wbv.date!, value: ivalue!)
-                            share.saveTrendsData(datedValuesToAdd: [dv], trendName: .intrinsicValue)
-                        }
-                    }
-                    
-                    if let r1 = share.rule1Valuation {
-                        let (_, moat) = r1.moatScore()
-                        
-                        if moat != nil {
-                            let dv = DatedValue(date: r1.creationDate!, value: moat!)
-//                            share.saveTrendsData(datedValuesToAdd: [dv], trendName: .moatScore)
-                            r1.addMoatTrend(date: Date(), moat: moat!)
-                        }
-                        
-                        let (price,_) = r1.stickerPrice()
-                        if price != nil {
-                            let dv = DatedValue(date: r1.creationDate!, value: price!)
-//                            share.saveTrendsData(datedValuesToAdd: [dv], trendName: .stickerPrice)
-                            r1.addStickerPriceTrend(date: Date(), price: price!)
-                        }
-                    }
-
-                    // 2 save new prices
-                    share.avgAnnualPrices = hxPriceDatedValues?.convertToData()
-                    
-                    let incomeStatement = share.income_statement ?? Income_statement(context: backgroundMoc)
-                    incomeStatement.share = share
-                    
-                    let balanceSheet = share.balance_sheet ?? Balance_sheet(context: backgroundMoc)
-                    balanceSheet.share = share
-                    
-                    let cashFlowStatement = share.cash_flow ?? Cash_flow(context: backgroundMoc)
-                    cashFlowStatement.share = share
-                    
-                    let ratios = share.ratios ?? Ratios(context: backgroundMoc)
-                    ratios.share = share
-                    
-                    ratios.pe_ratios = pe_datedValues?.convertToData()
-                    incomeStatement.eps_annual = eps_datedValues?.convertToData()
-
-                    for datedResult in labelledDatedResults {
-                        
-                        switch datedResult.label {
-                        case "Revenue":
-                            incomeStatement.revenue = datedResult.datedValues.convertToData()
-                        case "Gross Profit":
-                            incomeStatement.grossProfit = datedResult.datedValues.convertToData()
-                        case "Research And Development Expenses":
-                            incomeStatement.rdExpense = datedResult.datedValues.convertToData()
-                        case "SG&A Expenses":
-                            incomeStatement.sgaExpense = datedResult.datedValues.convertToData()
-                        case "Net Income":
-                            incomeStatement.netIncome = datedResult.datedValues.convertToData()
-                        case "Operating Income":
-                            incomeStatement.operatingIncome = datedResult.datedValues.convertToData()
-                        case "EPS - Earnings Per Share":
-                            incomeStatement.eps_annual = datedResult.datedValues.convertToData()
-                        case "Long Term Debt":
-                            balanceSheet.debt_longTerm = datedResult.datedValues.convertToData()
-                        case "Property, Plant, And Equipment":
-                            balanceSheet.ppe_net = datedResult.datedValues.convertToData()
-                        case "Retained Earnings (Accumulated Deficit)":
-                            balanceSheet.retained_earnings = datedResult.datedValues.convertToData()
-                        case "Share Holder Equity":
-                            balanceSheet.sh_equity = datedResult.datedValues.convertToData()
-                        case "Net property, plant and equipment":
-                            var capEx = [DatedValue]()
-                            for i in 0..<datedResult.datedValues.count-1 {
-                                // assumes time DESCENDING values, as is the case on MT financials pages
-                                // proper CapEx is yoy-delta-PPE + depreciation (pr net PPE) - NA on MT
-                                let change = datedResult.datedValues[i].value - datedResult.datedValues[i+1].value
-                                capEx.append(DatedValue(date: datedResult.datedValues[i].date, value: change))
-                            }
-                            cashFlowStatement.capEx = capEx.convertToData()
-                        case "Cash Flow From Operating Activities":
-                            cashFlowStatement.opCashFlow = datedResult.datedValues.convertToData()
-                        case "ROE - Return On Equity":
-                            ratios.roe = datedResult.datedValues.convertToData()
-                        case "ROA - Return On Assets":
-                            ratios.roa = datedResult.datedValues.convertToData()
-                        case "Book Value Per Share":
-                            ratios.bvps = datedResult.datedValues.convertToData()
-                        default:
-                            ErrorController.addInternalError(errorLocation: "WebScraper2.downloadAndAnalyseWBVData", systemError: nil, errorInfo: "undefined download result with title \(datedResult.label)")
-                        }
-                        }
-                    
-                }
-
-                try backgroundMoc.save()
-            } catch let error {
-                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "couldn't save background MOC")
-            }
-            
-            
-            if (downloadErrors ?? []).contains(InternalErrorType.generalDownloadError) {
-                throw InternalErrorType.generalDownloadError
-            }
-        }
-        */
     }
     
     
@@ -1251,156 +978,4 @@ class MacrotrendsScraper {
         return datedValues
     }
 
-    // MARK: - NSManagedObject functions
-    
-    /*
-    class func saveR1Data(shareID: NSManagedObjectID, labelledDatedValues: [Labelled_DatedValues]) async throws {
-        
-        let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
-        backgroundMoc.automaticallyMergesChangesFromParent = true
-        
-        do {
-            if let bgShare = backgroundMoc.object(with: shareID) as? Share {
-                try await bgShare.mergeInDownloadedData(labelledDatedValues: labelledDatedValues)
-            }
-        } catch {
-            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "couldn't save background MOC")
-        }
-
-        /*
-        let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
-        backgroundMoc.automaticallyMergesChangesFromParent = true
-        
-        
-        
-        try await backgroundMoc.perform {
-
-            do {
-                if let bgShare = backgroundMoc.object(with: shareID) as? Share {
-                    
-                    let incomeStatement = bgShare.income_statement ?? Income_statement(context: backgroundMoc)
-                    incomeStatement.share = bgShare
-                    
-                    let ratios = bgShare.ratios ?? Ratios(context: backgroundMoc)
-                    ratios.share = bgShare
-                    
-                    let cashFLowStatement = bgShare.cash_flow ?? Cash_flow(context: backgroundMoc)
-                    cashFLowStatement.share = bgShare
-                    
-                    let balanceSheet = bgShare.balance_sheet ?? Balance_sheet(context: backgroundMoc)
-                    balanceSheet.share = bgShare
-                    
-                    let analysis = bgShare.analysis ?? Analysis(context: backgroundMoc)
-                    analysis.share = bgShare
-                    
-                    let keyStats = bgShare.key_stats ?? Key_stats(context: backgroundMoc)
-                    keyStats.share = bgShare
-                                        
-                    let r1v = bgShare.rule1Valuation ?? Rule1Valuation(context: backgroundMoc)
-                    r1v.share = bgShare
-                    
-                    // save new value with date in a share trend
-                    let (_, moat) = r1v.moatScore()
-                    
-                    if moat != nil {
-                        let dv = DatedValue(date: r1v.creationDate!, value: moat!)
-//                        bgShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .moatScore)
-                        r1v.addMoatTrend(date: Date(), moat: moat!)
-                    }
-                    
-                    let (price,_) = r1v.stickerPrice()
-                    if price != nil {
-                        let dv = DatedValue(date: r1v.creationDate!, value: price!)
-//                        bgShare.saveTrendsData(datedValuesToAdd: [dv], trendName: .stickerPrice)
-                        r1v.addStickerPriceTrend(date: Date(), price: price!)
-                    }
-
-                    // calculate FCF from OCF and netPPEChange
-                    let ocf = labelledDatedValues.filter { ldv in
-                        if ldv.label.lowercased().contains("operating activities") { return true }
-                        else { return false }
-                    }.first?.datedValues
-                    
-                    let netPPE = labelledDatedValues.filter { ldv in
-                        if ldv.label.lowercased() == ("net change in property, plant, and equipment") { return true }
-                        else { return false }
-                    }.first?.datedValues
-                    
-                    if let  fcfDV = cashFLowStatement.calculateFCF(ocf: ocf, netPPEChange: netPPE) {
-                        let millions: [DatedValue] = fcfDV.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
-                        cashFLowStatement.freeCashFlow = millions.convertToData()
-                    }
-                        
-                    for result in labelledDatedValues {
-                        switch result.label.lowercased() {
-                        case "revenue":
-                            let millions: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
-                            incomeStatement.revenue = millions.convertToData()
-                        case "eps - earnings per share":
-                            incomeStatement.eps_annual = result.datedValues.convertToData()
-                        case "net income":
-                            let millions: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
-                           incomeStatement.netIncome = millions.convertToData()
-                        case "roi - return on investment":
-                            let percent: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value / 100) }
-                            ratios.roi = percent.convertToData()
-                        case "book value per share":
-                            ratios.bvps = result.datedValues.convertToData()
-                        case "cash flow from operating activities":
-                            let millions: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
-                            cashFLowStatement.opCashFlow = millions.convertToData()
-                        case "long term debt":
-                            let millions: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
-                            balanceSheet.debt_longTerm = millions.convertToData()
-                        case "pe ratio historical data":
-                            ratios.pe_ratios = result.datedValues.convertToData()
-                        case "sales growth (year/est)":
-                            analysis.future_revenueGrowthRate = result.datedValues.convertToData()
-//                        case "operating cash flow":
-//                            let millions: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
-//                            cashFLowStatement.opCashFlow = millions.convertToData()
-                        case "purchases":
-                            if let r0 = result.datedValues.first { // first or last?
-                                keyStats.insiderPurchases = [r0].convertToData()
-                            }
-                        case "sales":
-                            if let r0 = result.datedValues.first { // first or last?
-                                keyStats.insiderSales = [r0].convertToData()
-                            }
-                        case "total insider shares held":
-                            if let r0 = result.datedValues.first { // first or last?
-                                keyStats.insiderShares =  [r0].convertToData()
-                            }
-                        case "forward p/e":
-                            if let r0 = result.datedValues.first { // first or last?
-                                analysis.forwardPE = [r0].convertToData()
-                            }
-                        case "rdexpense":
-                            incomeStatement.rdExpense = result.datedValues.convertToData()
-                        default:
-                            ErrorController.addInternalError(errorLocation: "WebPageScraper2.saveR1Date", systemError: nil, errorInfo: "unspecified result label \(result.label)")
-                        }
-                    }
-                    
-                    r1v.creationDate = Date()
-                    try backgroundMoc.save()
-                    
-                    NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil, userInfo: nil)
-                    //DEBUG ONLY
-                }
-                //DEBUG ONLY
-
-                else {
-                    print("Unable to get background share from objectID for R1 valuation")
-                }
-                //DEBUG ONLY
-
-            } catch {
-                ErrorController.addInternalError(errorLocation: "WebPageScraper2.saveR1Data", systemError: error, errorInfo: "Error saving R1 data download")
-                throw error
-            }
-       }
-         */
-    }
-    */
 }

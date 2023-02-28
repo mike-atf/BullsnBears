@@ -181,7 +181,7 @@ class ResearchController {
         
         switch parameter {
         case "businessDescription":
-            if let valid = share?.research?.businessDescription { return [valid] }
+            if let valid = share?.company_info?.businessDescription { return [valid] }
             else { return nil }
         case "symbol":
             if let valid = share?.research?.symbol { return [valid] }
@@ -345,7 +345,7 @@ extension ResearchController: ResearchCellDelegate {
         case "industry":
             share?.company_info?.industry = notes
         case "businessDescription":
-            share?.research?.businessDescription = notes
+            share?.company_info?.businessDescription = notes
         case "targetBuyPrice":
             let number = notes.filter("-0123456789.".contains)
             share?.research?.targetBuyPrice = Double(number) ?? 0.0

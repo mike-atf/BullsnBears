@@ -19,7 +19,7 @@ class StocksController2: NSFetchedResultsController<Share> {
     let renewInterval: TimeInterval = 365*24*3600/12
     var treasuryBondYields: [DatedValue]?
     var viewController: StocksListTVC?
-    var backgroundMoc: NSManagedObjectContext?
+//    var backgroundMoc: NSManagedObjectContext?
     var sharesAwaitingUpdateDownload: [Share]? // to check if/when all share update download are complete
     var controllerDelegate: StocksController2Delegate?
     var shareInfosToDownload = 0
@@ -68,10 +68,10 @@ class StocksController2: NSFetchedResultsController<Share> {
     /// send either url, OR pricePoints with symbol. companyName is an optional long name for the company to override the name found in the stocksDictionary
     func getDataForNewShare(objectID: NSManagedObjectID, url: URL?, symbol: String?, progressDelegate: ProgressViewDelegate?) async throws {
         
-        backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
-        backgroundMoc?.automaticallyMergesChangesFromParent = true
+        let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+        backgroundMoc.automaticallyMergesChangesFromParent = true
         
-        guard let newShare = backgroundMoc?.object(with: objectID) as? Share else {
+        guard let newShare = backgroundMoc.object(with: objectID) as? Share else {
             AlertController.shared().showDialog(title: "Not completed", alertMessage: "new share object couldn;t fetched from background MOC")
             return
         }
@@ -103,21 +103,20 @@ class StocksController2: NSFetchedResultsController<Share> {
         
         async let datedDividends = YahooPageScraper.dividendsHxFileDownload(symbol: symbol!, companyName: newShare.name_short ?? "missing", years: 10)
         
-        await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: newShare.symbol ?? "", shortName: newShare.name_short ?? "missing", shareID: objectID, downloadOption: .allPossible, progressDelegate: progressDelegate,downloadRedirectDelegate: self)
-        
-        await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol!, shortName: newShare.name_short ?? "missing", shareID: objectID, option: .allPossible, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
+        await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: newShare.symbol ?? "", shortName: newShare.name_short ?? "missing", shareID: objectID, downloadOption: .screeningInfos, progressDelegate: progressDelegate,downloadRedirectDelegate: self)
+                
+        await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol!, shortName: newShare.name_short ?? "missing", shareID: objectID, option: .screeningInfos, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
         
         await dividendsAndReturns(shareID: newShare.objectID, pricesCsvURL: url)
         
         newShare.saveDividendData(datedValues: await datedDividends, save: true)
         
         do {
-            try backgroundMoc?.save()
+            try backgroundMoc.save()
         } catch {
             ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error trying to save new share \(String(describing: symbol))")
         }
-        
-        
+                
         // update all other share data
         DispatchQueue.main.async {
 
@@ -139,7 +138,11 @@ class StocksController2: NSFetchedResultsController<Share> {
     /// using yahoo as source
     func dividendsAndReturns(shareID: NSManagedObjectID, pricesCsvURL: URL?) async {
         
-        guard let share = backgroundMoc?.object(with: shareID) as? Share else {
+        let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+        backgroundMoc.automaticallyMergesChangesFromParent = true
+
+        
+        guard let share = backgroundMoc.object(with: shareID) as? Share else {
             ErrorController.addInternalError(errorLocation: #function, errorInfo: "Failed to convert shareID to Share from background MOC")
             return
         }
@@ -178,7 +181,7 @@ class StocksController2: NSFetchedResultsController<Share> {
             }
         
             async let datedDividends = YahooPageScraper.dividendsHxFileDownload(symbol: share.symbol!, companyName: share.name_short ?? "", years: 10)
-            share.saveDividendData(datedValues: await datedDividends, save: true)
+            share.saveDividendData(datedValues: await datedDividends, save: false) // saved in bgMOC below
         
             // if pricePoint csv file is available calculate 3 and 10 year returns
             if let fileURL = pricesCSVurl {
@@ -217,14 +220,14 @@ class StocksController2: NSFetchedResultsController<Share> {
                                 share.return10y = (latestClose + divSum10Y) / valid
                           }
                             else {
-                                ErrorController.addInternalError(errorLocation: #function, errorInfo: "can't find 10 year closing price  \(String(describing: price10yAgo)) to work out 3-year-return")
+                                ErrorController.addInternalError(errorLocation: #function, errorInfo: "can't find 10 year closing price \(String(describing: price10yAgo)) to work out 10-year-return")
                             }
                         }
                         else {
                             ErrorController.addInternalError(errorLocation: #function, errorInfo: "failed 3- and 10 year return due to missing latest close price")
                         }
                         
-                        try share.managedObjectContext?.save()
+                        try backgroundMoc.save()
 
                     }
                     else {
@@ -266,29 +269,29 @@ class StocksController2: NSFetchedResultsController<Share> {
     }
     
 
-    func fetchSpecificShare(symbol: String, fromBackgroundContext: Bool? = false) -> Share? {
-        
-        let request = NSFetchRequest<Share>(entityName:"Share")
-        let predicate = NSPredicate(format: "symbol == %@", argumentArray: [symbol])
-        request.predicate = predicate
-
-        request.sortDescriptors = [NSSortDescriptor(key:  "symbol" , ascending:  true )]
-        
-        if fromBackgroundContext ?? false {
-            setBackgroundMOC()
-        }
-        
-        let theContext = (fromBackgroundContext ?? false) ? backgroundMoc! : (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        
-        var shares: [Share]?
-        do {
-            shares  =  try theContext.fetch(request)
-        } catch let error as NSError{
-            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error fetching Shares")
-        }
-        
-        return shares?.first
-    }
+//    func fetchSpecificShare(symbol: String, fromBackgroundContext: Bool? = false) -> Share? {
+//
+//        let request = NSFetchRequest<Share>(entityName:"Share")
+//        let predicate = NSPredicate(format: "symbol == %@", argumentArray: [symbol])
+//        request.predicate = predicate
+//
+//        request.sortDescriptors = [NSSortDescriptor(key:  "symbol" , ascending:  true )]
+//
+//        if fromBackgroundContext ?? false {
+//            setBackgroundMOC()
+//        }
+//
+//        let theContext = (fromBackgroundContext ?? false) ? backgroundMoc! : (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//
+//        var shares: [Share]?
+//        do {
+//            shares  =  try theContext.fetch(request)
+//        } catch let error as NSError{
+//            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error fetching Shares")
+//        }
+//
+//        return shares?.first
+//    }
     
     // MARK: - other general functions
     
@@ -407,8 +410,8 @@ class StocksController2: NSFetchedResultsController<Share> {
             }  else { return false }
         })
                 
-        backgroundMoc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
-        backgroundMoc!.automaticallyMergesChangesFromParent = true
+        let backgroundMoc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+        backgroundMoc.automaticallyMergesChangesFromParent = true
 
         NotificationCenter.default.addObserver(self, selector: #selector(backgroundContextDidSave(notification:)), name: .NSManagedObjectContextDidSave, object: nil)
         
@@ -419,7 +422,7 @@ class StocksController2: NSFetchedResultsController<Share> {
             let shareID = share.objectID
             let minDate = share.priceDateRange()?.first?.addingTimeInterval(-365*24*3600)
             let latestQEPSDate = share.income_statement?.eps_quarter.datedValues(dateOrder: .ascending)?.dropZeros().last?.date ?? Date().addingTimeInterval(-365*24*3600/2)
-            let temp = Date().addingTimeInterval(-365*24*3600/4)
+//            let temp = Date().addingTimeInterval(-365*24*3600/4)
             
             Task.init(priority: .background, operation: {
                 
@@ -435,7 +438,6 @@ class StocksController2: NSFetchedResultsController<Share> {
                 
                 // uses Yahoo so should work for (Some) non-US stocks
                 let existingPrices = share.getDailyPrices()
-//                let latestExistingPricePointDate = existingPrices?.compactMap{ $0.tradingDate}.max()
                 await YahooPageScraper.dailyPricesDownloadAnalyseSave(symbol: symbol, shareID: shareID, existingPricePoints: existingPrices)
                 
                 DispatchQueue.main.async {
@@ -471,10 +473,6 @@ class StocksController2: NSFetchedResultsController<Share> {
             let symbol = share.symbol
             var latestUpdate = (share.dcfValuation?.creationDate ?? Date().addingTimeInterval(-renewInterval-1))
             
-            // set adjusted future growth rate in r1Valuation to meanGrowth in research
-            if let research = share.research {
-                share.rule1Valuation?.adjGrowthEstimates = [research.futureGrowthMean, research.futureGrowthMean]
-            }
             let shareID = share.objectID
             
 // 1 DCF Valuation
@@ -606,7 +604,7 @@ class StocksController2: NSFetchedResultsController<Share> {
                         await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol!, shortName: shortName!, shareID: shareID, option: .yahooKeyStatistics, progressDelegate: viewController, downloadRedirectDelegate: self)
 
                         let singleShareID = singleShare != nil ? shareID : nil
-                            await dividendsAndReturns(shareID: shareID, pricesCsvURL: nil)
+                            await dividendsAndReturns(shareID: singleShareID ?? shareID, pricesCsvURL: nil)
                         NotificationCenter.default.post(name: Notification.Name(rawValue: "SingleShareInfoDownloadComplete"), object: nil, userInfo: nil)
                     }
                 }
@@ -769,7 +767,8 @@ class StocksController2: NSFetchedResultsController<Share> {
             return
         }
             
-        await YChartsScraper.qepsDownloadAnalyseSave(symbol: shareSymbol, shortName: sn, shareID: shareID, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
+        await YChartsScraper.dataDownloadAnalyseSave(symbol: shareSymbol, downloadOption: .qEPS, shareID: shareID, progressDelegate: progressDelegate)
+//        await YChartsScraper.qepsDownloadAnalyseSave(symbol: shareSymbol, shortName: sn, shareID: shareID, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
             
     }
 
@@ -851,8 +850,8 @@ class StocksController2: NSFetchedResultsController<Share> {
     
     // MARK: - ManagedObjectContext
     func setBackgroundMOC() {
-        backgroundMoc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
-        backgroundMoc!.automaticallyMergesChangesFromParent = true
+        let backgroundMoc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+        backgroundMoc.automaticallyMergesChangesFromParent = true
     }
     
 //    func saveBackgroundMOC(share: Share) throws {

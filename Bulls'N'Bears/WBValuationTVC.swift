@@ -210,10 +210,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
         Task {
             await controller?.downloadAllValuationData()
-        
-//            DispatchQueue.main.async {
-//                self.downloadButtonConfiguration.showsActivityIndicator = false
-//            }
         }
     }
     
@@ -406,13 +402,13 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                     score = numberFormatterWith1Digit.string(from: lynch! as NSNumber) ?? "NA"
                 }
                 
-                if let divYieldDV = share.key_stats?.dividendYield.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+                if let divYieldDV = share.key_stats?.dividendYield.valuesOnly(dateOrdered: .ascending, withoutZeroes: true, includeThisYear: true)?.last {
                     yield$ += percentFormatter2Digits.string(from: divYieldDV as NSNumber)!
                 } else {
                     yield$ += "NA"
                 }
                 
-                if let currentPEdv = share.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+                if let currentPEdv = share.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending, withoutZeroes: true, includeThisYear: true)?.last {
                     currentPE$ += numberFormatter2Decimals.string(from: currentPEdv as NSNumber)!
                 }
                 else {
@@ -686,7 +682,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             self.progressView?.removeFromSuperview()
             self.progressView = nil
             
-            self.controller?.updateData()
+//            self.controller?.updateData()
             self.tableView.reloadData()
         }
         

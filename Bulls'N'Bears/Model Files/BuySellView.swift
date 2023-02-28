@@ -25,7 +25,7 @@ class BuySellView: UIView {
         transactionLabel = {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.font = UIFont.systemFont(ofSize: 14)
+            label.font = UIFont.systemFont(ofSize: 10)
             label.textAlignment = .center
             label.numberOfLines = 0
             return label
@@ -34,18 +34,18 @@ class BuySellView: UIView {
         
         readinessLabel = {
             let label = UILabel()
-            label.font = UIFont.systemFont(ofSize: 13)
+            label.font = UIFont.systemFont(ofSize: 10)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.textAlignment = .center
             return label
         }()
-
+        
         addSubview(transactionLabel!)
         addSubview(readinessLabel!)
-        
+
         readinessLabel?.topAnchor.constraint(equalTo: topAnchor).isActive = true
         readinessLabel?.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        
+
         transactionLabel?.topAnchor.constraint(equalTo: readinessLabel!.bottomAnchor).isActive = true
         transactionLabel?.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         
@@ -85,10 +85,9 @@ class BuySellView: UIView {
         }
 
         buySellText = lastCrossing.signal > 0 ? "Buy" : "Sell"
+        
 
-        buySellText = lastCrossing.signal > 0 ? "Buy" : "Sell"
-
-        let fontColor = lastCrossing.signal > 0 ? UIColor(named: "Green") : UIColor(named: "Red")
+        let fontColor = lastCrossing.signal > 0 ? UIColor.systemGreen : UIColor.systemRed
         var earlierSignalsSame = [Bool]()
         if has3Signals {
             earlierSignalsSame = latest3Crossings[..<2].compactMap{ $0!.signalIsBuy() }.filter { (buySignal) -> Bool in
@@ -98,7 +97,7 @@ class BuySellView: UIView {
         }
 
         readyText = earlierSignalsSame.count == 2 ? "" : "Wait to"
-
+        
         if !readyText.starts(with: "Wait") {
             var date$ = String()
             if let validDate = lastCrossing.date {

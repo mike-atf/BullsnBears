@@ -20,11 +20,17 @@ public class Share: NSManagedObject {
     var sharePriceSplitCorrected = false
     
     public override func awakeFromInsert() {
-        eps_current = Double()
-        peRatio_current = Double()
-        beta = Double()
         watchStatus = 2
-//        watchStatus = 0 // 0 watchList, 1 owned, 3 archived, 2 research
+        
+        if let context = self.managedObjectContext {
+            wbValuation = WBValuation(context: context)
+            wbValuation?.date = Date()
+            rule1Valuation = Rule1Valuation(context: context)
+            rule1Valuation?.creationDate = Date()
+            dcfValuation = DCFValuation(context: context)
+            dcfValuation?.creationDate = Date()
+        }
+        
     }
     
     public override func awakeFromFetch() {
@@ -38,9 +44,9 @@ public class Share: NSManagedObject {
             sector = "Unknown"
         }
         
-        if moatCategory == nil {
-            moatCategory = "NA"
-        }
+//        if moatCategory == nil {
+//            moatCategory = "NA"
+//        }
         
         if let date = self.research?.nextReportDate {
             if date < Date().addingTimeInterval(-quarter) {
@@ -140,7 +146,7 @@ public class Share: NSManagedObject {
                 if let wbv = self.wbValuation {
                     let (sp, _) = wbv.ivalue()
                     if sp != nil {
-                        let date = wbv.date!
+                        let date = wbv.date ?? Date()
                         datedValue = DatedValue(date:date, value: sp!)
                     }
                 }
@@ -238,7 +244,7 @@ public class Share: NSManagedObject {
                 if let wbv = self.wbValuation {
                     let (sp, _) = wbv.ivalue()
                     if sp != nil {
-                        let date = wbv.date!
+                        let date = wbv.date ?? Date()
                         dataSet = ChartDataSet(x:date, y: sp)
                     }
                 }
@@ -370,11 +376,11 @@ public class Share: NSManagedObject {
 
     }
     
-    func averageAnnualPrices() -> [DatedValue]? {
-        
-        return self.avgAnnualPrices.datedValues(dateOrder: .ascending)
-        
-    }
+//    func averageAnnualPrices() -> [DatedValue]? {
+//
+//        return self.avgAnnualPrices.datedValues(dateOrder: .ascending)
+//
+//    }
     
     func datedValuesToData(datedValues: [DatedValue]?) -> Data? {
         
@@ -439,7 +445,7 @@ public class Share: NSManagedObject {
             let data2 = try NSKeyedArchiver.archivedData(withRootObject: data1, requiringSecureCoding: false)
             return data2
         } catch let error {
-            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error storing MCD data")
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error storing MCD data")
         }
 
         return nil
@@ -549,12 +555,12 @@ public class Share: NSManagedObject {
     
     func pe_currentDV() -> DatedValue? {
         
-        return ratios?.pe_ratios.datedValues(dateOrder: .ascending)?.last
+        return ratios?.pe_ratios.datedValues(dateOrder: .ascending, includeThisYear: true)?.last
     }
     
     func pe_current() -> Double? {
         
-        return ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending)?.last
+        return ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending,includeThisYear: true)?.last
     }
 
 
@@ -1781,11 +1787,11 @@ public class Share: NSManagedObject {
     public func lynchRatio() -> ([String]?, Double?) {
         
         // can be zero, so don't drop zeros
-        guard let divYieldDV = key_stats?.dividendYield.datedValues(dateOrder: .ascending, oneForEachYear: true)?.last else {
+        guard let divYieldDV = key_stats?.dividendYield.datedValues(dateOrder: .ascending, oneForEachYear: true, includeThisYear: true)?.last else {
             return (["missing dividend yield value"],nil)
         }
         
-        guard let currentPEdv = ratios?.pe_ratios.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros().last else {
+        guard let currentPEdv = ratios?.pe_ratios.datedValues(dateOrder: .ascending, oneForEachYear: true,  includeThisYear: true)?.dropZeros().last else {
             return (["missing current P/E ratio"],nil)
         }
         
@@ -1867,6 +1873,9 @@ public class Share: NSManagedObject {
             let research = self.research ?? StockResearch(context: backgroundMoc)
             research.share = self
             
+            let companyInfo = self.company_info ??  Company_Info(context: backgroundMoc)
+            companyInfo.share = self
+            
             for result in ldTexts {
                 
                 switch result.label.lowercased() {
@@ -1876,7 +1885,7 @@ public class Share: NSManagedObject {
                 case "industry":
                     self.industry = result.datedTexts[0].text
                 case "description":
-                    research.businessDescription = result.datedTexts[0].text
+                    companyInfo.businessDescription = result.datedTexts[0].text
                 case "currency":
                     self.currency = result.datedTexts[0].text
                 case "exchange":
@@ -1886,7 +1895,7 @@ public class Share: NSManagedObject {
                 }
                 
             }
-            try self.managedObjectContext?.save()
+            try backgroundMoc.save()
         
             NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil, userInfo: nil)
         }  catch {
@@ -2009,12 +2018,6 @@ public class Share: NSManagedObject {
                     } else {
                         incomeStatement.eps_annual = result.datedValues.convertToData()
                     }
-                case "diluted eps":
-                    if let existingDVs = incomeStatement.eps_annual.datedValues(dateOrder: .ascending) {
-                        incomeStatement.eps_annual = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
-                    } else {
-                        incomeStatement.eps_annual = result.datedValues.convertToData()
-                    }
                 case "quarterly eps":
                     if let existingDVs = incomeStatement.eps_quarter.datedValues(dateOrder: .ascending) {
                         incomeStatement.eps_quarter = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
@@ -2022,6 +2025,19 @@ public class Share: NSManagedObject {
                         incomeStatement.eps_quarter = result.datedValues.convertToData()
                     }
 
+                case "diluted eps":
+                    if let existingDVs = incomeStatement.eps_annual.datedValues(dateOrder: .ascending) {
+                        incomeStatement.eps_annual = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+                    } else {
+                        incomeStatement.eps_annual = result.datedValues.convertToData()
+                    }
+//                case "quarterly eps":
+//                    if let existingDVs = incomeStatement.eps_quarter.datedValues(dateOrder: .ascending) {
+//                        incomeStatement.eps_quarter = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
+//                    } else {
+//                        incomeStatement.eps_quarter = result.datedValues.convertToData()
+//                    }
+//
                 case "basic eps":
                     if let existingDVs = incomeStatement.eps_annual.datedValues(dateOrder: .ascending) {
                         incomeStatement.eps_annual = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
@@ -2170,6 +2186,7 @@ public class Share: NSManagedObject {
                         }
 //                            bgShare.eps_current = result.values.first ?? Double()
                 case "trailing annual dividend yield":
+                    print("trailing annual dividend yield saved as \(result.datedValues)")
                         keyStats.dividendYield = result.datedValues.convertToData()
 //                            bgShare.divYieldCurrent = result.values.
                     

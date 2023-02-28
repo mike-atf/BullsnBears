@@ -153,47 +153,71 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             return
         }
         
-        let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate) // 10 years back!
-        let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
-
-        let start$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
-        let end$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
-        
-        var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(symbol)")
-        urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
-        
-        
-        if let sourceURL = urlComponents?.url {
-
-            // first try to download historical prices from Yahoo finance as CSV file
-            let expectedHeaderTitles = ["Date","Open","High","Low","Close","Adj Close","Volume"]
-
-            Task.init(priority: .background) {
-                
-                do {
-                    if let csvURL = try await Downloader.downloadCSVFile2(url: sourceURL, symbol: symbol, type: "_PPoints") {
-                        if CSVImporter.matchesExpectedFormat(url: csvURL, expectedHeaderTitles: expectedHeaderTitles) {
-                            // successful CSV file downloaded
-                            DispatchQueue.main.async {
-                                self.callingVC.addShare(url: csvURL, pricePoints: nil, symbol: symbol, companyName: companyName)
-                            }
-                        } else {
-                            // csv file not correct, download data from webpage instead
-                            await dataDownload(symbol: symbol, companyName: companyName!)
-                        }
-                    } else {
-                        // csv file download failed, download data from webpage instead
-                        await dataDownload(symbol: symbol, companyName: companyName!)
-                    }
-                } catch {
-                    ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error when trying to download Yahoo CSV Price csv file for \(symbol)")
+        Task.init(priority: .background) {
+            
+            if let prices = await YahooPageScraper.dailyPricesDownloadCSV(symbol: symbol) {
+                DispatchQueue.main.async {
+                    self.callingVC.addShare(url: nil, pricePoints: prices, symbol: symbol, companyName: companyName)
                 }
-                
+            }
+            else if let prices = await dataDownload(symbol: symbol, companyName: companyName!) {
+                DispatchQueue.main.async {
+                    self.callingVC.addShare(url: nil, pricePoints: prices, symbol: symbol, companyName: companyName)
+                }
             }
         }
+        
+        
+//        let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate) // 10 years back!
+//        let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
+//
+//        let start$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
+//        let end$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
+//
+//        var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(symbol)")
+//        urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
+//
+//
+//        if let sourceURL = urlComponents?.url {
+//
+//            // first try to download historical prices from Yahoo finance as CSV file
+//            let expectedHeaderTitles = ["Date","Open","High","Low","Close","Adj Close","Volume"]
+//
+//            Task.init(priority: .background) {
+//
+//                if let prices = await YahooPageScraper.dailyPricesDownloadCSV(symbol: symbol, companyName: companyName) {
+//                    DispatchQueue.main.async {
+//                        self.callingVC.addShare(url: nil, pricePoints: prices, symbol: symbol, companyName: companyName)
+//                    }
+//                }
+//                else {
+//                    await dataDownload(symbol: symbol, companyName: companyName!)
+//                }
+                
+//                do {
+//                    if let csvURL = try await Downloader.downloadCSVFile2(url: sourceURL, symbol: symbol, type: "_PPoints") {
+//                        if CSVImporter.matchesExpectedFormat(url: csvURL, expectedHeaderTitles: expectedHeaderTitles) {
+//                            // successful CSV file downloaded
+//                            DispatchQueue.main.async {
+//                                self.callingVC.addShare(url: csvURL, pricePoints: nil, symbol: symbol, companyName: companyName)
+//                            }
+//                        } else {
+//                            // csv file not correct, download data from webpage instead
+//                            await dataDownload(symbol: symbol, companyName: companyName!)
+//                        }
+//                    } else {
+//                        // csv file download failed, download data from webpage instead
+//                        await dataDownload(symbol: symbol, companyName: companyName!)
+//                    }
+//                } catch {
+//                    ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error when trying to download Yahoo CSV Price csv file for \(symbol)")
+//                }
+                
+//            }
+//        }
     }
     
-    func dataDownload(symbol: String, companyName: String) async {
+    func dataDownload(symbol: String, companyName: String) async -> [PricePoint]? {
         
         let tenYearsSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate)
         let nowSinceRefDate = Date().timeIntervalSince(yahooRefDate)
@@ -206,17 +230,11 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
 
         // second, if file download fails download price page table and extract price data
         if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-//            do {
-            let pricePoints = await downloadYahooPriceData(sourceURL, stockName: companyName)
+            return await downloadYahooPriceData(sourceURL, stockName: companyName)
             
-            DispatchQueue.main.async {
-                self.callingVC.addShare(url: nil, pricePoints: pricePoints, symbol: symbol, companyName: companyName)
-            }
-//            } catch {
-//                alertController.showDialog(title: "Dowload failed", alertMessage: "can't find any company data for \(symbol) on Yahoo finance \(error.localizedDescription)")
-//                return
-//            }
         }
+        
+        return nil
 
     }
 
@@ -326,26 +344,3 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
     }
 
 }
-
-/*
- extension StockSearchTVC: CSVFileDownloadDelegate {
- 
- func dataDownloadCompleted(results: [DatedValue]?) {
- <#code#>
- }
- 
- 
- func csvFileDownloadComplete(localURL: URL, companyName: String) {
- callingVC.addShare(fileURL: localURL, companyName: companyName)
- }
- 
- func csvFileDownloadWithHeaderError(symbol: String, companyName: String) {
- 
- Task(priority: .background) {
- await self.dataDownload(symbol: symbol, companyName: companyName)
- }
- }
- 
- 
- }
- */

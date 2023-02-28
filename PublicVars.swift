@@ -39,7 +39,7 @@ let gradientBarHeight = UIImage(named: "GradientBar")!.size.height - 1
 let gradientBar = UIImage(named: "GradientBar")
 let userDefaultTerms = UserDefaultTerms()
 let sharesListSortParameter = SharesListSortParameter()
-var valuationWeightsSingleton = Financial_Valuation_Factors()
+var valuationFactors = Financial_Valuation_Factors()
 let nonRefreshTimeInterval: TimeInterval  = 300
 
 enum Order {
@@ -1065,16 +1065,20 @@ struct Financial_Valuation_Factors {
 
 // 1 future earnings growth estimate
         if self.futureEarningsGrowth > 0 {
-            if let research = forShare.research {
-                if research.futureGrowthMean != 0 {
+//            if let research = forShare.research {
+                
+                
+                let futureGrowth = forShare.analysis?.adjFutureGrowthRate.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last ?? forShare.analysis?.future_growthNextYear.valuesOnly(dateOrdered: .ascending,withoutZeroes: true)?.last
+
+                if futureGrowth != nil {
                     var correctedFactor = Double()
-                    if research.futureGrowthMean > 0.15 {
+                    if futureGrowth! > 0.15 {
                         correctedFactor = 1.0
                     }
-                    else if research.futureGrowthMean > 0.1 {
+                    else if futureGrowth! > 0.1 {
                         correctedFactor = 0.5
                     }
-                    else if research.futureGrowthMean > 0 {
+                    else if futureGrowth! > 0 {
                         correctedFactor = 0.25
                     }
                     else {
@@ -1085,13 +1089,13 @@ struct Financial_Valuation_Factors {
                     allWeights.append(futureEarningsGrowth)
                     allFactorNames.append("Future earnings growth")
                 }
-            }
+//            }
         }
         
 // 2 WBV trailing revenue growth
-        if let wbv = forShare.wbValuation {
+//        if let wbv = forShare.wbValuation {
             
-            if let valid = valueFactor(values1: wbv.revenue, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            if let valid = valueFactor(values1: forShare.income_statement?.revenue.valuesOnly(dateOrdered: .ascending), values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
 
                 allFactors.append(valid * revenueGrowth)
                 allWeights.append(revenueGrowth)
@@ -1099,7 +1103,7 @@ struct Financial_Valuation_Factors {
             }
         
 // 3 WBC trailing retained earnings growth
-            if let valid = valueFactor(values1: wbv.equityRepurchased, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            if let valid = valueFactor(values1: forShare.balance_sheet?.retained_earnings.valuesOnly(dateOrdered: .ascending), values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
 
                 allFactors.append(valid * retEarningsGrowth)
                 allWeights.append(retEarningsGrowth)
@@ -1107,7 +1111,7 @@ struct Financial_Valuation_Factors {
             }
             
 // 4 WBC trailing EPS growth
-            if let valid = valueFactor(values1: wbv.eps, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            if let valid = valueFactor(values1:forShare.income_statement?.eps_annual.valuesOnly(dateOrdered: .ascending), values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
 
                 allFactors.append(valid * epsGrowth)
                 allWeights.append(epsGrowth)
@@ -1115,7 +1119,9 @@ struct Financial_Valuation_Factors {
             }
 
 // 5 WBV Profit margin growth
-            if let valid = valueFactor(values1: wbv.revenue, values2: wbv.grossProfit, maxCutOff: 1, emaPeriod: emaPeriods) {
+            if let valid = valueFactor(values1: forShare.income_statement?.revenue.valuesOnly(dateOrdered: .ascending),
+                       values2: forShare.income_statement?.grossProfit.valuesOnly(dateOrdered: .ascending),
+                       maxCutOff: 1, emaPeriod: emaPeriods) {
 
                 allFactors.append(valid * profitMargin)
                 allWeights.append(profitMargin)
@@ -1123,23 +1129,27 @@ struct Financial_Valuation_Factors {
             }
 
 // 6 WBV Lynch score
-            if let earningsGrowth = wbv.netEarnings?.growthRates()?.ema(periods: emaPeriods) {
-                let denominator = (earningsGrowth + forShare.divYieldCurrent) * 100
-                if forShare.peRatio_current > 0 {
-                    var value = (denominator / forShare.peRatio_current) - 1
-                    if value > 1 { value = 1 }
-                    else if value < 0 { value = 0 }
-
-                    allFactors.append(value * lynchScore)
-                    allWeights.append(lynchScore)
-                    allFactorNames.append("P Lynch sore")
+            if let earningsGrowth = forShare.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.growthRates(dateOrder: .descending)?.ema(periods: emaPeriods) {
+                if let divYield = forShare.key_stats?.dividendYield.valuesOnly(dateOrdered: .ascending)?.last {
+                    let denominator = (earningsGrowth + divYield) * 100
+                    if let currentPE = forShare.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+                        if currentPE > 0 {
+                            var value = (denominator / currentPE) - 1
+                            if value > 1 { value = 1 }
+                            else if value < 0 { value = 0 }
+                            
+                            allFactors.append(value * lynchScore)
+                            allWeights.append(lynchScore)
+                            allFactorNames.append("P Lynch sore")
+                        }
+                    }
                 }
             }
 
 // 7 WBV CapEx
-            if let sumDiv = wbv.netEarnings?.reduce(0, +) {
+            if let sumDiv = forShare.income_statement?.netIncome.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.reduce(0, +) {
                 // use 10 y sums / averages, not ema according to Book Ch 51
-                if let sumDenom = wbv.capExpend?.reduce(0, +) {
+                if let sumDenom = forShare.cash_flow?.capEx.valuesOnly(dateOrdered: .ascending)?.reduce(0, +) {
                     let tenYAverages = abs(sumDenom / sumDiv)
                     let maxCutOff = 0.5
                     let factor = (tenYAverages < maxCutOff) ? ((maxCutOff - tenYAverages) / maxCutOff) : 0
@@ -1150,42 +1160,42 @@ struct Financial_Valuation_Factors {
                 }
             }
             
-            if let valid = valueFactor(values1: wbv.roe, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            if let valid = valueFactor(values1:forShare.ratios?.roe.valuesOnly(dateOrdered: .ascending), values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
 
                 allFactors.append(valid * roeGrowth)
                 allWeights.append(roeGrowth)
                 allFactorNames.append("ROE growth trend")
             }
 
-            if let valid = valueFactor(values1: wbv.opCashFlow, values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
+            if let valid = valueFactor(values1: forShare.cash_flow?.opCashFlow.valuesOnly(dateOrdered: .ascending), values2: nil, maxCutOff: 1, emaPeriod: emaPeriods) {
 
                 allFactors.append(valid * opCashFlowGrowth)
                 allWeights.append(opCashFlowGrowth)
                 allFactorNames.append("Op. cash flow growth trend")
             }
             
-            if let valid = inverseValueFactor(values1: wbv.netEarnings, values2: wbv.debtLT ?? [], maxCutOff: 3, emaPeriod: emaPeriods, removeZeroElements: false) {
+            if let valid = inverseValueFactor(values1: forShare.income_statement?.netIncome.valuesOnly(dateOrdered: .descending), values2: forShare.balance_sheet?.debt_longTerm.valuesOnly(dateOrdered: .descending) ?? [], maxCutOff: 3, emaPeriod: emaPeriods, removeZeroElements: false) {
 
                 allFactors.append(valid * ltDebtDivIncome)
                 allWeights.append(ltDebtDivIncome)
                 allFactorNames.append("Growth trend long-term debt / net earnings")
             }
 
-            if let valid = valueFactor(values1: wbv.grossProfit, values2: wbv.sgaExpense ?? [], maxCutOff: 0.4, emaPeriod: emaPeriods) {
+            if let valid = valueFactor(values1: forShare.income_statement?.grossProfit.valuesOnly(dateOrdered: .descending), values2: forShare.income_statement?.sgaExpense.valuesOnly(dateOrdered: .descending) ?? [], maxCutOff: 0.4, emaPeriod: emaPeriods) {
 
                 allFactors.append(valid * sgaDivProfit)
                 allWeights.append(sgaDivProfit)
                 allFactorNames.append("Growth trend SGA expense / profit")
             }
             
-            if let valid = valueFactor(values1: wbv.grossProfit, values2: wbv.rAndDexpense ?? [], maxCutOff: 1, emaPeriod: emaPeriods) {
+            if let valid = valueFactor(values1: forShare.income_statement?.grossProfit.valuesOnly(dateOrdered: .descending), values2: forShare.income_statement?.rdExpense.valuesOnly(dateOrdered: .descending), maxCutOff: 1, emaPeriod: emaPeriods) {
 
                 allFactors.append(valid * radDivProfit)
                 allWeights.append(radDivProfit)
                 allFactorNames.append("Growth trend R&D expense / profit")
             }
 
-        }
+//        }
         
         if let (errors, moat) = forShare.rule1Valuation?.moatScore() {
             

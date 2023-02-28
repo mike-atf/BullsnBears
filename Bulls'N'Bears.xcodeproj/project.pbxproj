@@ -66,6 +66,7 @@
 		EA32081B25EF9A1400A6A6AB /* WBVRatingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA32081A25EF9A1400A6A6AB /* WBVRatingButton.swift */; };
 		EA32082825EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA32082625EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift */; };
 		EA32082925EFDF1F00A6A6AB /* WBValuation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA32082725EFDF1F00A6A6AB /* WBValuation+CoreDataProperties.swift */; };
+		EA3613E829A677D3007ED67F /* ArivaScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3613E729A677D3007ED67F /* ArivaScraper.swift */; };
 		EA3DF0C4260A1184001A0098 /* LineCrossingSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */; };
 		EA3DF0C9260B8C5A001A0098 /* BuySellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3DF0C8260B8C5A001A0098 /* BuySellView.swift */; };
 		EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */; };
@@ -385,6 +386,7 @@
 		EA32081A25EF9A1400A6A6AB /* WBVRatingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBVRatingButton.swift; sourceTree = "<group>"; };
 		EA32082625EFDF1F00A6A6AB /* WBValuation+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WBValuation+CoreDataClass.swift"; sourceTree = "<group>"; };
 		EA32082725EFDF1F00A6A6AB /* WBValuation+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WBValuation+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		EA3613E729A677D3007ED67F /* ArivaScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArivaScraper.swift; sourceTree = "<group>"; };
 		EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineCrossingSignal.swift; sourceTree = "<group>"; };
 		EA3DF0C8260B8C5A001A0098 /* BuySellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BuySellView.swift; path = "Bulls'N'Bears/Model Files/BuySellView.swift"; sourceTree = SOURCE_ROOT; };
 		EA4B5F1625E2B6D40070CC70 /* ValueChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueChart.swift; sourceTree = "<group>"; };
@@ -663,8 +665,9 @@
 				EAA548B82734302F0083808A /* WebPageScraper2.swift */,
 				EA84A1242971EC6C000A1957 /* MacrotrendsScraper.swift */,
 				EAF8CDBF296759BB0069D77D /* YahooPageScraper.swift */,
-				EA84A1222971E8F5000A1957 /* TSScraper.swift */,
 				EA84A12029709FED000A1957 /* YChartsScraper.swift */,
+				EA84A1222971E8F5000A1957 /* TSScraper.swift */,
+				EA3613E729A677D3007ED67F /* ArivaScraper.swift */,
 				EAA548B627342FA10083808A /* Downloader.swift */,
 				EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */,
 				EA51A9BF2632FD3200C857A8 /* CitationsManager.swift */,
@@ -1066,6 +1069,7 @@
 				EAF8CDD8296B3DAB0069D77D /* Cash_flow+CoreDataProperties.swift in Sources */,
 				EAC2FC4525A0B76B0060F387 /* Rule1Valuation+CoreDataProperties.swift in Sources */,
 				EA641C292642BCD4002FE8C1 /* TBYChartViewController.swift in Sources */,
+				EA3613E829A677D3007ED67F /* ArivaScraper.swift in Sources */,
 				EA20161C2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */,
 				EA225B1D25F3DE9700871D7D /* ScoreCircle.swift in Sources */,
 				EAB58D8026F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */,
@@ -1479,7 +1483,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7.8;
+				MARKETING_VERSION = 0.8;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1503,7 +1507,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7.8;
+				MARKETING_VERSION = 0.8;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

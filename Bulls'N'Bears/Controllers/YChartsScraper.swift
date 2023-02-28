@@ -9,9 +9,43 @@ import Foundation
 import CoreData
 import UIKit
 
+enum YChartsDownloadTasks {
+    case all
+    case qEPS
+    case divYield
+}
+
+struct YChartDownloadJob {
+    
+    var url: URL?
+    var task: YChartsDownloadTasks
+    
+    init(symbol: String, task: YChartsDownloadTasks ,taskString: String) {
+                
+        self.url = URL(string: ("https://ycharts.com/companies/" + symbol.uppercased() + "/" + taskString))
+        self.task = task
+    }
+    
+}
+
 class YChartsScraper {
     
+    class func downloadJobs(symbol: String, option: YChartsDownloadTasks) -> [YChartDownloadJob] {
+        
+        switch option {
+        case .qEPS:
+            return [YChartDownloadJob(symbol: symbol, task: .qEPS ,taskString: "eps")]
+        case .divYield:
+            return [YChartDownloadJob(symbol: symbol, task: .divYield ,taskString: "dividend_yield")]
+        case .all:
+            let eps = YChartDownloadJob(symbol: symbol, task: .qEPS ,taskString: "eps")
+            let divYield = YChartDownloadJob(symbol: symbol, task: .divYield ,taskString: "dividend_yield")
+            return [eps, divYield]
+        }
+    }
     
+    
+    /*
     /// returns quarterly eps  with dates from YCharts website
     /// in form of [DatedValues] = (date, eps )
     /// ; optional parameter 'date' returns values back to this date and the first set before.
@@ -47,13 +81,49 @@ class YChartsScraper {
             }
 
     }
+     
+     */
     
-    class func qepsDownloadAnalyseSave(symbol: String, shortName: String, shareID: NSManagedObjectID, until date: Date?=nil, progressDelegate: ProgressViewDelegate? , downloadRedirectDelegate: DownloadRedirectionDelegate?) async {
+    class func dataDownloadAnalyseSave(symbol: String, downloadOption: YChartsDownloadTasks ,shareID: NSManagedObjectID, until date: Date?=nil, progressDelegate: ProgressViewDelegate?) async {
         
-        var sn = shortName
-        if sn.contains(" ") {
-            sn = sn.replacingOccurrences(of: " ", with: "-").lowercased()
+        let jobs = YChartsScraper.downloadJobs(symbol: symbol, option: downloadOption)
+        let codes = WebpageExtractionCodes(tableTitle: "Historical EPS Diluted (Quarterly) Data", option: .yCharts, dataCellStartSequence: "<td") // "\">"
+
+        var labelledDVs = [Labelled_DatedValues]()
+        for job in jobs {
+            
+            guard let htmlText = await Downloader().downloadDataWithRedirectionOption(url: job.url) else {
+                ErrorController.addInternalError(errorLocation: #function, errorInfo: "Download failure for YCHarts data for \(String(describing: job.url)) - html text nil")
+                continue
+            }
+            
+            // TODO: - won't work for dividend_Yield page - needs new extractor
+            if let datedValues = YChartsScraper.extractQEPSTableData(html: htmlText, extractionCodes: codes, untilDate: date) {
+                
+                let label = job.task == .qEPS ? "quarterly eps" : "dividend yield"
+                let labelledDV = Labelled_DatedValues(label: label, datedValues: datedValues)
+                labelledDVs.append(labelledDV)
+            }
+            else {  ErrorController.addInternalError(errorLocation: #function, errorInfo: "did not find any qEPS data on YCharts for \(symbol)")
+            }
         }
+        let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+        backgroundMoc.automaticallyMergesChangesFromParent = true
+        
+        do {
+            if let bgShare = backgroundMoc.object(with: shareID) as? Share {
+                try await bgShare.mergeInDownloadedData(labelledDatedValues: labelledDVs)
+                try bgShare.managedObjectContext?.save()
+            }
+        }
+        catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "failed YCharts data download or bg save for \(symbol)")
+        }
+            
+    }
+    
+    /*
+    class func qepsDownloadAnalyseSave(symbol: String, shortName: String, shareID: NSManagedObjectID, until date: Date?=nil, progressDelegate: ProgressViewDelegate? , downloadRedirectDelegate: DownloadRedirectionDelegate?) async {
                 
         guard let url = URL(string: ("https://ycharts.com/companies/" + symbol.uppercased() + "/eps")) else {
             ErrorController.addInternalError(errorLocation: #function, errorInfo: "Download failure for YCHarts data for \(symbol) - URL error")
@@ -62,10 +132,12 @@ class YChartsScraper {
 
         
         var htmlText:String?
-        var datedValues = [DatedValue]()
         let downloader = Downloader(task: .qEPS)
-    
-        NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
+        
+        if downloadRedirectDelegate != nil {
+            
+            NotificationCenter.default.addObserver(downloadRedirectDelegate!, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
+        }
         
         htmlText = await downloader.downloadDataWithRedirectionOption(url: url)
     
@@ -75,13 +147,18 @@ class YChartsScraper {
         }
         
         let codes = WebpageExtractionCodes(tableTitle: "Historical EPS Diluted (Quarterly) Data", option: .yCharts, dataCellStartSequence: "<td") // "\">"
+        
+        guard let datedValues = YChartsScraper.extractQEPSTableData(html: validPageText, extractionCodes: codes, untilDate: date) else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "did not find any qEPS data on YCharts for \(symbol)")
+            return
+        }
+
 
         let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc.automaticallyMergesChangesFromParent = true
         
         do {
             if let bgShare = backgroundMoc.object(with: shareID) as? Share {
-                datedValues = try YChartsScraper.extractQEPSTableData(html: validPageText, extractionCodes: codes, untilDate: date)
                 bgShare.income_statement?.eps_quarter = datedValues.convertToData()
                 try bgShare.managedObjectContext?.save()
             }
@@ -91,12 +168,12 @@ class YChartsScraper {
         }
 
     }
-
+    */
     
     // MARK: - Internal functions
     
     /// for MT pages such as 'PE-Ratio' with dated rows and table header, to assist 'extractTable' and 'extractTableData' func
-    class func extractQEPSTableData(html: String, extractionCodes: WebpageExtractionCodes ,untilDate: Date?=nil) throws -> [DatedValue] {
+    class func extractQEPSTableData(html: String, extractionCodes: WebpageExtractionCodes ,untilDate: Date?=nil) -> [DatedValue]? {
         
         let bodyStartSequence = extractionCodes.bodyStartSequence
         let bodyEndSequence = extractionCodes.bodyEndSequence
@@ -107,19 +184,21 @@ class YChartsScraper {
         let startSequence = extractionCodes.tableTitle ?? extractionCodes.tableStartSequence
         
         guard let tableStartIndex = html.range(of: startSequence) else {
-            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: startSequence)) in \(html)", errorType: .htmlTableTitleNotFound)
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "did not find \(String(describing: startSequence))")
+            return nil
         }
         
         var tableText = String(html[tableStartIndex.upperBound..<html.endIndex])
 
         guard let bodyStartIndex = tableText.range(of: bodyStartSequence) else {
-            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: bodyStartSequence)) in \(tableText)", errorType: .htmlTableBodyStartIndexNotFound)
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "did not find \(String(describing: bodyStartSequence)) in \(tableText)")
+            return nil
         }
         
         guard let bodyEndIndex = tableText.range(of: bodyEndSequence,options: [NSString.CompareOptions.literal], range: bodyStartIndex.upperBound..<tableText.endIndex, locale: nil) else {
-            throw InternalError(location: #function, errorInfo: "did not find \(String(describing: bodyEndSequence)) in \(tableText)", errorType: .htmlTableBodyEndIndexNotFound)
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "did not find \(String(describing: bodyEndSequence)) in \(tableText)")
+            return nil
         }
-        
         
         tableText = String(tableText[bodyStartIndex.upperBound..<bodyEndIndex.lowerBound])
         var rowStartIndex = tableText.range(of: extractionCodes.rowStartSequence, options: [NSString.CompareOptions.literal])

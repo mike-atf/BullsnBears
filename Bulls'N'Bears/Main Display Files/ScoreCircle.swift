@@ -65,22 +65,6 @@ class ScoreCircle: UIView {
         
 
         setNeedsDisplay()
-        /*
-        if symbol == .star {
-            centerImageView = UIImageView(image: UIImage(systemName: "star.circle")!)
-        } else {
-            centerImageView = UIImageView(image: UIImage(systemName: "dollarsign.circle")!)
-        }
-
-        centerImageView.tintColor = userCommentsCount > 0 ? UIColor.link : UIColor.systemGray
-        addSubview(centerImageView)
-        centerImageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        centerImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        centerImageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        centerImageView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.6).isActive = true
-        centerImageView.widthAnchor.constraint(equalTo: centerImageView.heightAnchor).isActive = true
-         */
         
         if userCommentsCount > 0 {
             tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(userTap))

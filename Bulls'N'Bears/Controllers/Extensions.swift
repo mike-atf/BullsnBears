@@ -7,6 +7,172 @@
 
 import UIKit
 
+//MARK: - [YahooDictionaryEntry]
+extension [YahooDictionaryEntry] {
+    
+    func pageName(for saveTitle: String) -> String? {
+        
+        return self.filter { element in
+            if element.parameterTitle == saveTitle { return true }
+            else { return false }
+        }.first?.pageName
+    }
+    
+    func sectionName(for saveTitle: String) -> String? {
+        
+        return self.filter { element in
+            if element.parameterTitle == saveTitle { return true }
+            else { return false }
+        }.first?.sectionName
+    }
+    
+    func addElement(pageName: String, sectionNames: [String?], rowNames: [[String]], saveNames: [[String?]]) -> [YahooDictionaryEntry] {
+        
+        var existing = self
+        var sectionCount = 0
+        var rowCount = 0
+        
+        for names in rowNames {
+            rowCount = 0
+            let sections = sectionNames[sectionCount]
+            for name in names {
+                let new = YahooDictionaryEntry(pageName: pageName, sectionName: sections, rowName: name, parameterTitle: saveNames[sectionCount][rowCount] ?? name)
+                rowCount += 1
+                existing.append(new)
+            }
+            sectionCount += 1
+        }
+        
+        return existing
+    }
+
+    func rowTitles(for downloadOption: DownloadOptions) -> [String] {
+        
+        switch downloadOption {
+        case .allPossible:
+            return [
+                [["Revenue","EPS - Earnings Per Share", "Net Income","Interest expense","Income before tax","Income tax expense"]],
+                [["Current debt","Long-term Debt","Total liabilities"]],
+                [["Free cash flow", "Operating cash flow","Capital expenditure"]],
+                [["Total insider shares held", "Purchases", "Sales"]],
+                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
+                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)","Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
+                [["Sector", "Industry", "Employees", "Description"]],
+                [["Market cap","Beta (5Y monthly)", "PE ratio (TTM)","Earnings date"]]].flatMap{ $0 }.flatMap{ $0 }
+            case .dcfOnly:
+            return [
+                [["Total revenue", "Net income", "Interest expense","Income before tax","Income tax expense"]],
+                [["Current debt","Long-term debt"]],
+                [["Free cash flow","Capital expenditure"]],
+                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
+                [["Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
+                [["Market cap","Beta (5Y monthly)", "Earnings date"]]].flatMap{ $0 }.flatMap{ $0 }
+        case .rule1Only:
+                return [
+                [["Total revenue","Basic EPS","Net income"]],
+                [["Current debt","Long-term debt"]],
+                [["Total insider shares held", "Purchases", "Sales"]],
+                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
+                [["Forward P/E"]]
+                ].flatMap{ $0 }.flatMap{ $0 }
+        case .wbvOnly:
+            return [
+                [["Total revenue","Basic EPS","Net income", "Interest expense","Income before tax","Income tax expense"]],
+                [["Current debt","Long-term debt", "Total liabilities"]],
+                [["Free cash flow","Operating cash flow","Capital expenditure"]],
+                [["Total insider shares held", "Purchases", "Sales"]],
+                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
+                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]]].flatMap{ $0 }.flatMap{ $0 }
+        case .yahooKeyStatistics:
+            return [[["Beta (5Y monthly)", "Trailing P/E", "Diluted EPS", "Trailing annual dividend yield"]],
+                         [["Market cap","Beta (5Y monthly)", "Earnings date"]]].flatMap{ $0 }.flatMap{ $0 }
+        case .yahooProfile:
+            return [[["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]]].flatMap{ $0 }.flatMap{ $0 }
+        case .lynchParameters:
+            return [[["Trailing annual dividend yield"]], [["PE ratio (TTM)"]]].flatMap{ $0 }.flatMap{ $0 }
+        case .wbvIntrinsicValue:
+            return []
+        case .allValuationDataOnly:
+            return [
+                [["Total revenue","Basic EPS","Net income", "Interest expense","Income before tax","Income tax expense"]],
+                [["Current debt","Long-term debt", "Total liabilities"]],
+                [["Free cash flow","Operating cash flow","Capital expenditure"]],
+                [["Total insider shares held", "Purchases", "Sales"]],
+                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
+                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
+                [["Market cap","Beta (5Y monthly)", "Earnings date"]]].flatMap{ $0 }.flatMap{ $0 }
+        case .researchDataOnly:
+            return [
+                    [["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]],
+                    [["Market cap","Beta (5Y monthly)", "Earnings date"]]].flatMap{ $0 }.flatMap{ $0 }
+        case .mainIndicatorsOnly:
+            // none required for moat from Yahoo
+            return [[["Trailing annual dividend yield"]], [["PE ratio (TTM)"]]].flatMap{ $0 }.flatMap{ $0 }
+        case .screeningInfos:
+            var array = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)","Market cap","Beta (5Y monthly)", "Earnings date"]]] // [keyStat, summary]
+            array.append([["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]]) // profile
+            return array.flatMap{ $0 }.flatMap{ $0 }
+        default:
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "[YahooWebDictionary] has been asked to download unknown job \(downloadOption)")
+            return []
+        }
+    }
+    
+    func findEntries(for rowNames: [String]) -> [YahooDictionaryEntry]? {
+        
+        return self.filter { entry in
+            if rowNames.contains(entry.rowName) { return true }
+            else { return false }
+        }
+    }
+    
+    func downloadJobs(for option: DownloadOptions, symbol: String, shortName: String) -> [YahooDownloadJob]? {
+        
+        let rows = self.rowTitles(for: option)
+        guard let allMatchingsEntries = findEntries(for: rows) else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "no matching entries for \(rows)")
+            return nil
+        }
+        
+        let pages = Set<String>(allMatchingsEntries.compactMap{ $0.pageName })
+        
+        var jobs = [YahooDownloadJob]()
+        for page in pages {
+            
+            let entriesForPage = allMatchingsEntries.filter({ entry in
+                if entry.pageName == page { return true }
+                else { return false }
+            })
+            
+            let sectionsSetForPage: Set<String?> = Set<String?>(entriesForPage.map{ $0.sectionName })
+            let sectionsForPage = sectionsSetForPage.map { $0 }
+            
+            var rowsForSections = [[String]]()
+            var saveAsForSections = [[String]]()
+            for section in sectionsForPage {
+                let entriesForSection = entriesForPage.filter { entry in
+                    if entry.sectionName == section { return true }
+                    else { return false }
+                }
+                
+                let rowsForSection = entriesForSection.compactMap{ $0.rowName }
+                let savAsForSection = entriesForSection.compactMap{ $0.parameterTitle }
+                rowsForSections.append(rowsForSection)
+                saveAsForSections.append(savAsForSection)
+            }
+
+            if let newJob = YahooDownloadJob(symbol: symbol, shortName: shortName, pageName: page, tableTitles: sectionsForPage, rowTitles: rowsForSections, saveTitles: saveAsForSections) {
+                jobs.append(newJob)
+            } else {
+                ErrorController.addInternalError(errorLocation: #function, errorInfo: "failed to create job for page \(page), sections \(sectionsSetForPage), rows \(rowsForSections)")
+            }
+        }
+        return jobs
+    }
+
+    
+}
+
 //MARK: - [DatedValue]
 extension [DatedValue] {
     
@@ -17,6 +183,8 @@ extension [DatedValue] {
     func mergeIn(newDV: [DatedValue]?, removeZeroes:Bool?=false) -> [DatedValue]? {
         
         guard let new = newDV?.sortByDate(dateOrder: .ascending) else { return self }
+        
+        guard new.count > 0 else { return self }
 
         var existing = self.sortByDate(dateOrder: .ascending)
         if new.count < existing.count {
@@ -27,7 +195,7 @@ extension [DatedValue] {
             })
             
             if removeZeroes ?? false {
-                existing.filter { dv in
+                existing = existing.filter { dv in
                     if dv.value == 0 { return false }
                     else { return true }
                 }
@@ -431,15 +599,23 @@ extension [DatedValues] {
 
 extension Data? {
         
-    func datedValues(dateOrder: Order, oneForEachYear:Bool?=nil) -> [DatedValue]? {
+    func datedValues(dateOrder: Order, oneForEachYear:Bool?=nil, includeThisYear:Bool?=false) -> [DatedValue]? {
         
         guard self != nil else { return nil }
-        
+
         do {
             if let dictionary = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(self!) as? [Date: Double] {
                 var datedValues = [DatedValue]()
                 for element in dictionary {
                     datedValues.append(DatedValue(date: element.key, value: element.value))
+                }
+                
+                if !(includeThisYear ?? false ) {
+                    let startThisYear = DatesManager.beginningOfYear(of: Date())
+                    datedValues = datedValues.filter { dv in
+                        if dv.date < startThisYear { return true }
+                        else { return false }
+                    }
                 }
                 
                 if !(oneForEachYear ?? false) {
@@ -552,9 +728,9 @@ extension Data? {
 
     }
     
-    func valuesOnly(dateOrdered: Order, withoutZeroes:Bool?=false, oneElementPerYear:Bool?=false) -> [Double]? {
+    func valuesOnly(dateOrdered: Order, withoutZeroes:Bool?=false, oneElementPerYear:Bool?=false, includeThisYear:Bool?=false) -> [Double]? {
         
-        if let dvs = self.datedValues(dateOrder: dateOrdered, oneForEachYear: oneElementPerYear) {
+        if let dvs = self.datedValues(dateOrder: dateOrdered, oneForEachYear: oneElementPerYear, includeThisYear: includeThisYear) {
             if !(withoutZeroes ?? false) {
                 return dvs.compactMap{ $0.value }
             } else {
@@ -1441,7 +1617,8 @@ extension String {
 
 extension [PricePoint] {
     
-    /// filters out any new pricePoints that are earlier than the latest existing PricePoint
+    /// if new PP have earlier and equal or later datre than existing one replaces exsting ones with new
+    /// otherwise, filters out any new pricePoints that are earlier than the latest existing PricePoint
     func mergeIn(pricePoints: [PricePoint]?) -> [PricePoint] {
         
         guard let newPP = pricePoints else {
@@ -1452,9 +1629,23 @@ extension [PricePoint] {
             return pricePoints ?? [PricePoint]()
         }
         
-        let latestExistingDate = self.compactMap{ $0.tradingDate }.max()!
-        var merged = self
+        let existingPriceDates = self.compactMap{ $0.tradingDate }
+        let earliestExistingDate = existingPriceDates.min()!
+        let latestExistingDate = existingPriceDates.max()!
+ 
+        let newPriceDates = newPP.compactMap{ $0.tradingDate }
+        let earliestNewDate = newPriceDates.min()!
+        let latestNewDate = newPriceDates.max()!
         
+        // if new pricePoints are from earlier as well equal/or later than current PP replace existing with newPP
+        if earliestNewDate < earliestExistingDate {
+            if latestExistingDate <= latestNewDate {
+                print("replacing exisitng price points with new from \(earliestNewDate) -- to -- \(latestNewDate)")
+                return newPP
+            }
+        }
+        
+        var merged = self
         let newerPricePoints = newPP.filter({ pp in
             if pp.tradingDate > latestExistingDate {
                 return true

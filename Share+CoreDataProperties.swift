@@ -20,9 +20,9 @@ extension Share {
     @NSManaged public var creationDate: Date?
     @NSManaged public var dailyPrices: Data?
     @NSManaged public var dividendWDates: Data?
-    @NSManaged public var divYieldCurrent: Double
+//    @NSManaged public var divYieldCurrent: Double
     @NSManaged public var employees: Double
-    @NSManaged public var eps_current: Double
+//    @NSManaged public var eps_current: Double
     @NSManaged public var exchange: String?
     @NSManaged public var industry: String?
     @NSManaged public var isin: String?
@@ -30,10 +30,10 @@ extension Share {
     @NSManaged public var lastLivePriceDate: Date?
     @NSManaged public var macd: Data?
     @NSManaged public var moat: Double
-    @NSManaged public var moatCategory: String?
+//    @NSManaged public var moatCategory: String?
     @NSManaged public var name_long: String?
     @NSManaged public var name_short: String?
-    @NSManaged public var peRatio_current: Double
+//    @NSManaged public var peRatio_current: Double
     @NSManaged public var purchaseStory: String?
     @NSManaged public var return3y: Double
     @NSManaged public var return10y: Double

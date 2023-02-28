@@ -234,7 +234,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         let newValuation:WBValuation? = {
             NSEntityDescription.insertNewObject(forEntityName: "WBValuation", into: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext) as? WBValuation
         }()
-        newValuation?.company = share.symbol!
+//        newValuation?.company = share.symbol!
         share.wbValuation = newValuation
         
         do {
@@ -267,22 +267,22 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         return ratings
     }
     
-    func updateData() {
-        
-        guard let validID = valuationID else {
-            ErrorController.addInternalError(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
-            return
-        }
-        
-        self.wbValuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? WBValuation)!
-    }
+//    func updateData() {
+//        
+//        guard let validID = valuationID else {
+//            ErrorController.addInternalError(errorLocation: "CombinedValuationController.checkValuation", systemError: nil, errorInfo: "controller has no valid NSManagedObjectID to fetch valuation")
+//            return
+//        }
+//        
+//        self.wbValuation = ((UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: validID) as? WBValuation)!
+//    }
 
     
     //MARK: - TVC controller functions
     
-    public func latestDataDate() -> Date? {
-        return wbValuation?.latestDataDate
-    }
+//    public func latestDataDate() -> Date? {
+//        return wbValuation?.latestDataDate
+//    }
 
     public func valuationDate() -> Date? {
         return wbValuation?.date
@@ -358,7 +358,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
             case 1:
             // PE ratio
-                if let pe = share.ratios?.pe_ratios.datedValues(dateOrder: .ascending)?.last {
+                if let pe = share.ratios?.pe_ratios.datedValues(dateOrder: .ascending, includeThisYear: true)?.last {
                     value$ = numberFormatter2Decimals.string(from: pe.value as NSNumber)
                     if pe.value > 0 {
                         color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 40, value: pe.value, greenCutoff: 10.0, redCutOff: 40.0)
@@ -412,7 +412,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     if let trendDVs = share.trendValues(trendName: .lynchScore) {
                         
                         if let pdv = trendDVs.filter({ dv in
-                            if dv.date < wbValuation.date! { return true }
+                            if dv.date < (wbValuation.date ?? Date()) { return true }
                             else { return false }
                         }).first {
                             value$! += " (" + numberFormatterWith1Digit.string(from: pdv.value as NSNumber)! + ")"
@@ -435,7 +435,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 value$ = v10$ + "/" + v3$
             case 5:
             // beta
-                if let beta = share.key_stats?.beta.valuesOnly(dateOrdered: .ascending)?.last {
+                if let beta = share.key_stats?.beta.valuesOnly(dateOrdered: .ascending, includeThisYear: true)?.last {
                     value$ = numberFormatter2Decimals.string(from: beta as NSNumber)
                 }
             case 6:
@@ -485,9 +485,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 }
             case 8:
             // WB intrinsic value
-//                if let currentPE = share.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending)?.last {
-//                if share.peRatio_current != Double() {
-
                     let (valid, es$) = wbValuation.ivalue()
                     errors = es$
                     if valid != nil {
@@ -496,7 +493,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     
                     if let trendData = share.trendValues(trendName: .intrinsicValue) {
                         let pastData = trendData.filter { datedValue in
-                            if datedValue.date < wbValuation.date! { return true }
+                            if datedValue.date < wbValuation.date ?? Date() { return true }
                             else { return false }
                         }
                         if let mostRecent = pastData.first {
@@ -807,29 +804,53 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             ErrorController.addInternalError(errorLocation: #function, errorInfo: "all data download reauested for \(symbol) but short name not available")
             return
         }
+        
+        
+        let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+        backgroundMoc.automaticallyMergesChangesFromParent = true
+        
+        let wbv = share.wbValuation ?? WBValuation(context: backgroundMoc)
+        wbv.share = share
+        wbv.date = Date()
+        
+        let r1v = share.rule1Valuation ?? Rule1Valuation(context: backgroundMoc)
+        r1v.share = share
+        r1v.creationDate = Date()
+        
+        let dcfv = share.dcfValuation ?? DCFValuation(context: backgroundMoc)
+        dcfv.share = share
+        dcfv.creationDate = Date()
+        
+        do {
+            try backgroundMoc.save()
+        }
+        catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "failed to save new valuations dates for \(symbol)")
+        }
+
         let shareID = share.objectID
         
             do {
-                progressDelegate?.allTasks = MacrotrendsScraper.countOfRowsToDownload(option: .allPossible) + YahooPageScraper.countOfRowsToDownload(option: .wbvOnly)
+                progressDelegate?.allTasks = MacrotrendsScraper.countOfRowsToDownload(option: .allValuationDataOnly) + YahooPageScraper.countOfRowsToDownload(option: .allValuationDataOnly)
 
                 // TODO: non-US stocks  needs review
                 if symbol.contains(".") {
                     
-                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .allPossible, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
+                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .allValuationDataOnly, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
                     
                     try Task.checkCancellation()
 
-                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allPossible, downloadRedirectDelegate: self)
+                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allValuationDataOnly, downloadRedirectDelegate: self)
 
                 }
                 // US stocks
                 else {
 
-                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .allPossible, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
+                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .allValuationDataOnly, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
                     
                     try Task.checkCancellation()
 
-                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allPossible, downloadRedirectDelegate: self)
+                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allValuationDataOnly, downloadRedirectDelegate: self)
 
                 }
             } catch {
@@ -839,8 +860,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             
             NotificationCenter.default.removeObserver(self)
             progressDelegate?.downloadComplete()
-//            return nil
-//        }
 
     }
 
@@ -859,35 +878,40 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         downloadTask = Task.init(priority: .background) {
             
             do {
-                try await YahooPageScraper.keyratioDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID)
+//                try await YahooPageScraper.keyratioDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID)
                 try Task.checkCancellation()
 //                if let validID = wbValuationID {
                 progressDelegate?.allTasks += 1
                 // non-US stocks
                 if symbol?.contains(".") ?? false {
                     
-                    try await MacrotrendsScraper.wbvDataDownloadAnalyseSave(shareSymbol: symbol,  shortName: shortName, shareID: shareID,downloadRedirectDelegate: self)
+                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missing symbol", shortName: shortName ?? "missing short name", shareID: shareID, option: .wbvOnly, downloadRedirectDelegate: self)
+                    
+//                    try await MacrotrendsScraper.wbvDataDownloadAnalyseSave(shareSymbol: symbol,  shortName: shortName, shareID: shareID,downloadRedirectDelegate: self)
                     
                 }
                 // US stocks
                 else {
-                    try await MacrotrendsScraper.wbvDataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadRedirectDelegate: self)
                     
+                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missing symbol", shortName: shortName ?? "missing short name", shareID: shareID, option: .wbvOnly, downloadRedirectDelegate: self)
+                    
+                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol ?? "missing symbol", shortName: shortName ?? "mimssing short name", shareID: shareID, downloadOption: .wbvOnly, downloadRedirectDelegate: self)
+//                    try await MacrotrendsScraper.wbvDataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadRedirectDelegate: self)
+//
                     progressDelegate?.taskCompleted()
                 }
-//                }
                 try Task.checkCancellation()
                 
                 progressDelegate?.allTasks += 2
 
-                try await Rule1Valuation.downloadAnalyseAndSave(shareSymbol: symbol, shortName: shortName!, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
-                
-                progressDelegate?.taskCompleted()
-
-                try Task.checkCancellation()
-                
-                try await YahooPageScraper.dcfDownloadAnalyseAndSave(shareSymbol: symbol, shareID: shareID, progressDelegate: nil)
-                progressDelegate?.taskCompleted()
+//                try await Rule1Valuation.downloadAnalyseAndSave(shareSymbol: symbol, shortName: shortName!, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
+//
+//                progressDelegate?.taskCompleted()
+//
+//                try Task.checkCancellation()
+//
+//                try await YahooPageScraper.dcfDownloadAnalyseAndSave(shareSymbol: symbol, shareID: shareID, progressDelegate: nil)
+//                progressDelegate?.taskCompleted()
 
 //                if dcfValuationID != nil {
 //                    progressDelegate?.allTasks += 1
@@ -895,7 +919,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
 //
 //                    progressDelegate?.taskCompleted()
 //                }
-                try Task.checkCancellation()
+//                try Task.checkCancellation()
 
             } catch let error {
                 progressDelegate?.downloadError(error: error.localizedDescription)

@@ -25,11 +25,6 @@ class FinHealthController: NSObject {
     var debEquityRatios = [ChartDataSet]()
     var currentHealthScore: Double?
     
-    // progressView
-//    var progressView: DownloadProgressView?
-//    var allDownloadTasks = 0
-//    var completedDownloadTasks = 0
-
     init(share: Share!, finHealthTVC: FinHealthTVC) {
         super.init()
         
@@ -89,6 +84,15 @@ class FinHealthController: NSObject {
 
         if indexPath.section == 1 {
             if indexPath.row == 0 {
+                // Health score
+                for healthData in share?.trendValues(trendName: .healthScore) ?? [] {
+                    let data = ChartDataSet(x: healthData.date, y: healthData.value)
+                    chartData.append(data)
+                }
+                return LabelledChartDataSet(title: "Health", chartData: chartData, format: .percent)
+                
+            }
+            else if indexPath.row == 1 {
                 // MOAT
                 for moatData in share?.trendValues(trendName: .moatScore) ?? [] {
                     let data = ChartDataSet(x: moatData.date, y: moatData.value)
@@ -96,21 +100,21 @@ class FinHealthController: NSObject {
                 }
                 return LabelledChartDataSet(title: "Moat", chartData: chartData, format: .percent)
                 
-            } else if indexPath.row == 1 {
+            } else if indexPath.row == 2 {
                 for spData in share?.trendValues(trendName: .stickerPrice) ?? [] {
                     let data = ChartDataSet(x: spData.date, y: spData.value)
                     chartData.append(data)
                 }
                 return LabelledChartDataSet(title: "Sticker", chartData: chartData, format: .currency)
                 
-            } else if indexPath.row == 2 {
+            } else if indexPath.row == 3 {
                 for spData in share?.trendValues(trendName: .dCFValue) ?? [] {
                     let data = ChartDataSet(x: spData.date, y: spData.value)
                     chartData.append(data)
                 }
                 return LabelledChartDataSet(title: "DCF", chartData: chartData, format: .currency)
                 
-            } else if indexPath.row == 3 {
+            } else if indexPath.row == 4 {
                 for spData in share?.trendValues(trendName: .intrinsicValue) ?? [] {
                     let data = ChartDataSet(x: spData.date, y: spData.value)
                     chartData.append(data)
@@ -118,7 +122,7 @@ class FinHealthController: NSObject {
                 return LabelledChartDataSet(title: "Intrinsic", chartData: chartData, format: .currency)
                 
             }
-            else if indexPath.row == 4 {
+            else if indexPath.row == 5 {
                 for spData in share?.trendValues(trendName: .lynchScore) ?? [] {
                     let data = ChartDataSet(x: spData.date, y: spData.value)
                     chartData.append(data)
@@ -398,9 +402,11 @@ class FinHealthController: NSObject {
                 // chartData are returned date ASCENDING
                 
                 if keyFinTypes[i] == .moatScore {
+                    // add latest moatScore
                     keyFinScores.append(keyFinTrend.last!.y!)
                     if let trendRatio = firstValueRatioToMax(datedValues: keyFinTrend) {
                         if trendRatio < 0.9 {
+                            // if moat score lates / earliest < 90% = dropping trend multiply current moat with trendRatio
                             keyFinScores[i]! *= trendRatio
                         }
                     }
@@ -425,12 +431,12 @@ class FinHealthController: NSObject {
                 }
                 else if keyFinTypes[i] == .lynchScore {
                     
-                    if keyFinTrend.last!.y! < 1 {
+                    if keyFinTrend.last!.y! < 1 { // 0 if lynch < 1
                         keyFinScores.append(0)
-                    } else if keyFinTrend.last!.y! < 2 {
+                    } else if keyFinTrend.last!.y! < 2 { // 0-1 score if lynch 1-2
                         keyFinScores.append(keyFinTrend.last!.y!-1)
                     } else {
-                        keyFinScores.append(1.0)
+                        keyFinScores.append(1.0) // add 1 if lynch > 2
                     }
                     
                     if let trendRatio = firstValueRatioToMax(datedValues: keyFinTrend) {

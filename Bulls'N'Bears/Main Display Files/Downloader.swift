@@ -161,16 +161,18 @@ class Downloader: NSObject {
                     }
                 }
                 else {
-                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "unexpected download response")
+                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "unexpected download response \(urlResponse) for url \(String(describing: url))")
                     return nil
                 }
+            }
+            else {
+                ErrorController.addInternalError(errorLocation: #function, errorInfo: "download of url \(String(describing: url)) failed, there was nil response")
+                return nil
             }
         } catch {
             ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "download error for \(url!)")
             return nil
         }
-        
-        return nil
         
     }
 

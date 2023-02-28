@@ -72,7 +72,7 @@ class Diary_StocksListVC: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let sectionTitles = ["Watch list", "Stocks owned", "Archived stocks"]
+        let sectionTitles = ["Watch list", "Owned", "Researched", "Archived"]
         
         return sectionTitles[section]
     }

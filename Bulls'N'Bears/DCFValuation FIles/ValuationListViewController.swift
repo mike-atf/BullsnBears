@@ -33,6 +33,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         super.viewDidLoad()
         
         let methodName = valuationMethod == .dcf ? "DCF" : "R1"
+        
         var downloadButtonConfiguration = UIButton.Configuration.filled()
         downloadButtonConfiguration.title = "Refresh " + methodName
         downloadButtonConfiguration.buttonSize = .small
@@ -240,8 +241,6 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
     @objc
     func downloadValuationData() {
         
-//        button.isEnabled = false
-//
         progressView = DownloadProgressView.instanceFromNib()
         progressView?.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(progressView!)

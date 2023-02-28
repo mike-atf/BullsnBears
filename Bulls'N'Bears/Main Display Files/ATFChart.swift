@@ -598,9 +598,15 @@ class ATFChart: UIView {
         
     internal func findAxisMinMax(minMax: [Double]) -> [Double]? {
         
-        var axisMax: Double = 1
         guard let min = minMax.first else { return nil }
         guard let max = minMax.last else { return nil }
+        
+        var axisMax: Double = 1
+        var axisMin: Double = 0
+        
+        if min == 0.0 && max == 0.0 {
+            return [axisMin, axisMax]
+        }
 
         if max < 0 {
             axisMax = 0
@@ -621,7 +627,6 @@ class ATFChart: UIView {
             
         }
 
-        var axisMin: Double = 0
 
         if min < 0 {
             var e:Double = 0
@@ -638,20 +643,19 @@ class ATFChart: UIView {
                     break
                 }
             }
-
         }
+        
+//        let zeroToOne = 0.0..<1.0
+//        
+//        if zeroToOne.contains(axisMin) && axisMax < 1.0 {
+//            axisMax = 1.0
+//        }
         
         return [minimumYAxisValue ?? axisMin, maximumYAxisValue ?? axisMax]
     }
     
     internal func createSurroundingLabels() {
-        
-//        for key in chartLabels.keys {
-//
-//            chartLabels[key]?.removeFromSuperview()
-//            chartLabels[key] = UILabel()
-//        }
-        
+                
         for labelData in chartLabelData ?? [] {
                         
             let newLabel: UILabel = {

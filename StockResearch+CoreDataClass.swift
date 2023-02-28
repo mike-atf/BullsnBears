@@ -111,6 +111,7 @@ public class StockResearch: NSManagedObject {
     }
 
 
+    /// entered in StockResearch in the form of DatedValues = [Date, [Double]]; Date = date of user entry, values are low, mean, high prediction
     func sharePricePredictions() -> DatedValues? {
         
         guard let predictions = self.pricePredictions else { return nil }
@@ -145,6 +146,7 @@ public class StockResearch: NSManagedObject {
         return nil
     }
     
+    /// entered in StockResearch in the form of DatedValues = [Date, [Double]]; Date = date of user entry, values are low, mean, high prediction
     func savePricePredictions(datedValues: DatedValues?) {
         
         guard let validValues = datedValues else {

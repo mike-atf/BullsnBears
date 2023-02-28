@@ -14,6 +14,10 @@ class ResearchTVC: UITableViewController {
     var sectionTitles: [String]?
     var controller: ResearchController?
     
+    var progressView: DownloadProgressView?
+    var allDownloadTasks = 0
+    var completedDownloadTasks = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -28,6 +32,20 @@ class ResearchTVC: UITableViewController {
         self.title = "\(share?.name_short ?? "missing") - Research (" + latestChangeDate + ")"
 
         sectionTitles = controller?.sectionTitles()
+        
+        var downloadButtonConfiguration = UIButton.Configuration.filled()
+        downloadButtonConfiguration.title = "Refresh data"
+        downloadButtonConfiguration.buttonSize = .small
+        downloadButtonConfiguration.titleAlignment = .center
+        downloadButtonConfiguration.cornerStyle = .small
+        let db = UIButton(configuration: downloadButtonConfiguration, primaryAction: UIAction() {_ in
+//            self.downloadButtonConfiguration.showsActivityIndicator = true
+            self.downloadResearchData()
+        })
+        
+        let downloadButton = UIBarButtonItem(customView: db)
+        self.navigationItem.rightBarButtonItem = downloadButton
+
     }
 
     // MARK: - Table view data source
@@ -193,5 +211,126 @@ class ResearchTVC: UITableViewController {
         return swipeActions
 
     }
+    
+    func downloadResearchData() {
         
+        progressView = DownloadProgressView.instanceFromNib()
+        progressView?.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(progressView!)
+        
+        let margins = view.layoutMarginsGuide
+
+        progressView?.widthAnchor.constraint(equalTo: margins.widthAnchor, multiplier: 0.8).isActive = true
+        progressView?.centerXAnchor.constraint(equalTo: margins.centerXAnchor).isActive = true
+        progressView?.heightAnchor.constraint(equalTo: margins.heightAnchor, multiplier: 0.2).isActive = true
+        progressView?.centerYAnchor.constraint(equalTo: margins.centerYAnchor).isActive = true
+
+        progressView?.delegate = self
+        progressView?.title.text = "Downloading..."
+                
+        guard let symbol = share?.symbol else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo:  "research data download reauested for \(String(describing: share)) but symbol not available")
+            return
+ 
+        }
+        guard let shortName = share?.name_short else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "research data download reauested for \(symbol) but short name not available")
+            return
+        }
+        guard let shareID = share?.objectID else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "research data download reauested for \(symbol) but objectID for share not available")
+            return
+
+        }
+        
+        let downloadJob = DownloadOptions.researchDataOnly
+        
+        Task {
+            progressView?.delegate?.allTasks = MacrotrendsScraper.countOfRowsToDownload(option: downloadJob) + YahooPageScraper.countOfRowsToDownload(option: downloadJob)
+            
+                do {
+     
+                    // TODO: non-US stocks  needs review
+                    if symbol.contains(".") {
+                        
+                        await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: downloadJob, progressDelegate: self, downloadRedirectDelegate: nil)
+                        
+                        try Task.checkCancellation()
+
+                        await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: downloadJob, downloadRedirectDelegate: nil)
+
+                    }
+                    // US stocks
+                    else {
+
+                        await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: downloadJob, progressDelegate: self, downloadRedirectDelegate: nil)
+                        
+                        try Task.checkCancellation()
+
+                        await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: downloadJob, progressDelegate: self ,downloadRedirectDelegate: nil)
+
+                    }
+                } catch {
+                    ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "research data download for \(symbol) failed.")
+                    progressView?.delegate?.downloadError(error: error.localizedDescription)
+                }
+                
+            NotificationCenter.default.removeObserver(self)
+            progressView?.delegate?.downloadComplete()
+        }
+        
+    }
+        
+}
+
+extension ResearchTVC: ProgressViewDelegate {
+    
+    func progressUpdate(allTasks: Int, completedTasks: Int) {
+        self.allDownloadTasks = allTasks
+        self.completedDownloadTasks = completedTasks
+        progressView?.updateProgress(tasks: allTasks, completed: completedTasks)
+    }
+    
+    func cancelRequested() {
+        allTasks = 0
+        self.progressView?.removeFromSuperview()
+    }
+    
+    func downloadComplete() {
+        self.progressView?.removeFromSuperview()
+    }
+    
+    func downloadError(error: String) {
+        self.progressView?.removeFromSuperview()
+    }
+    
+    func taskCompleted() {
+        self.progressView?.delegate?.completedTasks += 1
+        
+        if self.progressView?.delegate?.completedTasks ?? 0 >= self.progressView?.delegate?.allTasks ?? 0 {
+            self.progressView?.delegate?.downloadComplete()
+        }
+        
+        progressView?.updateProgress(tasks: allDownloadTasks, completed: completedDownloadTasks)
+    }
+    
+    var allTasks: Int {
+        get {
+            self.allDownloadTasks
+        }
+        set (newValue) {
+            self.allDownloadTasks = newValue
+        }
+    }
+    
+    var completedTasks: Int {
+        get {
+            self.completedDownloadTasks
+        }
+        set (newValue) {
+            self.completedDownloadTasks = newValue
+        }
+    }
+    
+    
 }

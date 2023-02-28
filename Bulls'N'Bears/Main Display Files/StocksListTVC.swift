@@ -168,29 +168,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 //        wbValuationView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "WBValuationTVC") as? WBValuationTVC
                 
     }
-    
-    /*
-    func deleteOldDCFValuations() {
-        
-        let fetchRequest = NSFetchRequest<DCFValuation>(entityName: "DCFValuation")
-        fetchRequest.sortDescriptors = [ NSSortDescriptor(key: "creationDate", ascending: true)]
-        
-        let dcfvcs = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-        
-        do {
-            try dcfvcs.performFetch()
-            
-            for object in dcfvcs.fetchedObjects ?? [DCFValuation]() {
-                object.delete()
-            }
-
-        } catch let error as NSError {
-            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error fetching old DCFV \(error)")
-        }
-        
-    }
-    */
-    
+   
     @objc
     func updateShares() {
                 
@@ -343,24 +321,12 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         let macds = newShare.calculateMACDs(shortPeriod: 8, longPeriod: 17)
         newShare.macd = newShare.convertMACDToData(macds: macds)
-        
-//        newShare.wbValuation = WBValuationController.returnWBValuations(share: newShare)
-//        newShare.wbValuation?.date = Date().addingTimeInterval(-(controller.renewInterval+1))
-//        newShare.dcfValuation = CombinedValuationController.returnDCFValuations(company: newShare.symbol!)
-//        newShare.dcfValuation?.creationDate = Date().addingTimeInterval(-(controller.renewInterval+1))
-//        newShare.rule1Valuation = CombinedValuationController.returnR1Valuations(company: newShare.symbol)
-//        newShare.rule1Valuation?.creationDate = Date().addingTimeInterval(-(controller.renewInterval+1))
-//        newShare.research = StockResearch(context: moc)
-//        newShare.research?.share = newShare
-//        newShare.research?.creationDate = Date()
 
         do {
             try newShare.managedObjectContext?.save() // TODO: - does this refresh to UI/TVC??
         } catch {
             ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "failure trying to save new share in mainthread MOC")
         }
-//
-//        NotificationCenter.default.addObserver(self, selector: #selector(receivedISINandCurrencyInfo(notification: )), name: Notification.Name(rawValue: "ISIN and CURRENCY INFO"), object: nil)
 
 // 4 slower download tasks for more data do on a background thread, using NSManagedObjectID
         let newShareID = newShare.objectID
@@ -379,8 +345,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         progressView?.delegate = self
         progressView?.title.text = "Downloading \(newShare.symbol ?? "no symbol")..."
 
-//        controller?.downloadWBValuationData()
-        
         // then pass shareID to background process to get all other details. Creating the share in a background task fails to trigger FRC didChange function, so will not make the new share visible right away.
         Task.init() {
             do {
@@ -393,13 +357,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                                 ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Failure to save main background context after creating new share on background context")
                             }
                             
-//                            if let indexPath = self.controller.indexPath(forObject: newShare) {
-//                                self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-//                                self.performSegue(withIdentifier: "showChartSegue", sender: nil)
-//
-//                            } else {
-//                                self.tableView.reloadData()
-//                            }
                        }
 
             } catch {
@@ -529,7 +486,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             else { return false }
         }).count ?? 0
 
-        cell.configureCell(indexPath: indexPath, stock: share, userRatingScore: share.userEvaluationScore, valueRatingScore: share.valueScore, scoreDelegate: self, userCommentCount: evaluationsCount)
+        cell.configureCell(indexPath: indexPath, stock: share, userRatingScore: share.userEvaluationScore, valueRatingScore: share.valueScore, scoreDelegate: self, userCommentCount: evaluationsCount, viewController: self)
         
         return cell
     }
@@ -935,6 +892,12 @@ extension StocksListTVC: StocksController2Delegate, ScoreCircleDelegate {
             present(evaluationsView, animated: true, completion:  nil)
         }
 
+    }
+    
+    func healthTap(indexPath: IndexPath) {
+        
+        showFinHealthView(share: controller.object(at: indexPath) as Share)
+        
     }
 
     func treasuryBondRatesDownloaded() {

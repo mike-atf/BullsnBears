@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="ipad10_9rounded" orientation="landscape" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -14,56 +14,56 @@
             <rect key="frame" x="0.0" y="0.0" width="500" height="820"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="What have you learnt?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vuo-du-cvr">
-                    <rect key="frame" x="60" y="485.5" width="239" height="30"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Learning points" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vuo-du-cvr">
+                    <rect key="frame" x="59" y="481.5" width="159" height="29"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="24"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Why did you buy?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="72y-Kc-nlC">
-                    <rect key="frame" x="59" y="228.5" width="192" height="30"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                    <rect key="frame" x="58" y="225.5" width="184.5" height="29"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="24"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ivL-oB-8sU">
-                    <rect key="frame" x="64" y="112" width="30.5" height="17"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                    <rect key="frame" x="61.5" y="109" width="30.5" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Price" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XfE-kI-XEC">
-                    <rect key="frame" x="64" y="132" width="33" height="17"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                    <rect key="frame" x="61.5" y="129" width="33" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Quantity" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lyR-O9-Cf8">
-                    <rect key="frame" x="64" y="152" width="55" height="17"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                    <rect key="frame" x="61.5" y="149" width="55" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1.1.21" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TI9-1b-7WM">
-                    <rect key="frame" x="124" y="112" width="34" height="17"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                    <rect key="frame" x="121.5" y="109" width="34" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$000.00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L1t-fa-Wnn">
-                    <rect key="frame" x="124" y="132" width="55" height="17"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                    <rect key="frame" x="121.5" y="129" width="55" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tZb-V9-WrZ">
-                    <rect key="frame" x="124" y="152" width="26.5" height="17"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                    <rect key="frame" x="121.5" y="149" width="26.5" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="hKn-jM-gp0">
-                    <rect key="frame" x="59" y="514.5" width="421" height="162"/>
+                    <rect key="frame" x="58" y="509.5" width="422" height="162"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="hKn-jM-gp0" secondAttribute="height" multiplier="460:177" id="Abt-2G-Cp5"/>
@@ -74,7 +74,7 @@
                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                 </textView>
                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Uty-Im-1Fk">
-                    <rect key="frame" x="59" y="258.5" width="421" height="177"/>
+                    <rect key="frame" x="58" y="254.5" width="422" height="177"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                     <color key="textColor" systemColor="labelColor"/>
@@ -82,26 +82,26 @@
                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                 </textView>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cart.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="a2w-rt-lmz">
-                    <rect key="frame" x="20" y="229.5" width="29" height="28"/>
+                    <rect key="frame" x="20" y="226.5" width="28" height="27"/>
                     <color key="tintColor" systemColor="systemOrangeColor"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="a2w-rt-lmz" secondAttribute="height" multiplier="1:1" id="sK7-DD-SVR"/>
                     </constraints>
                 </imageView>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="creditcard.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Yre-vX-RUk">
-                    <rect key="frame" x="20" y="79.5" width="29" height="28"/>
+                    <rect key="frame" x="20" y="79.5" width="26.5" height="25.5"/>
                     <color key="tintColor" systemColor="systemOrangeColor"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="Yre-vX-RUk" secondAttribute="height" multiplier="1:1" id="cDI-fH-byz"/>
                     </constraints>
                 </imageView>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="lightbulb.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="2RG-JG-TDU">
-                    <rect key="frame" x="20" y="486" width="30" height="29"/>
+                    <rect key="frame" x="20" y="482" width="29" height="28"/>
                     <color key="tintColor" systemColor="systemOrangeColor"/>
                 </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Transaction" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oci-ZZ-8uO">
-                    <rect key="frame" x="59" y="75" width="154.5" height="37"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                    <rect key="frame" x="56.5" y="75.5" width="139.5" height="33.5"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="28"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
@@ -113,7 +113,7 @@
                 <constraint firstItem="ivL-oB-8sU" firstAttribute="leading" secondItem="oci-ZZ-8uO" secondAttribute="leading" constant="5" id="2Cf-pE-sPN"/>
                 <constraint firstItem="Yre-vX-RUk" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="2LI-uh-5Dh"/>
                 <constraint firstItem="XfE-kI-XEC" firstAttribute="leading" secondItem="ivL-oB-8sU" secondAttribute="leading" id="4tg-ZF-nRM"/>
-                <constraint firstItem="lyR-O9-Cf8" firstAttribute="firstBaseline" secondItem="XfE-kI-XEC" secondAttribute="baseline" constant="20" symbolType="layoutAnchor" id="6M3-Zj-969"/>
+                <constraint firstItem="lyR-O9-Cf8" firstAttribute="firstBaseline" secondItem="XfE-kI-XEC" secondAttribute="baseline" constant="24" symbolType="layoutAnchor" id="6M3-Zj-969"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="hKn-jM-gp0" secondAttribute="trailing" constant="20" id="7ch-7O-REY"/>
                 <constraint firstItem="2RG-JG-TDU" firstAttribute="centerY" secondItem="vuo-du-cvr" secondAttribute="centerY" id="9C7-MZ-vhT"/>
                 <constraint firstItem="lyR-O9-Cf8" firstAttribute="leading" secondItem="XfE-kI-XEC" secondAttribute="leading" id="BRi-Dl-beI"/>
@@ -140,7 +140,7 @@
                 <constraint firstItem="TI9-1b-7WM" firstAttribute="firstBaseline" secondItem="ivL-oB-8sU" secondAttribute="firstBaseline" id="oUK-iR-afT"/>
                 <constraint firstItem="vuo-du-cvr" firstAttribute="top" secondItem="Uty-Im-1Fk" secondAttribute="bottom" constant="50" id="pHx-Ce-deS"/>
                 <constraint firstItem="Yre-vX-RUk" firstAttribute="height" secondItem="oci-ZZ-8uO" secondAttribute="height" multiplier="0.783784" id="qUh-Ig-r3Y"/>
-                <constraint firstItem="L1t-fa-Wnn" firstAttribute="firstBaseline" secondItem="TI9-1b-7WM" secondAttribute="baseline" constant="20" symbolType="layoutAnchor" id="rcP-eM-87q"/>
+                <constraint firstItem="L1t-fa-Wnn" firstAttribute="firstBaseline" secondItem="TI9-1b-7WM" secondAttribute="baseline" constant="24" symbolType="layoutAnchor" id="rcP-eM-87q"/>
                 <constraint firstItem="Uty-Im-1Fk" firstAttribute="leading" secondItem="72y-Kc-nlC" secondAttribute="leading" id="s4u-fU-v2n"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="oci-ZZ-8uO" secondAttribute="trailing" constant="10" id="uQK-RI-Bsw"/>
                 <constraint firstItem="2RG-JG-TDU" firstAttribute="width" secondItem="2RG-JG-TDU" secondAttribute="height" multiplier="1:1" id="vqS-up-SAL"/>
@@ -160,11 +160,11 @@
         </view>
     </objects>
     <resources>
-        <image name="cart.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="creditcard.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="lightbulb.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="cart.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="creditcard.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="lightbulb.circle.fill" catalog="system" width="128" height="123"/>
         <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

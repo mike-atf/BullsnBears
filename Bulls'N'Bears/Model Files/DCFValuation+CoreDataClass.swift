@@ -507,26 +507,26 @@ public class DCFValuation: NSManagedObject {
             taxRate = abs(incomeTax) / incomePreTax
         }
         
-        guard let mCap = share?.key_stats?.marketCap.valuesOnly(dateOrdered: .ascending,withoutZeroes: true)?.last else {
+        guard let mCap = share?.key_stats?.marketCap.valuesOnly(dateOrdered: .ascending,withoutZeroes: true, includeThisYear: true)?.last else {
             errors.append("market cap data missing")
             return (nil,errors)
         }
-        guard let debt_lt = share?.balance_sheet?.debt_longTerm.valuesOnly(dateOrdered: .ascending)?.last else {
+        guard let debt_lt = share?.balance_sheet?.debt_longTerm.valuesOnly(dateOrdered: .ascending, includeThisYear: true)?.last else {
             errors.append("long term debt data missing")
             return (nil,errors)
         }
         
-        guard let debt_st = share?.balance_sheet?.debt_shortTerm.valuesOnly(dateOrdered: .ascending)?.last else {
+        guard let debt_st = share?.balance_sheet?.debt_shortTerm.valuesOnly(dateOrdered: .ascending, includeThisYear: true)?.last else {
             errors.append("short term debt data missing")
             return (nil,errors)
         }
 
-        guard let interestExpense = share?.income_statement?.interestExpense.valuesOnly(dateOrdered: .ascending)?.last else {
+        guard let interestExpense = share?.income_statement?.interestExpense.valuesOnly(dateOrdered: .ascending, includeThisYear: true)?.last else {
             errors.append("interest expense data missing")
             return (nil,errors)
         }
         
-        guard let beta = share?.key_stats?.beta.valuesOnly(dateOrdered: .ascending,withoutZeroes: true)?.last else {
+        guard let beta = share?.key_stats?.beta.valuesOnly(dateOrdered: .ascending,withoutZeroes: true, includeThisYear: true)?.last else {
             errors.append("missing beta value")
             return (nil,errors)
         }

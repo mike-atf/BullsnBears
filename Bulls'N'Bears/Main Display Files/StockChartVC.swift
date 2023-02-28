@@ -7,7 +7,7 @@
 
 import UIKit
 
-class StockChartVC: UIViewController {
+class StockChartVC: UIViewController, UIPopoverPresentationControllerDelegate {
 
     var share: Share?
     
@@ -48,7 +48,7 @@ class StockChartVC: UIViewController {
             exchangeText = ", " + exchange
         }
         
-        var title$ = NSMutableAttributedString(string: titleText, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3)])
+        let title$ = NSMutableAttributedString(string: titleText, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3)])
         let currency$ = NSMutableAttributedString(string: currencyText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 11), NSAttributedString.Key.foregroundColor: UIColor.gray])
         let exchange$ = NSMutableAttributedString(string: exchangeText, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 11), NSAttributedString.Key.foregroundColor: UIColor.gray])
         
@@ -311,32 +311,34 @@ class StockChartVC: UIViewController {
     
 }
 
-extension StockChartVC: ValuationListDelegate, ValuationSummaryDelegate, UIPopoverPresentationControllerDelegate {
-        
-    func valuationSummaryComplete(toDismiss: ValuationSummaryTVC?) {
 
-        // return point from ValuationSummaryTVC for R1Valuations
+//extension StockChartVC: UIPopoverPresentationControllerDelegate {
         
-        refreshValuationButton()
-        
-    }
+//    func valuationSummaryComplete(toDismiss: ValuationSummaryTVC?) {
+//
+//        // return point from ValuationSummaryTVC for R1Valuations
+//
+//        refreshValuationButton()
+//
+//    }
+//
+//    func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?) {
+//
+//        listView.dismiss(animated: true, completion: {
+//
+//            if let _ = r1Valuation {
+//                if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationSummaryTVC") as? ValuationSummaryTVC {
+//                    tvc.loadViewIfNeeded()
+//                    tvc.delegate = self
+//                    tvc.share = self.share
+//                    self.present(tvc, animated: true, completion: nil)
+//                }
+//            }
+//            else {
+//                self.refreshValuationButton()
+//            }
+//        })
+//    }
     
-    func valuationComplete(listView: ValuationListViewController, r1Valuation: Rule1Valuation?) {
+//}
 
-        listView.dismiss(animated: true, completion: {
-
-            if let _ = r1Valuation {
-                if let tvc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ValuationSummaryTVC") as? ValuationSummaryTVC {
-                    tvc.loadViewIfNeeded()
-                    tvc.delegate = self
-                    tvc.share = self.share
-                    self.present(tvc, animated: true, completion: nil)
-                }
-            }
-            else {
-                self.refreshValuationButton()
-            }
-        })
-    }
-    
-}

@@ -45,7 +45,7 @@ class FinHealthTVC: UITableViewController {
         if section == 0 {
             return 0
         } else if section == 1 {
-            return 5
+            return 6
         } else if section == 2 {
             return 1
         } else if section == 3 {

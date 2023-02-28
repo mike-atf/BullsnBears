@@ -9,121 +9,12 @@ import Foundation
 import CoreData
 import UIKit
 
-enum YahooPageType {
-    case financials
-    case balance_sheet
-    case cash_flow
-    case insider_transactions
-    case analysis
-    case key_statistics
-    case summary
-    case profile
-}
-
-struct YahooPageDelimiters {
-    
-    var tableStart:String?
-    var tableEnd = String()
-    var rowStarts = [String]()
-    /// rowEnd may not be found in last row, so check for tableEnd if not found
-    var rowEnd = String()
-    var columnStart = String()
-    var dataStart = String()
-    var dataEnd = String()
-    var topRowTitle: String?
-    var topRowEnd: String?
-    var topRowDataEnd: String?
-    var saveRowTitles = [String]()
-    
-    init(pageType: YahooPageType, tableHeader: String?, rowTitles: [String], saveTitles:[String]?=nil) {
-        
-        if tableHeader != nil {
-            tableStart = "<span>" + tableHeader! + "</span>"
-        }
-        for title in rowTitles {
-            if title == "Next year" {
-                rowStarts.append(title + "</span></td>" ) // without this will find top row column 'Next year (yyyy)'
-            }
-            else if title == "Free cash flow" {
-                rowStarts.append("title=\"Free cash flow\"><span class=\"Va(m)\">" + title + "</span>")
-            }
-            else {
-                rowStarts.append(title + "</span>")
-            }
-        }
-        
-        self.saveRowTitles = saveTitles ?? rowTitles
-
-        switch pageType {
-        case .financials:
-            rowEnd = "fin-row"
-            columnStart = "fin-col"
-            dataStart = "<span>"
-            dataEnd = "</span>"
-            tableEnd = "</div></div><div></div></div></div></div></div>"
-            topRowTitle = "<span>Breakdown</span>"
-            topRowEnd = "fin-row"
-            topRowDataEnd = dataEnd
-        case .balance_sheet:
-            rowEnd = "fin-row"
-            columnStart = "fin-col"
-            dataStart = "<span>"
-            dataEnd = "</span>"
-            tableEnd = "</div></div><div></div></div></div></div></div>"
-            topRowTitle = "<span>Breakdown</span>"
-            topRowEnd = "fin-row"
-            topRowDataEnd = dataEnd
-        case .cash_flow:
-            rowEnd = "fin-row"
-            columnStart = "fin-col"
-            dataStart = "<span>"
-            dataEnd = "</span>"
-            tableEnd = "</div></div><div></div></div></div></div></div>"
-            topRowTitle = "<span>Breakdown</span>"
-            topRowEnd = "fin-row"
-            topRowDataEnd = dataEnd
-        case .analysis:
-            rowEnd = "</tr>"
-            columnStart = "Ta(end)"
-            dataStart = ">"
-            dataEnd = "</td>"
-            tableEnd = "</tbody></table>"
-            topRowTitle = tableStart
-            topRowEnd = "</thead><tbody>"
-            topRowDataEnd = "</th>"
-        case .key_statistics:
-            // no top row
-            rowEnd = "</tr>"
-            columnStart = "Pstart"
-            dataStart = ">"
-            dataEnd = "</td>"
-            tableEnd = "</tbody></table>"
-        case .insider_transactions:
-            tableStart! += "</h3><span"
-            rowEnd = "</tr>"
-            columnStart = "Py(10px)"
-            dataStart = ">"
-            dataEnd = "</td>"
-            tableEnd = "</tbody></table>"
-        case .summary:
-            rowEnd = "</td></tr>"
-            dataStart = ">"
-            dataEnd = ""
-        case .profile:
-            // Description text block doesn't have dataEnd , ends with rowEnd
-            rowEnd = "</p>"
-            dataStart = ">"
-            dataEnd = "</span></span>"
-        }
-    }
-}
 
 struct YahooDownloadJob {
     var pageName = String()
     var tableTitles = [String?]()
     var rowTitles = [[String]]()
     var saveTitles = [[String]]()
-//    var delimiters: YahooPageDelimiters!
     var url: URL?
     
     init?(symbol: String, shortName: String, pageName: String, tableTitles: [String?], rowTitles: [[String]], saveTitles: [[String]]?=nil) {
@@ -144,38 +35,46 @@ struct YahooDownloadJob {
         components?.queryItems = [URLQueryItem(name: "p", value: symbol)]
         self.url = components?.url
         
-//        self.delimiters = YahooPageDelimiters(pageType: getPageType(url: self.url!), tableHeader: <#T##String?#>, rowTitles: <#T##[String]#>)
-
-
     }
 }
 
+var yahooWebDictionary: [YahooDictionaryEntry]?
 
 class YahooPageScraper {
     
     //MARK: - Download descriptors and delimiters
     class func yahooDownloadJobs(symbol: String, shortName: String, option: DownloadOptions) -> [YahooDownloadJob]? {
         
-        let pages = yahooPageNames(option: option)
-        let tableTitles = yahooTableTitles(option: option)
-        let rowTitles = yahooRowTitles(option: option)
-        let saveTitles = yahooSaveTitles(option: option)
+        let dictionary = yahooWebDictionary ?? dictionaryBuilder()
+        return dictionary.downloadJobs(for: option, symbol: symbol, shortName: shortName)
         
-        guard pages.count == tableTitles.count && rowTitles.count == tableTitles.count && rowTitles.count == saveTitles.count else  {
-            ErrorController.addInternalError(errorLocation: "yahooDownloadJobs function", errorInfo: "mismatch between tables to download \(tableTitles) \n and rowTitle groups \(rowTitles)")
-            return nil
-        }
-        
-        var allJobs = [YahooDownloadJob]()
-        for i in 0..<pages.count {
-            if let job = YahooDownloadJob(symbol: symbol, shortName: shortName, pageName: pages[i], tableTitles: tableTitles[i], rowTitles: rowTitles[i], saveTitles: saveTitles[i]) {
-                allJobs.append(job)
-            }
-        }
-        
-        return allJobs
     }
     
+
+    class func dictionaryBuilder() -> [YahooDictionaryEntry] {
+        
+        var dictionary = [YahooDictionaryEntry]()
+        
+        dictionary = dictionary.addElement(pageName: "financials", sectionNames: ["Income statement"], rowNames: [["Total revenue","Basic EPS","Net income", "Interest expense","Income before tax","Income tax expense"]], saveNames: [["Revenue","EPS - Earnings Per Share", "Net Income","Interest expense","Income before tax","Income tax expense"]])
+        
+        dictionary = dictionary.addElement(pageName: "balance-sheet", sectionNames: ["Balance sheet"], rowNames: [["Current debt","Long-term debt", "Total liabilities"]], saveNames: [["Current debt","Long-term Debt","Total liabilities"]])
+        
+        dictionary = dictionary.addElement(pageName: "cash-flow", sectionNames: ["Cash flow"], rowNames: [["Free cash flow","Operating cash flow","Capital expenditure"]], saveNames: [["Free cash flow", "Operating cash flow","Capital expenditure"]])
+        
+        dictionary = dictionary.addElement(pageName: "insider-transactions", sectionNames: ["Insider purchases - Last 6 months"], rowNames: [["Total insider shares held", "Purchases", "Sales"]], saveNames: [["Total insider shares held", "Purchases", "Sales"]])
+        
+        dictionary = dictionary.addElement(pageName: "analysis", sectionNames: ["Revenue estimate", "Growth estimates"], rowNames: [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]], saveNames: [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]])
+        
+        dictionary = dictionary.addElement(pageName: "key-statistics", sectionNames: ["Valuation measures", nil], rowNames: [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]], saveNames: [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)","Shares outstanding", "Payout ratio","Trailing annual dividend yield"]])
+        
+        dictionary = dictionary.addElement(pageName: "profile", sectionNames: [nil], rowNames: [["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]], saveNames: [["Sector", "Industry", "Employees", "Description"]])
+        
+        dictionary = dictionary.addElement(pageName: "summary", sectionNames: [nil], rowNames: [["Market cap","Beta (5Y monthly)", "PE ratio (TTM)","Earnings date"]], saveNames: [["Market cap","Beta (5Y monthly)", "PE ratio (TTM)","Earnings date"]])
+        
+        return dictionary
+        
+    }
+    /*
     class func yahooPageNames(option: DownloadOptions) -> [String] {
         
         var pageNames = [String]()
@@ -198,6 +97,18 @@ class YahooPageScraper {
             pageNames = ["key-statistics", "summary"]
         case .wbvIntrinsicValue:
             pageNames = []
+        case .allValuationDataOnly:
+            pageNames = ["financials","balance-sheet","cash-flow", "insider-transactions", "analysis", "key-statistics", "summary"]
+        case .researchDataOnly:
+            pageNames = ["profile", "summary"]
+        case .mainIndicatorsOnly:
+            // none required for moat from Yahoo
+            pageNames = yahooPageNames(option: .lynchParameters)
+        case .screeningInfos:
+            pageNames = yahooPageNames(option: .mainIndicatorsOnly)
+            pageNames.append("profile")
+        default:
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "YahooScraper has been asked to download unknown job \(option)")
         }
 
         return pageNames
@@ -247,6 +158,26 @@ class YahooPageScraper {
             tableTitles = [[nil], [nil]]
         case .wbvIntrinsicValue:
             tableTitles = [[]]
+        case .allValuationDataOnly:
+            tableTitles = [["Income statement"],
+                           ["Balance sheet"],
+                           ["Cash flow"],
+                           ["Insider purchases - Last 6 months"],
+                           ["Revenue estimate", "Growth estimates"],
+                           ["Valuation measures", nil],[nil]]
+        case .researchDataOnly:
+            tableTitles = [
+                    ["Valuation measures", nil],
+                    [nil]
+                    ]
+        case .mainIndicatorsOnly:
+            // none required for moat from Yahoo
+            tableTitles = yahooTableTitles(option: .lynchParameters)
+        case .screeningInfos:
+            tableTitles = [[nil], [nil]] // [keyStat, summary]
+            tableTitles.append(["Valuation measures"]) // profile
+        default:
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "YahooScraper has been asked to download unknown job \(option)")
         }
         
         return tableTitles
@@ -300,6 +231,27 @@ class YahooPageScraper {
             rowTitles = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)"]]]
         case .wbvIntrinsicValue:
             rowTitles = [[[]]]
+        case .allValuationDataOnly:
+            rowTitles = [
+                [["Total revenue","Basic EPS","Net income", "Interest expense","Income before tax","Income tax expense"]],
+                [["Current debt","Long-term debt", "Total liabilities"]],
+                [["Free cash flow","Operating cash flow","Capital expenditure"]],
+                [["Total insider shares held", "Purchases", "Sales"]],
+                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
+                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
+                [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
+        case .researchDataOnly:
+            rowTitles = [
+                    [["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]],
+                    [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
+        case .mainIndicatorsOnly:
+            // none required for moat from Yahoo
+            rowTitles = yahooRowTitles(option: .lynchParameters)
+        case .screeningInfos:
+            rowTitles = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)","Market cap","Beta (5Y monthly)", "Earnings date"]]] // [keyStat, summary]
+            rowTitles.append([["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]]) // profile
+        default:
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "YahooScraper has been asked to download unknown job \(option)")
         }
         
         return rowTitles
@@ -347,34 +299,43 @@ class YahooPageScraper {
             saveTitles = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)"]]]
         case .wbvIntrinsicValue:
             saveTitles = [[[]]]
+        case .allValuationDataOnly:
+            saveTitles = [
+                [["Revenue","EPS - Earnings Per Share", "Net Income","Interest expense","Income before tax","Income tax expense"]],
+                [["Current debt","Long-term Debt","Total liabilities"]],
+                [["Free cash flow", "Operating cash flow","Capital expenditure"]],
+                [["Total insider shares held", "Purchases", "Sales"]],
+                [["Avg. Estimate", "Sales growth (year/est)"],["Next year", "Next 5 years (per annum)"]],
+                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
+                [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
+        case .researchDataOnly:
+            saveTitles = [[["Sector", "Industry", "Employees", "Description"]],
+                [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
+        case .mainIndicatorsOnly:
+            // none required for moat from Yahoo
+            saveTitles = yahooSaveTitles(option: .lynchParameters)
+        case .screeningInfos:
+            saveTitles = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)","Market cap","Beta (5Y monthly)", "Earnings date"]]] // [keyStat, summary]
+            saveTitles.append([["Sector", "Industry", "Full-time employees", "Description"]]) // profile
+        default:
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "YahooScraper 'saveTitles' has been asked to download unknown job \(option)")
         }
         
         return saveTitles
     }
-
-//    class func yahooAllDataRowTitles() -> [[String]] {
-//
-//        return [
-//            ["Total revenue","Basic EPS","Net income", "Interest expense","Income before tax","Income tax expense"],
-//            ["Current debt","Long-term debt", "Total liabilities"],
-//            ["Free cash flow","Operating cash flow","Capital expenditure"],
-//            ["Total insider shares held", "Purchases", "Sales"],
-//            ["Avg. Estimate", "Sales growth (year/est)"],
-//            ["Next year", "Next 5 years (per annum)"],
-//            ["Forward P/E","Market cap (intra-day)", "Beta (5Y monthly)"],
-//            ["Shares outstanding", "Payout ratio","Trailing annual dividend yield"]]
-//
-//    }
+    */
+    
     
     class func countOfRowsToDownload(option: DownloadOptions) -> Int {
         
-        return yahooRowTitles(option: option).flatMap{ $0 }.count
+        let dictionary = yahooWebDictionary ?? dictionaryBuilder()
+        return dictionary.rowTitles(for: option).count
     }
     
-    class func countPagesToDownload(option: DownloadOptions) -> Int {
-        
-        return yahooPageNames(option: option).flatMap{ $0 }.count
-    }
+//    class func countPagesToDownload(option: DownloadOptions) -> Int {
+//
+//        return yahooPageNames(option: option).flatMap{ $0 }.count
+//    }
 
     
     // MARK: - central download function
@@ -452,6 +413,23 @@ class YahooPageScraper {
                                 }
                             }
                         }
+                    }
+                }
+                else if job.pageName.contains("statistics") {
+                                        
+                    for result in extractionResults {
+                        print(result)
+                    }
+                    
+                    // if Yahoo doesn't have div Yield try YCharts
+                    let divYield = extractionResults.filter({ ldv in
+                        if ldv.label.contains("dividend yield") { return true }
+                        else { return false }
+                    }).first
+                    
+                    if divYield == nil || divYield?.datedValues.count ?? 0 < 1 {
+                        print("no div Yield from Yahoo, trying from YCharts...")
+                        await YChartsScraper.dataDownloadAnalyseSave(symbol: symbol, downloadOption: .divYield, shareID: shareID, progressDelegate: progressDelegate)
                     }
                 }
                 
@@ -582,29 +560,54 @@ class YahooPageScraper {
 
         return nil
     }
-    /*
-    class func dailyPricesDownloadAndAnalyse(shareSymbol: String, minDate:Date?=nil) async -> [PricePoint]? {
 
-// 2 data download usually for the last 3 momnths or so
-        var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(shareSymbol)/history")
-        urlComponents?.queryItems = [URLQueryItem(name: "p", value: shareSymbol)]
+    class func dailyPricesDownloadCSV(symbol: String?) async -> [PricePoint]? {
         
-        
-        guard let sourceURL = urlComponents?.url else {
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "daily prices url error \(String(describing: urlComponents))")
+        guard symbol != nil else {
             return nil
         }
         
-        if let dataText = await Downloader.downloadDataNoThrow(url: sourceURL) {
-            
-            let downloadedPricePoints = YahooPageScraper.priceTableAnalyse(html$: dataText, limitDate: minDate)
-            
-            return downloadedPricePoints
+        let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate) // 10 years back!
+        let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
+
+        let start$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
+        let end$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
+        
+        var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(symbol!)")
+        urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
+        
+        
+        if let sourceURL = urlComponents?.url {
+
+            // first try to download historical prices from Yahoo finance as CSV file
+            let expectedHeaderTitles = ["Date","Open","High","Low","Close","Adj Close","Volume"]
+
+            do {
+                if let csvURL = try await Downloader.downloadCSVFile2(url: sourceURL, symbol: symbol!, type: "_PPoints") {
+                    if CSVImporter.matchesExpectedFormat(url: csvURL, expectedHeaderTitles: expectedHeaderTitles) {
+                        // successful CSV file downloaded
+                        let oneYearAgo = Date().addingTimeInterval(-year)
+                        if let pricePoints = CSVImporter.extractPricePointsFromFile(url: csvURL, symbol: symbol!, minDate: oneYearAgo) {
+                            removeFile(csvURL)
+                            return pricePoints
+                        }
+                    } else {
+                        // csv file not correct, download data from webpage instead
+                        removeFile(csvURL)
+                        ErrorController.addInternalError(errorLocation: #function, errorInfo: "Error when trying to download Yahoo CSV Price - incorrect csv file format for \(symbol!)")
+                    }
+                } else {
+                    // csv file download failed, download data from webpage instead
+                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "download failed for Yahoo CSV Price file for \(symbol!) - url \(sourceURL)")
+                }
+            } catch {
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error when trying to download Yahoo CSV Price csv file for \(symbol!)")
+            }
         }
         
         return nil
     }
-    */
+    
     /// downloads, analyses and merges new with existing price points, then saves; min date is optional for manual limitation; re-calculates MACD's
     class func dailyPricesDownloadAnalyseSave(symbol: String, shareID: NSManagedObjectID, minDate:Date?=nil, existingPricePoints: [PricePoint]?) async {
 
@@ -619,18 +622,32 @@ class YahooPageScraper {
         }
         
         guard let html = await Downloader.downloadDataNoThrow(url: sourceURL) else  {
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "daily prices download for \(symbol) failed \(String(describing: urlComponents))")
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "daily prices download for \(symbol) failed \(String(describing: urlComponents)) as page text is nil")
             return
         }
             
-        let minDate = minDate ?? existingPricePoints?.last?.tradingDate
+        var minDate = minDate ?? existingPricePoints?.last?.tradingDate
+//        if Date().timeIntervalSince(minDate ?? Date()) < 365*24*3600 {
+//            minDate = Date().addingTimeInterval(-365*24*3600)
+//        }
         
-        guard let pricePoints = YahooPageScraper.priceTableAnalyse(html$: html, limitDate: minDate, specificDate: nil) else {
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "daily prices download for \(symbol) failed - no price points retrieved from page")
-            return
+        
+        var newPricePoints: [PricePoint]?
+        
+        // if for whatever reason the price history is less than one year, download from one year ago.
+        // This requires CSV download, the data page only goes back 6 months for a 'bot' download
+        let targetEarliestDate: TimeInterval = ["AAPL","TSLA", "LOGI"].contains(symbol) ? 3*365*24*3600 : 365*24*3600
+        let earliestPriceDate = existingPricePoints?.first?.tradingDate
+        if Date().timeIntervalSince(earliestPriceDate ?? Date()) < (targetEarliestDate-5*24*3600) {
+            minDate = Date().addingTimeInterval(-targetEarliestDate)
+            print("price Hx is less than one year - try to reload from \(minDate!) for \(symbol)")
+            newPricePoints = await dailyPricesDownloadCSV(symbol: symbol)
         }
-        
-        guard pricePoints.count > 0 else {
+        else {
+            newPricePoints = YahooPageScraper.priceTableAnalyse(html$: html, limitDate: minDate, specificDate: nil, symbol: symbol)
+        }
+            
+        guard newPricePoints?.count ?? 0 > 0 else {
             ErrorController.addInternalError(errorLocation: #function, errorInfo: "daily prices download for \(symbol) failed - no price points retrieved from page")
             return
         }
@@ -639,7 +656,7 @@ class YahooPageScraper {
        
         if existingPricePoints != nil {
             
-            merged = (existingPricePoints!.mergeIn(pricePoints: pricePoints))
+            merged = (existingPricePoints!.mergeIn(pricePoints: newPricePoints))
             //TEMP
 //            merged = existingPricePoints!.fillGaps(pricePoints: pricePoints)
         }
@@ -711,8 +728,8 @@ class YahooPageScraper {
         return ProfileData(sector: sector, industry: industry, employees: employees, description: description)
     }
     */
-    /// providing a limit date stops the analysis after encountering that date. Providing a specific date looks for pricepoint data closest to that date only. Don't send both limit AND specific dates
-    class func priceTableAnalyse(html$: String, limitDate: Date?=nil, specificDate:Date?=nil) -> [PricePoint]? {
+    /// providing a limit date stops the analysis after encountering that date. Providing a specific date looks for pricepoint data closest to that date only. Don't send both limit AND specific dates; unlike browser page the earliest date is much less than one year ago (six months only)
+    class func priceTableAnalyse(html$: String, limitDate: Date?=nil, specificDate:Date?=nil, symbol:String?=nil) -> [PricePoint]? {
         
         let tableEnd$ = "</tbody><tfoot>"
         let tableStart$ = "<thead>"
@@ -734,7 +751,6 @@ class YahooPageScraper {
         }()
 
         var pageText = html$
-        
         // eliminate above table start
         if let tableStartIndex = pageText.range(of: tableStart$) {
             pageText.removeSubrange(...tableStartIndex.upperBound)
@@ -802,7 +818,7 @@ class YahooPageScraper {
                     pricePoints.append(valid)
                     
                     if let limit = limitDate {
-                        if valid.tradingDate < limit { break rowLoop }
+                      if valid.tradingDate < limit { break rowLoop }
                     }
                 }
             }
@@ -1527,5 +1543,131 @@ class YahooPageScraper {
     }
 
 
+}
+
+
+struct YahooDictionaryEntry {
+    
+    var pageName:String
+    var sectionName: String?
+    var rowName: String
+    var parameterTitle: String
+    
+    init(pageName: String, sectionName: String?, rowName: String, parameterTitle: String?) {
+        self.pageName = pageName
+        self.sectionName = sectionName
+        self.rowName = rowName
+        self.parameterTitle = parameterTitle ?? rowName
+    }
+    
+}
+
+enum YahooPageType {
+    case financials
+    case balance_sheet
+    case cash_flow
+    case insider_transactions
+    case analysis
+    case key_statistics
+    case summary
+    case profile
+}
+
+struct YahooPageDelimiters {
+    
+    var tableStart:String?
+    var tableEnd = String()
+    var rowStarts = [String]()
+    /// rowEnd may not be found in last row, so check for tableEnd if not found
+    var rowEnd = String()
+    var columnStart = String()
+    var dataStart = String()
+    var dataEnd = String()
+    var topRowTitle: String?
+    var topRowEnd: String?
+    var topRowDataEnd: String?
+    var saveRowTitles = [String]()
+    
+    init(pageType: YahooPageType, tableHeader: String?, rowTitles: [String], saveTitles:[String]?=nil) {
+        
+        if tableHeader != nil {
+            tableStart = "<span>" + tableHeader! + "</span>"
+        }
+        for title in rowTitles {
+            if title == "Next year" {
+                rowStarts.append(title + "</span></td>" ) // without this will find top row column 'Next year (yyyy)'
+            }
+            else if title == "Free cash flow" {
+                rowStarts.append("title=\"Free cash flow\"><span class=\"Va(m)\">" + title + "</span>")
+            }
+            else {
+                rowStarts.append(title + "</span>")
+            }
+        }
+        
+        self.saveRowTitles = saveTitles ?? rowTitles
+
+        switch pageType {
+        case .financials:
+            rowEnd = "fin-row"
+            columnStart = "fin-col"
+            dataStart = "<span>"
+            dataEnd = "</span>"
+            tableEnd = "</div></div><div></div></div></div></div></div>"
+            topRowTitle = "<span>Breakdown</span>"
+            topRowEnd = "fin-row"
+            topRowDataEnd = dataEnd
+        case .balance_sheet:
+            rowEnd = "fin-row"
+            columnStart = "fin-col"
+            dataStart = "<span>"
+            dataEnd = "</span>"
+            tableEnd = "</div></div><div></div></div></div></div></div>"
+            topRowTitle = "<span>Breakdown</span>"
+            topRowEnd = "fin-row"
+            topRowDataEnd = dataEnd
+        case .cash_flow:
+            rowEnd = "fin-row"
+            columnStart = "fin-col"
+            dataStart = "<span>"
+            dataEnd = "</span>"
+            tableEnd = "</div></div><div></div></div></div></div></div>"
+            topRowTitle = "<span>Breakdown</span>"
+            topRowEnd = "fin-row"
+            topRowDataEnd = dataEnd
+        case .analysis:
+            rowEnd = "</tr>"
+            columnStart = "Ta(end)"
+            dataStart = ">"
+            dataEnd = "</td>"
+            tableEnd = "</tbody></table>"
+            topRowTitle = tableStart
+            topRowEnd = "</thead><tbody>"
+            topRowDataEnd = "</th>"
+        case .key_statistics:
+            // no top row
+            rowEnd = "</tr>"
+            columnStart = "Pstart"
+            dataStart = ">"
+            dataEnd = "</td>"
+            tableEnd = "</tbody></table>"
+        case .insider_transactions:
+            tableStart! += "</h3><span"
+            rowEnd = "</tr>"
+            columnStart = "Py(10px)"
+            dataStart = ">"
+            dataEnd = "</td>"
+            tableEnd = "</tbody></table>"
+        case .summary:
+            rowEnd = "</td></tr>"
+            dataStart = ">"
+            dataEnd = ""
+        case .profile:
+            // Description text block doesn't have dataEnd , ends with rowEnd
+            rowEnd = "</p>"
+            dataStart = ">"
+            dataEnd = "</span></span>"
+        }
+    }
 }
 

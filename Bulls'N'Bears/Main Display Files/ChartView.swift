@@ -336,20 +336,20 @@ class ChartView: UIView {
                 
                 //MARK: - pricePredictionBox
                 if let predictions = share?.research?.sharePricePredictions() {
-                   
+
                     let sp = PriceDate(date: predictions.date, price: predictions.values.max()!)
                     let ep = PriceDate(date: (dateRange?.max()!)!, price: predictions.values.min()!)
                     let startPoint = plotPricePoint(pricePoint: sp)
                     let endPoint = plotPricePoint(pricePoint: ep)
                     let box = CGRect(x: startPoint.x, y: startPoint.y, width: endPoint.x - startPoint.x, height:  endPoint.y - startPoint.y)
                     let pricePredictionBox = UIBezierPath(rect: box)
-                    
+
                     for layer in self.layer.sublayers ?? [] {
                         if let gradient = layer as? CAGradientLayer {
                             gradient.removeFromSuperlayer()
                         }
                     }
-                    
+
                     let range = predictions.values.max()! - predictions.values.min()!
                     let average = predictions.values[1] - predictions.values.min()!
                     let averageRatio = 1.0 - average / range
@@ -362,7 +362,7 @@ class ChartView: UIView {
                     gradient.mask = shapeMask
                     gradient.addSublayer(shapeMask)
                     self.layer.addSublayer(gradient)
-                    
+
                 }
                 
                 //MARK: - purchase Price line
@@ -443,7 +443,7 @@ class ChartView: UIView {
         // uses different vertical scale!
         
         
-            if let historicEPSWithDates = share?.income_statement?.eps_quarter.datedValues(dateOrder: .ascending) { //share?.wbValuation?.epsQWithDates(){
+            if let historicEPSWithDates = share?.income_statement?.eps_quarter.datedValues(dateOrder: .ascending, includeThisYear: true) { //share?.wbValuation?.epsQWithDates(){
 
             let qEPSInChartRange = historicEPSWithDates.filter { dv in
                 if dv.date > (dateRange?.min()?.addingTimeInterval(-180*24*3600) ?? Date()) {
@@ -505,8 +505,7 @@ class ChartView: UIView {
         trendsToShow.forEach { (trend) in
             drawTrend(stock: validStock, trendProperties: trend)
         }
-
-
+        
     }
     
     private func drawTrend(stock: Share, trendProperties: TrendProperties) {
@@ -604,7 +603,8 @@ class ChartView: UIView {
     
     private func plotPricePoint(pricePoint: PriceDate) -> CGPoint {
         
-        let timeFromEarliest = pricePoint.date.timeIntervalSince(dateRange![0])
+        var timeFromEarliest = pricePoint.date.timeIntervalSince(dateRange![0])
+        if timeFromEarliest < 0 { timeFromEarliest = 0 }
         let datePoint: CGFloat = chartOrigin.x + CGFloat(timeFromEarliest / chartTimeSpan) * chartAreaSize.width
         let point: CGFloat = chartOrigin.y - CGFloat((pricePoint.price - minPrice) / (maxPrice - minPrice)) * chartAreaSize.height
         return CGPoint(x: datePoint, y: point)
