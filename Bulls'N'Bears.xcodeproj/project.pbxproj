@@ -105,6 +105,7 @@
 		EA84A12129709FED000A1957 /* YChartsScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA84A12029709FED000A1957 /* YChartsScraper.swift */; };
 		EA84A1232971E8F5000A1957 /* TSScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA84A1222971E8F5000A1957 /* TSScraper.swift */; };
 		EA84A1252971EC6C000A1957 /* MacrotrendsScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA84A1242971EC6C000A1957 /* MacrotrendsScraper.swift */; };
+		EA96EB5229B0F7D2004B0094 /* FraBoScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA96EB5129B0F7D2004B0094 /* FraBoScraper.swift */; };
 		EA9D7399264432C300672762 /* TrendIconView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9D7398264432C300672762 /* TrendIconView2.swift */; };
 		EAA099C42588020B00DBB93C /* CheckButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA099C32588020B00DBB93C /* CheckButton.swift */; };
 		EAA548B527342D170083808A /* StocksController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA548B427342D170083808A /* StocksController2.swift */; };
@@ -269,11 +270,13 @@
 		EADA38F727131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADA38F327131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift */; };
 		EADA38F827131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADA38F327131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift */; };
 		EADA38F927131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADA38F327131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift */; };
+		EAE06B0B29B28369009F4BCE /* WebKitLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE06B0A29B28369009F4BCE /* WebKitLoader.swift */; };
 		EAEA758C25ACF53F008EEC05 /* ErrorLogListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */; };
 		EAED149525A8D0250073C46F /* Bulls'N'BearsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */; };
 		EAED14DF25A8D78C0073C46F /* Bulls'N'BearsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */; };
 		EAED14FB25A8DA090073C46F /* Bulls'N'BearsTests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = EAC1905F257641180030B331 /* Bulls'N'BearsTests.xctest */; };
 		EAED14FC25A8DA100073C46F /* Bulls'N'BearsUITests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = EAC1906A257641180030B331 /* Bulls'N'BearsUITests.xctest */; };
+		EAEF7A7D29AF7A5D003EDF4F /* MWScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF7A7C29AF7A5D003EDF4F /* MWScraper.swift */; };
 		EAEF8D2928EC447200102DC8 /* DatesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF8D2828EC447200102DC8 /* DatesManager.swift */; };
 		EAF5D73225AE1A8000E7A681 /* CombinedValuationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */; };
 		EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF5D74225B06F2E00E7A681 /* Extensions.swift */; };
@@ -411,6 +414,7 @@
 		EA84A12029709FED000A1957 /* YChartsScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YChartsScraper.swift; sourceTree = "<group>"; };
 		EA84A1222971E8F5000A1957 /* TSScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TSScraper.swift; sourceTree = "<group>"; };
 		EA84A1242971EC6C000A1957 /* MacrotrendsScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacrotrendsScraper.swift; sourceTree = "<group>"; };
+		EA96EB5129B0F7D2004B0094 /* FraBoScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FraBoScraper.swift; sourceTree = "<group>"; };
 		EA9D7398264432C300672762 /* TrendIconView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TrendIconView2.swift; path = "Bulls'N'Bears/TrendIconView2.swift"; sourceTree = SOURCE_ROOT; };
 		EAA099C32588020B00DBB93C /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
 		EAA1884827A1A719009AC214 /* TrendMyStocks 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 13.xcdatamodel"; sourceTree = "<group>"; };
@@ -496,9 +500,11 @@
 		EADA38F127131A1E00B294E3 /* TrendMyStocks 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 10.xcdatamodel"; sourceTree = "<group>"; };
 		EADA38F227131AA100B294E3 /* ShareTransaction+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShareTransaction+CoreDataClass.swift"; sourceTree = "<group>"; };
 		EADA38F327131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShareTransaction+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		EAE06B0A29B28369009F4BCE /* WebKitLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WebKitLoader.swift; path = "Bulls'N'Bears/WebKitLoader.swift"; sourceTree = SOURCE_ROOT; };
 		EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ErrorLogListCell.xib; sourceTree = "<group>"; };
 		EAED149325A8D0250073C46F /* Bulls'N'BearsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsTests.swift"; path = "TrendMyStocksTests/Bulls'N'BearsTests.swift"; sourceTree = SOURCE_ROOT; };
 		EAED14DC25A8D78C0073C46F /* Bulls'N'BearsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Bulls'N'BearsUITests.swift"; path = "TrendMyStocksUITests/Bulls'N'BearsUITests.swift"; sourceTree = SOURCE_ROOT; };
+		EAEF7A7C29AF7A5D003EDF4F /* MWScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MWScraper.swift; path = "Bulls'N'Bears/Controllers/MWScraper.swift"; sourceTree = SOURCE_ROOT; };
 		EAEF8D2828EC447200102DC8 /* DatesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatesManager.swift; sourceTree = "<group>"; };
 		EAF5D73125AE1A8000E7A681 /* CombinedValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedValuationController.swift; sourceTree = "<group>"; };
 		EAF5D74225B06F2E00E7A681 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -668,7 +674,10 @@
 				EA84A12029709FED000A1957 /* YChartsScraper.swift */,
 				EA84A1222971E8F5000A1957 /* TSScraper.swift */,
 				EA3613E729A677D3007ED67F /* ArivaScraper.swift */,
+				EAEF7A7C29AF7A5D003EDF4F /* MWScraper.swift */,
+				EA96EB5129B0F7D2004B0094 /* FraBoScraper.swift */,
 				EAA548B627342FA10083808A /* Downloader.swift */,
+				EAE06B0A29B28369009F4BCE /* WebKitLoader.swift */,
 				EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */,
 				EA51A9BF2632FD3200C857A8 /* CitationsManager.swift */,
 				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
@@ -1122,6 +1131,7 @@
 				EA3207F125EEA13200A6A6AB /* ValueListRatingCell.swift in Sources */,
 				EA9D7399264432C300672762 /* TrendIconView2.swift in Sources */,
 				EAD835EF25DC12000015C93A /* ValueListCell.swift in Sources */,
+				EA96EB5229B0F7D2004B0094 /* FraBoScraper.swift in Sources */,
 				EA774907296CB90400469053 /* Key_stats+CoreDataProperties.swift in Sources */,
 				EA0366BB296D8C7B009772B9 /* Share+CoreDataProperties.swift in Sources */,
 				EAA69F8126121A940067EE1A /* CompanyNews+CoreDataProperties.swift in Sources */,
@@ -1142,10 +1152,12 @@
 				EA84A12129709FED000A1957 /* YChartsScraper.swift in Sources */,
 				EADA38F427131AA100B294E3 /* ShareTransaction+CoreDataClass.swift in Sources */,
 				EAAB7BE32754038A00295DA7 /* RatingFactorCell.swift in Sources */,
+				EAE06B0B29B28369009F4BCE /* WebKitLoader.swift in Sources */,
 				EACBFD5928E9F4980066D36B /* FinHealthCell.swift in Sources */,
 				EAAB7BDE2753FE9C00295DA7 /* RatingFactorSettingsTVC.swift in Sources */,
 				EAD835BC25DA9BA40015C93A /* WBValuationTVC.swift in Sources */,
 				EA805DC525D54D4E00720E68 /* StockSearchTVC.swift in Sources */,
+				EAEF7A7D29AF7A5D003EDF4F /* MWScraper.swift in Sources */,
 				EA0E2F292625D50A00602BEE /* SortView.swift in Sources */,
 				EAF8CDD5296B3DAB0069D77D /* Cash_flow+CoreDataClass.swift in Sources */,
 				EAC2FC5025A0B93D0060F387 /* StockListCellTableViewCell.swift in Sources */,

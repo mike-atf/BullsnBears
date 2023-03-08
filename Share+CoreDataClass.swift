@@ -1841,7 +1841,7 @@ public class Share: NSManagedObject {
 
     }
     
-    func mergeInDownloadedTexts(ldTexts: [Labelled_DatedTexts], replace:Bool=false) async throws {
+    func mergeInDownloadedTexts(ldTexts: [Labelled_DatedTexts], replace:Bool=false) async {
         
         //DEBUG only
 //        let dateFormatter: DateFormatter = {
@@ -1865,9 +1865,10 @@ public class Share: NSManagedObject {
         //DEBUG only
         
         guard let backgroundMoc = self.managedObjectContext else {
-            throw InternalError(location: #function, errorInfo: "savings downloaded data in background share's own context FAILED!")
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "savings downloaded data in background share's own context FAILED as no bg context could be established")
+            return
         }
-        
+
         do {
             
             let research = self.research ?? StockResearch(context: backgroundMoc)
@@ -1890,6 +1891,8 @@ public class Share: NSManagedObject {
                     self.currency = result.datedTexts[0].text
                 case "exchange":
                     self.exchange = result.datedTexts[0].text
+                case "isin":
+                    self.isin = result.datedTexts[0].text
                 default:
                     ErrorController.addInternalError(errorLocation: #function, errorInfo: "received unexpected labelled result \(result)")
                 }
@@ -1900,7 +1903,6 @@ public class Share: NSManagedObject {
             NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil, userInfo: nil)
         }  catch {
             ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error saving \(self.symbol!) data download")
-            throw error
         }
 
 
@@ -1909,7 +1911,7 @@ public class Share: NSManagedObject {
 
     
     // for MOST but not all integrates into existing value; does NOT convert numbers from throusands or millions inot proper numbers!
-    func mergeInDownloadedData(labelledDatedValues: [Labelled_DatedValues],replace:Bool=false) async throws {
+    func mergeInDownloadedData(labelledDatedValues: [Labelled_DatedValues],replace:Bool=false) async {
         
         //DEBUG only
 //        let numberFormatter: NumberFormatter = {
@@ -1941,7 +1943,8 @@ public class Share: NSManagedObject {
         //DEBUG only
         
         guard let backgroundMoc = self.managedObjectContext else {
-            throw InternalError(location: #function, errorInfo: "savings downloaded data in background share's own context FAILED!")
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "savings downloaded data in background share's own context FAILED as no bg context could be established")
+            return
         }
         
         do {
@@ -2186,13 +2189,14 @@ public class Share: NSManagedObject {
                         }
 //                            bgShare.eps_current = result.values.first ?? Double()
                 case "trailing annual dividend yield":
-                    print("trailing annual dividend yield saved as \(result.datedValues)")
-                        keyStats.dividendYield = result.datedValues.convertToData()
+                    keyStats.dividendYield = result.datedValues.convertToData()
 //                            bgShare.divYieldCurrent = result.values.
                     
                 case "gross profit":
                     incomeStatement.grossProfit = result.datedValues.convertToData()
                 case "sg&a expenses":
+                    incomeStatement.sgaExpense = result.datedValues.convertToData()
+                case "sga":
                     incomeStatement.sgaExpense = result.datedValues.convertToData()
                 case "operating income":
                     incomeStatement.operatingIncome = result.datedValues.convertToData()
@@ -2291,14 +2295,13 @@ public class Share: NSManagedObject {
             
             r1v.creationDate = Date()
             
-            try self.managedObjectContext?.save()
+            try backgroundMoc.save()
             
             NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil, userInfo: nil)
 
         }
         catch {
             ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error saving \(self.symbol!) data download")
-            throw error
         }
 
     }

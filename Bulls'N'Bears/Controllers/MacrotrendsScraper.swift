@@ -188,13 +188,13 @@ class MacrotrendsScraper {
             return
         }
         
-        if let delegate = downloadRedirectDelegate {
-            NotificationCenter.default.addObserver(delegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
-        }
+//        if let delegate = downloadRedirectDelegate {
+//            NotificationCenter.default.addObserver(delegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
+//        }
 
         var labelledDatedResults = [Labelled_DatedValues]()
         var sectionCount = 0
-        let downloader = Downloader()
+//        let downloader = Downloader()
         
         for job in jobs {
             
@@ -223,7 +223,7 @@ class MacrotrendsScraper {
                 }
             }
             else if job.pageNameForURL == "stock-price-history" {
-                guard let htmlText = await Downloader.downloadDataNoThrow(url: url) else {
+                guard let htmlText = await Downloader.downloadDataWithRedirectionOption(url: url) else {
                     continue
                 }
                 if let datedValues = numbersFromColumn(html$: htmlText, tableHeader: "Historical Annual Stock Price Data</th>", targetColumnsFromLeft: [1]) {
@@ -231,7 +231,7 @@ class MacrotrendsScraper {
                 }
             }
             else {
-                guard let htmlText = await downloader.downloadDataWithRedirectionOption(url: url) else {
+                guard let htmlText = await Downloader.downloadDataWithRedirectionOption(url: url) else {
                     continue
                 }
                 if let labelledDatedValues = await MacrotrendsScraper.extractDatedValuesFromTable(htmlText: htmlText, rowTitles: job.rowTitles) {
@@ -288,16 +288,16 @@ class MacrotrendsScraper {
 //        progressDelegate?.taskCompleted()
         
         
-        do {
+//        do {
             let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
             backgroundMoc.automaticallyMergesChangesFromParent = true
             
             if let bgShare = backgroundMoc.object(with: shareID) as? Share {
-                try await bgShare.mergeInDownloadedData(labelledDatedValues: labelledDatedResults)
+                await bgShare.mergeInDownloadedData(labelledDatedValues: labelledDatedResults)
             }
-        } catch {
-            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "couldn't save background MOC")
-        }
+//        } catch {
+//            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "couldn't save background MOC")
+//        }
     }
 
     
@@ -358,7 +358,7 @@ class MacrotrendsScraper {
 
              NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
              
-             guard let htmlText = await downloader.downloadDataWithRedirectionOption(url: url) else {
+             guard let htmlText = await Downloader.downloadDataWithRedirectionOption(url: url) else {
                  errors.append(RunTimeError.specificError(description: "empty page / download failure for \(pageName) "))
                  progressDelegate?.taskCompleted()
                  continue
@@ -474,13 +474,13 @@ class MacrotrendsScraper {
             var tableText = String()
             var tableHeaderTexts = [String]()
             var datedValues = [Dated_EPS_PER_Values]()
-            let downloader = Downloader(task: .epsPER)
+//            let downloader = Downloader(task: .epsPER)
         
             if let delegate = downloadRedirectDelegate {
                 NotificationCenter.default.addObserver(delegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
             }
             
-            guard let validPageText = await downloader.downloadDataWithRedirectionOption(url: url) else {
+            guard let validPageText = await Downloader.downloadDataWithRedirectionOption(url: url) else {
                 ErrorController.addInternalError(errorLocation: "MTScraper.getHxEPSandPEData", errorInfo: "download failed for \(url)")
                 return nil
             }

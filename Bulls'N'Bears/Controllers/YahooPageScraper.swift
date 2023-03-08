@@ -74,269 +74,12 @@ class YahooPageScraper {
         return dictionary
         
     }
-    /*
-    class func yahooPageNames(option: DownloadOptions) -> [String] {
-        
-        var pageNames = [String]()
-        // analysis includes Exchange and Currency [DatedTExt]
-        
-        switch option {
-        case .allPossible:
-            pageNames = ["financials","balance-sheet","cash-flow", "insider-transactions", "analysis", "key-statistics", "profile", "summary"]
-        case .dcfOnly:
-            pageNames = ["financials","balance-sheet","cash-flow", "analysis", "key-statistics","summary"]
-        case .rule1Only:
-            pageNames = ["financials","balance-sheet", "insider-transactions", "analysis", "key-statistics"]
-        case .wbvOnly:
-            pageNames = ["financials","balance-sheet","cash-flow", "insider-transactions", "analysis", "key-statistics"]
-        case .yahooKeyStatistics:
-            pageNames = ["key-statistics", "summary"]
-        case .yahooProfile:
-            pageNames = ["profile"]
-        case .lynchParameters:
-            pageNames = ["key-statistics", "summary"]
-        case .wbvIntrinsicValue:
-            pageNames = []
-        case .allValuationDataOnly:
-            pageNames = ["financials","balance-sheet","cash-flow", "insider-transactions", "analysis", "key-statistics", "summary"]
-        case .researchDataOnly:
-            pageNames = ["profile", "summary"]
-        case .mainIndicatorsOnly:
-            // none required for moat from Yahoo
-            pageNames = yahooPageNames(option: .lynchParameters)
-        case .screeningInfos:
-            pageNames = yahooPageNames(option: .mainIndicatorsOnly)
-            pageNames.append("profile")
-        default:
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "YahooScraper has been asked to download unknown job \(option)")
-        }
-
-        return pageNames
-    }
-    
-    class func yahooTableTitles(option: DownloadOptions) -> [[String?]] {
-        
-        var tableTitles = [[String?]]()
-        
-        // page - [table] - [[rows]]
-        // [pages] - [[table]] - [[[rows]]]
-        
-        switch option {
-        case .allPossible:
-            tableTitles = [["Income statement"],
-                           ["Balance sheet"],
-                           ["Cash flow"],
-                           ["Insider purchases - Last 6 months"],
-                           ["Revenue estimate", "Growth estimates"],
-                           ["Valuation measures", nil],
-                            [nil], [nil]]
-        case .dcfOnly:
-            tableTitles = [["Income statement"],
-                           ["Balance sheet"],
-                           ["Cash flow"],
-                           ["Revenue estimate", "Growth estimates"],
-                           ["Valuation measures", nil],
-                           [nil]]
-         case .rule1Only:
-            tableTitles = [["Income statement"],
-                           ["Balance sheet"],
-                           ["Insider purchases - Last 6 months"],
-                           ["Revenue estimate", "Growth estimates"],
-                           ["Valuation measures"]]
-        case .wbvOnly:
-            tableTitles = [["Income statement"],
-                           ["Balance sheet"],
-                           ["Cash flow"],
-                           ["Insider purchases - Last 6 months"],
-                           ["Revenue estimate", "Growth estimates"],
-                           ["Valuation measures", nil]]
-        case .yahooKeyStatistics:
-            tableTitles = [[nil], [nil]]
-        case .yahooProfile:
-            tableTitles = [[nil]]
-        case .lynchParameters:
-            tableTitles = [[nil], [nil]]
-        case .wbvIntrinsicValue:
-            tableTitles = [[]]
-        case .allValuationDataOnly:
-            tableTitles = [["Income statement"],
-                           ["Balance sheet"],
-                           ["Cash flow"],
-                           ["Insider purchases - Last 6 months"],
-                           ["Revenue estimate", "Growth estimates"],
-                           ["Valuation measures", nil],[nil]]
-        case .researchDataOnly:
-            tableTitles = [
-                    ["Valuation measures", nil],
-                    [nil]
-                    ]
-        case .mainIndicatorsOnly:
-            // none required for moat from Yahoo
-            tableTitles = yahooTableTitles(option: .lynchParameters)
-        case .screeningInfos:
-            tableTitles = [[nil], [nil]] // [keyStat, summary]
-            tableTitles.append(["Valuation measures"]) // profile
-        default:
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "YahooScraper has been asked to download unknown job \(option)")
-        }
-        
-        return tableTitles
-    }
-    
-    class func yahooRowTitles(option: DownloadOptions) -> [[[String]]] {
-        
-        var rowTitles = [[[String]]]()
-        
-        switch option {
-        case .allPossible:
-            rowTitles = [
-                [["Total revenue","Basic EPS","Net income", "Interest expense","Income before tax","Income tax expense"]],
-                [["Current debt","Long-term debt", "Total liabilities"]],
-                [["Free cash flow","Operating cash flow","Capital expenditure"]],
-                [["Total insider shares held", "Purchases", "Sales"]],
-                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
-                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
-                [["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]],
-            [["Market cap","Beta (5Y monthly)", "PE ratio (TTM)","Earnings date"]]]
-        case .dcfOnly:
-            rowTitles = [
-                [["Total revenue", "Net income", "Interest expense","Income before tax","Income tax expense"]],
-                [["Current debt","Long-term debt"]],
-                [["Free cash flow","Capital expenditure"]],
-                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
-                [["Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
-                 [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
-         case .rule1Only:
-            rowTitles = [
-                [["Total revenue","Basic EPS","Net income"]],
-                [["Current debt","Long-term debt"]],
-                [["Total insider shares held", "Purchases", "Sales"]],
-                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
-                [["Forward P/E"]]
-                ]
-        case .wbvOnly:
-            rowTitles = [
-                [["Total revenue","Basic EPS","Net income", "Interest expense","Income before tax","Income tax expense"]],
-                [["Current debt","Long-term debt", "Total liabilities"]],
-                [["Free cash flow","Operating cash flow","Capital expenditure"]],
-                [["Total insider shares held", "Purchases", "Sales"]],
-                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
-                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]]]
-        case .yahooKeyStatistics:
-            rowTitles = [[["Beta (5Y monthly)", "Trailing P/E", "Diluted EPS", "Trailing annual dividend yield"]],
-                         [["Market cap","Beta (5Y monthly)", "Earnings date"]]] // titles differ from the ones displayed on webpage!
-        case .yahooProfile:
-            rowTitles = [[["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]]]
-        case .lynchParameters:
-            rowTitles = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)"]]]
-        case .wbvIntrinsicValue:
-            rowTitles = [[[]]]
-        case .allValuationDataOnly:
-            rowTitles = [
-                [["Total revenue","Basic EPS","Net income", "Interest expense","Income before tax","Income tax expense"]],
-                [["Current debt","Long-term debt", "Total liabilities"]],
-                [["Free cash flow","Operating cash flow","Capital expenditure"]],
-                [["Total insider shares held", "Purchases", "Sales"]],
-                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
-                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
-                [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
-        case .researchDataOnly:
-            rowTitles = [
-                    [["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]],
-                    [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
-        case .mainIndicatorsOnly:
-            // none required for moat from Yahoo
-            rowTitles = yahooRowTitles(option: .lynchParameters)
-        case .screeningInfos:
-            rowTitles = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)","Market cap","Beta (5Y monthly)", "Earnings date"]]] // [keyStat, summary]
-            rowTitles.append([["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]]) // profile
-        default:
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "YahooScraper has been asked to download unknown job \(option)")
-        }
-        
-        return rowTitles
-    }
-    
-    class func yahooSaveTitles(option: DownloadOptions) -> [[[String]]] {
-        
-        var saveTitles = [[[String]]]()
-        
-        switch option {
-        case .allPossible:
-            saveTitles = [
-                [["Revenue","EPS - Earnings Per Share", "Net Income","Interest expense","Income before tax","Income tax expense"]],
-                [["Current debt","Long-term Debt","Total liabilities"]],
-                [["Free cash flow", "Operating cash flow","Capital expenditure"]],
-                [["Total insider shares held", "Purchases", "Sales"]],
-                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
-                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)","Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
-                [["Sector", "Industry", "Employees", "Description"]],
-                [["Market cap","Beta (5Y monthly)", "PE ratio (TTM)","Earnings date"]]]
-            
-        case .dcfOnly:
-            saveTitles = [
-                [["Revenue","Net Income","Interest expense","Income before tax","Income tax expense"]],
-                [["Current debt","Long-term Debt"]],
-                [["Free cash flow", "Capital expenditure"]],
-                [["Avg. Estimate", "Sales growth (year/est)"], ["Next year", "Next 5 years (per annum)"]],
-                [["Market cap (intra-day)"],["Beta (5Y monthly)","Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
-                [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
-        case .rule1Only:
-            print()
-        case .wbvOnly:
-            saveTitles = [
-                [["Revenue","EPS - Earnings Per Share", "Net Income","Interest expense","Income before tax","Income tax expense"]],
-                [["Current debt","Long-term Debt","Total liabilities"]],
-                [["Free cash flow", "Operating cash flow","Capital expenditure"]],
-                [["Total insider shares held", "Purchases", "Sales"]],
-                [["Avg. Estimate", "Sales growth (year/est)"],["Next year", "Next 5 years (per annum)"]],
-                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]]]
-        case .yahooKeyStatistics:
-            saveTitles = [[["Beta (5Y monthly)", "Trailing P/E", "EPS - Earnings Per Share", "Trailing annual dividend yield"]],[["Market cap","Beta (5Y monthly)", "Earnings date"]]] // titles differ from the ones
-        case .yahooProfile:
-            saveTitles = [[["Sector", "Industry", "Employees", "Description"]]]
-        case.lynchParameters:
-            saveTitles = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)"]]]
-        case .wbvIntrinsicValue:
-            saveTitles = [[[]]]
-        case .allValuationDataOnly:
-            saveTitles = [
-                [["Revenue","EPS - Earnings Per Share", "Net Income","Interest expense","Income before tax","Income tax expense"]],
-                [["Current debt","Long-term Debt","Total liabilities"]],
-                [["Free cash flow", "Operating cash flow","Capital expenditure"]],
-                [["Total insider shares held", "Purchases", "Sales"]],
-                [["Avg. Estimate", "Sales growth (year/est)"],["Next year", "Next 5 years (per annum)"]],
-                [["Forward P/E","Market cap (intra-day)"],["Beta (5Y monthly)", "Shares outstanding", "Payout ratio","Trailing annual dividend yield"]],
-                [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
-        case .researchDataOnly:
-            saveTitles = [[["Sector", "Industry", "Employees", "Description"]],
-                [["Market cap","Beta (5Y monthly)", "Earnings date"]]]
-        case .mainIndicatorsOnly:
-            // none required for moat from Yahoo
-            saveTitles = yahooSaveTitles(option: .lynchParameters)
-        case .screeningInfos:
-            saveTitles = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)","Market cap","Beta (5Y monthly)", "Earnings date"]]] // [keyStat, summary]
-            saveTitles.append([["Sector", "Industry", "Full-time employees", "Description"]]) // profile
-        default:
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "YahooScraper 'saveTitles' has been asked to download unknown job \(option)")
-        }
-        
-        return saveTitles
-    }
-    */
-    
     
     class func countOfRowsToDownload(option: DownloadOptions) -> Int {
         
         let dictionary = yahooWebDictionary ?? dictionaryBuilder()
         return dictionary.rowTitles(for: option).count
     }
-    
-//    class func countPagesToDownload(option: DownloadOptions) -> Int {
-//
-//        return yahooPageNames(option: option).flatMap{ $0 }.count
-//    }
-
     
     // MARK: - central download function
     
@@ -346,6 +89,9 @@ class YahooPageScraper {
         guard let downloadJobs = yahooDownloadJobs(symbol: symbol, shortName: shortName, option: option) else {
             return
         }
+        
+        var checkCurrency: String?
+        var checkExchange: String?
         
         var nextEarningsDate: Date?
         var currencyAndExchangrLDT: [Labelled_DatedTexts]?
@@ -392,12 +138,13 @@ class YahooPageScraper {
             }
             else if var extractionResults = YahooPageScraper.extractPageData(html: htmlText, pageType: type, job: job, shareID: shareID) {
                 
-                // extract Currency and Exchange from Yahoo>Analysis page
-                if job.pageName == "analysis" {
+                // extract Currency and Exchange from any Yahoo page
+                if checkCurrency == nil || checkExchange == nil {
                     if let currencyPosition = htmlText.range(of: "Currency in ") {
                         if let currencyEndPosition = htmlText.range(of: "</span>", range: currencyPosition.upperBound..<htmlText.endIndex) {
                             let shareCurrency = String(htmlText[currencyPosition.upperBound..<currencyEndPosition.lowerBound])
-                            currencyAndExchangrLDT = [Labelled_DatedTexts(label: "Currency", datedTexts: [DatedText(date: Date(), text: shareCurrency)])]
+                            checkCurrency = shareCurrency
+                            currencyAndExchangrLDT = [Labelled_DatedTexts(label: "Currency", datedTexts: [DatedText(date: Date(), text: shareCurrency.replacingOccurrences(of: " ", with: ""))])]
                         }
                         
                         if let exchangeStartPosition = htmlText.range(of: "<span>", options: .backwards ,range: htmlText.startIndex..<currencyPosition.lowerBound) {
@@ -405,7 +152,8 @@ class YahooPageScraper {
                             let exchangeRowText = String(htmlText[exchangeStartPosition.upperBound..<currencyPosition.lowerBound])
                             let exchangeRowTexts = exchangeRowText.split(separator: "-")
                             if let exchange$ = exchangeRowTexts.first {
-                                let exchangeLDV = Labelled_DatedTexts(label: "Exchange", datedTexts: [DatedText(date: Date(), text: String(exchange$))])
+                                checkExchange = String(exchange$)
+                                let exchangeLDV = Labelled_DatedTexts(label: "Exchange", datedTexts: [DatedText(date: Date(), text: String(exchange$).replacingOccurrences(of: " ", with: ""))])
                                 if currencyAndExchangrLDT == nil {
                                     currencyAndExchangrLDT = [exchangeLDV]
                                 } else {
@@ -415,11 +163,8 @@ class YahooPageScraper {
                         }
                     }
                 }
-                else if job.pageName.contains("statistics") {
-                                        
-                    for result in extractionResults {
-                        print(result)
-                    }
+                
+                if job.pageName.contains("statistics") {
                     
                     // if Yahoo doesn't have div Yield try YCharts
                     let divYield = extractionResults.filter({ ldv in
@@ -428,7 +173,7 @@ class YahooPageScraper {
                     }).first
                     
                     if divYield == nil || divYield?.datedValues.count ?? 0 < 1 {
-                        print("no div Yield from Yahoo, trying from YCharts...")
+//                        print("no div Yield from Yahoo, trying from YCharts...")
                         await YChartsScraper.dataDownloadAnalyseSave(symbol: symbol, downloadOption: .divYield, shareID: shareID, progressDelegate: progressDelegate)
                     }
                 }
@@ -448,24 +193,24 @@ class YahooPageScraper {
         let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc.automaticallyMergesChangesFromParent = true
         
-        do {
-            if let bgShare = backgroundMoc.object(with: shareID) as? Share {
-                if let valid = nextEarningsDate {
-                    let research = bgShare.research ?? StockResearch(context: backgroundMoc)
-                    research.share = bgShare
-                    if valid > research.nextReportDate ?? Date() {
-                        research.nextReportDate = valid
-                    }
+//        do {
+        if let bgShare = backgroundMoc.object(with: shareID) as? Share {
+            if let valid = nextEarningsDate {
+                let research = bgShare.research ?? StockResearch(context: backgroundMoc)
+                research.share = bgShare
+                if valid > research.nextReportDate ?? Date() {
+                    research.nextReportDate = valid
                 }
-                if let valid = currencyAndExchangrLDT {
-                    try await bgShare.mergeInDownloadedTexts(ldTexts: valid)
-                }
-                try await bgShare.mergeInDownloadedData(labelledDatedValues: results)
             }
+            if let valid = currencyAndExchangrLDT {
+                await bgShare.mergeInDownloadedTexts(ldTexts: valid)
+            }
+            await bgShare.mergeInDownloadedData(labelledDatedValues: results)
         }
-        catch {
-            ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "failed to save downloadde data for \(symbol)")
-        }
+//        }
+//        catch {
+//            ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "failed to save downloadde data for \(symbol)")
+//        }
         
     }
 
@@ -1243,14 +988,14 @@ class YahooPageScraper {
         let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc.automaticallyMergesChangesFromParent = true
         
-        do {
+//        do {
             if let bgShare = backgroundMoc.object(with: shareID) as? Share {
-                try await bgShare.mergeInDownloadedData(labelledDatedValues: valueResults)
-                try await bgShare.mergeInDownloadedTexts(ldTexts: textResults)
+                await bgShare.mergeInDownloadedData(labelledDatedValues: valueResults)
+                await bgShare.mergeInDownloadedTexts(ldTexts: textResults)
             }
-        } catch {
-            ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "failed to save profile downloads data for \(job.url!)")
-        }
+//        } catch {
+//            ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "failed to save profile downloads data for \(job.url!)")
+//        }
     }
     
     class func getPageType(url: URL) -> YahooPageType {

@@ -91,23 +91,49 @@ class StocksController2: NSFetchedResultsController<Share> {
             return
 
         }
+        
+        guard newShare.name_long != nil else {
+            AlertController.shared().showDialog(title: "Not completed", alertMessage: "new share object \(String(describing: symbol)) did not have valid long name \(String(describing: newShare.name_long))")
+            return
 
-                
-        async let _ = await checkMTRedirection(symbol: newShare.symbol!, shortName: newShare.name_short)
+        }
+
+//        await checkMTRedirection(symbol: newShare.symbol!, shortName: newShare.name_short)
         
         // download company profile data
         // Download data first
         shareInfosToDownload = 1
         
-        progressDelegate?.allTasks = 1 + MacrotrendsScraper.countOfRowsToDownload(option: .allPossible) + YahooPageScraper.countOfRowsToDownload(option: .allPossible)
+        progressDelegate?.allTasks = 1 + MacrotrendsScraper.countOfRowsToDownload(option: .screeningInfos) + YahooPageScraper.countOfRowsToDownload(option: .screeningInfos)
         
         async let datedDividends = YahooPageScraper.dividendsHxFileDownload(symbol: symbol!, companyName: newShare.name_short ?? "missing", years: 10)
-        
-        await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: newShare.symbol ?? "", shortName: newShare.name_short ?? "missing", shareID: objectID, downloadOption: .screeningInfos, progressDelegate: progressDelegate,downloadRedirectDelegate: self)
-                
+                        
         await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol!, shortName: newShare.name_short ?? "missing", shareID: objectID, option: .screeningInfos, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
         
         await dividendsAndReturns(shareID: newShare.objectID, pricesCsvURL: url)
+        
+        if (newShare.currency ?? "USD") == "USD" {
+            await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: newShare.symbol ?? "", shortName: newShare.name_short ?? "missing", shareID: objectID, downloadOption: .screeningInfos, progressDelegate: progressDelegate,downloadRedirectDelegate: self)
+        }
+        else {
+            // non-macrotrends screening data download options here
+            print("Macrotrends data download for NON-US stock...")
+            await WebPageScraper2.nonUSDataDownload(symbol: newShare.symbol ?? "", shortName: newShare.name_short ?? "missing", shareID: objectID)
+            
+//            await MWScraper.dataDownloadAnalyseSave(symbol: symbol ?? "", exchange: newShare.exchange ?? "missing", currency: newShare.currency ?? "missing" ,shareID: objectID, option: .allPossible)
+            
+            let s = newShare.symbol!
+            let longName = newShare.name_long!
+            let ex = newShare.exchange!
+            let cu = newShare.currency! 
+            
+            DispatchQueue.main.async {
+                let fraboScraper = FraBoScraper()
+                fraboScraper.downloadWithWebView(symbol: s, companyName: longName, exchange: ex, currency: cu, shareID: objectID, option: .allPossible, downloadDelegate: self.viewController!)
+            }
+            
+//            await FraBoScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missingSy", companyName: newShare.name_long ?? "missingNL", exchange: newShare.exchange ?? "missingExc", currency: newShare.currency ?? "missingCu" ,shareID: objectID, option: .allPossible)
+        }
         
         newShare.saveDividendData(datedValues: await datedDividends, save: true)
         
@@ -245,7 +271,7 @@ class StocksController2: NSFetchedResultsController<Share> {
     }
     
     /// check if MT name correct; if not the website may respond with a redirection which contains the correct MT name
-    func checkMTRedirection(symbol: String, shortName: String?) async -> Bool {
+    func checkMTRedirection(symbol: String, shortName: String?) async {
         
         let mtShortname = shortName?.replacingOccurrences(of: " ", with: "-")
         let components =  URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(mtShortname ?? "")/revenue")
@@ -253,18 +279,18 @@ class StocksController2: NSFetchedResultsController<Share> {
         // will receive redirect delegate call if shortName wrong in MT
             
         if let url = components?.url {
-            NotificationCenter.default.addObserver(self, selector: #selector(awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil) // for MT download redirects
+//            NotificationCenter.default.addObserver(self, selector: #selector(awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil) // for MT download redirects
             
             // testing if MT redirects to another symbol/name. This is then picked up by then delegate sent here.
-            do {
-                async let test = Downloader.mtTestDownload(url: url, delegate: self) ?? false
-                return try await test
-            } catch {
-                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error running MT test download with new share \(symbol)")
-            }
+//            do {
+                async let test = Downloader.downloadDataWithRedirectionOption(url: url)
+//                return await test
+//            } catch {
+//                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error running MT test download with new share \(symbol)")
+//            }
         }
             
-        return false
+//        return false
 
     }
     
@@ -543,22 +569,25 @@ class StocksController2: NSFetchedResultsController<Share> {
                     
                     Task(priority: .background) {
                         
-                        do {
-                            
-                            if symbol!.contains(".") {
+//                        do {
+//
+                        if (share.currency ?? "USD") == "USD" {
                                 // US Stocks
                                 await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .rule1Only, downloadRedirectDelegate: self)
                                 await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missing", shortName: shortName ?? "missing", shareID: shareID, option: .rule1Only, downloadRedirectDelegate: self)
                                 
                             } else {
                                 // non-US Stocks
-                                try await Rule1Valuation.nonMTRule1DataDownload(symbol: symbol, shortName: share.name_short, shareID: shareID)
+                                await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missing", shortName: shortName ?? "missing", shareID: shareID, option: .rule1Only, downloadRedirectDelegate: self)
+                                
+                                await WebPageScraper2.nonUSDataDownload(symbol: symbol, shortName: share.name_short, shareID: shareID)
+//                                try await Rule1Valuation.nonMTRule1DataDownload(symbol: symbol, shortName: share.name_short, shareID: shareID)
                                 NotificationCenter.default.post(name: Notification.Name(rawValue: "SingleShareInfoDownloadComplete"), object: nil, userInfo: nil)
                             }
-                        } catch {
-                            ErrorController.addInternalError(errorLocation: "StocksController2.updateSharesInfo.r1Valuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
-                            NotificationCenter.default.post(name: Notification.Name(rawValue: "SingleShareInfoDownloadComplete"), object: nil, userInfo: nil)
-                        }
+//                        } catch {
+//                            ErrorController.addInternalError(errorLocation: "StocksController2.updateSharesInfo.r1Valuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
+//                            NotificationCenter.default.post(name: Notification.Name(rawValue: "SingleShareInfoDownloadComplete"), object: nil, userInfo: nil)
+//                        }
                         
                     }
                 }
@@ -896,6 +925,11 @@ class StocksController2: NSFetchedResultsController<Share> {
 
 extension StocksController2: DownloadRedirectionDelegate {
     
+    func redirectTo(url: URL?) {
+        guard let validURL = url else { return }
+        
+    }
+    
     func awaitingRedirection(notification: Notification) {
         
         NotificationCenter.default.removeObserver(self)
@@ -949,6 +983,7 @@ extension StocksController2: DownloadRedirectionDelegate {
                 }
             }
         }
+        
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest) async -> URLRequest? {

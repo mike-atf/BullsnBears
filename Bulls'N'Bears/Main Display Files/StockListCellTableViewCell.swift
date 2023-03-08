@@ -147,7 +147,7 @@ class StockListCellTableViewCell: UITableViewCell {
                 healthDateLabel.textColor = UIColor.systemYellow
             }
             
-            let config = UIImage.SymbolConfiguration(paletteColors: [healthColor, .white])
+            let config = UIImage.SymbolConfiguration(paletteColors: [healthColor, .label])
 
             healthIcon.preferredSymbolConfiguration = config
             
@@ -191,7 +191,7 @@ class StockListCellTableViewCell: UITableViewCell {
             }
         }
         
-        let config = UIImage.SymbolConfiguration(paletteColors: [actionIconTintColor, .white])
+        let config = UIImage.SymbolConfiguration(paletteColors: [actionIconTintColor, .label])
         
         actionIcon?.image = lastCrossing.signal > 0 ? UIImage(systemName: "cart.fill.badge.plus"):  UIImage(systemName: "cart.fill.badge.minus")
         actionIcon.preferredSymbolConfiguration = config

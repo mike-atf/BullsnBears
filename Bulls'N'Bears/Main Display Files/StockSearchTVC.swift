@@ -79,35 +79,6 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         tableView.reloadData()
     }
     
-    /*
-    func searchSymbolInWeb(searchText: String) async -> [String]? {
-        
-        let components = URLComponents(string: "https://stockanalysis.com/stocks/\(searchText)")
-        guard  let url = components?.url else {
-            return nil
-        }
-        
-        do {
-            print(url)
-            if let html = try await Downloader().downloadDataWithRedirection(url: url) {
-                print()
-                print(html)
-                print()
-            } else {
-                print("empty webpage for \(searchText) downloaded from 'https://stockanalysis.com/stocks'")
-                print()
-            }
-            
-        } catch {
-            print(error.localizedDescription)
-            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error trying to download from Stock Web Ticker Data website 'https://stockanalysis.com/stocks'")
-        }
-        
-        return nil
-        
-    }
-    */
-    
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         
             if let searchTerm = searchBar.text?.uppercased() {
@@ -167,54 +138,6 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
             }
         }
         
-        
-//        let nowSinceRefDate = yahooPricesStartDate.timeIntervalSince(yahooRefDate) // 10 years back!
-//        let yearAgoSinceRefDate = yahooPricesEndDate.timeIntervalSince(yahooRefDate)
-//
-//        let start$ = numberFormatter.string(from: nowSinceRefDate as NSNumber) ?? ""
-//        let end$ = numberFormatter.string(from: yearAgoSinceRefDate as NSNumber) ?? ""
-//
-//        var urlComponents = URLComponents(string: "https://query1.finance.yahoo.com/v7/finance/download/\(symbol)")
-//        urlComponents?.queryItems = [URLQueryItem(name: "period1", value: start$),URLQueryItem(name: "period2", value: end$),URLQueryItem(name: "interval", value: "1d"), URLQueryItem(name: "events", value: "history"), URLQueryItem(name: "includeAdjustedClose", value: "true") ]
-//
-//
-//        if let sourceURL = urlComponents?.url {
-//
-//            // first try to download historical prices from Yahoo finance as CSV file
-//            let expectedHeaderTitles = ["Date","Open","High","Low","Close","Adj Close","Volume"]
-//
-//            Task.init(priority: .background) {
-//
-//                if let prices = await YahooPageScraper.dailyPricesDownloadCSV(symbol: symbol, companyName: companyName) {
-//                    DispatchQueue.main.async {
-//                        self.callingVC.addShare(url: nil, pricePoints: prices, symbol: symbol, companyName: companyName)
-//                    }
-//                }
-//                else {
-//                    await dataDownload(symbol: symbol, companyName: companyName!)
-//                }
-                
-//                do {
-//                    if let csvURL = try await Downloader.downloadCSVFile2(url: sourceURL, symbol: symbol, type: "_PPoints") {
-//                        if CSVImporter.matchesExpectedFormat(url: csvURL, expectedHeaderTitles: expectedHeaderTitles) {
-//                            // successful CSV file downloaded
-//                            DispatchQueue.main.async {
-//                                self.callingVC.addShare(url: csvURL, pricePoints: nil, symbol: symbol, companyName: companyName)
-//                            }
-//                        } else {
-//                            // csv file not correct, download data from webpage instead
-//                            await dataDownload(symbol: symbol, companyName: companyName!)
-//                        }
-//                    } else {
-//                        // csv file download failed, download data from webpage instead
-//                        await dataDownload(symbol: symbol, companyName: companyName!)
-//                    }
-//                } catch {
-//                    ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error when trying to download Yahoo CSV Price csv file for \(symbol)")
-//                }
-                
-//            }
-//        }
     }
     
     func dataDownload(symbol: String, companyName: String) async -> [PricePoint]? {

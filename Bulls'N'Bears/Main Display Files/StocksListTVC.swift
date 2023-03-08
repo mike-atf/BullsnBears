@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import WebKit
 
 class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -90,6 +91,9 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var progressView: DownloadProgressView?
     var allDownloadTasks = 0
     var completedDownloadTasks = 0
+    
+    var hiddenWebKitView: WKWebView?
+    var fraBoScraper: FraBoScraper?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -393,26 +397,27 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @objc
     func downloadEnded(notification: Notification) {
         
-        let moc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        do {
-            try moc.save()
-        } catch {
-            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Stocks list TVC moc save error after download ended")
-        }
-        
-        if let shareID = notification.object as? NSManagedObjectID {
-            if let share = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: shareID) as? Share {
-                if let indexPath = controller.indexPath(forObject: share) {
-                    DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            
+            let moc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+            do {
+                try moc.save()
+            } catch {
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Stocks list TVC moc save error after download ended")
+            }
+            
+            if let shareID = notification.object as? NSManagedObjectID {
+                if let share = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: shareID) as? Share {
+                    if let indexPath = self.controller.indexPath(forObject: share) {
                         self.tableView.reloadRows(at: [indexPath], with: .automatic)
                     }
-                }
-           }
-        } else {
-            DispatchQueue.main.async {
+               }
+            } else {
                 self.tableView.reloadData()
             }
+            
         }
+        
     }
     
     @objc
@@ -1105,3 +1110,91 @@ extension StocksListTVC: ProgressViewDelegate {
     }
 }
 
+extension StocksListTVC: FraBoDownloadDelegate, WKNavigationDelegate, WKUIDelegate {
+    
+    
+    var instantiatedScraper: FraBoScraper? {
+        get {
+            self.fraBoScraper
+        }
+        set (newValue) {
+            self.fraBoScraper = newValue
+        }
+    }
+    
+    
+    var hostViewController: StocksListTVC {
+        get {
+            self
+        }
+        set (newValue) {
+            print("StockVC setting illegal")
+        }
+    }
+    
+    var hiddenDownloadView: WKWebView? {
+        get {
+            self.hiddenWebKitView
+        }
+        set (newValue) {
+            if newValue != nil {
+                self.view.addSubview(newValue!)
+            }
+            self.hiddenWebKitView = newValue
+        }
+    }
+    
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+        
+        if let host = navigationAction.request.url?.host {
+            if host.starts(with: "www.boerse-frankfurt.de") {
+                return .allow
+            }
+        }
+        print("donwload disallowed for \(String(describing: navigationAction.request.url?.host))")
+        return .cancel
+    }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        
+        print("finished loading...")
+        
+        webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") { (result, error) in
+            
+            if let error = error {
+                print("!!!!!!!")
+                print(error)
+                print()
+                self.hiddenWebKitView?.removeFromSuperview()
+                self.hiddenWebKitView = nil
+                self.fraBoScraper = nil
+            }
+            if let result = result as? String {
+                print("============ FraBo Webview navigation finished")
+                if let retrievedJob = FraBoScraper.fromURLToJob(url: webView.url!, scraper: self.fraBoScraper!) {
+                    FraBoScraper.analyseAndSave(htmlText: result, job: retrievedJob, shareID: self.fraBoScraper?.shareID)
+                    self.hiddenWebKitView?.removeFromSuperview()
+                    self.hiddenWebKitView = nil
+                    self.fraBoScraper = nil
+                } else {
+                    print("unable to retrieve frabo download job from url \(String(describing: webView.url))")
+                    self.hiddenWebKitView?.removeFromSuperview()
+                    self.hiddenWebKitView = nil
+                    self.fraBoScraper = nil
+                }
+            }
+            
+//            self.hiddenDownloadView = nil
+        }
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "estimatedProgress" {
+            print(Float(hiddenDownloadView?.estimatedProgress ?? 0))
+            // use ProgressBar view here
+        }
+    }
+
+    
+    
+}

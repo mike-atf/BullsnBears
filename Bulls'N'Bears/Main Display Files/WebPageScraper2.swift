@@ -86,6 +86,116 @@ class WebPageScraper2: NSObject {
         self.progressDelegate = progressDelegate
     }
 
+    /// called  by StocksController.updateStocks for non-US stocks when trying to download from MacroTrends
+    class func nonUSDataDownload(symbol: String?, shortName: String?, shareID: NSManagedObjectID ,progressDelegate: ProgressViewDelegate?=nil) async {
+        
+        guard let valid = symbol else {
+            ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "missing stock symbol")
+            progressDelegate?.cancelRequested()
+            return
+        }
+        
+        guard let validSN = shortName else {
+            ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "missing stock short name")
+            progressDelegate?.cancelRequested()
+            return
+        }
+
+        let webString = valid.replacingOccurrences(of: " ", with: "+")
+        let webStringComps = webString.split(separator: ".")
+        var tagesschauURL: URL?
+        if let symbolNoDots = webStringComps.first {
+            tagesschauURL = URL(string: "https://www.tagesschau.de/wirtschaft/boersenkurse/suche/?suchbegriff=\(symbolNoDots)")
+        }
+        
+        let snComponents = validSN.split(separator: " ")
+        var arivaComponents = String(snComponents.first!)
+        if snComponents.count > 1 {
+            if snComponents[1] == "SE" {
+                arivaComponents += " " + String(snComponents[1])
+            }
+        }
+        let arivaString = arivaComponents.replacingOccurrences(of: " ", with: "_") + "-aktie"
+        let arivaURL = URL(string: "https://www.ariva.de/\(arivaString)/bilanz-guv")
+        let tsURL = tagesschauURL
+        progressDelegate?.allTasks = 5
+        
+        Task.init {
+            do {
+                // download from ariva and move on after async let...
+                var r1LabelledValues = [Labelled_DatedValues]()
+
+                async let arivaHTML = Downloader.downloadDataNoThrow(url: arivaURL!)
+                
+                progressDelegate?.taskCompleted()
+                                
+//                await YahooPageScraper.dataDownloadAnalyseSave(symbol: valid, shortName: validSN, shareID: shareID, option: .rule1Only, downloadRedirectDelegate: nil)
+                
+//                progressDelegate?.taskCompleted()
+
+                // find full url for company on tagesschau search page
+                if let html = await Downloader.downloadDataWithRedirectionOption(url: tsURL) {
+                    var tagesschauShareURLs = try TagesschauScraper.shareAddressLineTagesschau(htmlText: html)
+                    if tagesschauShareURLs?.count ?? 0 > 1 {
+                        tagesschauShareURLs = tagesschauShareURLs?.filter({ address in
+                            if address.contains("aktie") { return true }
+                            else { return false }
+                        })
+                    }
+
+                    if let firstAddress = tagesschauShareURLs?.first {
+                        if let url = URL(string: firstAddress) {
+
+                            // 2 download tagesschau data webpage from full url
+                            if let htmlText = await Downloader.downloadDataNoThrow(url: url) {
+                                await TagesschauScraper.dataDownloadAnalyseSave(htmlText: htmlText, symbol: symbol, shareID: shareID, progressDelegate: progressDelegate)
+                            }
+//                            if let infoPage = await Downloader.downloadDataNoThrow(url: url) {
+//                                if infoPage != "" {
+//                                    if let ldvs = await TagesschauScraper.rule1DownloadAndAnalyse(htmlText: infoPage, symbol: symbol, shareID: shareID, progressDelegate: progressDelegate) {
+//                                        r1LabelledValues.append(contentsOf: ldvs.sortAllElementDatedValues(dateOrder: .ascending))
+//                                    }
+//                                }
+//                            }
+                        }
+                    }
+                }
+                progressDelegate?.taskCompleted()
+
+                // ...continue analysing arivaHTML here
+                if let arivaLDVs = await ArivaScraper.pageAnalysis(html: arivaHTML ?? "", headers: ["Bewertung"], parameters: [["KGV (Kurs/Gewinn)","Return on Investment in %"]]) {
+                    
+                    r1LabelledValues.append(contentsOf: arivaLDVs.sortAllElementDatedValues(dateOrder: .ascending))
+                }
+                progressDelegate?.taskCompleted()
+                
+                for i in 0..<r1LabelledValues.count {
+                    if let latest = r1LabelledValues[i].datedValues.first {
+                        if latest.value == 0.0 {
+                            r1LabelledValues[i].datedValues = Array(r1LabelledValues[i].datedValues.dropFirst())
+                        }
+                    }
+                }
+
+                progressDelegate?.downloadComplete()
+                
+                let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+                backgroundMoc.automaticallyMergesChangesFromParent = true
+                
+                if let bgShare = backgroundMoc.object(with: shareID) as? Share {
+                    await bgShare.mergeInDownloadedData(labelledDatedValues: r1LabelledValues)
+                }
+                
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadEnded"), object: nil, userInfo: nil)
+
+            } catch {
+                progressDelegate?.downloadError(error: error.localizedDescription)
+//                NotificationCenter.default.post(name: Notification.Name(rawValue: "DownloadEnded"), object: nil, userInfo: nil)
+                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "error downloading 'Tageschau' Aktien info page")
+            }
+        }
+    }
+
     /*
     class func arivaPageAnalysis(html: String, headers: [String], parameters: [[String]]) -> [Labelled_DatedValues]? {
         

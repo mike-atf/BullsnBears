@@ -114,6 +114,10 @@ class ChartPricesView: UIView {
                 return label
             }()
             
+            if (share?.currency ?? "USD") != "USD" {
+                currentPriceLabel?.text = currentPriceLabel?.text?.replacingOccurrences(of: "$", with: "€")
+            }
+            
             if share?.lastLivePriceDate != nil {
                currentLabelRefreshTimer = Timer(timeInterval: 120, target: self, selector: #selector(refreshCurrentLabel), userInfo: nil, repeats: true)
                 currentLabelRefreshTimer?.tolerance = 1.0
@@ -134,6 +138,11 @@ class ChartPricesView: UIView {
                 label.sizeToFit()
                 label.isHidden = true
                 self.addSubview(label)
+                
+                if (share?.currency ?? "USD") != "USD" {
+                    label.text = label.text?.replacingOccurrences(of: "$", with: "€")
+                }
+
                 return label
             }()
             priceLabels.append(newLabel)
@@ -166,6 +175,10 @@ class ChartPricesView: UIView {
                             label.sizeToFit()
                             label.backgroundColor = labelColor
                             label.isHidden = true
+                            if (share?.currency ?? "USD") != "USD" {
+                                label.text = label.text?.replacingOccurrences(of: "$", with: "€")
+                            }
+
                             self.addSubview(label)
                             return label
                         }()

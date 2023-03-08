@@ -92,7 +92,7 @@ class YChartsScraper {
         var labelledDVs = [Labelled_DatedValues]()
         for job in jobs {
             
-            guard let htmlText = await Downloader().downloadDataWithRedirectionOption(url: job.url) else {
+            guard let htmlText = await Downloader.downloadDataWithRedirectionOption(url: job.url) else {
                 ErrorController.addInternalError(errorLocation: #function, errorInfo: "Download failure for YCHarts data for \(String(describing: job.url)) - html text nil")
                 continue
             }
@@ -110,15 +110,15 @@ class YChartsScraper {
         let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc.automaticallyMergesChangesFromParent = true
         
-        do {
+//        do {
             if let bgShare = backgroundMoc.object(with: shareID) as? Share {
-                try await bgShare.mergeInDownloadedData(labelledDatedValues: labelledDVs)
-                try bgShare.managedObjectContext?.save()
+                await bgShare.mergeInDownloadedData(labelledDatedValues: labelledDVs)
+//                try bgShare.managedObjectContext?.save()
             }
-        }
-        catch {
-            ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "failed YCharts data download or bg save for \(symbol)")
-        }
+//        }
+//        catch {
+//            ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "failed YCharts data download or bg save for \(symbol)")
+//        }
             
     }
     

@@ -6,30 +6,32 @@
 //
 
 import Foundation
+import CoreData
+import UIKit
 
 class TagesschauScraper {
     
-    class func rule1DownloadAndAnalyse(htmlText: String, symbol: String?, progressDelegate: ProgressViewDelegate?=nil) throws -> [Labelled_DatedValues] {
+    class func dataDownloadAnalyseSave(htmlText: String, symbol: String?, shareID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil) async{
         
         let sectionHeaders = ["Gewinn und Verlustrechnung", ">Bilanz</h2>", "Wertpapierdaten"]
         // vermeide äöü in html search string
         let rowTitles = [["Umsatz","Herstellungskosten", "Forschungs- und Entwicklungskosten","Buchwert je Aktie","Verwaltungsaufwand","Sonstige betriebliche Aufwendungen"],["Summe langfristiges Fremdkapital"],["Ausstehende Aktien in Mio.","Gewinn je Aktie", "Aktuell ausstehende Aktien"]]
 
         var results = [Labelled_DatedValues]()
+        var textResults = [Labelled_DatedTexts]()
         var sga: [DatedValue]?
         var sharesOutstanding:[DatedValue]?
         do {
-            // isin and currency data have to be sent via notification as there is no access to the share object in this function
-            var sendDictionary = [String: String]()
 
             if let isin = try TagesschauScraper.extractStringFromPage(html: htmlText, searchTerm: "ISIN:") {
-                sendDictionary["isin"] = isin
+                
+                let isinDV = Labelled_DatedTexts(label: "ISIN", datedTexts: [DatedText(date: Date(), text: String(isin))])
+                textResults.append(isinDV)
             }
             if let currency = try TagesschauScraper.extractStringFromPage(html: htmlText, searchTerm: "hrung:") {//Währung
-                sendDictionary["currency"] = currency
+                let currencyLDV = Labelled_DatedTexts(label: "Currency", datedTexts: [DatedText(date: Date(), text: String(currency))])
+                textResults.append(currencyLDV)
             }
-            
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "ISIN and CURRENCY INFO"), object: symbol, userInfo: sendDictionary)
             
             var count = 0
             for header in sectionHeaders {
@@ -82,8 +84,18 @@ class TagesschauScraper {
             let sho = Labelled_DatedValues(label: "Shares outstanding", datedValues: valid)
             results.append(sho)
         }
-
-        return results
+        
+//        do {
+            let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+            backgroundMoc.automaticallyMergesChangesFromParent = true
+            
+            if let bgShare = backgroundMoc.object(with: shareID) as? Share {
+                await bgShare.mergeInDownloadedData(labelledDatedValues: results)
+                await bgShare.mergeInDownloadedTexts(ldTexts: textResults)
+            }
+//        } catch {
+//            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "couldn't save background MOC")
+//        }
         
     }
 
