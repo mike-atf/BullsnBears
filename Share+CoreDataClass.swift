@@ -1935,7 +1935,7 @@ public class Share: NSManagedObject {
 //            print(ldv.label)
 //            for dvs in  ldv.datedValues {
 //                let date$ = dateFormatter.string(from: dvs.date)
-//                let value$ = numberFormatter.string(from: dvs.value as NSNumber) ?? "-'"
+//                let value$ = numberFormatterWith1Digit.string(from: dvs.value as NSNumber) ?? "-'"
 //                print(date$, ": " ,value$)
 //            }
 //            print()
@@ -2049,14 +2049,12 @@ public class Share: NSManagedObject {
                     }
 
                 case "net income":
-//                    let millions: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
                     if let existingDVs = incomeStatement.netIncome.datedValues(dateOrder: .ascending) {
                         incomeStatement.netIncome = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
                     } else {
                         incomeStatement.netIncome = result.datedValues.convertToData()
                     }
                 case "roi - return on investment":
-//                    let percent: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value / 100) }
                     if let existingDVs = ratios.roi.datedValues(dateOrder: .ascending) {
                         ratios.roi = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
                     } else {

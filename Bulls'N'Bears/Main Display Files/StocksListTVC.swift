@@ -1110,91 +1110,16 @@ extension StocksListTVC: ProgressViewDelegate {
     }
 }
 
-extension StocksListTVC: FraBoDownloadDelegate, WKNavigationDelegate, WKUIDelegate {
+extension StocksListTVC: WebViewDownloadDelegate {
     
-    
-    var instantiatedScraper: FraBoScraper? {
-        get {
-            self.fraBoScraper
-        }
-        set (newValue) {
-            self.fraBoScraper = newValue
-        }
-    }
-    
-    
-    var hostViewController: StocksListTVC {
-        get {
-            self
-        }
-        set (newValue) {
-            print("StockVC setting illegal")
-        }
-    }
-    
-    var hiddenDownloadView: WKWebView? {
-        get {
-            self.hiddenWebKitView
-        }
-        set (newValue) {
-            if newValue != nil {
-                self.view.addSubview(newValue!)
-            }
-            self.hiddenWebKitView = newValue
-        }
-    }
-    
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+    func downloadAnalyseSaveComplete(remove view: WebViewDownloader) {
         
-        if let host = navigationAction.request.url?.host {
-            if host.starts(with: "www.boerse-frankfurt.de") {
-                return .allow
-            }
-        }
-        print("donwload disallowed for \(String(describing: navigationAction.request.url?.host))")
-        return .cancel
+        print("StocksVC 2 as webView download hosting delegate as received compelte message. removing webView")
+        view.hostingDelegate = nil
+        view.shareID = nil
+        view.removeFromSuperview()
     }
     
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        
-        print("finished loading...")
-        
-        webView.evaluateJavaScript("document.documentElement.outerHTML.toString()") { (result, error) in
-            
-            if let error = error {
-                print("!!!!!!!")
-                print(error)
-                print()
-                self.hiddenWebKitView?.removeFromSuperview()
-                self.hiddenWebKitView = nil
-                self.fraBoScraper = nil
-            }
-            if let result = result as? String {
-                print("============ FraBo Webview navigation finished")
-                if let retrievedJob = FraBoScraper.fromURLToJob(url: webView.url!, scraper: self.fraBoScraper!) {
-                    FraBoScraper.analyseAndSave(htmlText: result, job: retrievedJob, shareID: self.fraBoScraper?.shareID)
-                    self.hiddenWebKitView?.removeFromSuperview()
-                    self.hiddenWebKitView = nil
-                    self.fraBoScraper = nil
-                } else {
-                    print("unable to retrieve frabo download job from url \(String(describing: webView.url))")
-                    self.hiddenWebKitView?.removeFromSuperview()
-                    self.hiddenWebKitView = nil
-                    self.fraBoScraper = nil
-                }
-            }
-            
-//            self.hiddenDownloadView = nil
-        }
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "estimatedProgress" {
-            print(Float(hiddenDownloadView?.estimatedProgress ?? 0))
-            // use ProgressBar view here
-        }
-    }
-
     
     
 }

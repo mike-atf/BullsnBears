@@ -35,6 +35,7 @@
 		EA0F889C2639575B009C980F /* ComparisonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0F889B2639575B009C980F /* ComparisonCell.swift */; };
 		EA0F889E263959D6009C980F /* ComparisonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0F889D263959D6009C980F /* ComparisonController.swift */; };
 		EA0F88A02639D03C009C980F /* ManualSearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0F889F2639D03C009C980F /* ManualSearchVC.swift */; };
+		EA126D8229BB881D0003C8B2 /* WebViewDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA126D8129BB881D0003C8B2 /* WebViewDownloader.swift */; };
 		EA163F77258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA163F78258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
 		EA163F79258BA85E000974AB /* StockTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA163F76258BA85E000974AB /* StockTrend.swift */; };
@@ -368,6 +369,7 @@
 		EA0F889B2639575B009C980F /* ComparisonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonCell.swift; sourceTree = "<group>"; };
 		EA0F889D263959D6009C980F /* ComparisonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonController.swift; sourceTree = "<group>"; };
 		EA0F889F2639D03C009C980F /* ManualSearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualSearchVC.swift; sourceTree = SOURCE_ROOT; };
+		EA126D8129BB881D0003C8B2 /* WebViewDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WebViewDownloader.swift; path = "Bulls'N'Bears/Controllers/WebViewDownloader.swift"; sourceTree = SOURCE_ROOT; };
 		EA163F76258BA85E000974AB /* StockTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockTrend.swift; sourceTree = "<group>"; };
 		EA1F86D625DC247C006791BD /* WBValuationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBValuationController.swift; sourceTree = "<group>"; };
 		EA20160B2714BE3D004432EC /* DiaryListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryListCell.swift; sourceTree = "<group>"; };
@@ -676,6 +678,7 @@
 				EA3613E729A677D3007ED67F /* ArivaScraper.swift */,
 				EAEF7A7C29AF7A5D003EDF4F /* MWScraper.swift */,
 				EA96EB5129B0F7D2004B0094 /* FraBoScraper.swift */,
+				EA126D8129BB881D0003C8B2 /* WebViewDownloader.swift */,
 				EAA548B627342FA10083808A /* Downloader.swift */,
 				EAE06B0A29B28369009F4BCE /* WebKitLoader.swift */,
 				EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */,
@@ -1096,6 +1099,7 @@
 				EAC9890225F146E1007AE6F6 /* TrendIconView.swift in Sources */,
 				EAA69F9226121CA30067EE1A /* StockResearch+CoreDataClass.swift in Sources */,
 				EAFCB98825C9A4DE0029AA4F /* ValuationSummaryCell.swift in Sources */,
+				EA126D8229BB881D0003C8B2 /* WebViewDownloader.swift in Sources */,
 				EA736CCD25D7C8FF007FC981 /* ValuationDataCleaner.swift in Sources */,
 				EA20160D2714BE3D004432EC /* DiaryListCell.swift in Sources */,
 				EAD921632607D0CA008312E0 /* StochasticOscillator.swift in Sources */,

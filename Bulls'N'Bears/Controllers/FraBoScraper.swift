@@ -316,11 +316,12 @@ class FraBoScraper: NSObject {
         config.websiteDataStore.httpCookieStore.setCookie(acceptanceCookie!)
         self.downloadDelegate?.hiddenDownloadView = WKWebView(frame: CGRect(origin: .zero, size: self.downloadDelegate?.hostViewController.view.frame.size ?? CGSize(width: 1920, height: 1280)), configuration: config)
         
-        self.downloadDelegate?.hiddenDownloadView?.backgroundColor = UIColor.systemOrange
+        // TODO: invisible but blocks TVC touches! Push behind TVC if possible
+        self.downloadDelegate?.hiddenDownloadView?.alpha = 0.0
         
-        self.downloadDelegate?.hiddenDownloadView?.navigationDelegate = downloadDelegate.hostViewController
-        self.downloadDelegate?.hiddenDownloadView?.uiDelegate = downloadDelegate.hostViewController
-        self.downloadDelegate?.hiddenDownloadView?.addObserver(downloadDelegate.hostViewController, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+//        self.downloadDelegate?.hiddenDownloadView?.navigationDelegate = downloadDelegate.hostViewController
+//        self.downloadDelegate?.hiddenDownloadView?.uiDelegate = downloadDelegate.hostViewController
+//        self.downloadDelegate?.hiddenDownloadView?.addObserver(downloadDelegate.hostViewController, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
 
         for job in jobs {
 

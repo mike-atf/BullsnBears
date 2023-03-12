@@ -115,13 +115,16 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     var dcfValuation: DCFValuation?
     var r1Valuation: Rule1Valuation?
+    var viewController: WBValuationTVC!
+    var webViewDownloader: WebViewDownloader?
     
     //MARK: - init
 
-    init(share: Share, progressDelegate: ProgressViewDelegate) {
+    init(share: Share, progressDelegate: ProgressViewDelegate, viewController: WBValuationTVC) {
         
         super.init()
         
+        self.viewController = viewController
         self.share = share
         self.progressDelegate = progressDelegate
         
@@ -841,6 +844,16 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     try Task.checkCancellation()
 
                     await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allValuationDataOnly, downloadRedirectDelegate: self)
+                    
+                    let longName = share.name_long!
+                    let cu = share.currency
+                    
+                    DispatchQueue.main.async {
+                        
+                        self.webViewDownloader = WebViewDownloader.newWebViewDownloader(delegate: self.viewController!)
+                        self.webViewDownloader?.downloadPage(domain: "https://www.boerse-frankfurt.de/equity", companyName: longName, pageName: "key-data", currency: cu, shareID: shareID, in: self.viewController!)
+                    }
+
 
                 }
                 // US stocks

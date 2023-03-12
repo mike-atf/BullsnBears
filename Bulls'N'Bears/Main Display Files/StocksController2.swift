@@ -23,6 +23,7 @@ class StocksController2: NSFetchedResultsController<Share> {
     var sharesAwaitingUpdateDownload: [Share]? // to check if/when all share update download are complete
     var controllerDelegate: StocksController2Delegate?
     var shareInfosToDownload = 0
+    var webViewDownloader: WebViewDownloader?
 
     // MARK: - FRC functions
     // these use the main MOC
@@ -122,17 +123,20 @@ class StocksController2: NSFetchedResultsController<Share> {
             
 //            await MWScraper.dataDownloadAnalyseSave(symbol: symbol ?? "", exchange: newShare.exchange ?? "missing", currency: newShare.currency ?? "missing" ,shareID: objectID, option: .allPossible)
             
-            let s = newShare.symbol!
+//            let s = newShare.symbol!
             let longName = newShare.name_long!
-            let ex = newShare.exchange!
-            let cu = newShare.currency! 
+//            let ex = newShare.exchange!
+            let cu = newShare.currency
             
             DispatchQueue.main.async {
-                let fraboScraper = FraBoScraper()
-                fraboScraper.downloadWithWebView(symbol: s, companyName: longName, exchange: ex, currency: cu, shareID: objectID, option: .allPossible, downloadDelegate: self.viewController!)
+                
+                self.webViewDownloader = WebViewDownloader.newWebViewDownloader(delegate: self.viewController!)
+                self.webViewDownloader?.downloadPage(domain: "https://www.boerse-frankfurt.de/equity", companyName: longName, pageName: "key-data", currency: cu, shareID: objectID, in: self.viewController!)
+                
+//                let fraboScraper = FraBoScraper()
+//                fraboScraper.downloadWithWebView(symbol: s, companyName: longName, exchange: ex, currency: cu, shareID: objectID, option: .allPossible, downloadDelegate: self.viewController!)
             }
             
-//            await FraBoScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missingSy", companyName: newShare.name_long ?? "missingNL", exchange: newShare.exchange ?? "missingExc", currency: newShare.currency ?? "missingCu" ,shareID: objectID, option: .allPossible)
         }
         
         newShare.saveDividendData(datedValues: await datedDividends, save: true)
@@ -923,11 +927,11 @@ class StocksController2: NSFetchedResultsController<Share> {
 
 }
 
+
 extension StocksController2: DownloadRedirectionDelegate {
     
     func redirectTo(url: URL?) {
         guard let validURL = url else { return }
-        
     }
     
     func awaitingRedirection(notification: Notification) {

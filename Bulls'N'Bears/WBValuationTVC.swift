@@ -59,7 +59,7 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
         
         NotificationCenter.default.addObserver(self, selector: #selector(refreshRow(notification:)), name: NSNotification.Name(rawValue: "refreshWBValuationTVCRow"), object: nil)
 
-        controller = WBValuationController(share: share, progressDelegate: self)
+        controller = WBValuationController(share: share, progressDelegate: self,viewController: self)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -712,5 +712,19 @@ extension WBValuationTVC: WBValuationCellDelegate {
         }
     }
 
+    
+}
+
+extension WBValuationTVC: WebViewDownloadDelegate {
+    
+    func downloadAnalyseSaveComplete(remove view: WebViewDownloader) {
+        
+        print("StocksVC 2 as webView download hosting delegate as received compelte message. removing webView")
+        view.hostingDelegate = nil
+        view.shareID = nil
+        view.removeFromSuperview()
+    }
+    
+    
     
 }
