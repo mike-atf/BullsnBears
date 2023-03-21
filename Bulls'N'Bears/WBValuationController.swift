@@ -808,6 +808,8 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             return
         }
         
+        let longName = share.name_long ?? "noLongName"
+        let currency = share.currency ?? "noCurrency"
         
         let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc.automaticallyMergesChangesFromParent = true
@@ -831,39 +833,48 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             ErrorController.addInternalError(errorLocation: #function, systemError: error ,errorInfo: "failed to save new valuations dates for \(symbol)")
         }
 
+
         let shareID = share.objectID
         
             do {
-                progressDelegate?.allTasks = MacrotrendsScraper.countOfRowsToDownload(option: .allValuationDataOnly) + YahooPageScraper.countOfRowsToDownload(option: .allValuationDataOnly)
 
-                // TODO: non-US stocks  needs review
-                if symbol.contains(".") {
+                if currency == "EUR" {
                     
-                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .allValuationDataOnly, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
+                    let webKitDownloadTasks = await WebViewDownloader.countOfDownloadTasks()
+                    
+//                    progressDelegate?.allTasks = MacrotrendsScraper.countOfRowsToDownload(option: .allValuationDataOnly) + YahooPageScraper.countOfRowsToDownload(option: .allValuationDataOnly) + FinanzenScraper.countOfDownloadTasks() + webKitDownloadTasks
+                    
+                    progressDelegate?.allTasks = YahooPageScraper.countOfRowsToDownload(option: .nonUS) + FinanzenScraper.countOfDownloadTasks() + webKitDownloadTasks
+                    
+                    
+                    await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .nonUS, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
+
+                    try Task.checkCancellation()
+                    
+                    await FinanzenScraper.downloadAnalyseAndSavePredictions(shareSymbol: symbol, companyName: longName, shareID: shareID, progressDelegate: progressDelegate)
                     
                     try Task.checkCancellation()
 
-                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allValuationDataOnly, downloadRedirectDelegate: self)
-                    
-                    let longName = share.name_long!
-                    let cu = share.currency
-                    
                     DispatchQueue.main.async {
                         
                         self.webViewDownloader = WebViewDownloader.newWebViewDownloader(delegate: self.viewController!)
-                        self.webViewDownloader?.downloadPage(domain: "https://www.boerse-frankfurt.de/equity", companyName: longName, pageName: "key-data", currency: cu, shareID: shareID, in: self.viewController!)
+                        self.webViewDownloader?.downloadPage(domain: "https://www.boerse-frankfurt.de/equity", companyName: longName, pageName: "key-data", currency: currency, shareID: shareID, in: self.viewController!)
+                        
+                        self.progressDelegate?.downloadComplete()
                     }
-
-
                 }
                 // US stocks
                 else {
 
+                    progressDelegate?.allTasks = MacrotrendsScraper.countOfRowsToDownload(option: .allValuationDataOnly) + YahooPageScraper.countOfRowsToDownload(option: .allValuationDataOnly)
+                    
                     await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .allValuationDataOnly, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
                     
                     try Task.checkCancellation()
 
                     await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allValuationDataOnly, downloadRedirectDelegate: self)
+                    
+                    progressDelegate?.downloadComplete()
 
                 }
             } catch {
@@ -872,8 +883,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             }
             
             NotificationCenter.default.removeObserver(self)
-            progressDelegate?.downloadComplete()
-
     }
 
     
@@ -883,24 +892,17 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                      
         let symbol = share.symbol
         let shortName = share.name_short
-//        let wbValuationID = wbValuation?.objectID
-//        let dcfValuationID = dcfValuation?.objectID
-//        let r1ValuationID = r1Valuation?.objectID
         let shareID = share.objectID
         
         downloadTask = Task.init(priority: .background) {
             
             do {
-//                try await YahooPageScraper.keyratioDownloadAndSave(shareSymbol: symbol, shortName: shortName, shareID: shareID)
                 try Task.checkCancellation()
-//                if let validID = wbValuationID {
                 progressDelegate?.allTasks += 1
                 // non-US stocks
                 if symbol?.contains(".") ?? false {
                     
                     await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missing symbol", shortName: shortName ?? "missing short name", shareID: shareID, option: .wbvOnly, downloadRedirectDelegate: self)
-                    
-//                    try await MacrotrendsScraper.wbvDataDownloadAnalyseSave(shareSymbol: symbol,  shortName: shortName, shareID: shareID,downloadRedirectDelegate: self)
                     
                 }
                 // US stocks
@@ -908,31 +910,14 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     
                     await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missing symbol", shortName: shortName ?? "missing short name", shareID: shareID, option: .wbvOnly, downloadRedirectDelegate: self)
                     
-                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol ?? "missing symbol", shortName: shortName ?? "mimssing short name", shareID: shareID, downloadOption: .wbvOnly, downloadRedirectDelegate: self)
-//                    try await MacrotrendsScraper.wbvDataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadRedirectDelegate: self)
-//
+                    await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol ?? "missing symbol", shortName: shortName ?? "missing short name", shareID: shareID, downloadOption: .wbvOnly, downloadRedirectDelegate: self)
+
                     progressDelegate?.taskCompleted()
                 }
                 try Task.checkCancellation()
                 
                 progressDelegate?.allTasks += 2
 
-//                try await Rule1Valuation.downloadAnalyseAndSave(shareSymbol: symbol, shortName: shortName!, shareID: shareID, progressDelegate: nil, downloadRedirectDelegate: self)
-//
-//                progressDelegate?.taskCompleted()
-//
-//                try Task.checkCancellation()
-//
-//                try await YahooPageScraper.dcfDownloadAnalyseAndSave(shareSymbol: symbol, shareID: shareID, progressDelegate: nil)
-//                progressDelegate?.taskCompleted()
-
-//                if dcfValuationID != nil {
-//                    progressDelegate?.allTasks += 1
-//                    try await YahooPageScraper.dcfDownloadAnalyseAndSave(shareSymbol: symbol, shareID: shareID, progressDelegate: nil)
-//
-//                    progressDelegate?.taskCompleted()
-//                }
-//                try Task.checkCancellation()
 
             } catch let error {
                 progressDelegate?.downloadError(error: error.localizedDescription)

@@ -99,13 +99,13 @@ public class Share: NSManagedObject {
             data = trend_healthScore
         }
        
-        if let valid = data {
-            do {
-                
-                return try dataToDatedValues(data: valid)
-            } catch let error {
-                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
-            }
+        if data != nil {
+//            do {
+            return data.datedValues(dateOrder: Order.descending, includeThisYear: true)?.dropZeros()
+//                return try dataToDatedValues(data: valid)
+//            } catch let error {
+//                ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
+//            }
         } else {
             
             var datedValue: DatedValue?
@@ -190,6 +190,7 @@ public class Share: NSManagedObject {
                     for element in dictionary {
                         dataSet.append(ChartDataSet(x: element.key, y: element.value))
                     }
+                    
                     return dataSet.sorted { (e0, e1) -> Bool in
                         if e0.x! > e1.x! { return true }
                         else { return false }
@@ -274,9 +275,8 @@ public class Share: NSManagedObject {
                 }
             }
         }
-                
+        
         if let validData = datedValuesToData(datedValues: existingValues) {
-
 
             switch trendName {
             case .moatScore:
@@ -2006,6 +2006,7 @@ public class Share: NSManagedObject {
 //                cashFlowStatement.freeCashFlow = millions.convertToData()
 //            }
             
+            
             for result in labelledDatedValues {
                                 
                 switch result.label.lowercased() {
@@ -2068,7 +2069,6 @@ public class Share: NSManagedObject {
                         ratios.bvps = result.datedValues.convertToData()
                     }
                 case "cash flow from operating activities":
-//                    let millions: [DatedValue] = result.datedValues.compactMap{ DatedValue(date: $0.date, value: $0.value * 1_000_000) }
                     if let existingDVs = cashFlowStatement.opCashFlow.datedValues(dateOrder: .ascending) {
                         cashFlowStatement.opCashFlow = existingDVs.mergeIn(newDV: result.datedValues)?.convertToData()
                     } else {
@@ -2118,35 +2118,22 @@ public class Share: NSManagedObject {
                     }
                case "sales growth (year/est)":
                     // save only last two
-                    let count = result.datedValues.count
-                    var lastTwo = [DatedValue]()
-                    if count == 2 {
-                        lastTwo = result.datedValues
-                    } else if count > 2 {
-                        let last = result.datedValues[count-1]
-                        let previous = result.datedValues[count-2]
-                        lastTwo = [previous, last]
-                    }
+                    analysis.future_revenueGrowthRate = result.datedValues.dropZeros().convertToData()
                     
-                    if let existingDVs = analysis.future_revenueGrowthRate.datedValues(dateOrder: .ascending) {
-                        analysis.future_revenueGrowthRate = existingDVs.mergeIn(newDV: lastTwo)?.convertToData()
-                    } else {
-                        analysis.future_revenueGrowthRate = lastTwo.convertToData()
-                    }
                 case "purchases":
-                    if let r0 = result.datedValues.first { // first or last?
+                    if let r0 = result.datedValues.sortByDate(dateOrder: .ascending).last {
                         keyStats.insiderPurchases = [r0].convertToData()
                     }
                 case "sales":
-                    if let r0 = result.datedValues.first { // first or last?
+                    if let r0 = result.datedValues.sortByDate(dateOrder: .ascending).last {
                         keyStats.insiderSales = [r0].convertToData()
                     }
                 case "total insider shares held":
-                    if let r0 = result.datedValues.first { // first or last?
+                    if let r0 = result.datedValues.sortByDate(dateOrder: .ascending).last {
                         keyStats.insiderShares =  [r0].convertToData()
                     }
                 case "forward p/e":
-                    if let r0 = result.datedValues.first { // first or last?
+                    if let r0 = result.datedValues.sortByDate(dateOrder: .ascending).first {
                         if r0.value != 0 {
                             analysis.forwardPE = [r0].convertToData()
                         }
@@ -2185,10 +2172,8 @@ public class Share: NSManagedObject {
                                 incomeStatement.eps_annual = existingEPS.convertToData()
                             }
                         }
-//                            bgShare.eps_current = result.values.first ?? Double()
                 case "trailing annual dividend yield":
                     keyStats.dividendYield = result.datedValues.convertToData()
-//                            bgShare.divYieldCurrent = result.values.
                     
                 case "gross profit":
                     incomeStatement.grossProfit = result.datedValues.convertToData()
@@ -2228,9 +2213,6 @@ public class Share: NSManagedObject {
                         }
                     }
                 case "shares outstanding":
-                    for dv in result.datedValues {
-                        print(dv)
-                    }
                     keyStats.sharesOutstanding = [result.datedValues.last!].convertToData()
                 case "total revenue":
                     // don't replace any existing macrotrends data as Yahoo only has last four years
@@ -2245,9 +2227,13 @@ public class Share: NSManagedObject {
                         incomeStatement.preTaxIncome = result.datedValues.convertToData()
                     }
                 case "income tax expense":
-                    incomeStatement.incomeTax = [result.datedValues.last!].convertToData()
+                    if let nextYear = result.datedValues.sortByDate(dateOrder: .ascending).first {
+                        incomeStatement.incomeTax = [nextYear].convertToData()
+                    }
                 case "current debt":
-                    balanceSheet.debt_shortTerm = [result.datedValues.last!].convertToData()
+                    if let nextYear = result.datedValues.sortByDate(dateOrder: .ascending).first {
+                        balanceSheet.debt_shortTerm = [nextYear].convertToData()                    }
+
                 case "total liabilities":
                     balanceSheet.debt_total = [result.datedValues.last!].convertToData()
                 case "operating cash flow":
@@ -2261,15 +2247,7 @@ public class Share: NSManagedObject {
                     }
                     cashFlowStatement.capEx = result.datedValues.convertToData()
                 case "avg. estimate":
-                    // save only last two
-                    let count = result.datedValues.count
-                    if count == 2 {
-                        analysis.future_revenue = result.datedValues.convertToData()
-                    } else if count > 2 {
-                        let last = result.datedValues[count-1]
-                        let previous = result.datedValues[count-2]
-                        analysis.future_revenue = [previous, last].convertToData()
-                    }
+                    analysis.future_revenue = result.datedValues.dropZeros().convertToData()
                 case "next year":
                     analysis.future_growthNextYear = result.datedValues.convertToData()
                 case "next 5 years (per annum)":
@@ -2293,8 +2271,90 @@ public class Share: NSManagedObject {
             
             r1v.creationDate = Date()
             
-            try backgroundMoc.save()
+            let lynchScoreParameters = ["dividend yield", "net income", "eps"]
+            let moatParameters = ["book value", "eps", "revenue", "operating cash flow per share", "roi"]
+            let stickerPriceParameters = ["book value", "eps","forward p/e","avg. estimate"]
+            let dcfPriceParameters = ["net income", "free cash flow", "next year","next 5 years","avg. estimate"]
+            let intrinsicValueParameters = ["next year","next 5 years","avg. estimate", "net income","pe ratio"]
             
+            var updateTrends = Set<ShareTrendNames>()
+            
+            for result in labelledDatedValues {
+                
+                for parameter in lynchScoreParameters {
+                    if result.label.contains(parameter) {
+                        updateTrends.insert(.lynchScore)
+                    }
+                }
+                
+                for parameter in moatParameters {
+                    if result.label.contains(parameter) {
+                        updateTrends.insert(.moatScore)
+                    }
+                }
+
+                for parameter in stickerPriceParameters {
+                    if result.label.contains(parameter) {
+                        updateTrends.insert(.stickerPrice)
+                    }
+                }
+
+                for parameter in dcfPriceParameters {
+                    if result.label.contains(parameter) {
+                        updateTrends.insert(.dCFValue)
+                    }
+                }
+                
+                for parameter in intrinsicValueParameters {
+                    if result.label.contains(parameter) {
+                        updateTrends.insert(.intrinsicValue)
+                    }
+                }
+            }
+            
+            for trendToUpdate in updateTrends {
+                
+                switch trendToUpdate {
+                case .lynchScore:
+                    let (_, score) = self.lynchRatio()
+                    if let newLynch = score {
+                        let dv = [DatedValue(date: Date(), value: newLynch)]
+                        saveTrendsData(datedValuesToAdd: dv, trendName: .lynchScore, saveInContext: true)
+                    }
+                case .moatScore:
+                    let (_, score) = r1v.moatScore()
+                    if let newMoat = score {
+                        let dv = [DatedValue(date: Date(), value: newMoat)]
+                        saveTrendsData(datedValuesToAdd: dv, trendName: .moatScore, saveInContext: true)
+                    }
+                case .stickerPrice:
+                    let (score,_) = r1v.stickerPrice()
+                    if let newSP = score {
+                        let dv = [DatedValue(date: Date(), value: newSP)]
+                        saveTrendsData(datedValuesToAdd: dv, trendName: .stickerPrice, saveInContext: true)
+                    }
+                case .dCFValue:
+                    let (score,_) = dcfv.returnIValueNew()
+                    if let newIV = score {
+                        let dv = [DatedValue(date: Date(), value: newIV)]
+                        saveTrendsData(datedValuesToAdd: dv, trendName: .dCFValue, saveInContext: true)
+                    }
+                case .intrinsicValue:
+                    let (score,_) = wbv.ivalue()
+                    if let newIV = score {
+                        let dv = [DatedValue(date: Date(), value: newIV)]
+                        saveTrendsData(datedValuesToAdd: dv, trendName: .intrinsicValue, saveInContext: true)
+                    }
+                case .healthScore:
+                    print()
+
+                }
+                
+            }
+            
+            
+            try backgroundMoc.save()
+
             NotificationCenter.default.post(name: Notification.Name(rawValue: "UpdateValuationData"), object: nil, userInfo: nil)
 
         }

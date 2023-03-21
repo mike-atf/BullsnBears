@@ -136,7 +136,7 @@ class StockListCellTableViewCell: UITableViewCell {
             if healthDV.value > 0.8 {
                 healthColor = UIColor.systemGreen
             }
-            else if healthDV.value > 0.5 {
+            else if healthDV.value > 0.6 {
                 healthColor = UIColor.systemYellow
             }
             else {

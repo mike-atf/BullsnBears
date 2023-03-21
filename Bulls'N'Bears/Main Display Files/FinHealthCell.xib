@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -31,7 +30,7 @@
                 </subviews>
                 <constraints>
                     <constraint firstItem="87k-q5-Eg1" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="4" id="BnT-cg-s6e"/>
-                    <constraint firstItem="87k-q5-Eg1" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Hv5-u1-Zj9" secondAttribute="trailing" constant="5" id="H3A-ir-WZO"/>
+                    <constraint firstItem="87k-q5-Eg1" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Hv5-u1-Zj9" secondAttribute="trailing" id="H3A-ir-WZO"/>
                     <constraint firstAttribute="trailing" secondItem="87k-q5-Eg1" secondAttribute="trailing" constant="15" id="RUQ-Zz-6Aw"/>
                     <constraint firstItem="Hv5-u1-Zj9" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="5" id="ZyN-Vf-uRK"/>
                     <constraint firstItem="Hv5-u1-Zj9" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="hsW-mj-etJ"/>

@@ -213,7 +213,7 @@ class ResearchController {
             if let validEmployees = share?.employees {
                 employees$ = "Employees: " + (numberFormatterNoFraction.string(from: validEmployees as NSNumber) ?? "")
             }
-            if let valid = share?.key_stats?.marketCap.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
+            if let valid = share?.key_stats?.marketCap.valuesOnly(dateOrdered: .ascending, withoutZeroes: true, includeThisYear: true)?.last {
                 let valid$ = valid.shortString(decimals: 2)
                 return [valid$ + ", " + employees$]
             }

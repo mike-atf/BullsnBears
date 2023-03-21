@@ -22,6 +22,7 @@ enum AnalysisParameters {
 @objc(Analysis)
 public class Analysis: NSManagedObject {
     
+    /*
     func getValues(parameter: AnalysisParameters) -> Labelled_DatedValues? {
         
         var label = String()
@@ -54,16 +55,21 @@ public class Analysis: NSManagedObject {
             return nil
         }
     }
+    */
     
-    /// if revenueGrowthRate = true return future_RevenueGrowthRate, else returns future_GrowthRate
+    /// if revenueGrowthRate = true return future_RevenueGrowthRate, else returns future_GrowthRate.
+    /// salesgroth will prioritise the sales growth parameters, if false will use adjFutureGrowth > future_growthNextYear > future_revenueGrowthRate
     func meanFutureGrowthRate(adjusted: Bool, salesGrowthRate:Bool?=false) -> Double? {
         
         var growthData = adjusted ? adjFutureGrowthRate : future_growthNextYear
+        if growthData == nil {
+            growthData = self.future_revenueGrowthRate
+        }
         if salesGrowthRate ?? false {
             growthData = future_revenueGrowthRate
         }
         
-        if let growthDVs = growthData.datedValues(dateOrder: .ascending) {
+        if let growthDVs = growthData.datedValues(dateOrder: .ascending, includeThisYear: true) {
             let values = growthDVs.compactMap{ $0.value }
             return values.mean()
         }
@@ -79,7 +85,7 @@ public class Analysis: NSManagedObject {
             growthData = future_revenueGrowthRate
         }
 
-        if let growthDVs = growthData.datedValues(dateOrder: .ascending) {
+        if let growthDVs = growthData.datedValues(dateOrder: .ascending, includeThisYear: true) {
             let values = growthDVs.compactMap{ $0.value }
             return values.min()
         }
@@ -95,7 +101,7 @@ public class Analysis: NSManagedObject {
             growthData = future_revenueGrowthRate
         }
 
-        if let growthDVs = growthData.datedValues(dateOrder: .ascending) {
+        if let growthDVs = growthData.datedValues(dateOrder: .ascending, includeThisYear: true) {
             let values = growthDVs.compactMap{ $0.value }
             return values.max()
         }
@@ -113,7 +119,7 @@ public class Analysis: NSManagedObject {
             }
         }
         
-        if let historicalPEs = share?.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending, withoutZeroes: true) {
+        if let historicalPEs = share?.ratios?.pe_ratios.valuesOnly(dateOrdered: .ascending, withoutZeroes: true, includeThisYear: true) {
             return historicalPEs.mean()
         }
         

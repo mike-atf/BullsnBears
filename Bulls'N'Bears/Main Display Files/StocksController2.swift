@@ -99,8 +99,6 @@ class StocksController2: NSFetchedResultsController<Share> {
 
         }
 
-//        await checkMTRedirection(symbol: newShare.symbol!, shortName: newShare.name_short)
-        
         // download company profile data
         // Download data first
         shareInfosToDownload = 1
@@ -118,23 +116,14 @@ class StocksController2: NSFetchedResultsController<Share> {
         }
         else {
             // non-macrotrends screening data download options here
-            print("Macrotrends data download for NON-US stock...")
             await WebPageScraper2.nonUSDataDownload(symbol: newShare.symbol ?? "", shortName: newShare.name_short ?? "missing", shareID: objectID)
-            
-//            await MWScraper.dataDownloadAnalyseSave(symbol: symbol ?? "", exchange: newShare.exchange ?? "missing", currency: newShare.currency ?? "missing" ,shareID: objectID, option: .allPossible)
-            
-//            let s = newShare.symbol!
             let longName = newShare.name_long!
-//            let ex = newShare.exchange!
             let cu = newShare.currency
             
             DispatchQueue.main.async {
                 
                 self.webViewDownloader = WebViewDownloader.newWebViewDownloader(delegate: self.viewController!)
                 self.webViewDownloader?.downloadPage(domain: "https://www.boerse-frankfurt.de/equity", companyName: longName, pageName: "key-data", currency: cu, shareID: objectID, in: self.viewController!)
-                
-//                let fraboScraper = FraBoScraper()
-//                fraboScraper.downloadWithWebView(symbol: s, companyName: longName, exchange: ex, currency: cu, shareID: objectID, option: .allPossible, downloadDelegate: self.viewController!)
             }
             
         }
@@ -458,7 +447,7 @@ class StocksController2: NSFetchedResultsController<Share> {
                 
                 await currentPriceDownloadAnalyseSave(symbol: symbol, shareID: shareID)
                 
-                if !symbol.contains(".") { // symbol.currency == "USD"
+                if share.currency == "USD" || share.currency == nil {
                     
                     await quarterlyEarningsUpdateDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, minDate: minDate, latestQEPSDate: latestQEPSDate, progressDelegate: viewController)
                 } else {
@@ -543,7 +532,9 @@ class StocksController2: NSFetchedResultsController<Share> {
                 canStopDownloadSpinner.append(false)
 
                 let shortName = share.name_short
+                let longName = share.name_long ?? "no longName"
                 let shareID = share.objectID
+                let currency = share.currency ?? "none"
                     
                 // save existing values if necessary
                 if  let r1v = share.rule1Valuation {
@@ -571,10 +562,8 @@ class StocksController2: NSFetchedResultsController<Share> {
                     }
                     
                     
-                    Task(priority: .background) {
+                    Task {
                         
-//                        do {
-//
                         if (share.currency ?? "USD") == "USD" {
                                 // US Stocks
                                 await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .rule1Only, downloadRedirectDelegate: self)
@@ -582,17 +571,20 @@ class StocksController2: NSFetchedResultsController<Share> {
                                 
                             } else {
                                 // non-US Stocks
-                                await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missing", shortName: shortName ?? "missing", shareID: shareID, option: .rule1Only, downloadRedirectDelegate: self)
+                                await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missing", shortName: shortName ?? "missing", shareID: shareID, option: .nonUS, downloadRedirectDelegate: self)
+                                
+                                DispatchQueue.main.async {
+                                    
+                                    self.webViewDownloader = WebViewDownloader.newWebViewDownloader(delegate: self.viewController!)
+                                    self.webViewDownloader?.downloadPage(domain: "https://www.boerse-frankfurt.de/equity", companyName: longName, pageName: "key-data", currency: currency, shareID: shareID, in: self.viewController!)
+                                }
                                 
                                 await WebPageScraper2.nonUSDataDownload(symbol: symbol, shortName: share.name_short, shareID: shareID)
-//                                try await Rule1Valuation.nonMTRule1DataDownload(symbol: symbol, shortName: share.name_short, shareID: shareID)
+                                
+                                await FinanzenScraper.downloadAnalyseAndSavePredictions(shareSymbol: symbol, companyName: longName, shareID: shareID)
+                                
                                 NotificationCenter.default.post(name: Notification.Name(rawValue: "SingleShareInfoDownloadComplete"), object: nil, userInfo: nil)
                             }
-//                        } catch {
-//                            ErrorController.addInternalError(errorLocation: "StocksController2.updateSharesInfo.r1Valuation", systemError: error, errorInfo: "Error downloading R1 valuation: \(error)")
-//                            NotificationCenter.default.post(name: Notification.Name(rawValue: "SingleShareInfoDownloadComplete"), object: nil, userInfo: nil)
-//                        }
-                        
                     }
                 }
             }
@@ -799,7 +791,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         if Date().timeIntervalSince(latestQEPSDate ?? Date()) < 365*24*3600/4 {
             return
         }
-            
+         
         await YChartsScraper.dataDownloadAnalyseSave(symbol: shareSymbol, downloadOption: .qEPS, shareID: shareID, progressDelegate: progressDelegate)
 //        await YChartsScraper.qepsDownloadAnalyseSave(symbol: shareSymbol, shortName: sn, shareID: shareID, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
             

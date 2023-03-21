@@ -566,7 +566,7 @@ public class DCFValuation: NSManagedObject {
         let todaysValue = pvOfFutureCF.compactMap{ $0 }.reduce(0, +)
         var fairValue: Double?
                 
-        guard let outstandingShares = share?.key_stats?.sharesOutstanding.datedValues(dateOrder: .descending).dropZeros()?.values().first else {
+        guard let outstandingShares = share?.key_stats?.sharesOutstanding.datedValues(dateOrder: .descending, includeThisYear: true).dropZeros()?.values().first else {
             errors.append("outstanding shares data missing")
             return (nil,errors)
         }
@@ -582,7 +582,7 @@ public class DCFValuation: NSManagedObject {
 
     func addIntrinsiceValueTrendAndSave(date: Date, price: Double) {
         
-        var existingTrendDv = ivalueTrend.datedValues(dateOrder: .ascending)
+        var existingTrendDv = ivalueTrend.datedValues(dateOrder: .ascending, includeThisYear: true)
         
         if let latest = existingTrendDv?.last?.date {
             if date.timeIntervalSince(latest) > (365/12 * 24 * 3600) {

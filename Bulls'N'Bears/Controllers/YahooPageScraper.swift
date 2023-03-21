@@ -818,12 +818,12 @@ class YahooPageScraper {
                         }
                     }
 
-                if rStart.contains("PE ratio") {
-                    print()
-                    print(rStart)
-                    print(rowValues)
-                    print()
-                }
+//                if rStart.contains("PE ratio") {
+//                    print()
+//                    print(rStart)
+//                    print(rowValues)
+//                    print()
+//                }
                     
                     labelledValues.append(LabelledValues(label: delimiters.saveRowTitles[rowCount], values: rowValues))
                     
@@ -850,7 +850,16 @@ class YahooPageScraper {
                                 datedvalues.append(dv)
                             }
                             labelledDatedValues.append(Labelled_DatedValues(label:delimiters.saveRowTitles[rowCount], datedValues: datedvalues))
+                    }
+                else if rStart.lowercased().starts(with: "avg. estimate") || rStart.lowercased().starts(with: "sales growth"){
+                        // use only next years' value, which is the last in the row
+                        if let nextYearValue = rowValues.last {
+                            let year = DatesManager.yearOnly(date: Date())
+                            let endOfNextYear = DatesManager.dateFromAString(dateString: "31.12.\(year+1)")!
+                            
+                            labelledDatedValues.append(Labelled_DatedValues(label: delimiters.saveRowTitles[rowCount], datedValues: [DatedValue(date: endOfNextYear, value: nextYearValue)]))
                         }
+                    }
                     else if topRowDates?.count ?? 0 >= rowValues.count {
                         var dvs = [DatedValue]()
                         for columnCount in 0..<rowValues.count {

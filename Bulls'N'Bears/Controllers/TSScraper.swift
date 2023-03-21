@@ -13,9 +13,9 @@ class TagesschauScraper {
     
     class func dataDownloadAnalyseSave(htmlText: String, symbol: String?, shareID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil) async{
         
-        let sectionHeaders = ["Gewinn und Verlustrechnung", ">Bilanz</h2>", "Wertpapierdaten"]
+        let sectionHeaders = ["Gewinn und Verlustrechnung"] //, ">Bilanz</h2>", "Wertpapierdaten"
         // vermeide äöü in html search string
-        let rowTitles = [["Umsatz","Herstellungskosten", "Forschungs- und Entwicklungskosten","Buchwert je Aktie","Verwaltungsaufwand","Sonstige betriebliche Aufwendungen"],["Summe langfristiges Fremdkapital"],["Ausstehende Aktien in Mio.","Gewinn je Aktie", "Aktuell ausstehende Aktien"]]
+        let rowTitles = [["Verwaltungsaufwand","Sonstige betriebliche Aufwendungen"]] // ["Umsatz","Herstellungskosten", "Forschungs- und Entwicklungskosten","Buchwert je Aktie"],["Summe langfristiges Fremdkapital", "Short-term debt in mio"], [] transferred to FraBo page in 'WebViewDownloader'
 
         var results = [Labelled_DatedValues]()
         var textResults = [Labelled_DatedTexts]()

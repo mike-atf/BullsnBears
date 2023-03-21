@@ -13,30 +13,30 @@ import WebKit
 
 //https://www.boerse-frankfurt.de/equity/aixtron-se/key-data
 
-protocol FraBoDownloadDelegate : AnyObject, WKNavigationDelegate, WKUIDelegate {
-    var hostViewController: StocksListTVC { get set }
-    var hiddenDownloadView: WKWebView? { get set }
-    var instantiatedScraper: FraBoScraper? { get set }
-}
-
-let fraboDateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "yyyy"
-    return formatter
-}()
+//protocol FraBoDownloadDelegate : AnyObject, WKNavigationDelegate, WKUIDelegate {
+//    var hostViewController: StocksListTVC { get set }
+//    var hiddenDownloadView: WKWebView? { get set }
+//    var instantiatedScraper: FraBoScraper? { get set }
+//}
+//
+//let fraboDateFormatter: DateFormatter = {
+//    let formatter = DateFormatter()
+//    formatter.dateFormat = "yyyy"
+//    return formatter
+//}()
 
 class FraBoScraper: NSObject {
     
-    var symbol: String!
-    var companyName: String!
-    var exchange: String!
-    var currency: String!
-    var shareID: NSManagedObjectID!
-    var option: DownloadOptions!
-    var progressDelegate: ProgressViewDelegate?
-    var webView: WKWebView!
-    var downloadDelegate: FraBoDownloadDelegate?
-    var downloadJobs: [FraBoDownloadJob]?
+//    var symbol: String!
+//    var companyName: String!
+//    var exchange: String!
+//    var currency: String!
+//    var shareID: NSManagedObjectID!
+//    var option: DownloadOptions!
+//    var progressDelegate: ProgressViewDelegate?
+//    var webView: WKWebView!
+//    var downloadDelegate: FraBoDownloadDelegate?
+//    var downloadJobs: [FraBoDownloadJob]?
     
     /*
     override init() {
@@ -103,6 +103,7 @@ class FraBoScraper: NSObject {
     }
     */
     
+    /*
     class func fraBoDownloadJobs(symbol: String, companyName: String ,option: DownloadOptions) -> [FraBoDownloadJob]? {
         
         var pageNames = [String]()
@@ -135,7 +136,8 @@ class FraBoScraper: NSObject {
         
         return jobs
     }
-    
+    */
+    /*
     class func fromURLToJob(url: URL, scraper: FraBoScraper) -> FraBoDownloadJob? {
         
         guard let lastPathComponent = url.pathComponents.last else {
@@ -161,7 +163,8 @@ class FraBoScraper: NSObject {
         
         return nil
     }
-    
+    */
+    /*
     class func fraboPricesDownloadAnalyseSave(symbol: String, shortName: String, shareID: NSManagedObjectID, option: DownloadOptions, progressDelegate: ProgressViewDelegate?=nil) {
         
         var components = URLComponents(string: "https://www.marketwatch.com/investing/stock/\(symbol)/downloaddatapartial")
@@ -175,7 +178,8 @@ class FraBoScraper: NSObject {
             return
         }
     }
-    
+    */
+    /*
     class func analyseFraBoPage(htmlText: String, sections: [String?], parameterNames: [[String]], saveNames: [[String]]?) -> [Labelled_DatedValues]? {
         
         var results: [Labelled_DatedValues]?
@@ -234,7 +238,9 @@ class FraBoScraper: NSObject {
         
         return results
     }
-    
+    /*
+     
+     */
     class func checkCompatibility(htmlText: String, exchange: String, currency: String) -> Bool {
         
         print(htmlText)
@@ -288,7 +294,9 @@ class FraBoScraper: NSObject {
 
         return true
     }
-    
+    /*
+     
+     */
     func downloadWithWebView(symbol: String, companyName: String ,exchange: String, currency: String ,shareID: NSManagedObjectID, option: DownloadOptions, progressDelegate: ProgressViewDelegate?=nil, downloadDelegate: FraBoDownloadDelegate) {
         
         guard let jobs = FraBoScraper.fraBoDownloadJobs(symbol: symbol, companyName: companyName, option: option) else {
@@ -334,8 +342,9 @@ class FraBoScraper: NSObject {
                 //resumes after download to delegate's WKNavigationDelegate functions
         }
     }
-
+     */
     
+    /*
     class func analyseAndSave(htmlText: String, job: FraBoDownloadJob, shareID: NSManagedObjectID?) {
         
         var results = [Labelled_DatedValues]()
@@ -372,10 +381,11 @@ class FraBoScraper: NSObject {
         }
         
     }
-
+     */
     
 }
 
+/*
 struct FraBoDownloadJob {
     
     var pageName = String()
@@ -429,3 +439,4 @@ struct FraBoDownloadJob {
         
     }
 }
+*/

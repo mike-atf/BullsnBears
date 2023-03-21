@@ -24,6 +24,7 @@ enum DownloadOptions {
     case researchDataOnly
     case mainIndicatorsOnly // lynch [netIncome, PE ratio TTM from yahoo, current divYield from Yahoo], moat [bvps, eps_annual, revenue, opCFs, roi]
     case screeningInfos
+    case nonUS
 }
 
 struct MTDownloadJobs {

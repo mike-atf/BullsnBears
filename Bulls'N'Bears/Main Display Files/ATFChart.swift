@@ -110,7 +110,7 @@ class ATFChart: UIView {
     let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = NSLocale.current
-        formatter.dateStyle = .short
+        formatter.setLocalizedDateFormatFromTemplate("dMyy")
         return formatter
     }()
     let shortDateFormatter: DateFormatter = {
@@ -236,7 +236,7 @@ class ATFChart: UIView {
         for label in axisLabels[.horizontal] ?? [] {
             if label.frame.height > maxHAxisLabelHeight { maxHAxisLabelHeight = label.frame.height }
         }
-        insets[.bottom]! += maxHAxisLabelHeight
+        insets[.bottom]! += maxHAxisLabelHeight + 2.0
 
         
         //MARK: - draw Chart Lines
@@ -510,27 +510,21 @@ class ATFChart: UIView {
         } else {
             // horizontal time axis
             
-            let primary_Max = primaryData?.chartData.compactMap{ $0.x }.max() ?? Date()
             let primary_Min = primaryData?.chartData.compactMap{ $0.x }.min() ?? Date()
-            
-            var combinedMax = primary_Max
             var combinedMin = primary_Min
             
-            if let secondary_Max = secondaryData?.chartData.compactMap({ $0.x }).max() {
-                if combinedMax > secondary_Max {
-                    combinedMax = secondary_Max
-                }
-                
-            }
             if let secondary_Min = secondaryData?.chartData.compactMap({ $0.x }).min() {
                 if combinedMin < secondary_Min {
                     combinedMin = secondary_Min
                 }
             }
             
-            let dateRange = combinedMax.timeIntervalSince(combinedMin)
+            timeAxisEndDate = DatesManager.endOfYear(of: Date())
+            timeAxisStartDate = DatesManager.beginningOfYear(of: primary_Min)
             
-            if dateRange > minimumTimeAxisTimeSpan {
+            let dateRange = timeAxisEndDate.timeIntervalSince(timeAxisStartDate)
+            
+            if dateRange < minimumTimeAxisTimeSpan {
                 if dateRange < 24*3600 {
                     minimumTimeAxisTimeSpan = day
                 }
@@ -542,56 +536,22 @@ class ATFChart: UIView {
                     minimumTimeAxisTimeSpan = quarter
                 } else if dateRange < year {
                     minimumTimeAxisTimeSpan = year
-                } else if  dateRange < 2*year {
+                } else if dateRange <= 2*year {
                         minimumTimeAxisTimeSpan = 2 * year
                 } else {
                     minimumTimeAxisTimeSpan = 5 * year
                 }
-            }
-            
-            switch minimumTimeAxisTimeSpan {
-            case 0...24*3600:
-                // hours...
-                timeAxisStartDate = DatesManager.beginningOfDay(of: combinedMin)
-                timeAxisEndDate = DatesManager.endOfDay(of: combinedMax)
-                timeAxisStepInterval = 3600
-            case 24*3600...7*24*3600:
-                // days...
-                timeAxisStartDate = DatesManager.beginningOfFirstWeekDay(ofDate: combinedMin)
-                timeAxisEndDate = DatesManager.endOflastWeekDay(ofDate: combinedMax)
-                timeAxisStepInterval = day
-            case 7*24*3600...365*24*3600/12:
-                // weeks...
-                timeAxisStartDate = DatesManager.firstDayOfThisMonth(date: combinedMin)
-                timeAxisEndDate = DatesManager.endOflastDayOfThisMonth(date: combinedMax)
-                timeAxisStepInterval = week
-            case 365*24*3600/12...365*24*3600/4:
-                // weeks...
-                timeAxisStartDate = DatesManager.beginningOfQuarter(of: combinedMin)
-                timeAxisEndDate = DatesManager.endOfQuarter(of: combinedMax)
-                timeAxisStepInterval = week
-            case 365*24*3600/4...365*24*3600:
-                // one year...
-                timeAxisStartDate = DatesManager.beginningOfYear(of: combinedMin)
-                timeAxisEndDate = DatesManager.endOfYear(of: combinedMax)
-                timeAxisStepInterval = month
-            default:
-                // >more than one year...
-                timeAxisStartDate = DatesManager.beginningOfYear(of: combinedMin)
-                timeAxisEndDate = DatesManager.endOfYear(of: combinedMax)
-                timeAxisStepInterval = quarter
-            }
-            
-            let axisTimeSpan = timeAxisEndDate.timeIntervalSince(timeAxisStartDate)
-            var axisStep = timeAxisStepInterval
-            var noOfTicks = Int(axisTimeSpan / axisStep)
-            if noOfTicks > 4 {
-                timeAxisStepInterval *= 2
-                axisStep = timeAxisStepInterval
-                noOfTicks = Int(axisTimeSpan / axisStep)
+                
+                timeAxisStartDate = timeAxisEndDate.addingTimeInterval(-minimumTimeAxisTimeSpan)
             }
 
-            return AxisParameters(min: timeAxisStartDate.timeIntervalSince1970, max: timeAxisEndDate.timeIntervalSince1970, noOfTicks: noOfTicks, scale: .linear)
+            
+            let axisTimeSpan = timeAxisEndDate.timeIntervalSince(timeAxisStartDate)
+            
+            let ticks = 6
+            timeAxisStepInterval = axisTimeSpan / Double(ticks)
+
+            return AxisParameters(min: timeAxisStartDate.timeIntervalSince1970, max: timeAxisEndDate.timeIntervalSince1970, noOfTicks: ticks, scale: .linear)
             
         }
     }
@@ -789,7 +749,7 @@ class ATFChart: UIView {
                 
                 let date = timeAxisStartDate.addingTimeInterval(Double(i) * dateRangeStep)
                 var date$ = String()
-                if i == 0 {
+                if i == 0 || i == (axisParameters[.horizontal]?.noOfTicks ?? 0) {
                     date$ = dateFormatter.string(from: date)
                 } else {
                     date$ = shortDateFormatter.string(from: date)
@@ -797,7 +757,7 @@ class ATFChart: UIView {
                 
                 let newLabel: UILabel = {
                     let defaultLabel = UILabel()
-                    defaultLabel.font = UIFont.systemFont(ofSize: 11)
+                    defaultLabel.font = UIFont.systemFont(ofSize: 8)
                     defaultLabel.text = date$
                     defaultLabel.textColor = UIColor.label
                     return defaultLabel

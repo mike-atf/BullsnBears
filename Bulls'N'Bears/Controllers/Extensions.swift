@@ -112,6 +112,18 @@ extension [YahooDictionaryEntry] {
             var array = [[["Trailing annual dividend yield"]], [["PE ratio (TTM)","Market cap","Beta (5Y monthly)", "Earnings date"]]] // [keyStat, summary]
             array.append([["<span>Sector(s)</span>", "<span>Industry</span>", "span>Full-time employees</span>", "<span>Description</span>"]]) // profile
             return array.flatMap{ $0 }.flatMap{ $0 }
+        case .nonUS:
+            // extracte from FraBo: [["Revenue","Gross profit","income tax expense","Net income","eps - earnings per share", "Book value per share", "free cash flow per share", "pe ratio historical data", "roe - return on equity", "roa - return on assets", "roi - return on investment", "long-term debt", "current debt","trailing p/e"],["shares outstanding","market cap", "trailing annual dividend yield"]]
+            return [
+                [["Interest expense"]],
+                [[]],
+                [["Free cash flow", "Operating cash flow","Capital expenditure"]],
+                [["Total insider shares held", "Purchases", "Sales"]],
+                [[], []],
+                [[],["Beta (5Y monthly)","Payout ratio"]],
+                [["Sector", "Industry", "Employees", "Description"]],
+                [["Earnings date"]]].flatMap{ $0 }.flatMap{ $0 }
+ 
         default:
             ErrorController.addInternalError(errorLocation: #function, errorInfo: "[YahooWebDictionary] has been asked to download unknown job \(downloadOption)")
             return []
@@ -230,14 +242,18 @@ extension [DatedValue] {
 
         var existing = self.sortByDate(dateOrder: .ascending)
         
-        let latestExisting = existing.last!
-        if new.date.timeIntervalSince(latestExisting.date) < 24*3600 {
-            existing = existing.dropLast()
-            existing.append(new)
-        } else {
-            existing.append(new)
+        if existing.count > 0 {
+            let latestExisting = existing.last!
+            if new.date.timeIntervalSince(latestExisting.date) < 24*3600 {
+                existing = existing.dropLast()
+                existing.append(new)
+            } else {
+                existing.append(new)
+            }
         }
-        
+        else {
+            existing = [new]
+        }
         return existing
 
     }
@@ -530,6 +546,40 @@ extension [DatedText] {
         return nil
     }
 
+}
+
+//MARK: - Labelled_DatedValues
+extension Labelled_DatedValues {
+    
+    func sortDatedValues(dateOrder: Order) -> [DatedValue] {
+        
+        return self.datedValues.sorted { dv0, dv1 in
+            if dateOrder == .ascending {
+                if dv0.date < dv1.date { return true }
+                else { return false }
+            } else {
+                if dv0.date > dv1.date { return true }
+                else { return false }
+            }
+        }
+    }
+    
+    func withSortedDatedValues(dateOrder: Order) -> Labelled_DatedValues {
+        
+        let sortedDV = self.datedValues.sorted { dv0, dv1 in
+            if dateOrder == .ascending {
+                if dv0.date < dv1.date { return true }
+                else { return false }
+            } else {
+                if dv0.date > dv1.date { return true }
+                else { return false }
+            }
+        }
+        
+        return Labelled_DatedValues(label: self.label, datedValues: sortedDV)
+    }
+
+    
 }
 
 //MARK: - [Labelled_DatedValues]
@@ -1586,9 +1636,10 @@ extension String {
     func textToNumber() -> Double? {
         
         var value: Double?
+        let filter$ = "-0123456789."
         
-        if self.filter("-0123456789.".contains) != "" {
-            if let v = Double(self.filter("-0123456789.".contains)) {
+        if self.filter(filter$.contains) != "" {
+            if let v = Double(self.filter(filter$.contains)) {
               
                 if self.last == "%" {
                     value = v / 100.0
@@ -1598,11 +1649,17 @@ extension String {
                 } else if self.uppercased().last == "B" {
                     value = v * pow(10.0, 9) // should be 9 but values are entered as '000
                 }
-                else if self.uppercased().last == "M" {
-                    value = v * pow(10.0, 6) // should be 6 but values are entered as '000
-                }
+//                else if self.uppercased().last == "M" {
+//                    value = v * pow(10.0, 6) // should be 6 but values are entered as '000
+//                }
                 else if self.uppercased().last == "K" {
                     value = v * pow(10.0, 3) // should be 6 but values are entered as '000
+                }
+                else if self.uppercased().contains("M") { // FraBo Pages, last char is space
+                    value = v * pow(10.0, 6) // should be 6 but values are entered as '000
+                }
+                else if self.uppercased().contains("BN") { // FraBo Pages, , last char is space
+                    value = v * pow(10.0, 9) // should be 6 but values are entered as '000
                 }
                 else {
                     value = v

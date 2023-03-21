@@ -21,10 +21,16 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
     var shareID: NSManagedObjectID?
     var hostingDelegate: WebViewDownloadDelegate?
     var currency: String?
+    var progressDelegate: ProgressViewDelegate?
+    
+    static let sections = ["Historical key data", "Fundamentals", "Technical key data"]
+    static let parameters = [["Sales in mio.","Gross profit in mio.","EBIT in mio","Income tax payments in mio.","Net income / loss in mio.","Earnings per share (basic)", "Book value per share", "Cashflow per share", "P/E", "Return on equity", "Total return on Assets", "ROI", "Long-term debt in mio.", "Short-term debt in mio." ,"Total debt in mio."],["Number of shares","Market capitalization", "Dividend yield in %","P/E Ratio"],["Beta 250 days"]] // leave dots in place!
+    
+        // pos 2 = ,["Ausstehende Aktien in Mio.","Gewinn je Aktie", "Aktuell ausstehende Aktien"]??
+    static let saveNames = [["Revenue","Gross profit","income before tax","income tax expense","Net income","eps - earnings per share", "Book value per share", "free cash flow per share", "pe ratio historical data", "roe - return on equity", "roa - return on assets", "roi - return on investment", "long-term debt", "current debt","total liabilities"],["shares outstanding","market cap", "trailing annual dividend yield", "trailing p/e"],["beta"]]
+
 
     static func newWebViewDownloader(delegate: WebViewDownloadDelegate) -> WebViewDownloader {
-        
-        print("creating WK downloader")
         
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
@@ -41,16 +47,22 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
         let acceptanceCookie = HTTPCookie(properties: [.path: "/", .name: "cookie-settings-v3", .version: "1", .value: "%7B%22isFunctionalCookieCategoryAccepted%22%3Atrue%2C%22isAdvertisingCookieCategoryAccepted%22%3Atrue%2C%22isTrackingCookieCategoryAccepted%22%3Atrue%2C%22isCookiePolicyAccepted%22%3Atrue%2C%22isCookiePolicyDeclined%22%3Afalse%7D", .domain: "www.boerse-frankfurt.de", .sameSitePolicy: "lax", .secure: "FALSE", .expires: "2024-03-03 14:40:56 +0000"] ) // "2024-03-03 14:40:56 +0000"
         config.websiteDataStore.httpCookieStore.setCookie(acceptanceCookie!)
         
-        let frameSize = delegate.view.bounds.size
+        let frameSize = CGSize(width: 50, height: 100) // delegate.view.bounds.size
         return WebViewDownloader(frame: CGRect(origin: .zero, size: frameSize), configuration: config)
     }
     
-    func downloadPage(domain: String, companyName: String, pageName: String, currency: String?,shareID: NSManagedObjectID?, in delegate: WebViewDownloadDelegate) {
+    class func countOfDownloadTasks() -> Int {
+        return WebViewDownloader.parameters.flatMap{ $0 }.count + 1 // for downloading
+    }
+    
+    func downloadPage(domain: String, companyName: String, pageName: String, currency: String?,shareID: NSManagedObjectID?, in delegate: WebViewDownloadDelegate, progressDelegate: ProgressViewDelegate?=nil) {
         
         guard shareID != nil else {
             ErrorController.addInternalError(errorLocation: #function, errorInfo: "WebView download requested for \(companyName) without valid shareID")
             return
         }
+        
+        self.progressDelegate = progressDelegate
         
         let nameParts = companyName.split(separator: " ")
         var webname = String()
@@ -101,7 +113,7 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
                 self.downloadFailed(error: error, description: nil)
             }
             if let result = result as? String {
-                print("============ FraBo Webview navigation finished, text=\n\(result)")
+//                print("============ FraBo Webview navigation finished, text=\n\(result)")
                 self.downloadComplete(html: result)
             } else {
                 self.downloadFailed(error: nil, description: "downloaded non-html result \(String(describing: result))")
@@ -119,20 +131,24 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
     
     func downloadComplete(html: String?) {
         
+        self.progressDelegate?.taskCompleted()
+        
         if let htmlText = html {
-            print("received html string")
-            print()
+//            print("received html string")
+//            print()
             analyseAndSave(htmlText: htmlText)
         } else {
             print("received EMPTY html string")
             print()
             hostingDelegate?.downloadAnalyseSaveComplete(remove: self)
-
         }
                  
     }
     
     func downloadFailed(error: Error?, description: String?) {
+
+        self.progressDelegate?.taskCompleted()
+
         print()
         print("download error received")
         if error != nil {
@@ -147,22 +163,9 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
     func analyseAndSave(htmlText: String) {
         
         var results = [Labelled_DatedValues]()
+ 
         
-        guard let startPosition = htmlText.range(of: "> Historical key data") else {
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "download from FraBo key data page - cant find '> Historical key data' section start' in \(htmlText)")
-            return
-        }
-        
-        guard let endPosition = htmlText.range(of: "</tr></tbody></table>", range: startPosition.upperBound..<htmlText.endIndex) else {
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "download from FraBo key data page - cant find '</tr></tbody></table>' as end sequence in \(htmlText)")
-            return
-        }
-
-        let sections = ["Historical key data"]
-        let parameters = [["Sales in mio.","Gross profit in mio.","Income tax payments in mio.","Net income / loss in mio.","Earnings per share (basic)", "Book value per share", "Cashflow per share", "P/E", "Return on equity", "Total return on Assets", "ROI"]]
-        let saveNames = [["Revenue","Gross profit","income tax expense","Net income","eps - earnings per share", "Book value per share", "free cash flow per share", "pe ratio historical data", "roe - return on equity", "roa - return on assets", "roi - return on investment"]]
-        
-        if let lDVs = analyseFraBoKeyDataPage(htmlText: String(htmlText[startPosition.upperBound..<endPosition.lowerBound]), sections: sections, parameterNames: parameters, saveNames: saveNames, currency: self.currency ?? "no currency") {
+        if let lDVs = analyseFraBoKeyDataPage(htmlText: htmlText, sections: WebViewDownloader.sections, parameterNames: WebViewDownloader.parameters, saveNames: WebViewDownloader.saveNames, currency: self.currency ?? "no currency") {
             results.append(contentsOf: lDVs)
         }
         
@@ -241,41 +244,39 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
         }
       
         // 4 get figures
-    sectionLoop: for _ in sections {
+    sectionLoop: for section in sections {
             
-//            var endPosition: Range<String.Index>?
-//            if section != nil {
-//                if let bodyStartPosition = htmlText.range(of: "<tbody>") {
-//                    endPosition = htmlText.range(of: "</tbody></table>", range: bodyStartPosition.upperBound..<htmlText.endIndex)
-//                    if endPosition != nil {
-//                        pageText = String(htmlText[startPosition.upperBound..<endPosition!.lowerBound])
-//                    }
-//                }
-//                else {
-//                    ErrorController.addInternalError(errorLocation: #function, errorInfo: "frabo key data download unable to find position of '</tbody></table>' on page \(htmlText)")
-//                    sectionCount += 1
-//                    continue sectionLoop
-//                }
-//            }
+        guard let sectionStartPosition = htmlText.range(of: "\(section!)") else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "download from FraBo key data page - unable to find start of section '\(section!)'")
+            continue sectionLoop
+        }
         
-            parameterCount = 0
+        guard let sectionEndPosition = htmlText.range(of: "</tbody></table>", range: sectionStartPosition.upperBound..<htmlText.endIndex) else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "download from FraBo key data page - unable to find end of section '\(section!)' with sequence '</tbody></table>'")
+            continue sectionLoop
+        }
+        
+        let sectionText = String(htmlText[sectionStartPosition.upperBound..<sectionEndPosition.lowerBound])
+        
+        parameterCount = 0
         
     parameterLoop: for parameter in parameterNames[sectionCount] {
         
         var labelledDVs = Labelled_DatedValues(label: realNames[sectionCount][parameterCount], datedValues: [DatedValue]())
         
-        if let parameterStartPosition = htmlText.range(of: (parameter + "</td>")) {
+        if let parameterStartPosition = sectionText.range(of: (parameter + "</td>")) {
             
-            if let rowEndPosition = htmlText.range(of: "!----></tr>", range: parameterStartPosition.upperBound..<htmlText.endIndex) {
+            // for Historical key data section
+            if let rowEndPosition = sectionText.range(of: "!----></tr>", range: parameterStartPosition.upperBound..<sectionText.endIndex) {
                 
-                let row$ = htmlText[parameterStartPosition.upperBound..<rowEndPosition.lowerBound]
+                let row$ = sectionText[parameterStartPosition.upperBound..<rowEndPosition.lowerBound]
                 
                 let columnTexts = row$.split(separator: "</td><")
                 var columnCount = 0
                 for text in columnTexts {
                     if let pmStartPosition = text.range(of: ">", options: .backwards) {
                         var value$ = String(text[pmStartPosition.upperBound..<text.endIndex])
-                        if ["ROI", "Total return on Assets", "Return on equity"].contains(parameter) {
+                        if ["ROI", "Total return on Assets", "Return on equity", "Dividend yield in %"].contains(parameter) {
                             value$ += "%"
                         } else if parameter.contains("in mio") {
                             value$ += "M"
@@ -291,14 +292,37 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
                     columnCount += 1
                 }
                 
-            } else {
+            }
+            // for Fundamentals section
+            else if let rowEndPosition = sectionText.range(of: "</td></tr>", range: parameterStartPosition.upperBound..<sectionText.endIndex) {
+                let rowText = String(sectionText[parameterStartPosition.upperBound..<rowEndPosition.lowerBound])
+                if let numberStartPosition = rowText.range(of: ">", options: .backwards) {
+                    var number$ = rowText[numberStartPosition.upperBound...]
+                    if ["Dividend yield in %"].contains(parameter) {
+                        number$ += "%"
+                    } else if parameter.contains("in mio") {
+                        number$ += "M"
+                    }
+                    let value = String(number$).textToNumber() ?? 0.0
+                    let dv = DatedValue(date: Date(), value: value)
+                    labelledDVs.datedValues.append(dv)
+                }
+                else {
+                    ErrorController.addInternalError(errorLocation: #function, errorInfo: " unable to find number startSequence '>' for \(parameter) in \(rowText)")
+                    parameterCount += 1
+                    continue parameterLoop
+                }
+            }
+            else {
                 ErrorController.addInternalError(errorLocation: #function, errorInfo: "mw download unable to find row endSequence '!----></tr>' for \(parameter)")
                 parameterCount += 1
                 continue parameterLoop
             }
+            
+            progressDelegate?.taskCompleted()
         }
         else {
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "mw download unable to find row start position for '\(parameter)' in\n \(htmlText)")
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "mw download unable to find row start position for '\(parameter)'")
         }
 
         if results == nil {

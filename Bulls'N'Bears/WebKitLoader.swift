@@ -106,14 +106,56 @@ extension WebKitLoader: WKNavigationDelegate, WKUIDelegate {
 
 }
 
+struct FraBoDownloadJob {
+    
+    var pageName = String()
+    var tableTitles = [String?]()
+    var rowTitles = [[String]]()
+    var saveTitles = [[String]]()
+    var url: URL?
+    
+    init?(symbol: String, companyName: String ,pageName: String, tableTitles: [String?], rowTitles: [[String]], saveTitles: [[String]]?=nil) {
+        
+        guard tableTitles.count == rowTitles.count else {
+            ErrorController.addInternalError(errorLocation: "FrBoJobs struct", errorInfo: "mismatch between tables to download \(tableTitles) and rowTitle groups \(rowTitles)")
+            return nil
+        }
+        
+        let nameParts = companyName.split(separator: " ")
+        var webname = String()
+        var count = 0
+        for namePart in nameParts {
+            webname += namePart.lowercased()
+            if count > 0 {
+                break
+            }
+            webname += "-"
+            count += 1
+        }
+        
+        self.pageName = pageName
+        
+        var sectionCount = 0
+        for title in tableTitles {
+            if title != nil {
+                self.tableTitles.append(">\(title!)</span>")
+            } else {
+                self.tableTitles.append(title)
+            }
+            
+            var new = [String]()
+            for parameter in rowTitles[sectionCount] {
+                new.append(">\(parameter)</td>")
+            }
+            self.rowTitles.append(new)
 
-//extension ViewController: WKScriptMessageHandler {
-//
-//    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-//        if message.name == "Test", let messageBody = message.body as? String {
-//            print()
-//            print("***************")
-//            print(messageBody)
-//        }
-//    }
-//}
+            sectionCount += 1
+        }
+        
+        self.saveTitles = saveTitles ?? rowTitles
+        
+        let components = URLComponents(string: "https://www.boerse-frankfurt.de/equity/\(webname)/key-data")
+        self.url = components?.url
+        
+    }
+}
