@@ -23,7 +23,7 @@ extension ShareTransaction {
     @NSManaged public var quantity: Double
     @NSManaged public var reason: String?
     @NSManaged public var share: Share?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension ShareTransaction : Identifiable {

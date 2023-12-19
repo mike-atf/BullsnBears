@@ -21,7 +21,6 @@ class AlertController: NSObject {
     class func shared() -> AlertController {
         return alertController
     }
-
     
     public func showDialog(title: String, alertMessage: String, viewController: UIViewController? = nil, delegate: AlertViewDelegate? = nil) {
         
@@ -32,8 +31,6 @@ class AlertController: NSObject {
             let windowScene = (UIApplication.shared.connectedScenes.first as? UIWindowScene)
             let sceneDelegate = windowScene?.delegate as? SceneDelegate
             let presentingVC = viewController ?? sceneDelegate?.window?.rootViewController
-//
-//            let presentingVC = viewController ?? UIApplication.shared.windows.filter({ $0.isKeyWindow }).first?.rootViewController?.children.first
             
             guard presentingVC != nil else {
                 return

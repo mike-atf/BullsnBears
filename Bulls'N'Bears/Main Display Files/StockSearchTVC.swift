@@ -113,7 +113,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
     }
     
     /// attempts to download from Yahoo finance either price as file
-    /// if downloaded file not in .csv format Downloader sends notification to start data download insteae
+    /// if downloaded file not in .csv format Downloader sends notification to start data download instead
     func newCompanyDataDownload(_ ticker: String?, companyName: String?) {
         
         guard let symbol = ticker else {
@@ -152,7 +152,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         urlComponents?.queryItems = [URLQueryItem(name: "period1", value: end$),URLQueryItem(name: "period2", value: start$),URLQueryItem(name: "interval", value: "1d"),URLQueryItem(name: "includeAdjustedClose", value: "true") ]
 
         // second, if file download fails download price page table and extract price data
-        if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
+        if let sourceURL = urlComponents?.url {
             return await downloadYahooPriceData(sourceURL, stockName: companyName)
             
         }
@@ -175,29 +175,6 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
     
     //MARK: - find new symbol on Yahoo
     
-    /*
-    func findNameOnYahoo(symbol: String?) {
-        
-        guard let name = symbol else {
-            return
-        }
-        
-        var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(name)/profile")
-        urlComponents?.queryItems = [URLQueryItem(name: "p", value: name)]
-        
-        if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
-            Task.init(priority: .background) {
-                do {
-                    try await downloadWebData(sourceURL, stockName: name, task: "name")
-                } catch let error {
-                    ErrorController.addInternalError(errorLocation: "StockSearchTVC.findNameOnYahoo", systemError: nil, errorInfo: "failed web data download \(error.localizedDescription)")
-                }
-            }
-
-        }
-    }
-    */
-    
     func findOtherSharesOnYahoo(searchTerm: String?) {
         
         guard let name = searchTerm else {
@@ -207,7 +184,8 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         var urlComponents = URLComponents(string: "https://uk.finance.yahoo.com/quote/\(name)")
         urlComponents?.queryItems = [URLQueryItem(name: "p", value: name)]
         
-        if let sourceURL = urlComponents?.url { // URL(fileURLWithPath: webPath)
+        if let sourceURL = urlComponents?.url { // URL(string: "https://uk.finance.yahoo.com/quote/\(name)")
+            
             Task.init(priority: .background) {
                 do {
                     try await downloadYahooNameSearchPage(sourceURL)
@@ -225,7 +203,7 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
         do {
             htmlText = try await Downloader.downloadData(url: url)
             
-            let namesDict = try YahooPageScraper.companyNameSearchOnPage(html: htmlText)
+            let namesDict = try YahooPageScraper.companyNamesListSearchOnPage(html: htmlText)
             
             DispatchQueue.main.async { [self] in
                 if namesDict != nil {
@@ -242,8 +220,11 @@ class StockSearchTVC: UITableViewController, UISearchBarDelegate, UISearchResult
                 self.tableView.reloadData()
             }
             
-        } catch let error {
-            ErrorController.addInternalError(errorLocation: "StockSearchTVC.downloadYahooNameSearchPage", systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
+        } catch {
+            if let ierror = error as? InternalError {
+                ErrorController.addInternalError(errorLocation: ierror.location, systemError: nil, errorInfo: ierror.errorInfo)
+            }
+            ErrorController.addInternalError(errorLocation: "StockSearchTVC.downloadYahooNameSearchPage", systemError: nil, errorInfo: "Error downloading other company data from Yahoo: \(error.localizedDescription)")
         }
 
     }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class FinHealthTVC: UITableViewController {
     
@@ -17,7 +18,7 @@ class FinHealthTVC: UITableViewController {
     var sectionSubtitles = ["","",
                             "A larger net margin, especially compared to industry peers, means a greater margin of financial safety, and also indicates a company is in a better financial position to commit capital to growth and expansion.",
                             " Operating margin considers a company's basic operational profit margin after deducting the variable costs of producing and marketing the company's products or services. Crucially, it indicates how well the company's management is able to control costs." ,
-                            "Quick ratio = 'Quick assets' / Current liabiities.\n\nThis indicates the company’s ability to instantly use its assets that can be converted quickly to cash to pay down its current liabilities, it is also called the Acid Test ratio.\n\nCurrent ratio = 'Current assets' / Current liabiities.\n\nThis is a liquidity ratio that measures a company’s ability to pay short-term obligations or those due within one year.",
+                            "Quick ratio = 'Quick assets' / Current liabiities.\n\nThis indicates the company’s ability to instantly use its assets that can be converted quickly to cash to pay down its current liabilities, it is also called the Acid Test ratio.\n\nCurrent ratio = 'Current assets' / Current liabilities.\n\nThis is a liquidity ratio that measures a company’s ability to pay short-term obligations or those due within one year.",
                             "Solvency is a company's ability to meet its debt obligations on an ongoing basis, not just over the short term. Solvency ratios calculate a company's long-term debt in relation to its assets or equity.\n\nA lower D/E ratio means more of a company's operations are being financed by shareholders rather than by creditors. This is a plus since shareholders do not charge interest.\n\nD/E ratios vary widely between industries. However, regardless of the specific nature of a business, a downward trend over time in the D/E ratio is a good indicator a company is on increasingly solid financial ground.\n\n If a company has a negative D/E ratio, this means it has negative shareholder equity. The company’s liabilities exceed its assets. In most cases, this would be considered a sign of high risk and an incentive to seek bankruptcy protection."]
 
     override func viewDidLoad() {
@@ -45,7 +46,7 @@ class FinHealthTVC: UITableViewController {
         if section == 0 {
             return 0
         } else if section == 1 {
-            return 6
+            return 7
         } else if section == 2 {
             return 1
         } else if section == 3 {
@@ -68,18 +69,43 @@ class FinHealthTVC: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "finHealthCell", for: indexPath) as! FinHealthCell
-
-        var minimumChartTime: TimeInterval?
         
-        if indexPath.section - 1 > 0 {
-            minimumChartTime = 2 * year
+        if indexPath == IndexPath(row: 0, section: 1) {
+            let chartData = controller.dataForPath(indexPath: indexPath)
+            return healthCell(indexPath: indexPath, chartData: chartData)
         } else {
-            minimumChartTime = month
+            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "finHealthCell", for: indexPath) as! FinHealthCell
+            
+            var minimumChartTime: TimeInterval?
+            
+            if indexPath.section - 1 > 0 {
+                minimumChartTime = 2 * year
+            } else {
+                minimumChartTime = month
+            }
+            
+            let chartData = controller.dataForPath(indexPath: indexPath)
+            cell.configure(path: indexPath, primaryData: chartData, chartMinimumTime: minimumChartTime)
+            
+            return cell
         }
+    }
+    
+    func healthCell(indexPath: IndexPath, chartData: LabelledChartDataSet) -> FinHealthCell {
         
-        let chartData = controller.dataForPath(indexPath: indexPath)
-        cell.configure(path: indexPath, primaryData: chartData, chartMinimumTime: minimumChartTime)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "finHealthCell", for: indexPath) as! FinHealthCell
+        
+//        let dataSet = [ChartDataSet(x: DatesManager.dateFromAString(dateString: "01/10/2022"), y: 1.0), ChartDataSet(x: DatesManager.dateFromAString(dateString: "03/03/2023"), y: 3.5), ChartDataSet(x: DatesManager.dateFromAString(dateString: "10/01/2023"), y: 5.0), ChartDataSet(x: DatesManager.dateFromAString(dateString: "2/12/2022"), y: 2.3)].sorted { s0, s1 in
+//            if s0.x ?? Date() < s1.x ?? Date() { return true }
+//            else { return false }
+//        }
+        
+        let sampleSet = LabelledChartDataSet(title: "Health", chartData: chartData.chartData, format: .numberNoDecimals)
+        
+        cell.contentConfiguration = UIHostingConfiguration {
+//            HealthTableCellView(share: share!, chartDataSet: sampleSet)
+        }
 
         return cell
     }

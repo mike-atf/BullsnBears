@@ -21,7 +21,7 @@ extension Cash_flow {
     @NSManaged public var netBorrowings: Data? // from MT used for DCF. Called 'Debt Issuance/Retirement Net - Total'
     @NSManaged public var freeCashFlow: Data? // use Yhaoo, or MT Operating cash flow - Net change in PPE; should be fcfToEquity for DCF purposes
     @NSManaged public var share: Share?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension Cash_flow : Identifiable {

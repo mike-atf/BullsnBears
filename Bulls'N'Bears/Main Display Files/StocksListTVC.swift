@@ -8,6 +8,7 @@
 import UIKit
 import CoreData
 import WebKit
+import SwiftUI
 
 class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -292,7 +293,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             }
 
             if let longNameComponents = longName?.split(separator: " ") {
-                let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co.", "SE", "o.N", "O.N", "Namens-Aktien"] // "Group",
+                let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co.", "SE", "o.N", "O.N", "Namens-Aktien", "A/S"] // "Group",
                 let replaceTerms = ["S.A.": "sa "]
                 var cleanedName = String()
                 for component in longNameComponents {
@@ -576,7 +577,6 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if !tableView.isEditing {
-//            performSegue(withIdentifier: "showChartSegue", sender: nil)
             showWBValuationView(indexPath: indexPath, chartViewSegue: true)
         }
         else {
@@ -632,19 +632,11 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func showFinHealthView(share: Share) {
         
-        for vc in self.navigationController?.children ?? [] {
-            if let _ = vc as? FinHealthTVC {
-                // FHV already open
-                return
-            }
-        }
+        let finHealthView = FinHealthListView(share: share).environment(\.managedObjectContext, PersistenceController.shared.persistentContainer.viewContext)
+        let hostView = UIHostingController(rootView: finHealthView)
         
-        guard let finHealthTVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FinHealthTVC") as? FinHealthTVC else { return }
+        self.navigationController?.pushViewController(hostView, animated: true)
         
-        finHealthTVC.share = share
-        
-        self.navigationController?.pushViewController(finHealthTVC, animated: true)
-
     }
 
     

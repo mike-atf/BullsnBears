@@ -17,12 +17,13 @@ extension Share {
     }
 
     @NSManaged public var beta: Double
-    @NSManaged public var creationDate: Date?
+    @NSManaged public var creationDate: Date
     @NSManaged public var dailyPrices: Data?
     @NSManaged public var dividendWDates: Data?
 //    @NSManaged public var divYieldCurrent: Double
     @NSManaged public var employees: Double
-//    @NSManaged public var eps_current: Double
+    @NSManaged public var pe_min: Double // undated - for Rule1
+    @NSManaged public var pe_max: Double // undated - for Rule1
     @NSManaged public var exchange: String?
     @NSManaged public var industry: String?
     @NSManaged public var isin: String?
@@ -58,8 +59,9 @@ extension Share {
     @NSManaged public var ratios: Ratios?
     @NSManaged public var research: StockResearch?
     @NSManaged public var rule1Valuation: Rule1Valuation?
-    @NSManaged public var transactions: NSSet?
+    @NSManaged public var transactions: Set<ShareTransaction>?
     @NSManaged public var wbValuation: WBValuation?
+    @NSManaged public var healthData: HealthData?
     @NSManaged public var currency: String?
     @NSManaged public var avgAnnualPrices: Data?
 

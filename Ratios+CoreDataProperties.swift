@@ -24,7 +24,7 @@ extension Ratios {
     @NSManaged public var ocfPerShare: Data?
     @NSManaged public var fcfPerShare: Data?
     @NSManaged public var share: Share?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension Ratios : Identifiable {

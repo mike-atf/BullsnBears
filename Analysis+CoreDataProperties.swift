@@ -28,7 +28,7 @@ extension Analysis {
     @NSManaged public var adjFutureGrowthRate: Data?
     @NSManaged public var adjForwardPE: Data?
     @NSManaged public var share: Share?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension Analysis : Identifiable {

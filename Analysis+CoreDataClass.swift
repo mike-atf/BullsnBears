@@ -20,42 +20,59 @@ enum AnalysisParameters {
 }
 
 @objc(Analysis)
-public class Analysis: NSManagedObject {
+public class Analysis: NSManagedObject, Codable {
     
-    /*
-    func getValues(parameter: AnalysisParameters) -> Labelled_DatedValues? {
+
+    // MARK: - coding
+    
+    enum CodingKeys: CodingKey {
+        case forwardPE
+        case future_growthNextYear
+        case future_growthNext5pa
+        case future_revenue
+        case future_revenueGrowthRate
+        case adjFutureGrowthRate
+        case adjForwardPE
+        case share
+        case shareSymbol
+   }
+    
+    required convenience public init(from decoder: Decoder) throws {
         
-        var label = String()
-        var datedValues: [DatedValue]?
-        
-        switch parameter {
-        case .forwardPE:
-            datedValues = forwardPE.datedValues(dateOrder: .ascending)
-            label = "ForwardPE"
-        case .future_revenue:
-            datedValues = future_revenue.datedValues(dateOrder: .ascending)
-            label = "FutureRevenue"
-        case .future_growthRate:
-            datedValues = future_growthNextYear.datedValues(dateOrder: .ascending)
-            label = "FutureGrowthRates"
-        case .future_revenueGrowthRate:
-            datedValues = future_revenueGrowthRate.datedValues(dateOrder: .ascending)
-            label = "FutureRevenueGrowthRates"
-        case .adjFutureGrowthRate:
-            datedValues = adjFutureGrowthRate.datedValues(dateOrder: .ascending)
-            label = "AdjustedFutureGrowthRates"
-        case .adjForwardPE:
-            datedValues = adjForwardPE.datedValues(dateOrder: .ascending)
-            label = "AdjustedForwardPE"
-       }
-        
-        if let dv = datedValues {
-            return Labelled_DatedValues(label:label, datedValues: dv)
-        } else {
-            return nil
+        guard let context = decoder.userInfo[CodingUserInfoKey.managedObjectContext] as? NSManagedObjectContext else {
+            throw DecoderConfigurationError.missingManagedObjectContext
         }
+        
+        self.init(context: context)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.forwardPE = try container.decodeIfPresent(Data.self, forKey: .forwardPE)
+        self.future_growthNextYear = try container.decodeIfPresent(Data.self, forKey: .future_growthNextYear)
+        self.future_growthNext5pa = try container.decodeIfPresent(Data.self, forKey: .future_growthNext5pa)
+        self.future_revenue = try container.decodeIfPresent(Data.self, forKey: .future_revenue)
+        self.future_revenueGrowthRate = try container.decodeIfPresent(Data.self, forKey: .future_revenueGrowthRate)
+        self.adjFutureGrowthRate = try container.decodeIfPresent(Data.self, forKey: .adjFutureGrowthRate)
+        self.adjForwardPE = try container.decodeIfPresent(Data.self, forKey: .adjForwardPE)
+//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
+//        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
+
     }
-    */
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encodeIfPresent(forwardPE, forKey: .forwardPE)
+        try container.encodeIfPresent(future_growthNextYear, forKey: .future_growthNextYear)
+        try container.encodeIfPresent(future_growthNext5pa, forKey: .future_growthNext5pa)
+        try container.encodeIfPresent(future_revenue, forKey: .future_revenue)
+        try container.encodeIfPresent(future_revenueGrowthRate, forKey: .future_revenueGrowthRate)
+        try container.encodeIfPresent(adjFutureGrowthRate, forKey: .adjFutureGrowthRate)
+        try container.encodeIfPresent(adjForwardPE, forKey: .adjForwardPE)
+//        try container.encodeIfPresent(share, forKey: .share)
+//        try container.encode(shareSymbol!, forKey: .shareSymbol)
+
+    }
+
     
     /// if revenueGrowthRate = true return future_RevenueGrowthRate, else returns future_GrowthRate.
     /// salesgroth will prioritise the sales growth parameters, if false will use adjFutureGrowth > future_growthNextYear > future_revenueGrowthRate

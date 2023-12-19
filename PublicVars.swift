@@ -8,13 +8,14 @@
 import UIKit
 import CoreData
 
-enum ShareTrendNames {
+enum ShareTrendNames: CaseIterable {
+    
+    case healthScore
     case moatScore
     case dCFValue
     case stickerPrice
     case lynchScore
     case intrinsicValue
-    case healthScore
 }
 
 enum WebServiceName {

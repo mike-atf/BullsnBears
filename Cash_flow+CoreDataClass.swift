@@ -15,7 +15,48 @@ enum CashFlowParameters {
 }
 
 @objc(Cash_flow)
-public class Cash_flow: NSManagedObject {
+public class Cash_flow: NSManagedObject, Codable {
+    
+    // MARK: - coding
+    
+    enum CodingKeys: CodingKey {
+        case capEx
+        case opCashFlow
+        case netBorrowings
+        case freeCashFlow
+        case share
+        case shareSymbol
+   }
+    
+    required convenience public init(from decoder: Decoder) throws {
+        
+        guard let context = decoder.userInfo[CodingUserInfoKey.managedObjectContext] as? NSManagedObjectContext else {
+            throw DecoderConfigurationError.missingManagedObjectContext
+        }
+        
+        self.init(context: context)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.capEx = try container.decodeIfPresent(Data.self, forKey: .capEx)
+        self.opCashFlow = try container.decodeIfPresent(Data.self, forKey: .opCashFlow)
+        self.netBorrowings = try container.decodeIfPresent(Data.self, forKey: .netBorrowings)
+        self.freeCashFlow = try container.decodeIfPresent(Data.self, forKey: .freeCashFlow)
+//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
+//        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
+
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encodeIfPresent(capEx, forKey: .capEx)
+        try container.encodeIfPresent(opCashFlow, forKey: .opCashFlow)
+        try container.encodeIfPresent(netBorrowings, forKey: .netBorrowings)
+        try container.encodeIfPresent(freeCashFlow, forKey: .freeCashFlow)
+//        try container.encodeIfPresent(share, forKey: .share)
+//        try container.encode(shareSymbol!, forKey: .shareSymbol)
+
+    }
     
     func getValues(parameter: CashFlowParameters) -> Labelled_DatedValues? {
         

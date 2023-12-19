@@ -10,7 +10,42 @@ import UIKit
 import CoreData
 
 @objc(DCFValuation)
-public class DCFValuation: NSManagedObject {
+public class DCFValuation: NSManagedObject, Codable {
+    
+    // MARK: - coding
+    
+    enum CodingKeys: CodingKey {
+        case creationDate
+        case ivalueTrend
+        case share
+        case shareSymbol
+   }
+    
+    required convenience public init(from decoder: Decoder) throws {
+        
+        guard let context = decoder.userInfo[CodingUserInfoKey.managedObjectContext] as? NSManagedObjectContext else {
+            throw DecoderConfigurationError.missingManagedObjectContext
+        }
+        
+        self.init(context: context)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
+        self.ivalueTrend = try container.decodeIfPresent(Data.self, forKey: .ivalueTrend)
+//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
+//        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
+
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encodeIfPresent(creationDate, forKey: . creationDate)
+        try container.encodeIfPresent(ivalueTrend, forKey: .ivalueTrend)
+//        try container.encodeIfPresent(share, forKey: .share)
+//        try container.encode(shareSymbol!, forKey: .shareSymbol)
+
+    }
     
     let reviewYears = 4
     let predictionYears = 2

@@ -43,6 +43,8 @@ class SettingsCell: UITableViewCell {
         }
         else if path.section == 1{
             inconView.image = UIImage(systemName: "slider.horizontal.3")
+        } else if path.section == 2 {
+            inconView.image = UIImage(systemName: "square.and.arrow.up")
         }
     }
 }

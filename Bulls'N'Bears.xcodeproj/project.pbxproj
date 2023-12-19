@@ -55,9 +55,9 @@
 		EA20161C2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */; };
 		EA20161D2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */; };
 		EA20161E2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */; };
+		EA21B45E29CB53CF00E4CC99 /* FinHealthListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA21B45D29CB53CF00E4CC99 /* FinHealthListView.swift */; };
 		EA225B1D25F3DE9700871D7D /* ScoreCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */; };
 		EA2CF5DF277B42BD00FE2FB9 /* Backup Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2CF5DE277B42BD00FE2FB9 /* Backup Manager.swift */; };
-		EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */; };
 		EA3207F125EEA13200A6A6AB /* ValueListRatingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */; };
 		EA3207F225EEA13200A6A6AB /* ValueListRatingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA3207F025EEA13200A6A6AB /* ValueListRatingCell.xib */; };
 		EA3207F825EEA15900A6A6AB /* ValueListTextEntryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3207F625EEA15900A6A6AB /* ValueListTextEntryCell.swift */; };
@@ -107,6 +107,8 @@
 		EA84A12129709FED000A1957 /* YChartsScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA84A12029709FED000A1957 /* YChartsScraper.swift */; };
 		EA84A1232971E8F5000A1957 /* TSScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA84A1222971E8F5000A1957 /* TSScraper.swift */; };
 		EA84A1252971EC6C000A1957 /* MacrotrendsScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA84A1242971EC6C000A1957 /* MacrotrendsScraper.swift */; };
+		EA8DB1B129CF77F1006A371A /* FinHealthListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8DB1B029CF77F1006A371A /* FinHealthListController.swift */; };
+		EA8DB1B329D0D4DB006A371A /* MultipleHealthChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8DB1B229D0D4DB006A371A /* MultipleHealthChart.swift */; };
 		EA96EB5229B0F7D2004B0094 /* FraBoScraper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA96EB5129B0F7D2004B0094 /* FraBoScraper.swift */; };
 		EA9D7399264432C300672762 /* TrendIconView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9D7398264432C300672762 /* TrendIconView2.swift */; };
 		EAA099C42588020B00DBB93C /* CheckButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA099C32588020B00DBB93C /* CheckButton.swift */; };
@@ -165,6 +167,7 @@
 		EAB58D8126F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB58D7F26F4CADE00F70F9A /* ShareTransactionDialog.swift */; };
 		EAB58D8226F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB58D7F26F4CADE00F70F9A /* ShareTransactionDialog.swift */; };
 		EAC0207229C9E5FC0091A7BB /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC0207129C9E5FC0091A7BB /* PersistenceController.swift */; };
+		EAC0207629CA12C30091A7BB /* HealthChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC0207529CA12C30091A7BB /* HealthChart.swift */; };
 		EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC07D6525ACEE350045D83B /* ErrorListVC.swift */; };
 		EAC1904A257641160030B331 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC19049257641160030B331 /* AppDelegate.swift */; };
 		EAC1904C257641160030B331 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC1904B257641160030B331 /* SceneDelegate.swift */; };
@@ -338,6 +341,16 @@
 		EAFCB98B25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB98725C9A4DE0029AA4F /* ValuationSummaryCell.xib */; };
 		EAFCB98C25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB98725C9A4DE0029AA4F /* ValuationSummaryCell.xib */; };
 		EAFCB98D25C9A4DE0029AA4F /* ValuationSummaryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EAFCB98725C9A4DE0029AA4F /* ValuationSummaryCell.xib */; };
+		FA2636EF2AF532EB00E4EB18 /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2636EE2AF532EB00E4EB18 /* ErrorLogListCell.swift */; };
+		FA2636F02AF532EB00E4EB18 /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2636EE2AF532EB00E4EB18 /* ErrorLogListCell.swift */; };
+		FA2636F12AF532EB00E4EB18 /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2636EE2AF532EB00E4EB18 /* ErrorLogListCell.swift */; };
+		FAA7AE8B2B2B94150079DBDA /* ImportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA7AE8A2B2B94150079DBDA /* ImportManager.swift */; };
+		FAF8CD812B29FEBA004B5C82 /* HealthData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF8CD7F2B29FEBA004B5C82 /* HealthData+CoreDataClass.swift */; };
+		FAF8CD822B29FEBA004B5C82 /* HealthData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF8CD7F2B29FEBA004B5C82 /* HealthData+CoreDataClass.swift */; };
+		FAF8CD832B29FEBA004B5C82 /* HealthData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF8CD7F2B29FEBA004B5C82 /* HealthData+CoreDataClass.swift */; };
+		FAF8CD842B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF8CD802B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift */; };
+		FAF8CD852B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF8CD802B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift */; };
+		FAF8CD862B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF8CD802B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -379,9 +392,9 @@
 		EA2016172715EE75004432EC /* DiaryTransactionCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = DiaryTransactionCard.xib; path = "Bulls'N'Bears/Main Display Files/DiaryTransactionCard.xib"; sourceTree = SOURCE_ROOT; };
 		EA20161B2715EEBF004432EC /* DiaryTransactionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryTransactionCard.swift; sourceTree = "<group>"; };
 		EA20161F272034EB004432EC /* TrendMyStocks 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 11.xcdatamodel"; sourceTree = "<group>"; };
+		EA21B45D29CB53CF00E4CC99 /* FinHealthListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinHealthListView.swift; sourceTree = "<group>"; };
 		EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCircle.swift; sourceTree = "<group>"; };
 		EA2CF5DE277B42BD00FE2FB9 /* Backup Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Backup Manager.swift"; path = "Bulls'N'Bears/Backup Manager.swift"; sourceTree = SOURCE_ROOT; };
-		EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = "/Users/adav/Dropbox/IOS Xcode Projects/Bulls'N'Bears/Bulls'N'Bears/ErrorList/ErrorLogListCell.swift"; sourceTree = "<absolute>"; };
 		EA3207EF25EEA13200A6A6AB /* ValueListRatingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueListRatingCell.swift; sourceTree = "<group>"; };
 		EA3207F025EEA13200A6A6AB /* ValueListRatingCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ValueListRatingCell.xib; sourceTree = "<group>"; };
 		EA3207F625EEA15900A6A6AB /* ValueListTextEntryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueListTextEntryCell.swift; sourceTree = "<group>"; };
@@ -418,6 +431,8 @@
 		EA84A12029709FED000A1957 /* YChartsScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YChartsScraper.swift; sourceTree = "<group>"; };
 		EA84A1222971E8F5000A1957 /* TSScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TSScraper.swift; sourceTree = "<group>"; };
 		EA84A1242971EC6C000A1957 /* MacrotrendsScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacrotrendsScraper.swift; sourceTree = "<group>"; };
+		EA8DB1B029CF77F1006A371A /* FinHealthListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinHealthListController.swift; sourceTree = "<group>"; };
+		EA8DB1B229D0D4DB006A371A /* MultipleHealthChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipleHealthChart.swift; sourceTree = "<group>"; };
 		EA96EB5129B0F7D2004B0094 /* FraBoScraper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FraBoScraper.swift; sourceTree = "<group>"; };
 		EA9D7398264432C300672762 /* TrendIconView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TrendIconView2.swift; path = "Bulls'N'Bears/TrendIconView2.swift"; sourceTree = SOURCE_ROOT; };
 		EAA099C32588020B00DBB93C /* CheckButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckButton.swift; sourceTree = "<group>"; };
@@ -447,6 +462,7 @@
 		EAB58D7E26F4C83300F70F9A /* TrendMyStocks 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 7.xcdatamodel"; sourceTree = "<group>"; };
 		EAB58D7F26F4CADE00F70F9A /* ShareTransactionDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTransactionDialog.swift; sourceTree = "<group>"; };
 		EAC0207129C9E5FC0091A7BB /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		EAC0207529CA12C30091A7BB /* HealthChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthChart.swift; sourceTree = "<group>"; };
 		EAC07D6525ACEE350045D83B /* ErrorListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorListVC.swift; sourceTree = "<group>"; };
 		EAC0F15825FA7EAF00AD9E29 /* TrendMyStocks 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 4.xcdatamodel"; sourceTree = "<group>"; };
 		EAC19046257641160030B331 /* Bulls'N'Bears.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bulls'N'Bears.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -532,6 +548,13 @@
 		EAFCB97C25C9A4060029AA4F /* ValuationSummaryTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationSummaryTVC.swift; sourceTree = SOURCE_ROOT; };
 		EAFCB98625C9A4DE0029AA4F /* ValuationSummaryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationSummaryCell.swift; sourceTree = "<group>"; };
 		EAFCB98725C9A4DE0029AA4F /* ValuationSummaryCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ValuationSummaryCell.xib; sourceTree = "<group>"; };
+		FA2636EE2AF532EB00E4EB18 /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = ../ErrorLogListCell.swift; sourceTree = "<group>"; };
+		FA2D0DE52B24D10700DB77D2 /* Bulls'N'Bears.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Bulls'N'Bears.entitlements"; sourceTree = "<group>"; };
+		FA9356DC2B2264BA000A9B9B /* TrendMyStocks 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 16.xcdatamodel"; sourceTree = "<group>"; };
+		FAA7AE8A2B2B94150079DBDA /* ImportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImportManager.swift; path = "Bulls'N'Bears/ImportManager.swift"; sourceTree = SOURCE_ROOT; };
+		FAF8CD7E2B29FD68004B5C82 /* BNB Model 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "BNB Model 17.xcdatamodel"; sourceTree = "<group>"; };
+		FAF8CD7F2B29FEBA004B5C82 /* HealthData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HealthData+CoreDataClass.swift"; sourceTree = "<group>"; };
+		FAF8CD802B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HealthData+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -568,6 +591,28 @@
 				EA0F889B2639575B009C980F /* ComparisonCell.swift */,
 			);
 			path = "Comparison Views";
+			sourceTree = "<group>";
+		};
+		EA8DB1B429D2122C006A371A /* HealthViews SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				EA21B45D29CB53CF00E4CC99 /* FinHealthListView.swift */,
+				EA8DB1B029CF77F1006A371A /* FinHealthListController.swift */,
+				EAC0207529CA12C30091A7BB /* HealthChart.swift */,
+				EA8DB1B229D0D4DB006A371A /* MultipleHealthChart.swift */,
+			);
+			path = "HealthViews SwiftUI";
+			sourceTree = "<group>";
+		};
+		EA8DB1B529D21275006A371A /* HeathViews UIKit */ = {
+			isa = PBXGroup;
+			children = (
+				EACBFD5528E9F4740066D36B /* FinHealthTVC.swift */,
+				EA7023CB28F8317100048679 /* FinHealthController.swift */,
+				EACBFD5728E9F4980066D36B /* FinHealthCell.swift */,
+				EACBFD5828E9F4980066D36B /* FinHealthCell.xib */,
+			);
+			path = "HeathViews UIKit";
 			sourceTree = "<group>";
 		};
 		EAA69FA6261221B10067EE1A /* Research Views */ = {
@@ -640,6 +685,8 @@
 		EAC2FC2D25A0B33B0060F387 /* Model Files */ = {
 			isa = PBXGroup;
 			children = (
+				FAF8CD7F2B29FEBA004B5C82 /* HealthData+CoreDataClass.swift */,
+				FAF8CD802B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift */,
 				EA0366B6296D8C7B009772B9 /* Share+CoreDataClass.swift */,
 				EA0366B7296D8C7B009772B9 /* Share+CoreDataProperties.swift */,
 				EA774902296CB90400469053 /* Key_stats+CoreDataClass.swift */,
@@ -678,6 +725,7 @@
 		EAC2FCA025A256B80060F387 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				FAA7AE8A2B2B94150079DBDA /* ImportManager.swift */,
 				EAF8CE01296B424A0069D77D /* UpdateManager.swift */,
 				EAEF8D2828EC447200102DC8 /* DatesManager.swift */,
 				EA2CF5DE277B42BD00FE2FB9 /* Backup Manager.swift */,
@@ -694,7 +742,6 @@
 				EA736CCC25D7C8FF007FC981 /* ValuationDataCleaner.swift */,
 				EA51A9BF2632FD3200C857A8 /* CitationsManager.swift */,
 				EA5FDBE225B1EE34008918C8 /* AlertController.swift */,
-				EAF5D74225B06F2E00E7A681 /* Extensions.swift */,
 				EAAA06AF25AA01A00077A972 /* ErrorController.swift */,
 				EAD835DF25DC06EC0015C93A /* Calculator.swift */,
 				EAA69F72260E52550067EE1A /* GrowthCategory.swift */,
@@ -749,12 +796,13 @@
 		EAED148325A8CED20073C46F /* Bulls'N'Bears */ = {
 			isa = PBXGroup;
 			children = (
+				FA2D0DE52B24D10700DB77D2 /* Bulls'N'Bears.entitlements */,
 				EA6AACD726050457002DE9DF /* MAC_D.swift */,
 				EAD921622607D0CA008312E0 /* StochasticOscillator.swift */,
 				EA06251225D079310015FA6E /* DownloadProgressView.xib */,
 				EA06251925D07A230015FA6E /* DownloadProgressView.swift */,
-				EA2DB58325ACF448007AFB1F /* ErrorLogListCell.swift */,
 				EAC07D6525ACEE350045D83B /* ErrorListVC.swift */,
+				FA2636EE2AF532EB00E4EB18 /* ErrorLogListCell.swift */,
 				EAEA758B25ACF53F008EEC05 /* ErrorLogListCell.xib */,
 				EAAB7BD02753E85F00295DA7 /* Settings View */,
 				EA0F8898263956FE009C980F /* Comparison Views */,
@@ -762,6 +810,8 @@
 				EADA38EC271316CD00B294E3 /* Diary Files */,
 				EAFD825025A4D2D800D27566 /* Main Display Files */,
 				EAD835F825DC156C0015C93A /* WB Valuation */,
+				EA8DB1B529D21275006A371A /* HeathViews UIKit */,
+				EA8DB1B429D2122C006A371A /* HealthViews SwiftUI */,
 				EAFD824925A4D2C000D27566 /* DCFValuation FIles */,
 				EACF43322582D4C800221CEB /* DocumentBrowserViewController.swift */,
 				EAC0207029C9E5B50091A7BB /* App Files */,
@@ -769,6 +819,7 @@
 				EAC19057257641180030B331 /* LaunchScreen.storyboard */,
 				EAC1905A257641180030B331 /* Info.plist */,
 				EAC2FCA025A256B80060F387 /* Controllers */,
+				FA0BB3192B31AFC2005BC6A5 /* Extensions */,
 				EAC2FC2D25A0B33B0060F387 /* Model Files */,
 			);
 			path = "Bulls'N'Bears";
@@ -836,13 +887,17 @@
 				EAD921672607D980008312E0 /* StochastikOscillatorView.swift */,
 				EA3DF0C3260A1184001A0098 /* LineCrossingSignal.swift */,
 				EA225B1C25F3DE9700871D7D /* ScoreCircle.swift */,
-				EACBFD5528E9F4740066D36B /* FinHealthTVC.swift */,
-				EA7023CB28F8317100048679 /* FinHealthController.swift */,
-				EACBFD5728E9F4980066D36B /* FinHealthCell.swift */,
-				EACBFD5828E9F4980066D36B /* FinHealthCell.xib */,
 				EACBFD5D28E9FFB80066D36B /* ATFChart.swift */,
 			);
 			path = "Main Display Files";
+			sourceTree = "<group>";
+		};
+		FA0BB3192B31AFC2005BC6A5 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				EAF5D74225B06F2E00E7A681 /* Extensions.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -908,8 +963,9 @@
 		EAC1903E257641160030B331 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1220;
-				LastUpgradeCheck = 1220;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					EAC19045257641160030B331 = {
 						CreatedOnToolsVersion = 12.2;
@@ -1058,7 +1114,6 @@
 				EAC5FB1826FCF53400419CA7 /* ChartLegendView.swift in Sources */,
 				EAA548B92734302F0083808A /* WebPageScraper2.swift in Sources */,
 				EA774904296CB90400469053 /* Key_stats+CoreDataClass.swift in Sources */,
-				EA2DB58425ACF448007AFB1F /* ErrorLogListCell.swift in Sources */,
 				EAC190D52576731B0030B331 /* StockChartVC.swift in Sources */,
 				EAC190EA2577E2E20030B331 /* ChartContainerView.swift in Sources */,
 				EA1F86D725DC247C006791BD /* WBValuationController.swift in Sources */,
@@ -1068,20 +1123,25 @@
 				EA4B5F1725E2B6D40070CC70 /* ValueChart.swift in Sources */,
 				EA0F889E263959D6009C980F /* ComparisonController.swift in Sources */,
 				EAC07D6625ACEE350045D83B /* ErrorListVC.swift in Sources */,
+				EA21B45E29CB53CF00E4CC99 /* FinHealthListView.swift in Sources */,
 				EAAB7BD22753E88B00295DA7 /* SettingsTVC.swift in Sources */,
 				EAD921682607D980008312E0 /* StochastikOscillatorView.swift in Sources */,
 				EAF8CDD2296B3DAB0069D77D /* Balance_sheet+CoreDataProperties.swift in Sources */,
 				EACBFD5E28E9FFB80066D36B /* ATFChart.swift in Sources */,
+				FAA7AE8B2B2B94150079DBDA /* ImportManager.swift in Sources */,
 				EA84A1252971EC6C000A1957 /* MacrotrendsScraper.swift in Sources */,
 				EA32080A25EED93A00A6A6AB /* UserEvaluation+CoreDataClass.swift in Sources */,
 				EACF43332582D4C800221CEB /* DocumentBrowserViewController.swift in Sources */,
+				FAF8CD812B29FEBA004B5C82 /* HealthData+CoreDataClass.swift in Sources */,
 				EAAB7BD72753E9A700295DA7 /* SettingsCell.swift in Sources */,
 				EAF8CDE4296B3DAB0069D77D /* Ratios+CoreDataProperties.swift in Sources */,
 				EA3DF0C4260A1184001A0098 /* LineCrossingSignal.swift in Sources */,
 				EAF5D74325B06F2E00E7A681 /* Extensions.swift in Sources */,
 				EA0F889A26395745009C980F /* ComparisonVC.swift in Sources */,
+				FAF8CD842B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift in Sources */,
 				EAC1908F257642F20030B331 /* CSVImporter.swift in Sources */,
 				EAF8CDF0296B3DAB0069D77D /* Company_Info+CoreDataProperties.swift in Sources */,
+				EAC0207629CA12C30091A7BB /* HealthChart.swift in Sources */,
 				EA7023CC28F8317100048679 /* FinHealthController.swift in Sources */,
 				EA163F77258BA85E000974AB /* StockTrend.swift in Sources */,
 				EA79790225E6F24200663644 /* GradientColorFinder.swift in Sources */,
@@ -1100,6 +1160,7 @@
 				EA3DF0C9260B8C5A001A0098 /* BuySellView.swift in Sources */,
 				EAA099C42588020B00DBB93C /* CheckButton.swift in Sources */,
 				EA51A9C02632FD3200C857A8 /* CitationsManager.swift in Sources */,
+				EA8DB1B129CF77F1006A371A /* FinHealthListController.swift in Sources */,
 				EA736CDE25D7E72C007FC981 /* ValuationErrorsTVC.swift in Sources */,
 				EAC2FC4225A0B76B0060F387 /* Rule1Valuation+CoreDataClass.swift in Sources */,
 				EA3207F825EEA15900A6A6AB /* ValueListTextEntryCell.swift in Sources */,
@@ -1138,6 +1199,7 @@
 				EAEF8D2928EC447200102DC8 /* DatesManager.swift in Sources */,
 				EAF5D73225AE1A8000E7A681 /* CombinedValuationController.swift in Sources */,
 				EA0E2F1B2624E4AA00602BEE /* SortSelectorTVC.swift in Sources */,
+				FA2636EF2AF532EB00E4EB18 /* ErrorLogListCell.swift in Sources */,
 				EA0F88A02639D03C009C980F /* ManualSearchVC.swift in Sources */,
 				EAF8CDED296B3DAB0069D77D /* Company_Info+CoreDataClass.swift in Sources */,
 				EA32080B25EED93A00A6A6AB /* UserEvaluation+CoreDataProperties.swift in Sources */,
@@ -1180,6 +1242,7 @@
 				EAC190F42577E3B60030B331 /* ChartView.swift in Sources */,
 				EAD34D5626545785004859A5 /* CategorySelectionCell.swift in Sources */,
 				EAC2FC6325A232780060F387 /* ValuationChooser.swift in Sources */,
+				EA8DB1B329D0D4DB006A371A /* MultipleHealthChart.swift in Sources */,
 				EAA69F73260E52550067EE1A /* GrowthCategory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1245,6 +1308,7 @@
 				EAC2FC7C25A240290060F387 /* ValuationListViewController.swift in Sources */,
 				EAB58D8126F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */,
 				EAFCB97E25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
+				FAF8CD822B29FEBA004B5C82 /* HealthData+CoreDataClass.swift in Sources */,
 				EAF8CDD3296B3DAB0069D77D /* Balance_sheet+CoreDataProperties.swift in Sources */,
 				EAF8CDFC296B411C0069D77D /* Income_statement+CoreDataClass.swift in Sources */,
 				EAC2FC4025A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
@@ -1253,6 +1317,7 @@
 				EAF8CDE5296B3DAB0069D77D /* Ratios+CoreDataProperties.swift in Sources */,
 				EA0366BC296D8C7B009772B9 /* Share+CoreDataProperties.swift in Sources */,
 				EA774905296CB90400469053 /* Key_stats+CoreDataClass.swift in Sources */,
+				FA2636F02AF532EB00E4EB18 /* ErrorLogListCell.swift in Sources */,
 				EAA69F9626121CA30067EE1A /* StockResearch+CoreDataProperties.swift in Sources */,
 				EADA38EF2713179C00B294E3 /* Diary_StocksListVC.swift in Sources */,
 				EA6AACE026053294002DE9DF /* MACD_View.swift in Sources */,
@@ -1260,6 +1325,7 @@
 				EA20161D2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */,
 				EA2016152715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
 				EAAB7BD82753E9A700295DA7 /* SettingsCell.swift in Sources */,
+				FAF8CD852B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1324,6 +1390,7 @@
 				EAC2FC7D25A240290060F387 /* ValuationListViewController.swift in Sources */,
 				EAB58D8226F4CADE00F70F9A /* ShareTransactionDialog.swift in Sources */,
 				EAFCB97F25C9A4060029AA4F /* ValuationSummaryTVC.swift in Sources */,
+				FAF8CD832B29FEBA004B5C82 /* HealthData+CoreDataClass.swift in Sources */,
 				EAF8CDD4296B3DAB0069D77D /* Balance_sheet+CoreDataProperties.swift in Sources */,
 				EAF8CDFD296B411C0069D77D /* Income_statement+CoreDataClass.swift in Sources */,
 				EAC2FC4125A0B76B0060F387 /* DCFValuation+CoreDataProperties.swift in Sources */,
@@ -1332,6 +1399,7 @@
 				EAF8CDE6296B3DAB0069D77D /* Ratios+CoreDataProperties.swift in Sources */,
 				EA0366BD296D8C7B009772B9 /* Share+CoreDataProperties.swift in Sources */,
 				EA774906296CB90400469053 /* Key_stats+CoreDataClass.swift in Sources */,
+				FA2636F12AF532EB00E4EB18 /* ErrorLogListCell.swift in Sources */,
 				EAA69F9726121CA30067EE1A /* StockResearch+CoreDataProperties.swift in Sources */,
 				EADA38F02713179C00B294E3 /* Diary_StocksListVC.swift in Sources */,
 				EA6AACE126053294002DE9DF /* MACD_View.swift in Sources */,
@@ -1339,6 +1407,7 @@
 				EA20161E2715EEBF004432EC /* DiaryTransactionCard.swift in Sources */,
 				EA2016162715B7CC004432EC /* DiaryDetailVC.swift in Sources */,
 				EAAB7BD92753E9A700295DA7 /* SettingsCell.swift in Sources */,
+				FAF8CD862B29FEBA004B5C82 /* HealthData+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1414,6 +1483,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1428,7 +1498,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1476,6 +1546,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1484,7 +1555,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1500,18 +1571,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Bulls'N'Bears/Bulls'N'Bears.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1867;
 				DEVELOPMENT_TEAM = 9T25ACNCQ7;
 				INFOPLIST_FILE = "Bulls'N'Bears/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bulls N Bears";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8;
+				MARKETING_VERSION = 0.83;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1524,18 +1596,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Bulls'N'Bears/Bulls'N'Bears.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1867;
 				DEVELOPMENT_TEAM = 9T25ACNCQ7;
 				INFOPLIST_FILE = "Bulls'N'Bears/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bulls N Bears";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8;
+				MARKETING_VERSION = 0.83;
 				PRODUCT_BUNDLE_IDENTIFIER = co.uk.apptoolfactory.BullsNBears;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1672,6 +1745,8 @@
 		EAC19052257641160030B331 /* TrendMyStocks.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				FAF8CD7E2B29FD68004B5C82 /* BNB Model 17.xcdatamodel */,
+				FA9356DC2B2264BA000A9B9B /* TrendMyStocks 16.xcdatamodel */,
 				EA61AFEB2906F4B200842285 /* TrendMyStocks 15.xcdatamodel */,
 				EA6B9E8D27D0F9F2002A55AD /* TrendMyStocks 14.xcdatamodel */,
 				EAA1884827A1A719009AC214 /* TrendMyStocks 13.xcdatamodel */,
@@ -1688,7 +1763,7 @@
 				EAD835C225DB02030015C93A /* TrendMyStocks 2.xcdatamodel */,
 				EAC19053257641160030B331 /* TrendMyStocks.xcdatamodel */,
 			);
-			currentVersion = EA61AFEB2906F4B200842285 /* TrendMyStocks 15.xcdatamodel */;
+			currentVersion = FAF8CD7E2B29FD68004B5C82 /* BNB Model 17.xcdatamodel */;
 			path = TrendMyStocks.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

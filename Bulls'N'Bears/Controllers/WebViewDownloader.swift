@@ -42,7 +42,7 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
             return formatter
         }()
         
-        let expiry$ = dateFormatter.string(from: Date().addingTimeInterval(30*24*3600))
+//        let expiry$ = dateFormatter.string(from: Date().addingTimeInterval(30*24*3600))
         
         let acceptanceCookie = HTTPCookie(properties: [.path: "/", .name: "cookie-settings-v3", .version: "1", .value: "%7B%22isFunctionalCookieCategoryAccepted%22%3Atrue%2C%22isAdvertisingCookieCategoryAccepted%22%3Atrue%2C%22isTrackingCookieCategoryAccepted%22%3Atrue%2C%22isCookiePolicyAccepted%22%3Atrue%2C%22isCookiePolicyDeclined%22%3Afalse%7D", .domain: "www.boerse-frankfurt.de", .sameSitePolicy: "lax", .secure: "FALSE", .expires: "2024-03-03 14:40:56 +0000"] ) // "2024-03-03 14:40:56 +0000"
         config.websiteDataStore.httpCookieStore.setCookie(acceptanceCookie!)
@@ -62,6 +62,7 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
             return
         }
         
+        self.configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         self.progressDelegate = progressDelegate
         
         let nameParts = companyName.split(separator: " ")
@@ -76,7 +77,6 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
             count += 1
         }
 
-        //https://www.boerse-frankfurt.de/equity/
         guard let url = WebViewDownloader.getURL(domain: domain,companyName: webname, pageName: pageName) else {
             return }
         
@@ -84,7 +84,6 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
         self.shareID = shareID!
         self.hostingDelegate = delegate
         hostingDelegate?.view.addSubview(self)
-//        hostingDelegate?.navigationController?.view.insertSubview(self, belowSubview: hostingDelegate!.navigationController!.view)
         
         self.navigationDelegate = self
         self.uiDelegate = self
@@ -100,23 +99,37 @@ class WebViewDownloader: WKWebView, WKNavigationDelegate, WKUIDelegate {
             if host.starts(with: "www.boerse-frankfurt.de") {
                 return .allow
             }
+            else if host.starts(with: "www.macrotrends.net") {
+                return .allow
+            }
+            else if host.starts(with: "www.cloudflare.com") {
+                return .allow
+            }
         }
         return .cancel
     }
     
+    func webView(_ webView: WKWebView, respondTo challenge: URLAuthenticationChallenge) async -> (URLSession.AuthChallengeDisposition, URLCredential?) {
+        
+        let acd = URLSession.AuthChallengeDisposition.performDefaultHandling
+        return (acd, nil)
+        
+    }
+ 
+    
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         
-        //outerHTML
-        webView.evaluateJavaScript("document.documentElement.innerHTML.toString()") { [self] (result, error) in
-            
-            if let error = error {
-                self.downloadFailed(error: error, description: nil)
-            }
-            if let result = result as? String {
-//                print("============ FraBo Webview navigation finished, text=\n\(result)")
-                self.downloadComplete(html: result)
-            } else {
-                self.downloadFailed(error: nil, description: "downloaded non-html result \(String(describing: result))")
+        DispatchQueue.main.async {
+            webView.evaluateJavaScript("document.documentElement.innerHTML.toString()") { [self] (result, error) in
+                
+                if let error = error {
+                    self.downloadFailed(error: error, description: nil)
+                }
+                if let result = result as? String {
+                    self.downloadComplete(html: result)
+                } else {
+                    self.downloadFailed(error: nil, description: "downloaded non-html result \(String(describing: result))")
+                }
             }
         }
     }

@@ -40,7 +40,6 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         downloadButtonConfiguration.titleAlignment = .center
         downloadButtonConfiguration.cornerStyle = .small
         let db = UIButton(configuration: downloadButtonConfiguration, primaryAction: UIAction() {_ in
-//            self.downloadButtonConfiguration.showsActivityIndicator = true
             self.downloadValuationData()
         })
         
@@ -61,26 +60,9 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
     }
     // MARK: - Table view data source
-    
-//    deinit {
-//        NotificationCenter.default.removeObserver(self)
-//    }
-    
+        
     override func viewDidLayoutSubviews() {
         
-//        if showDownloadCompleteMessage {
-//            var title = String()
-//            var message = String()
-//            if valuationMethod == .dcf {
-//                title = "Stock valuation data downloaded successfully from Yahoo"
-//                message = "Check the numbers, and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nSave after adjusting, using the blue button at the bottom!"
-//            } else {
-//                title = "Stock valuation data downloaded successfully from MacroTrends and Yahoo"
-//                message = "Check the numbers and adapt the two 'adjusted sales growth predictions' at the bottom of this list.\n\nSave after adjusting, using the blue button at the bottom!"
-//            }
-//            AlertController.shared().showDialog(title: title, alertMessage: message, viewController: self)
-//            showDownloadCompleteMessage = false
-//        }
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -101,10 +83,7 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "valuationTableViewCell", for: indexPath) as! ValuationTableViewCell
-
         
-//        let info = controller.cellInfo(indexPath: indexPath)
-//        cell.configure(info: info, indexPath: indexPath, method: valuationMethod, delegate: controller)
         cell.configureNew(indexPath: indexPath, data: controller.cellInfoNew(indexPath: indexPath), method: valuationMethod, delegate: controller)
         
         return cell
@@ -117,8 +96,6 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
             else if [7].contains(section) { return 40 }
             else { return (UIDevice().userInterfaceIdiom == .pad) ? 70 : 60 }
         } else {
-//            if [0,2,7,8,9,10,11,12].contains(section) { return 70 }
-//            else {  return (UIDevice().userInterfaceIdiom == .pad) ? 40 : 60 }
             return 50
         }
        
@@ -176,67 +153,75 @@ class ValuationListViewController: UITableViewController, AlertViewDelegate {
         subTitle.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
         subTitle.trailingAnchor.constraint(greaterThanOrEqualTo: titleLabel.leadingAnchor, constant: 10).isActive = true
         
-//        if section == 0 {
-//            var config = UIButton.Configuration.borderedTinted()
-//            if newDataDownloaded {
-//                config.image = UIImage(systemName: "square.and.arrow.down.fill")
-//            } else {
-//                config.image = UIImage(systemName: "arrow.down.square")
-//            }
-////            config.title = "Download"
-//            let donwloadButton = UIButton(configuration: config, primaryAction: nil)
-//            if newDataDownloaded {
-//                donwloadButton.addTarget(self, action: #selector(completeValuation), for: .touchUpInside)
-//            } else {
-//                donwloadButton.addTarget(self, action: #selector(downloadValuationData), for: .touchUpInside)
-//            }
-//            donwloadButton.translatesAutoresizingMaskIntoConstraints = false
-//            header.addSubview(donwloadButton)
-//
-//            donwloadButton.topAnchor.constraint(equalTo: titleLabel.topAnchor,constant: 5).isActive = true
-//            donwloadButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor,constant: -5).isActive = true
-//        }
-        
+        if section > 0 {
+            var config = UIButton.Configuration.borderedTinted()
+            config.image = UIImage(systemName: "clear.fill")
+//            config.title = "Reset"
+            
+            let resetAction = UIAction(title: "") { [self] (action) in
+                switch section {
+                case 1:
+                    // predicted growth and PE
+                    share.analysis?.adjFutureGrowthRate = nil
+                    share.analysis?.future_growthNextYear = nil
+                    share.analysis?.adjForwardPE = nil
+                    share.analysis?.forwardPE = nil
+                    share.ratios?.pe_ratios = nil
+                case 2:
+                    //BVPS
+                    share.ratios?.bvps = nil
+                case 3:
+                    //EPS
+                    share.income_statement?.eps_annual = nil
+                case 4:
+                    //Revenue
+                    share.income_statement?.revenue = nil
+                case 5:
+                    //OCF
+                    share.ratios?.ocfPerShare = nil
+                case 6:
+                    //ROI
+                    share.ratios?.roi = nil
+                case 7:
+                    //PE min max
+                    share.pe_max = 0
+                    share.pe_min = 0
+                case 8:
+                    //Growth prediction
+                    share.analysis?.future_growthNextYear = nil
+                case 9:
+                    //Adj. Growth prediction
+                    share.analysis?.adjFutureGrowthRate = nil
+                case 10:
+                    //DEbt
+                    share.balance_sheet?.debt_longTerm = nil
+                case 11:
+                    //Insider trading
+                    share.key_stats?.insiderSales = nil
+                    share.key_stats?.insiderPurchases = nil
+                    share.key_stats?.insiderShares = nil
+               default:
+                    print("default")
+                }
+                share.save()
+                self.tableView.reloadSections([section], with: .automatic)
+            }
+            
+            let resetButton = UIButton(configuration: config, primaryAction: resetAction)
+            resetButton.translatesAutoresizingMaskIntoConstraints = false
+            header.addSubview(resetButton)
+
+            resetButton.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
+            resetButton.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
+        }
         return header
         
     }
     
-
-    /*
     @objc
-    func completeValuation() {
+    func clearButtonAction(sender: UIButton) {
         
-        // after 'save' button tapped in Val List VC
-        
-        if let alerts = controller.checkValuation() {
-            var message = alerts.first!
-            for i in 1..<alerts.count {
-                message = message + "\n\n" + alerts[i]
-            }
-            AlertController.shared().showDialog(title: "Caution" , alertMessage: message, viewController: self ,delegate: self)
-        } else {
-            // important - these will otherwise stay in memory
-            if let analyser = self.controller.webAnalyser {
-                NotificationCenter.default.removeObserver(analyser)
-                NotificationCenter.default.removeObserver(self)
-            }
-
-            if valuationMethod == .rule1 {
-                
-                if let validDelegate = delegate {
-                    // separate mid-screen window
-                    validDelegate.valuationComplete(listView: self, r1Valuation: share.rule1Valuation)
-                }
-            }
-            else {
-                if let validDelegate = delegate {
-                    // separate mid-screen window
-                    validDelegate.valuationComplete(listView: self, r1Valuation: nil)
-                }
-            }
-        }
     }
-     */
     
     @objc
     func downloadValuationData() {

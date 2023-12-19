@@ -37,7 +37,7 @@ extension DCFValuation {
     @NSManaged public var ivalueTrend: Data?
     @NSManaged public var share: Share?
 //    @NSManaged public var alerts: [String]?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension DCFValuation : Identifiable {

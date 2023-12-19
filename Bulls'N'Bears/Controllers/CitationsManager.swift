@@ -96,12 +96,18 @@ class CitationsManager {
         let bg7 = "The shares of companies too small for big funds are always available on sale."
         let bg8 = "Spin-offs are a wonderful opportunity for investors who are not constrained by questions of market capitalisation."
         
+        let al1 = "Emotions have no place in investing.\nYou are generally better off doing the opposite of what you 'feel' you should be doing"
+        let al2 = "'Market timing' is impossible - managing risk exposure is logical and possible.\nInvestment is about discipline and patience. Lacking either one can be destructive to your investment goals"
+        let al3 = "No investment strategy works all the time. The trick is knowing the difference between a bad investment strategy and one temporarily out of favor"
+
+        
         let plCitations = [pL0, pL1, pL2,pL3,pL4, pL5, pL6, pL7, pL8, pL9, pL10, pL11, pL12, pL13, pL14, pL15, pL16, pL17, pL18, pL19, pL20, pL21, pL22 , pL23, pL24, pL25, pL26, pL27, pL28]
         let pl1Citations = [pL1_0, pL1_1, pL1_2, pL1_3, pL1_4, pL1_5]
         let wbCitations = [wb0, wb1, wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9, wb10,wb11,wb12, wb13, wb14, wb15, wb16, wb17, wb18]
         let jmCitations = [jm1,jm2, jm3, jm4, jm5, jm6, jm7, jm8, jm9, jm10,jm11,jm12,jm13,jm14,jm15, jm16]
         let bgCitations = [bg1, bg2, bg3, bg4, bg5, bg6, bg7, bg8]
-        
+        let alCitations = [al1, al2, al3]
+
         //
         var userCitations = [String]()
         let reqeust = NSFetchRequest<ShareTransaction>(entityName: "ShareTransaction")
@@ -124,6 +130,7 @@ class CitationsManager {
         allCitations.append(contentsOf: pl1Citations)
         allCitations.append(contentsOf: jmCitations)
         allCitations.append(contentsOf: bgCitations)
+        allCitations.append(contentsOf: alCitations)
         allCitations.append(contentsOf: userCitations)
 
         if let lastCitation = UserDefaults.standard.value(forKey: userDefaultTerms.lastCitation) as? String {
@@ -145,6 +152,7 @@ class CitationsManager {
         let tributeWB = "\n\nMary Buffett and David Clark\n'Warren Buffett and the Interpretation of Financial Statements'\nSimon & Schuster, 2008"
         let tributeJM = "\n\nJames Mortimer\n'The Little Book of Behavioural Investing'\nJohn Wiley & Sons Ltd,  2010"
         let tributeBG = "\n\nBruce Greenwald\n'Value Investing (2nd Ed)\nJohn Wiley & Sons Ltd,  2021"
+        let tributeAL = "\n\nSeeking Alpha\n'2023"
         let tributeUser = "\n\nYou, in your Lessons from Buying or Selling"
 
         var tribute = String()
@@ -154,6 +162,7 @@ class CitationsManager {
         let step3Count = step2Count + wbCitations.count
         let step4Count = step3Count + jmCitations.count
         let step5Count = step4Count + bgCitations.count
+        let step6Count = step5Count + alCitations.count
 //        let step6Count = step5Count + userCitations.count
 
         
@@ -168,7 +177,9 @@ class CitationsManager {
             tribute = tributeJM
         case step4Count..<step5Count:
             tribute = tributeBG
-        case step5Count...:
+        case step5Count..<step6Count:
+            tribute = tributeAL
+        case step6Count...:
             tribute = tributeUser
         default:
             tribute = "missing"

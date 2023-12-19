@@ -7,6 +7,24 @@
 
 import UIKit
 import CoreData
+import UserNotifications
+
+let localBackupFolderURL: URL? = {
+    
+    let applicationSupportDirectoryPaths = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true)
+    let localFolderPath = applicationSupportDirectoryPaths[0] + "/LocalBackups"
+    if FileManager.default.fileExists(atPath: localFolderPath) {
+        return URL(fileURLWithPath: localFolderPath)
+    } else {
+        do {
+            try FileManager.default.createDirectory(atPath: localFolderPath, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            print("a local Backup folder could not be created \(error.localizedDescription)")
+        }
+        return URL(fileURLWithPath: localFolderPath)
+    }
+}()
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+
         setUserDefaults()
         print("app folder path is \(NSHomeDirectory())")
         return true
@@ -59,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
     }
+
         
     // MARK: - Core Data stack
 
@@ -120,7 +139,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         return true
     }
-
+    
 
 }
 

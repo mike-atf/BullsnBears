@@ -8,7 +8,6 @@
 import UIKit
 import CoreData
 
-//financialsScore [adj/futureGrowthRate,revenue, retEarnings, EPS_annual, grossProfit, netIncome, divYield, pe ratios, capEx, ROE, opCashFLow, LTdebt, SGA, R&D]
 
 enum DownloadOptions {
     case allPossible
@@ -188,14 +187,9 @@ class MacrotrendsScraper {
             ErrorController.addInternalError(errorLocation: #function, errorInfo: "failure to create MT download jobs")
             return
         }
-        
-//        if let delegate = downloadRedirectDelegate {
-//            NotificationCenter.default.addObserver(delegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
-//        }
 
         var labelledDatedResults = [Labelled_DatedValues]()
         var sectionCount = 0
-//        let downloader = Downloader()
         
         for job in jobs {
             
@@ -245,60 +239,13 @@ class MacrotrendsScraper {
 
         }
         
-        
-// Historical PE and EPS with dates
-        
-//        let peEPSJob = MTDownloadJobs(pageNameForURL: "pe-ratio", symbol: symbol, shortName: sn, rowTitles: ["none"])
-//        var pe_datedValues: [DatedValue]?
-//        var eps_datedValues: [DatedValue]?
-//        if let url = peEPSJob.url {
-//            let perAndEPSvalues = await MacrotrendsScraper.getHxEPSandPEData(url: url, companyName: sn, until: nil, downloadRedirectDelegate: downloadRedirectDelegate)
-//
-//            pe_datedValues = perAndEPSvalues?.compactMap({ element in
-//                return DatedValue(date: element.date, value: element.peRatio)
-//            })
-//            if pe_datedValues?.count ?? 0 > 0 {
-//                labelledDatedResults.append(Labelled_DatedValues(label: "PE Ratio Historical data", datedValues: pe_datedValues!))
-//            }
-//            eps_datedValues = perAndEPSvalues?.compactMap({ element in
-//                return DatedValue(date: element.date, value: element.epsTTM)
-//            })
-//            if eps_datedValues?.count ?? 0 > 0 {
-//                labelledDatedResults.append(Labelled_DatedValues(label: "eps - earnings per share", datedValues: eps_datedValues!))
-//            }
-//        }
-//
-//        progressDelegate?.taskCompleted()
-            
-// Historical stock prices
-//        let historicalPricesJob = MTDownloadJobs(pageNameForURL: "stock-price-history", symbol: symbol, shortName: sn, rowTitles: ["none"])
-//        if let url = historicalPricesJob.url {
-//
-//            do {
-//                if let htmlText = await Downloader.downloadDataNoThrow(url: url) {
-//
-//                    if let datedValues = try numbersFromColumn(html$: htmlText, tableHeader: "Historical Annual Stock Price Data</th>", targetColumnsFromLeft: [1]) {
-//                        labelledDatedResults.append(Labelled_DatedValues(label: "Historical average annual stock prices", datedValues: datedValues))
-//                    }
-//                }
-//            } catch  {
-//                ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "Error downloading historical price WB Valuation data: \(error.localizedDescription)")
-//           }
-//        }
-//
-//        progressDelegate?.taskCompleted()
-        
-        
-//        do {
+
             let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
             backgroundMoc.automaticallyMergesChangesFromParent = true
             
             if let bgShare = backgroundMoc.object(with: shareID) as? Share {
                 await bgShare.mergeInDownloadedData(labelledDatedValues: labelledDatedResults)
             }
-//        } catch {
-//            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "couldn't save background MOC")
-//        }
     }
 
     
@@ -475,7 +422,6 @@ class MacrotrendsScraper {
             var tableText = String()
             var tableHeaderTexts = [String]()
             var datedValues = [Dated_EPS_PER_Values]()
-//            let downloader = Downloader(task: .epsPER)
         
             if let delegate = downloadRedirectDelegate {
                 NotificationCenter.default.addObserver(delegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)

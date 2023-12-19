@@ -574,7 +574,9 @@ class YahooPageScraper {
         
     }
     
-    class func companyNameSearchOnPage(html: String) throws -> [String: String]? {
+    /// searching for company not included in offline dixtionary on Yahoo
+    /// if result is one company rather than list try finding direct compmnay data on page
+    class func companyNamesListSearchOnPage(html: String) throws -> [String: String]? {
         
         var pageText = html
 //        let sectionStart = "<span>Exchange"
@@ -586,7 +588,11 @@ class YahooPageScraper {
         let termEnd$ = "\""
 
         guard let tableStartIndex = pageText.range(of: tableStart$) else {
-            throw InternalError(location: #function, errorInfo: "did not find \(tableStart$)) on Yahoo company name search page", errorType: .htmlTableSequenceStartNotFound)
+            if let dict = YahooPageScraper.companyNameSearch(html: html) {
+                return dict
+            } else {
+                throw InternalError(location: #function, errorInfo: "did not find \(tableStart$)) on Yahoo company name search page", errorType: .htmlTableSequenceStartNotFound)
+            }
         }
         pageText.removeSubrange(...tableStartIndex.upperBound)
         
@@ -632,6 +638,43 @@ class YahooPageScraper {
         }
         
         return sharesFound
+        
+    }
+    
+    class func companyNameSearch(html: String) -> [String: String]? {
+        
+        let start$ = "<title>"
+        let end$ = "</title>"
+        
+        let symbolStart = " ("
+        let symbolEnd = ") "
+        
+        var pageText = html
+        
+        guard let startIndex = pageText.range(of: start$) else {
+            return nil
+        }
+
+        pageText.removeSubrange(..<startIndex.upperBound)
+        
+        guard let endIndex = pageText.range(of: end$) else {
+            return nil
+        }
+        pageText.removeSubrange(endIndex.lowerBound...)
+        
+        if let symbolStartIndex = pageText.range(of: symbolStart) {
+            let fullName = String(pageText[pageText.startIndex..<symbolStartIndex.lowerBound])
+            if let symbolEndIndex = pageText.range(of: symbolEnd) {
+                let symbol = String(pageText[symbolStartIndex.upperBound..<symbolEndIndex.lowerBound])
+                return [symbol:fullName]
+            }
+            else {
+                return ["missing": fullName]
+            }
+        }
+        
+        return nil
+        
         
     }
 

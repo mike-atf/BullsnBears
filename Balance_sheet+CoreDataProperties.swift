@@ -23,7 +23,7 @@ extension Balance_sheet {
     @NSManaged public var sh_equity: Data?
     @NSManaged public var retained_earnings: Data?
     @NSManaged public var share: Share?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension Balance_sheet : Identifiable {

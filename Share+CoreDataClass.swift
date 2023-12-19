@@ -9,8 +9,17 @@
 import UIKit
 import CoreData
 
+enum DecoderConfigurationError: Error {
+    case missingManagedObjectContext
+}
+
+extension CodingUserInfoKey {
+    static let managedObjectContext = CodingUserInfoKey(rawValue: "managedObjectContext")!
+}
+
+
 @objc(Share)
-public class Share: NSManagedObject {
+public class Share: NSManagedObject, Codable {
     
     var priceUpdateComplete: Bool?
     var prices: [PricePoint]?
@@ -36,6 +45,7 @@ public class Share: NSManagedObject {
     public override func awakeFromFetch() {
         priceUpdateComplete = false
         
+        
         if industry == nil {
             industry = "Unknown"
         }
@@ -43,10 +53,6 @@ public class Share: NSManagedObject {
         if sector == nil {
             sector = "Unknown"
         }
-        
-//        if moatCategory == nil {
-//            moatCategory = "NA"
-//        }
         
         if let date = self.research?.nextReportDate {
             if date < Date().addingTimeInterval(-quarter) {
@@ -66,7 +72,7 @@ public class Share: NSManagedObject {
     
     func save() {
     
-       let context = wbValuation?.managedObjectContext
+        let context = wbValuation?.managedObjectContext
         if context?.hasChanges ?? false {
             context?.perform {
                 do {
@@ -77,6 +83,166 @@ public class Share: NSManagedObject {
 
             }
         }
+    }
+    
+    // MARK: - coding
+    
+    enum CodingKeys: CodingKey {
+        
+        case beta
+        case creationDate
+        case dailyPrices
+        case dividendWDates
+        case employees
+        case pe_min
+        case pe_max
+        case exchange
+        case id
+        case industry
+        case isin
+        case lastLivePrice
+        case lastLivePriceDate
+        case macd
+        case moat
+        case name_long
+        case name_short
+        case purchaseStory
+        case return3y
+        case return10y
+        case sector
+        case symbol
+        case trend_DCFValue
+        case trend_healthScore
+        case trend_intrinsicValue
+        case trend_LynchScore
+        case trend_MoatScore
+        case trend_StickerPrice
+        case userEvaluationScore
+        case valueScore
+        case watchStatus
+        case analysis //relation
+        case balance_sheet //relation
+        case cash_flow //relation
+        case company_info //relation
+        case dcfValuation //relation
+        case income_statement //relation
+        case key_stats //relation
+        case ratios //relation
+        case research //relation
+        case rule1Valuation //relation
+        case transactions //relation
+        case wbValuation //relation
+        case healthData
+        case currency
+        case avgAnnualPrices
+    }
+
+    required convenience public init(from decoder: Decoder) throws {
+        
+        guard let context = decoder.userInfo[CodingUserInfoKey.managedObjectContext] as? NSManagedObjectContext else {
+            throw DecoderConfigurationError.missingManagedObjectContext
+        }
+        
+        self.init(context: context)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.beta = try container.decode(Double.self, forKey: .beta)
+        self.creationDate = try container.decode(Date.self, forKey: .creationDate)
+        self.dailyPrices = try container.decode(Data.self, forKey: .dailyPrices)
+        self.dividendWDates = try container.decodeIfPresent(Data.self, forKey: .dividendWDates)
+        self.employees = try container.decode(Double.self, forKey: .employees)
+        self.pe_min = try container.decode(Double.self, forKey: .pe_min)
+        self.pe_max = try container.decode(Double.self, forKey: .pe_max)
+        self.exchange = try container.decodeIfPresent(String.self, forKey: .exchange)
+        self.industry = try container.decodeIfPresent(String.self, forKey: .industry)
+        self.isin = try container.decodeIfPresent(String.self, forKey: .isin)
+        self.lastLivePrice = try container.decode(Double.self, forKey: .lastLivePrice)
+        self.lastLivePriceDate = try container.decodeIfPresent(Date.self, forKey: .lastLivePriceDate)
+        self.macd = try container.decodeIfPresent(Data.self, forKey: .macd)
+        self.moat = try container.decode(Double.self, forKey: .moat)
+        self.name_long = try container.decodeIfPresent(String.self, forKey: .name_long)
+        self.name_short = try container.decodeIfPresent(String.self, forKey: .name_short)
+        self.purchaseStory = try container.decodeIfPresent(String.self, forKey: .purchaseStory)
+        self.return3y = try container.decodeIfPresent(Double.self, forKey: .return3y) ?? 0.0
+        self.return10y = try container.decodeIfPresent(Double.self, forKey: .return10y) ?? 0.0
+        self.sector = try container.decodeIfPresent(String.self, forKey: .sector)
+        self.symbol = try container.decode(String.self, forKey: .symbol)
+        self.trend_DCFValue = try container.decodeIfPresent(Data.self, forKey: .trend_DCFValue)
+        self.trend_MoatScore = try container.decodeIfPresent(Data.self, forKey: .trend_MoatScore)
+        self.trend_healthScore = try container.decodeIfPresent(Data.self, forKey: .trend_healthScore)
+        self.trend_intrinsicValue = try container.decodeIfPresent(Data.self, forKey: .trend_intrinsicValue)
+        self.trend_LynchScore = try container.decodeIfPresent(Data.self, forKey: .trend_LynchScore)
+        self.trend_StickerPrice = try container.decodeIfPresent(Data.self, forKey: .trend_StickerPrice)
+        self.userEvaluationScore = try container.decode(Double.self, forKey: .userEvaluationScore)
+        self.valueScore = try container.decodeIfPresent(Double.self, forKey: .valueScore) ?? 0.0
+        self.watchStatus = try container.decode(Int16.self, forKey: .watchStatus)
+        self.currency = try container.decodeIfPresent(String.self, forKey: .currency)
+        self.avgAnnualPrices = try container.decodeIfPresent(Data.self, forKey: .avgAnnualPrices)
+
+        self.analysis = try container.decodeIfPresent(Analysis.self, forKey: .analysis)
+        self.balance_sheet = try container.decodeIfPresent(Balance_sheet.self, forKey: .balance_sheet)
+        self.cash_flow = try container.decodeIfPresent(Cash_flow.self, forKey: .cash_flow)
+        self.income_statement = try container.decodeIfPresent(Income_statement.self, forKey: .income_statement)
+        self.dcfValuation = try container.decodeIfPresent(DCFValuation.self, forKey: .dcfValuation)
+        self.key_stats = try container.decodeIfPresent(Key_stats.self, forKey: .key_stats)
+        self.ratios = try container.decodeIfPresent(Ratios.self, forKey: .ratios)
+        self.research = try container.decodeIfPresent(StockResearch.self, forKey: .research)
+        self.rule1Valuation = try container.decodeIfPresent(Rule1Valuation.self, forKey: .rule1Valuation)
+        self.transactions = try container.decodeIfPresent(Set<ShareTransaction>.self, forKey: .transactions)
+        self.wbValuation = try container.decodeIfPresent(WBValuation.self, forKey: .wbValuation)
+        self.healthData = try container.decodeIfPresent(HealthData.self, forKey: .healthData)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(beta, forKey: .beta)
+        try container.encode(creationDate, forKey: .creationDate)
+        try container.encodeIfPresent(dailyPrices, forKey: .dailyPrices)
+        try container.encodeIfPresent(dividendWDates, forKey: .dividendWDates)
+        try container.encode(employees, forKey: .employees)
+        try container.encode(pe_min, forKey: .pe_min)
+        try container.encode(pe_max, forKey: .pe_max)
+        try container.encodeIfPresent(exchange, forKey: .exchange)
+        try container.encodeIfPresent(industry, forKey: .industry)
+        try container.encodeIfPresent(isin, forKey: .isin)
+        try container.encode(lastLivePrice, forKey: .lastLivePrice)
+        try container.encodeIfPresent(lastLivePriceDate, forKey: .lastLivePriceDate)
+        try container.encodeIfPresent(macd, forKey: .macd)
+        try container.encode(moat, forKey: .moat)
+        try container.encodeIfPresent(name_long, forKey: .name_long)
+        try container.encodeIfPresent(name_short, forKey: .name_short)
+        try container.encodeIfPresent(purchaseStory, forKey: .purchaseStory)
+        try container.encodeIfPresent(return3y, forKey: .return3y)
+        try container.encodeIfPresent(return10y, forKey: .return10y)
+        try container.encodeIfPresent(sector, forKey: .sector)
+        try container.encodeIfPresent(symbol, forKey: .symbol)
+        try container.encodeIfPresent(trend_DCFValue, forKey: .trend_DCFValue)
+        try container.encodeIfPresent(trend_MoatScore, forKey: .trend_MoatScore)
+        try container.encodeIfPresent(trend_LynchScore, forKey: .trend_LynchScore)
+        try container.encodeIfPresent(trend_healthScore, forKey: .trend_healthScore)
+        try container.encodeIfPresent(trend_StickerPrice, forKey: .trend_StickerPrice)
+        try container.encodeIfPresent(trend_intrinsicValue, forKey: .trend_intrinsicValue)
+        try container.encode(userEvaluationScore, forKey: .userEvaluationScore)
+        try container.encode(valueScore, forKey: .valueScore)
+        try container.encode(watchStatus, forKey: .watchStatus)
+        try container.encodeIfPresent(currency, forKey: .currency)
+        try container.encodeIfPresent(avgAnnualPrices, forKey: .avgAnnualPrices)
+
+        try container.encodeIfPresent(analysis, forKey: .analysis)
+        try container.encodeIfPresent(balance_sheet, forKey: .balance_sheet)
+        try container.encodeIfPresent(income_statement, forKey: .income_statement)
+        try container.encodeIfPresent(cash_flow, forKey: .cash_flow)
+        try container.encodeIfPresent(ratios, forKey: .ratios)
+        try container.encodeIfPresent(transactions, forKey: .transactions)
+        try container.encodeIfPresent(company_info, forKey: .company_info)
+        try container.encodeIfPresent(dcfValuation, forKey: .dcfValuation)
+        try container.encodeIfPresent(rule1Valuation, forKey: .rule1Valuation)
+        try container.encodeIfPresent(key_stats, forKey: .key_stats)
+        try container.encodeIfPresent(research, forKey: .research)
+        try container.encodeIfPresent(wbValuation, forKey: .wbValuation)
+        try container.encodeIfPresent(healthData, forKey: .healthData)
+
     }
     
     /// returns trend values with dates in date descending order
@@ -163,10 +329,11 @@ public class Share: NSManagedObject {
         return nil
     }
     
-    func trendChartData(trendName: ShareTrendNames) -> [ChartDataSet]? {
+    func trendChartData(trendName: ShareTrendNames) -> [ChartDataSet] {
         
         var data: Data?
-        
+        var dataSet = [ChartDataSet]()
+
         switch trendName {
         case .moatScore:
             data = trend_MoatScore
@@ -196,20 +363,21 @@ public class Share: NSManagedObject {
                         else { return false }
                     }
                 }
+                else {
+                    return dataSet
+                }
             } catch let error {
                 ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored P/E ratio historical data")
             }
         } else {
-            
-            var dataSet: ChartDataSet?
-            
+                        
             switch trendName {
             case  .moatScore:
                 if let r1v = self.rule1Valuation {
                     let (_, moat) = r1v.moatScore()
                     if moat != nil {
                         let date = r1v.creationDate!
-                        dataSet = ChartDataSet(x:date, y: moat!)
+                        dataSet.append(ChartDataSet(x:date, y: moat!))
                     }
                 }
             case .stickerPrice:
@@ -217,7 +385,7 @@ public class Share: NSManagedObject {
                     let (sp, _) = r1v.stickerPrice()
                     if sp != nil {
                         let date = r1v.creationDate!
-                        dataSet = ChartDataSet(x:date, y: sp)
+                        dataSet.append(ChartDataSet(x:date, y: sp))
                     }
                 }
             case .dCFValue:
@@ -225,54 +393,51 @@ public class Share: NSManagedObject {
                     let (sp, _) = dcfv.returnIValueNew()
                     if sp != nil {
                         let date = dcfv.creationDate!
-                        dataSet = ChartDataSet(x:date, y: sp)
+                        dataSet.append(ChartDataSet(x:date, y: sp))
                     }
                 }
             case .lynchScore:
                 let (_, sp) = lynchRatio()
                 if let price = sp {
-//                    datedValue = DatedValue(date:Date(), value: price)
-                    dataSet = ChartDataSet(x:Date(), y: price)
+                    dataSet.append(ChartDataSet(x:Date(), y: price))
                 }
-                
-//                if let wbv = self.wbValuation {
-//                    if let sp = wbv.lynchRatio() {
-//                        let date = wbv.date!
-//                        dataSet = ChartDataSet(x:date, y: sp)
-//                    }
-//                }
             case .intrinsicValue:
                 if let wbv = self.wbValuation {
                     let (sp, _) = wbv.ivalue()
                     if sp != nil {
                         let date = wbv.date ?? Date()
-                        dataSet = ChartDataSet(x:date, y: sp)
+                        dataSet.append(ChartDataSet(x:date, y: sp))
                     }
                 }
             case .healthScore:
+                // requires background download
                 data = trend_healthScore
-            }
-
-            if let valid = dataSet {
-                return [valid]
             }
 
         }
         
-        return nil
+        return dataSet
+        
     }
     
     /// adds new data to existing trend Data
     func saveTrendsData(datedValuesToAdd: [DatedValue]?, trendName: ShareTrendNames, saveInContext:Bool?=true) {
         
+        guard let values = datedValuesToAdd else { return }
+
         var existingValues = trendValues(trendName: trendName) ?? [DatedValue]()
-        // check if there's a value for the sent date already
-        let existingValueDates = existingValues.compactMap{ $0.date}
-        if let values = datedValuesToAdd {
-            for value in values {
-                if !existingValueDates.contains(value.date) {
-                    existingValues.append(value)
+        
+        if existingValues.count == 0 {
+            existingValues = datedValuesToAdd ?? [DatedValue]()
+        } else {
+        // check if there's a value within one week for each of the sent dates already
+            newValuesLoop: for value in values {
+                for existingValue in existingValues {
+                    if abs(existingValue.date.timeIntervalSince(value.date)) < 7*24*3600 {
+                        continue newValuesLoop
+                    }
                 }
+                existingValues.append(value)
             }
         }
         
@@ -1719,12 +1884,10 @@ public class Share: NSManagedObject {
         var priceSum = Double()
         var quantitySum = Double()
         
-        for element in transaction.allObjects {
-            if let transaction = element as? ShareTransaction {
-                if !transaction.isSale {
-                    priceSum += transaction.price * transaction.quantity
-                    quantitySum += transaction.quantity
-                }
+        for element in transaction {
+            if !element.isSale {
+                priceSum += element.price * element.quantity
+                quantitySum += element.quantity
             }
         }
         
@@ -1747,13 +1910,11 @@ public class Share: NSManagedObject {
         guard let transactions = self.transactions else { return  nil }
 
         var quantitySum = Double()
-        for element in transactions.allObjects {
-            if let transaction = element as? ShareTransaction {
-                if transaction.isSale {
-                    quantitySum -= transaction.quantity
-                } else {
-                    quantitySum += transaction.quantity
-                }
+        for element in transactions {
+            if element.isSale {
+                quantitySum -= element.quantity
+            } else {
+                quantitySum += element.quantity
             }
         }
         
@@ -1786,12 +1947,15 @@ public class Share: NSManagedObject {
     
     public func lynchRatio() -> ([String]?, Double?) {
         
+        // changed 'oneForEachYear to false in all three parameters as otherwise the outdated PE warning/old PE is used
+        //TODO: -  check if this works
+        
         // can be zero, so don't drop zeros
-        guard let divYieldDV = key_stats?.dividendYield.datedValues(dateOrder: .ascending, oneForEachYear: true, includeThisYear: true)?.last else {
+        guard let divYieldDV = key_stats?.dividendYield.datedValues(dateOrder: .ascending, oneForEachYear: false, includeThisYear: true)?.last else {
             return (["missing dividend yield value"],nil)
         }
         
-        guard let currentPEdv = ratios?.pe_ratios.datedValues(dateOrder: .ascending, oneForEachYear: true,  includeThisYear: true)?.dropZeros().last else {
+        guard let currentPEdv = ratios?.pe_ratios.datedValues(dateOrder: .ascending, oneForEachYear: false,  includeThisYear: true)?.dropZeros().last else {
             return (["missing current P/E ratio"],nil)
         }
         
@@ -1808,7 +1972,7 @@ public class Share: NSManagedObject {
             errors = ["last valid P/E ratio is from " + dateFormatter.string(from: currentPEdv.date)]
         }
         
-        if let netIncome = income_statement?.netIncome.datedValues(dateOrder: .ascending, oneForEachYear: true)?.dropZeros() { // ema(periods: emaPeriod)
+        if let netIncome = income_statement?.netIncome.datedValues(dateOrder: .ascending, oneForEachYear: false)?.dropZeros() { // ema(periods: emaPeriod)
             if let meanGrowth = netIncome.growthRates(dateOrder: .ascending)?.values().mean(){
             // use 10 y sums / averages, not ema according to Book Ch 51
                 let denominator = meanGrowth * 100 + divYieldDV.value * 100
@@ -2390,27 +2554,25 @@ public class Share: NSManagedObject {
     
         return (profitMargins, nil)
 
-        
-        // OLD
-//        guard revenue != nil && grossProfit != nil else {
-//            return ([Double()], ["there are no revenue and/or gross profit data"])
-//        }
-//
-//        let rawData = [revenue!, grossProfit!]
-//
-//        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
-//
-//        var margins = [Double]()
-//        var errors: [String]?
-//        for i in 0..<cleanedData[0].count {
-//            margins.append(cleanedData[1][i] / cleanedData[0][i])
-//        }
-//
-//        if let validError = error {
-//            errors = [validError]
-//        }
-//        return (margins, errors)
     }
 
     
+}
+
+extension Share {
+    
+    // to enable passing variable to SwiftUI view for preview purposes
+    static var preview: Share {
+        
+        get {
+            let context = PersistenceController.preview.persistentContainer.viewContext
+            if let share = try? context.fetch(Share.fetchRequest()).first {
+                return share
+            } else {
+                let newShare = Share(context: context)
+
+                return newShare
+            }
+        }
+    }
 }

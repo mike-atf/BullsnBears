@@ -276,7 +276,7 @@ class StocksController2: NSFetchedResultsController<Share> {
             
             // testing if MT redirects to another symbol/name. This is then picked up by then delegate sent here.
 //            do {
-                async let test = Downloader.downloadDataWithRedirectionOption(url: url)
+                let _ = await Downloader.downloadDataWithRedirectionOption(url: url)
 //                return await test
 //            } catch {
 //                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error running MT test download with new share \(symbol)")
@@ -566,6 +566,10 @@ class StocksController2: NSFetchedResultsController<Share> {
                         
                         if (share.currency ?? "USD") == "USD" {
                                 // US Stocks
+                            
+                            self.webViewDownloader = await WebViewDownloader.newWebViewDownloader(delegate: self.viewController!)
+//                            self.webViewDownloader?.downloadPage(domain: <#T##String#>, companyName: <#T##String#>, pageName: <#T##String#>, currency: <#T##String?#>, shareID: <#T##NSManagedObjectID?#>, in: <#T##WebViewDownloadDelegate#>)
+//                            
                                 await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .rule1Only, downloadRedirectDelegate: self)
                                 await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol ?? "missing", shortName: shortName ?? "missing", shareID: shareID, option: .rule1Only, downloadRedirectDelegate: self)
                                 
@@ -711,7 +715,7 @@ class StocksController2: NSFetchedResultsController<Share> {
         let htmlText = await Downloader.downloadDataNoThrow(url: validURL)
 
         guard let price = YahooPageScraper.singleNumberExtraction(htmlText: htmlText, parameterTitle: "regularMarketPrice", numberStart: ">", numberEnd:  "</fin-streamer>") else {
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "unable to find current live price for \(symbol)")
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "unable to find current live price")
             return
         }
         
@@ -923,7 +927,7 @@ class StocksController2: NSFetchedResultsController<Share> {
 extension StocksController2: DownloadRedirectionDelegate {
     
     func redirectTo(url: URL?) {
-        guard let validURL = url else { return }
+        guard url != nil else { return }
     }
     
     func awaitingRedirection(notification: Notification) {

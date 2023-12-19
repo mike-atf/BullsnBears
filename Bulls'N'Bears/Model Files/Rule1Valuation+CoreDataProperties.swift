@@ -38,7 +38,7 @@ extension Rule1Valuation {
     @NSManaged public var ceoRating: Double
     @NSManaged public var share: Share?
 //    @NSManaged public var alerts: [String]?
-
+//    @NSManaged public var shareSymbol: String?
 
 }
 

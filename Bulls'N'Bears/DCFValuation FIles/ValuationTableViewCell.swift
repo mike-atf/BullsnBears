@@ -43,28 +43,7 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
         textField.isEnabled = true
     }
     
-    /*
-    public func configure(info: ValuationListCellInfo,  indexPath: IndexPath, method: ValuationMethods, delegate: ValuationDelegate) {
-        
-        self.method = method
-        self.delegate = delegate
-        self.indexPath = indexPath
-        self.title.text = info.title
-        self.valueFormat = info.format
-        self.detail.text = info.cellDetailInfo.text
-        self.detail.textColor = info.cellDetailInfo.color
-        let lighterPlaceHolderText = NSAttributedString(string: info.value$ ?? "",
-                                                    attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
-        textField.attributedPlaceholder = lighterPlaceHolderText
-        if method == .rule1 {
-            if indexPath == IndexPath(row: 2, section: 9) { // proportion debt/ fcf
-                textField.isEnabled = false
-            }
-        }
-    }
-    */
-    
-    public func configureNew(indexPath: IndexPath, data: Rule1DCFCellData ,method: ValuationMethods, delegate: ValuationDelegate) {
+    public func configureNew(indexPath: IndexPath, data: Rule1DCFCellData, method: ValuationMethods, delegate: ValuationDelegate) {
         
         self.method = method
         self.delegate = delegate
@@ -81,7 +60,7 @@ class ValuationTableViewCell: UITableViewCell, UITextFieldDelegate {
     }
     
     @IBAction func textEntryComplete(_ sender: UITextField) {
-        
+                
         delegate.userEnteredText(sender: sender, indexPath: indexPath)
     }
     

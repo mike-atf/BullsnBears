@@ -10,7 +10,70 @@ import UIKit
 import CoreData
 
 @objc(StockResearch)
-public class StockResearch: NSManagedObject {
+public class StockResearch: NSManagedObject, Codable {
+    
+    // MARK: - coding
+    
+    enum CodingKeys: CodingKey {
+        case symbol
+        case growthPlan
+        case companySize
+        case productsNiches
+        case creationDate
+        case assets
+        case insiderBuying
+        case theBuyStory
+        case share
+        case news
+        case nextReportDate
+        case targetBuyPrice
+        case annualStatementOutlook
+        case pricePredictions
+    }
+    
+    required convenience public init(from decoder: Decoder) throws {
+        
+        guard let context = decoder.userInfo[CodingUserInfoKey.managedObjectContext] as? NSManagedObjectContext else {
+            throw DecoderConfigurationError.missingManagedObjectContext
+        }
+        
+        self.init(context: context)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.symbol = try container.decodeIfPresent(String.self, forKey: .symbol)
+        self.growthPlan = try container.decodeIfPresent(String.self, forKey: .growthPlan)
+        self.companySize = try container.decodeIfPresent(String.self, forKey: .companySize)
+        self.productsNiches = try container.decodeIfPresent([String].self, forKey: .productsNiches)
+        self.creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
+        self.assets = try container.decodeIfPresent(String.self, forKey: .assets)
+        self.insiderBuying = try container.decodeIfPresent(String.self, forKey: .insiderBuying)
+        self.news = try container.decodeIfPresent(Set<CompanyNews>.self, forKey: .news)
+        self.nextReportDate = try container.decodeIfPresent(Date.self, forKey: .nextReportDate)
+        self.targetBuyPrice = try container.decode(Double.self, forKey: .targetBuyPrice)
+        self.annualStatementOutlook = try container.decodeIfPresent(Data.self, forKey: .annualStatementOutlook)
+        self.pricePredictions = try container.decodeIfPresent(Data.self, forKey: .pricePredictions)
+//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
+
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encodeIfPresent(symbol, forKey: .symbol)
+        try container.encodeIfPresent(growthPlan, forKey: .growthPlan)
+        try container.encodeIfPresent(companySize, forKey: .companySize)
+        try container.encodeIfPresent(productsNiches, forKey: .productsNiches)
+        try container.encodeIfPresent(creationDate, forKey: .creationDate)
+        try container.encodeIfPresent(assets, forKey: .assets)
+        try container.encodeIfPresent(insiderBuying, forKey: .insiderBuying)
+        try container.encodeIfPresent(news, forKey: .news)
+        try container.encodeIfPresent(nextReportDate, forKey: .nextReportDate)
+        try container.encode(targetBuyPrice, forKey: .targetBuyPrice)
+        try container.encodeIfPresent(annualStatementOutlook, forKey: .annualStatementOutlook)
+        try container.encodeIfPresent(pricePredictions, forKey: .pricePredictions)
+//        try container.encodeIfPresent(share, forKey: .share)
+
+    }
 
     public override func awakeFromInsert() {
         self.creationDate = Date()

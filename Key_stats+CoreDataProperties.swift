@@ -25,7 +25,7 @@ extension Key_stats {
     @NSManaged public var insiderSales: Data?
     @NSManaged public var dividendPayoutRatio: Data?
     @NSManaged public var share: Share?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension Key_stats : Identifiable {

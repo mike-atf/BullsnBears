@@ -38,13 +38,10 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
 
         downloadButtonConfiguration = UIButton.Configuration.filled()
         downloadButtonConfiguration.title = "Download"
-//        downloadButtonConfiguration.attributedTitle = AttributedString("Download")
-//        downloadButtonConfiguration.attributedTitle?.font = UIFont.systemFont(ofSize: 14)
         downloadButtonConfiguration.buttonSize = .small
         downloadButtonConfiguration.titleAlignment = .center
         downloadButtonConfiguration.cornerStyle = .small
         let db = UIButton(configuration: downloadButtonConfiguration, primaryAction: UIAction() {_ in
-//            self.downloadButtonConfiguration.showsActivityIndicator = true
             self.startDownload()
         })
         
@@ -264,8 +261,6 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
          
         if let destination = segue.destination as? ValueListTVC {
             
-//            destination.delegate = self
-            
             guard let validController = controller else {
                 return
             }
@@ -275,94 +270,65 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
             destination.loadViewIfNeeded()
             
             destination.controller = controller
-//            destination.indexPath = selectedPath
             let titles = validController.wbvParameters.structuredTitlesParameters()[selectedPath.section-1][selectedPath.row]
             destination.sectionTitles.append(contentsOf: titles)
             destination.cellLegendTitles = validController.valueListChartLegendTitles[selectedPath.section-1][selectedPath.row]
             
-//            let arrays = arraysForValueListTVC(indexPath: selectedPath)
             destination.datedValues = datedValuesForValueListTVC(indexPath: selectedPath)
             
             if selectedPath.section == 1 {
                 if selectedPath.row == 0 {
                 // Revenue
-//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                 }
                 else if selectedPath.row == 1 {
                 // Net income
-//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapWithPence
                 }
                 else if selectedPath.row == 2 {
                 // Ret earnings
-//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                 }
                 else if selectedPath.row == 3 {
                 // EPS
-//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                 }
                else if selectedPath.row == 4 {
                 // Profit margin
-//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
-//                   let (dvs, _) = validController.wbValuation!.grossProfitMargins()
-//                   let margins = dvs.values(dateOrdered: .ascending)
-//                    destination.proportions = margins
                 }
                else if selectedPath.row == 5 {
                 // Op. cash flow
-//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-//                    let (margins, _) = validController.wbValuation!.longtermDebtProportion()
-//                    destination.proportions = margins
                 }
 
             }
             else if selectedPath.section == 2 {
-                if selectedPath.row == 0 {
-                // ROE
-//                    destination.values = arrays
-                    destination.formatter = percentFormatter0Digits
-                }
-                else if selectedPath.row == 1 {
-                // ROA
-//                    destination.values = arrays
-                    destination.formatter = percentFormatter0Digits
-                }
+                // ROI, ROE, ROA
+                destination.formatter = percentFormatter0Digits
             }
             else if selectedPath.section == 3 {
                 if selectedPath.row == 0 {
                 // CapEx / earnings
-//                    destination.values = arrays
                     destination.formatter = percentFormatter0Digits
-//                    let (prop, _) = validController.wbValuation!.proportions(array1: wbVal.netEarnings, array2: wbVal.capExpend)
-//                    destination.proportions = prop
                     destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
                     destination.higherGrowthIsBetter = false
                 }
                 else if selectedPath.row == 1 {
                 // Lt debt / net income
-//                    destination.values = arrays
-//                    let (margins, _) = validController.wbValuation!.longtermDebtProportion()
                     destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
                     destination.higherGrowthIsBetter = false
                 }
                 else if selectedPath.row == 2 {
                 // SGA / profit
-//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
                     destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
                     destination.higherGrowthIsBetter = false
                 }
                 else if selectedPath.row == 3 {
                 // R&D / profit
-//                    destination.values = arrays
                     destination.formatter = currencyFormatterGapNoPence
-//                    let (margins, _) = validController.wbValuation!.rAndDProportion()
                     destination.datedValues = [destination.datedValues.proportions() ?? [DatedValue]()]
                     destination.higherGrowthIsBetter = false
                 }

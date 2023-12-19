@@ -57,9 +57,24 @@ enum AxisUnit {
 
 typealias Inset = (position: Position, inset: CGFloat)
 typealias ChartLabelInfo = (position: Position, text: String, font: UIFont?, color: UIColor?, alignment: NSTextAlignment?)
-typealias ChartDataSet = (x: Date?, y: Double?)
+//typealias ChartDataSet = (x: Date?, y: Double?)
 typealias AxisParameters = (min: Double, max: Double, noOfTicks: Int, scale: ChartAxisScale)
-typealias LabelledChartDataSet = (title: String, chartData: [ChartDataSet], format: ValuationCellValueFormat)
+//typealias LabelledChartDataSet = (title: String, chartData: [ChartDataSet], format: ValuationCellValueFormat)
+
+struct ChartDataSet: Identifiable {
+    
+    var id = UUID()
+    var x: Date?
+    var y: Double?
+}
+
+struct LabelledChartDataSet: Identifiable {
+    
+    var title: String
+    var chartData: [ChartDataSet]
+    var format: ValuationCellValueFormat
+    var id = UUID()
+}
 
 
 /// NOT rotation safe

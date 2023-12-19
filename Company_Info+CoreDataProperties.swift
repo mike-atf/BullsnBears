@@ -21,7 +21,7 @@ extension Company_Info {
     @NSManaged public var sector: String?
     @NSManaged public var businessDescription: String?
     @NSManaged public var share: Share?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension Company_Info : Identifiable {

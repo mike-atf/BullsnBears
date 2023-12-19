@@ -25,7 +25,7 @@ extension StockResearch {
     @NSManaged public var insiderBuying: String?
     @NSManaged public var theBuyStory: String?
     @NSManaged public var share: Share?
-    @NSManaged public var news: NSSet?
+    @NSManaged public var news: Set<CompanyNews>?
 //    @NSManaged public var businessDescription: String?
     @NSManaged public var nextReportDate: Date?
 //    @NSManaged public var futureGrowthMean: Double

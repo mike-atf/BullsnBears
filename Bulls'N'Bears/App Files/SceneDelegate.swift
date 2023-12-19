@@ -89,6 +89,70 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         */
     }
     
+    //MARK: - file import
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        
+        guard let urlContext = URLContexts.first else {
+          return
+        }
+        
+        let fileURL = urlContext.url
+        
+        do {
+            let fileResources = try fileURL.resourceValues(forKeys: [.localizedNameKey,.localizedTypeDescriptionKey])
+            let type = fileResources.localizedTypeDescription ?? "nil"
+            guard type == "Bulls N Bears Backup" else {
+                print("incompatible file import failed for type \(type)")
+                return
+            }
+
+        } catch {
+            print("error trying to get fileResources from imported file")
+            return
+        }
+        
+        
+        if !urlContext.options.openInPlace {
+            //file needs to be copied in order to be opened
+            if fileURL.startAccessingSecurityScopedResource() {
+                do {
+                    
+                    guard let localFolderURL = localBackupFolderURL else {
+                        return
+                    }
+                    
+                    // add 'imported' as otherwise safety backup will overwrite the imported one
+                    let importedFileName = localFolderURL.path() + "/Imported " + fileURL.lastPathComponent
+                    let localURL = URL(fileURLWithPath: importedFileName)
+
+                    // move file into local backup folder
+                    print(localURL.path())
+                    if FileManager.default.fileExists(atPath: localURL.path()){
+                        try FileManager.default.removeItem(at: localURL)
+                    }
+                    try FileManager.default.copyItem(at: fileURL, to: localURL)
+                    let _ = ImportManager(fileURL: localURL)
+                    fileURL.stopAccessingSecurityScopedResource()
+
+                } catch {
+                    print("an error during import process: \(error.localizedDescription)")
+                    print("source file url: \(fileURL.path())")
+                    fileURL.stopAccessingSecurityScopedResource()
+                    return
+                }
+
+            }
+            else {
+                print("can't access file to import")
+            }
+        } 
+        else {
+            // file doesn't need to to be copies, ca be opened in place
+            let _ = ImportManager(fileURL: fileURL)
+        }
+
+    }
+    
     /*
     private func buildTickerDictionary() {
         
@@ -189,8 +253,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
-        
-        (UIApplication.shared.delegate as? AppDelegate)?.saveContext(context: (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext)
+//        
+//        let context = PersistenceController.shared.persistentContainer.viewContext
+//        do {
+//            try context.save()
+//        } catch {
+//            print("context saving error when going to background - bakup not undertaken")
+//        }
+//        
+////        let backupController = BackupManager(context: context)
+//        Task {
+//            await BackupManager.backupData()
+//        }
+//        
     }
 
 

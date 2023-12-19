@@ -18,8 +18,8 @@ class SettingsTVC: UITableViewController {
         
         tableView.register(UINib(nibName: "SettingsCell", bundle: nil), forCellReuseIdentifier: "settingsCell")
         
-        settingsSectionTitles = ["Version","Internal settings"]
-        settingsRowTitles = [["Build no."],["Rating score weighing factors"]]
+        settingsSectionTitles = ["Version","Internal settings","Backup"]
+        settingsRowTitles = [["Build no."],["Rating score weighing factors"],["Export backup"]]
 
     }
 
@@ -55,55 +55,39 @@ class SettingsTVC: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
             performSegue(withIdentifier: "ratingFactorsSegue", sender: nil)
+        } else if indexPath.section == 2 {
+            tableView.deselectRow(at: indexPath, animated: true)
+            exportBackup()
         }
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 55
     }
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+
+    func exportBackup() {
+        
+        Task {
+            if let backupURL = await BackupManager.backupData() {
+                
+                DispatchQueue.main.async {
+                    let exportView = UIActivityViewController(activityItems: [backupURL], applicationActivities: nil)
+                    exportView.completionWithItemsHandler = {(activityType: UIActivity.ActivityType?, completed: Bool, returnedItems: [Any]?, error: Error?) in
+                        
+                        self.dismiss(animated: true)
+                    }
+
+                    let popUpController = exportView.popoverPresentationController
+                    popUpController?.sourceView = self.view
+                    
+                    self.present(exportView, animated: true)
+
+                }
+            }
+            else {
+                print("backup not completed")
+            }
+        }
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//
-//        if let destination = segue.destination as? RatingFactorSettingsTVC {
-//            
-//        }
-//    }
 
 }

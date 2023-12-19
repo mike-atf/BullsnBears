@@ -29,28 +29,29 @@ class BackupManager {
         }
     }()
     
-    init(context: NSManagedObjectContext) {
-        self.context = context
+    /// default context is main thread context; for using background process send a background context
+    init(context: NSManagedObjectContext?) {
+        self.context = context ?? PersistenceController.shared.persistentContainer.viewContext
     }
 
     class func shared() -> BackupManager {
         return backupManager
     }
     
-    public func backupData() {
+    class func backupData() async -> URL? {
         
-        guard localBackupDirectoryPath != nil else {
-            return
+        guard let backupFolderURL = localBackupFolderURL else {
+            print("backup failed - there's no local backup directory")
+            return nil
         }
         
-        let backupName = "/BnB Backup " + ".bbf"
+        let backupName = "BnB Backup.bbf"
 
-        let backupPath = localBackupDirectoryPath! + backupName
-        let backupURL = URL(fileURLWithPath: backupPath)
+        let backupURL = backupFolderURL.appending(component: backupName)
         
         var saveOperation: UIDocument.SaveOperation!
         do {
-            if FileManager.default.fileExists(atPath: backupPath) {
+            if FileManager.default.fileExists(atPath: backupURL.path()) {
                 saveOperation = .forOverwriting
             }
             else {
@@ -58,84 +59,98 @@ class BackupManager {
             }
         }
         
-        let backupDocument = Backup_Document(fileURL: backupURL)
+        let backupDocument = await BNB_Archive(fileURL: backupURL)
         
-        backupDocument.sharesData = createSharesData()
-        backupDocument.transactionData = createTransactionsData()
-        backupDocument.wbValuationData = createWBVData()
-        backupDocument.researchData = createResearchData()
-        backupDocument.dcfValuationData = createDCFVData()
-        backupDocument.r1ValuationData = createR1VData()
-        
-        backupDocument.save(to: backupURL, for: saveOperation) { (success: Bool) in
-            if !success {
-                alertController.showDialog(title: "Backup failed", alertMessage: "The backup file couldn't be saved", viewController: nil, delegate: nil)
-            }
-        }
-        
-        backupDocument.close { (success: Bool) in
-            alertController.showDialog(title: "Backup failed", alertMessage: "The backup file couldn't be closed", viewController: nil, delegate: nil)
+        if await !backupDocument.save(to: backupURL, for: saveOperation) {
+            alertController.showDialog(title: "Backup failed", alertMessage: "The backup file couldn't be saved", viewController: nil, delegate: nil)
+            return nil
         }
 
+        do {
+            
+            try await backupDocument.backupAll()
+            //        backupDocument.transactionData = createTransactionsData()
+            //        backupDocument.wbValuationData = createWBVData()
+            //        backupDocument.researchData = createResearchData()
+            //        backupDocument.dcfValuationData = createDCFVData()
+            //        backupDocument.r1ValuationData = createR1VData()
+            
+            // important - keep this step.
+            if await !backupDocument.save(to: backupURL, for: saveOperation) {
+                alertController.showDialog(title: "Backup failed", alertMessage: "The backup file couldn't be saved", viewController: nil, delegate: nil)
+                return nil
+            }
+
+            
+            if await !backupDocument.close() {
+                alertController.showDialog(title: "Backup failed", alertMessage: "The backup file couldn't be closed", viewController: nil, delegate: nil)
+                return nil
+            }            
+            print("...archive closed")
+
+            
+            return backupURL
+            
+        } catch {
+            alertController.showDialog(title: "Backup failed", alertMessage: "The archiving process failed", viewController: nil, delegate: nil)
+            return nil
+        }
                 
     }
     
-    public func restoreData() {
+    /// restores data from backup file stored inside the App's localBackupDirectoryPath or any file provided
+    class func restoreData(fromURL: URL?=nil) async throws {
         
-        guard localBackupDirectoryPath != nil else {
+        var sourceURL = fromURL
+        
+        if sourceURL == nil {
+            guard let localFolderPath = localBackupFolderURL?.path() else {
+                throw InternalError()
+            }
+            let backupName = "/BnB Backup" + ".bbf"
+
+            sourceURL = URL(fileURLWithPath: localFolderPath + backupName)
+        }
+        
+        guard sourceURL != nil else {
             alertController.showDialog(title: "Restore failed", alertMessage: "The App's backup directory couldn't be found", viewController: nil, delegate: nil)
             return
         }
         
-        let backupName = "/BnB Backup " + ".bbf"
-
-        let backupPath = localBackupDirectoryPath! + backupName
-        let backupURL = URL(fileURLWithPath: backupPath)
-        
-
-            var errors = [String]()
-            if FileManager.default.fileExists(atPath: backupPath) {
-                let backupDocument = Backup_Document(fileURL: backupURL)
-                
-                if let shares = restoreShares(data: backupDocument.sharesData) {
-                    if !saveRestoredShares(shares: shares) {
-                        errors.append("Shares")
-                    }
-                } else {
-                    errors.append("Shares")
-                }
-                
-                if let transactions = restoreTransactions(data: backupDocument.transactionData) {
-                    if !saveRestoredTransactions(transactions: transactions) {
-                        errors.append("Transactions")
-                    }
-                } else {
-                    errors.append("Transactions")
-                }
-
-                
-                
+        if FileManager.default.fileExists(atPath: sourceURL!.path) {
+            let backupDocument = await BNB_Archive(fileURL: sourceURL!)
+            if await backupDocument.open() {
+                try await backupDocument.decodeShares()
             }
             else {
-                alertController.showDialog(title: "Restore failed", alertMessage: "A backup file couldn't be found in the App's backup directory", viewController: nil, delegate: nil)
-                return
+                alertController.showDialog(title: "Restore failed", alertMessage: "An existing backup file couldn't be opened", viewController: nil, delegate: nil)
             }
+        }
+        else {
+            print("missing import file at \(sourceURL!)")
+            alertController.showDialog(title: "Restore failed", alertMessage: "A backup file couldn't be found at the provided source or in the App's backup directory", viewController: nil, delegate: nil)
+            return
+        }
 
     }
     
     //MARK: - backup methods
-    private func createSharesData() -> Data? {
+    /*
+    private func createSharesData() -> [Data]? {
         
             
         var shares: [Share]?
-        var sharesData: Data?
+        var sharesData: [Data]?
         
         let request = NSFetchRequest<Share>(entityName: "Share" )
         
         do {
             shares = try self.context.fetch(request)
-            sharesData = try NSKeyedArchiver.archivedData(withRootObject: shares ?? [], requiringSecureCoding: false)
-        } catch let error {
+            for share in shares ?? [] {
+                let data = try NSKeyedArchiver.archivedData(withRootObject: share, requiringSecureCoding: false)
+                sharesData?.append(data)
+            }
+        } catch {
             ErrorController.addInternalError(errorLocation: "Backup Manager", systemError: error, errorInfo: "error trying to archive shares")
         }
         
@@ -237,119 +252,137 @@ class BackupManager {
         return  r1vData
         
     }
+    */
     
     //MARK: - restore methods
-    private func restoreShares(data: Data?) -> [Share]? {
-        
-        guard let validData = data else {
-            return nil
-        }
-        
-        var shares: [Share]?
-        
-        do {
-            shares = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(validData) as? [Share]
-        } catch {
-            return nil
-        }
-        
-        return shares
-    }
     
-    private func restoreTransactions(data: Data?) -> [ShareTransaction]? {
-        
-        guard let validData = data else {
-            return nil
-        }
-        
-        var transactions: [ShareTransaction]?
-        
-        do {
-            transactions = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(validData) as? [ShareTransaction]
-        } catch {
-            return nil
-        }
-        
-        return transactions
-    }
+    /// retrieves all data via Shares from backup
+//    public func retrieveShares(document: BNB_Archive) async {
+//        
+//            do {
+//                try await deleteAllData()
+//            } catch {
+//                ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Failure to delete old data before retreiving shares from backup")
+//            }
+//            
+//            await restoreData()
+//
+//    }
+    
+    
+//    private func restoreShares(data: Data?) -> [Share]? {
+//        
+//        guard let validData = data else {
+//            return nil
+//        }
+//        
+//        var shares: [Share]?
+//        
+//        do {
+//            shares = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(validData) as? [Share]
+//        } catch {
+//            return nil
+//        }
+//        
+//        return shares
+//    }
+    
+//    private func restoreTransactions(data: Data?) -> [ShareTransaction]? {
+//        
+//        guard let validData = data else {
+//            return nil
+//        }
+//        
+//        var transactions: [ShareTransaction]?
+//        
+//        do {
+//            transactions = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(validData) as? [ShareTransaction]
+//        } catch {
+//            return nil
+//        }
+//        
+//        return transactions
+//    }
 
     
     
     //MARK: - moc delete and save functions
-    private func saveRestoredShares(shares: [Share]) -> Bool {
-        
-        if deleteAllShares() {
-            for share in shares {
-                context.insert(share)
-            }
-            
-            do {
-                try context.save()
-            } catch {
-                return false
-            }
-            
-            return true
-            
-        } else {
-            return false
-        }
-        
-    }
+//    private func saveRestoredShares(shares: [Share]) -> Bool {
+//        
+//        if deleteAllShares() {
+//            for share in shares {
+//                context.insert(share)
+//            }
+//            
+//            do {
+//                try context.save()
+//            } catch {
+//                return false
+//            }
+//            
+//            return true
+//            
+//        } else {
+//            return false
+//        }
+//        
+//    }
     
-    private func saveRestoredTransactions(transactions: [ShareTransaction]) -> Bool {
+//    private func saveRestoredTransactions(transactions: [ShareTransaction]) -> Bool {
+//        
+//        if deleteAllShares() {
+//            for transaction in transactions {
+//                //TODO: - may need to re-create relationship to share!
+//                context.insert(transaction)
+//            }
+//            
+//            do {
+//                try context.save()
+//            } catch {
+//                return false
+//            }
+//            
+//            return true
+//            
+//        } else {
+//            return false
+//        }
+//        
+//    }
+//    
+    class func deleteAllData() async throws {
         
-        if deleteAllShares() {
-            for transaction in transactions {
-                //TODO: - may need to re-create relationship to share!
-                context.insert(transaction)
+        let context = PersistenceController.shared.persistentContainer.newBackgroundContext()
+        context.automaticallyMergesChangesFromParent = true
+        
+        let sharesFR = Share.fetchRequest()
+        let healthFR = HealthData.fetchRequest()
+        let keyStatsFR = Key_stats.fetchRequest()
+        let incomeFR = Income_statement.fetchRequest()
+        let balanceFR = Balance_sheet.fetchRequest()
+        let cashFR = Cash_flow.fetchRequest()
+        let analysisFR = Analysis.fetchRequest()
+        let ratiosFR = Ratios.fetchRequest()
+        let infoFR = Company_Info.fetchRequest()
+        let transactionsFR = ShareTransaction.fetchRequest()
+        let researchFDR = StockResearch.fetchRequest()
+        let userFR = UserEvaluation.fetchRequest()
+        let wbvFR = WBValuation.fetchRequest()
+        let dcfFR = DCFValuation.fetchRequest()
+        let r1FR = Rule1Valuation.fetchRequest()
+
+        let allRequest = [sharesFR, healthFR, keyStatsFR, incomeFR, balanceFR, cashFR, analysisFR, ratiosFR, infoFR, transactionsFR, researchFDR, userFR, wbvFR, dcfFR, r1FR]
+        
+        for request in allRequest {
+            let objects = try context.fetch(request as! NSFetchRequest<any NSFetchRequestResult>)
+            for object in objects {
+                context.delete(object as! NSManagedObject)
             }
-            
-            do {
-                try context.save()
-            } catch {
-                return false
-            }
-            
-            return true
-            
-        } else {
-            return false
         }
         
+        try context.save()
+
     }
-
-    
-    private func deleteAllShares() -> Bool {
-        
-        let allShares = NSFetchRequest<NSFetchRequestResult>(entityName: "Share")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: allShares)
-        
-        do {
-            try self.context.execute(deleteRequest)
-        } catch let error as NSError {
-            ErrorController.addInternalError(errorLocation: "Backup Controller", systemError: error, errorInfo: "Error deleting existing shares prior to Backup/ Import")
-            return false
-        }
-
-        return true
-    }
-    
-    private func deleteAllTransactions() -> Bool {
-        
-        let allTransactions = NSFetchRequest<NSFetchRequestResult>(entityName: "ShareTransaction")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: allTransactions)
-        
-        do {
-            try self.context.execute(deleteRequest)
-        } catch let error as NSError {
-            ErrorController.addInternalError(errorLocation: "Backup Controller", systemError: error, errorInfo: "Error deleting existing share transactions prior to Backup/ Import")
-            return false
-        }
-
-        return true
-    }
-
     
 }
 

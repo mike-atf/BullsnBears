@@ -28,7 +28,7 @@ extension Income_statement {
     @NSManaged public var rdExpense: Data?
     @NSManaged public var sgaExpense: Data?
     @NSManaged public var share: Share?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension Income_statement : Identifiable {

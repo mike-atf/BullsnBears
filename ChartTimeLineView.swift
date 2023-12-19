@@ -211,7 +211,8 @@ class ChartTimeLineView: UIView {
         
         let timeTicks = UIBezierPath()
 
-        let totalChartTimeInterval = dateRange.last!.timeIntervalSince(dateRange.first!)
+        var totalChartTimeInterval = dateRange.last!.timeIntervalSince(dateRange.first!)
+        if !(totalChartTimeInterval > 0) { totalChartTimeInterval = 24*3600 }
                 
         var labelDate = dateRange.last!
         dateLabels.reversed().forEach { (label) in

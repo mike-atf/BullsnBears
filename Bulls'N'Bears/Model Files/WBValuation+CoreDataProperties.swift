@@ -37,7 +37,7 @@ extension WBValuation {
 //    @NSManaged public var roe: [Double]?
 //    @NSManaged public var sgaExpense: [Double]?
 //    @NSManaged public var shareholdersEquity: [Double]?
-    @NSManaged public var userEvaluations: NSSet?
+    @NSManaged public var userEvaluations: Set<UserEvaluation>?
 //    @NSManaged public var avAnStockPrice: [Double]?
 //    @NSManaged public var bvps: [Double]?
 //    @NSManaged public var perDates: Data? // these are usually quarterly P/E from MacroTrends
@@ -45,7 +45,7 @@ extension WBValuation {
 //    @NSManaged public var epsDatesq: Data? // qEPS
     @NSManaged public var intrinsicValueTrend: Data?
     @NSManaged public var share: Share?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 // MARK: Generated accessors for userEvaluations

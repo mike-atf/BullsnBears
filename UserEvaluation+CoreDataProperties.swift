@@ -23,7 +23,7 @@ extension UserEvaluation {
     @NSManaged public var userEvaluation: WBValuation?
     @NSManaged public var higherIsBetter: Bool
     @NSManaged public var date: Date?
-
+//    @NSManaged public var shareSymbol: String?
 }
 
 extension UserEvaluation : Identifiable {

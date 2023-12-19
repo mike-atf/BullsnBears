@@ -83,7 +83,7 @@ struct WBVParameters {
 class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     
     var sectionTitles = ["Key financials","Earnings & incomings", "Returns", "Outgoings & debt"]
-    var sectionSubTitles: [String?] = [nil,"Trend & growth EMA","Trend & growth EMA","Trend & Ratio"]
+    var sectionSubTitles: [String?] = [nil,"Trend & growth EMA","Trend & Prop >10%","Trend & Ratio"]
     var rowTitles: [[String]]!
     var share: Share!
     var wbValuation: WBValuation?
@@ -339,7 +339,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                         }
                         errors!.append(contentsOf: moatErrors!)
                     }
-                    //                    if let (errors, moat) = r1v.moatScore() {
                     if moat != nil {
                         value$ = percentFormatter0Digits.string(from: moat! as NSNumber) ?? "-"
                         color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: moat!, greenCutoff: 0.7, redCutOff: 0.5)
@@ -423,8 +422,37 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     }
                 }
                 
-
             case 4:
+                // 12m Price/EPS ratio
+                value$ = "not implemented yet"
+                
+                if let epsDV = share.income_statement?.eps_quarter.datedValues(dateOrder: .ascending) {
+                    let oneYearAgo = Date().addingTimeInterval(-365*24*3600)
+                    let sixMonthsAgo = Date().addingTimeInterval(-182*24*3600)
+                    
+                    let epsInTargetRange = epsDV.filter { dv in
+                        if dv.date < oneYearAgo { return false }
+                        else if dv.date > sixMonthsAgo { return false }
+                        else { return true }
+                    }
+                    
+                    if let earliestQEPS = epsInTargetRange.first {
+                        if let latestQEPS = epsInTargetRange.last {
+                            // may be the same member
+                            if latestQEPS.date.timeIntervalSince(earliestQEPS.date) > 182*24*3600 {
+                                let epsDifference = latestQEPS.value - earliestQEPS.value
+                                let proportion = epsDifference / earliestQEPS.value
+                            }
+                        }
+                    }
+
+                }
+                else {
+                    value$ = "-/-"
+                }
+
+
+            case 5:
             // Return 10/3 years
                 value$ = "-/-"
                 var v10$ = "-"
@@ -436,12 +464,12 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     v3$ = (numberFormatter2Decimals.string(from: share.return3y as NSNumber) ?? "-") + "x"
                 }
                 value$ = v10$ + "/" + v3$
-            case 5:
+            case 6:
             // beta
                 if let beta = share.key_stats?.beta.valuesOnly(dateOrdered: .ascending, includeThisYear: true)?.last {
                     value$ = numberFormatter2Decimals.string(from: beta as NSNumber)
                 }
-            case 6:
+            case 7:
             // R1 Price
                 if let r1v = share.rule1Valuation {
                     let (stickerprice, es) = r1v.stickerPrice()
@@ -464,7 +492,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                         }
                     }
                 }
-            case 7:
+            case 8:
             // DCF Price
                 if let dcfv = share.dcfValuation {
                     let (price,es) = dcfv.returnIValueNew()
@@ -486,7 +514,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                         }
                     }
                 }
-            case 8:
+            case 9:
             // WB intrinsic value
                     let (valid, es$) = wbValuation.ivalue()
                     errors = es$
@@ -622,67 +650,69 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             // ROI
                 
                 if let values = share.ratios?.roi.valuesOnly(dateOrdered: .ascending) {
-//                    if let growthrates = Calculator.reatesOfReturn(datedValues: datedValues) {
-                        if let growthEMA = values.ema(periods: emaPeriod) {
-                            value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
-                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
-                        }
-//                    }
+                    
+                    let over10s = values.filter { roi in
+                        if roi < 0.1 { return false }
+                        else { return true }
+                    }
+                    
+                    if values.count > 0 {
+                        let proportionOver10 = Double(over10s.count) / Double(values.count)
+                        value$ = percentFormatter0DigitsPositive.string(from:  proportionOver10 as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: proportionOver10, greenCutoff: 0.8, redCutOff: 0.5)
+                    }
+                    
+//                        if let growthEMA = values.ema(periods: emaPeriod) {
+//                            value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+//                            color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
+//                        }
                  }
                 return (value$, color, errors)
-
                 
-//                if let roic = wbValuation.share!.rule1Valuation?.roic {
-//                    let roiGrowths = Calculator.growthRatesYoY(values: roic)
-//                    if roiGrowths?.count ?? 10 < emaPeriod {
-//                        emaPeriod = roiGrowths?.count ?? 0
-//                    }
-//                    if let meanGrowth = roiGrowths?.ema(periods: emaPeriod) {
-//                        value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.3, redCutOff: 0.1)
-//                    } else {
-//                        if errors == nil {
-//                            errors = ["Can't calculate ROI EMA; maybe not enough years"]
-//                        } else {
-//                            errors?.append("Can't calculate ROI EMA; maybe not enough years")
-//                        }
-//                    }
-//
-//                    return (value$, color, errors)
-//                }
             case 1:
             // ROE
                 
                 if let values = share.ratios?.roe.valuesOnly(dateOrdered: .ascending) {
-                    if let growthEMA = values.ema(periods: emaPeriod) {
-                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
+                    
+                    let over10s = values.filter { roe in
+                        if roe < 0.1 { return false }
+                        else { return true }
                     }
-                 }
+                    
+                    if values.count > 0 {
+                        let proportionOver10 = Double(over10s.count) / Double(values.count)
+                        value$ = percentFormatter0DigitsPositive.string(from:  proportionOver10 as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: proportionOver10, greenCutoff: 0.8, redCutOff: 0.5)
+                    }
 
-//                let roeGrowths = Calculator.growthRatesYoY(values: wbValuation.roe)
-//                if let meanGrowth = roeGrowths?.ema(periods: emaPeriod) {
-//                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-//                    color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: meanGrowth, greenCutoff: 0.3, redCutOff: 0.1)
-//                }
+//                    if let growthEMA = values.ema(periods: emaPeriod) {
+//                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
+//                    }
+                 }
 
                 return (value$, color, errors)
 
             case 2:
             // ROA
                 if let values = share.ratios?.roa.valuesOnly(dateOrdered: .ascending) {
-                    if let growthEMA = values.ema(periods: emaPeriod) {
-                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
-                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
+                    
+                    let over10s = values.filter { roa in
+                        if roa < 0.1 { return false }
+                        else { return true }
                     }
+                    
+                    if values.count > 0 {
+                        let proportionOver10 = Double(over10s.count) / Double(values.count)
+                        value$ = percentFormatter0DigitsPositive.string(from:  proportionOver10 as NSNumber) ?? "-"
+                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: proportionOver10, greenCutoff: 0.8, redCutOff: 0.5)
+                    }
+
+//                    if let growthEMA = values.ema(periods: emaPeriod) {
+//                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
+//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
+//                    }
                  }
-
-//                let roaGrowths = Calculator.growthRatesYoY(values: wbValuation.roa)
-//
-//                if let meanGrowth = roaGrowths?.ema(periods: emaPeriod) {
-//                    value$ = percentFormatter0DigitsPositive.string(from: meanGrowth as NSNumber) ?? "-"
-//                }
-
                 return (value$, color, errors)
 
             default:
@@ -787,7 +817,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     private func returnRowTitles() -> [[String]] {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
-        return [["Moat", "P/E ratio", "BVPS/price","Lynch ratio", "Return (10/3y)" ,"beta","R1 price","DCF Price", "intr. value (10y)"],
+        return [["Moat", "P/E ratio", "BVPS/price","Lynch ratio", "Price/EPS 12m" ,"Return (10/3y)" ,"beta","R1 price","DCF Price", "intr. value (10y)"],
                 ["Revenue", "Net income", "Ret. earnings", "EPS", "Profit margin", "OpCash flow"],
                 ["ROI","ROE", "ROA"],
                 ["CapEx/earnings", "LT Debt/earnings", "SGA /profit", "R&D /profit"]
@@ -803,13 +833,27 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
             return
  
         }
-        guard let shortName = share.name_short else {
+        guard var shortName = share.name_short else {
             ErrorController.addInternalError(errorLocation: #function, errorInfo: "all data download reauested for \(symbol) but short name not available")
             return
         }
         
         let longName = share.name_long ?? "noLongName"
         let currency = share.currency ?? "noCurrency"
+        
+        let shortNameComponents = shortName.split(separator: " ")
+        let removeTerms = ["Inc.","Incorporated" , "Ltd", "Ltd.", "LTD", "Limited","plc." ,"Corp.", "Corporation","Company" ,"International", "NV","&", "The", "Walt", "Co.", "SE", "o.N", "O.N", "Namens-Aktien", "A/S"] // "Group",
+        let replaceTerms = ["S.A.": "sa "]
+        var cleanedName = String()
+        for component in shortNameComponents {
+            if replaceTerms.keys.contains(String(component)) {
+                cleanedName += replaceTerms[String(component)] ?? ""
+            } else if !removeTerms.contains(String(component)) {
+                cleanedName += String(component) + " "
+            }
+        }
+        shortName = String(cleanedName.dropLast())
+
         
         let backgroundMoc = await (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
         backgroundMoc.automaticallyMergesChangesFromParent = true
@@ -842,8 +886,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     
                     let webKitDownloadTasks = await WebViewDownloader.countOfDownloadTasks()
                     
-//                    progressDelegate?.allTasks = MacrotrendsScraper.countOfRowsToDownload(option: .allValuationDataOnly) + YahooPageScraper.countOfRowsToDownload(option: .allValuationDataOnly) + FinanzenScraper.countOfDownloadTasks() + webKitDownloadTasks
-                    
                     progressDelegate?.allTasks = YahooPageScraper.countOfRowsToDownload(option: .nonUS) + FinanzenScraper.countOfDownloadTasks() + webKitDownloadTasks
                     
                     
@@ -871,7 +913,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     await YahooPageScraper.dataDownloadAnalyseSave(symbol: symbol, shortName: shortName, shareID: shareID, option: .allValuationDataOnly, progressDelegate: progressDelegate, downloadRedirectDelegate: self)
                     
                     try Task.checkCancellation()
-
+                    
                     await MacrotrendsScraper.dataDownloadAnalyseSave(shareSymbol: symbol, shortName: shortName, shareID: shareID, downloadOption: .allValuationDataOnly, downloadRedirectDelegate: self)
                     
                     progressDelegate?.downloadComplete()

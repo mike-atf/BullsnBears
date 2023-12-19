@@ -198,6 +198,7 @@ extension [DatedValue] {
         
         guard new.count > 0 else { return self }
 
+        // TODO: - manually adding in new numbers one by one results in only the lastest/ topmost number being saved
         var existing = self.sortByDate(dateOrder: .ascending)
         if new.count < existing.count {
             // replace all existing elements between new.latest and new.earliest
@@ -218,6 +219,8 @@ extension [DatedValue] {
 
         }
         else if new.count == existing.count {
+            // same number of new elements added
+            // filter new elements to include only NEWER elements than the latest existing element
             let newerDVs = new.filter ({ dv in
                 if dv.date > existing.last!.date { return true }
                 else { return false }
@@ -258,6 +261,32 @@ extension [DatedValue] {
 
     }
     
+    /// add all new elements if current elements don't already contain their date; returns updated array in date ascending order
+    func add(newDV: [DatedValue]?, replaceOldValues: Bool=false) -> [DatedValue]? {
+        
+        guard let newValues = newDV else { return nil }
+        
+        var existingValues = self
+        let existingValueDates = self.compactMap{ $0.date }
+        
+        for value in newValues {
+            if !existingValueDates.contains(value.date) {
+                existingValues.append(value)
+            } else {
+                if replaceOldValues {
+                    for i in 0..<existingValues.count {
+                        if existingValues[i].date == value.date {
+                            existingValues.remove(at: i)
+                            existingValues.append(value)
+                        }
+                    }
+                }
+            }
+        }
+        
+        return existingValues.sortByDate(dateOrder: .ascending)
+    }
+    
     func convertToData() -> Data? {
                 
         var array = [Date: Double]()
@@ -273,6 +302,24 @@ extension [DatedValue] {
         }
 
         return nil
+    }
+    
+    /// replaces all exisisting values in the year of the new DV with the newDV. Returns [DatedValue] array with replaced values
+    func replacedAllValuesInYear(newDV: DatedValue?) -> [DatedValue]? {
+        
+        guard let newDatedValue = newDV else {
+            return nil
+        }
+        
+        let yearOfNewDV = DatesManager.yearOnly(date: newDatedValue.date)
+        
+        var valuesNotInYear = self.filter { dv in
+            if DatesManager.yearOnly(date: dv.date) != yearOfNewDV { return true }
+            else { return false}
+        }
+        
+        valuesNotInYear.append(newDatedValue)
+        return valuesNotInYear
     }
     
     func sortByDate(dateOrder: Order) -> [DatedValue] {
@@ -642,6 +689,7 @@ extension [DatedValues] {
         return nil
 
     }
+
 
 }
 
@@ -1637,14 +1685,19 @@ extension String {
         
         var value: Double?
         let filter$ = "-0123456789."
+        var container = self
+        
+        if container.last == "-" {
+            container = String(container.dropLast())
+        }
         
         if self.filter(filter$.contains) != "" {
-            if let v = Double(self.filter(filter$.contains)) {
+            if let v = Double(container.filter(filter$.contains)) {
               
-                if self.last == "%" {
+                if container.last == "%" {
                     value = v / 100.0
                 }
-                else if self.uppercased().last == "T" {
+                else if container.uppercased().last == "T" {
                     value = v * pow(10.0, 12) // should be 12 but values are entered as '000
                 } else if self.uppercased().last == "B" {
                     value = v * pow(10.0, 9) // should be 9 but values are entered as '000
@@ -1652,13 +1705,13 @@ extension String {
 //                else if self.uppercased().last == "M" {
 //                    value = v * pow(10.0, 6) // should be 6 but values are entered as '000
 //                }
-                else if self.uppercased().last == "K" {
+                else if container.uppercased().last == "K" {
                     value = v * pow(10.0, 3) // should be 6 but values are entered as '000
                 }
-                else if self.uppercased().contains("M") { // FraBo Pages, last char is space
+                else if container.uppercased().contains("M") { // FraBo Pages, last char is space
                     value = v * pow(10.0, 6) // should be 6 but values are entered as '000
                 }
-                else if self.uppercased().contains("BN") { // FraBo Pages, , last char is space
+                else if container.uppercased().contains("BN") { // FraBo Pages, , last char is space
                     value = v * pow(10.0, 9) // should be 6 but values are entered as '000
                 }
                 else {

@@ -7,6 +7,22 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeIconFiles</key>
+			<array>
+				<string></string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Bulls N Bears Backup</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>co.uk.apptoolfactory.bullsnbears.document.bbf</string>
+			</array>
+		</dict>
+		<dict>
 			<key>CFBundleTypeName</key>
 			<string>CSV Files</string>
 			<key>CFBundleTypeRole</key>
@@ -22,7 +38,7 @@
 				<string>public.plain-text</string>
 				<string>public.data</string>
 				<string>public.csv</string>
-				<string>pubic.text</string>
+				<string>public.text</string>
 			</array>
 		</dict>
 	</array>
@@ -39,10 +55,14 @@
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>6226</string>
+	<string>6665</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>LSSupportsOpenDocumentsInPlace</key>
+	<string>YES</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
@@ -65,6 +85,10 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>processing</string>
+	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -95,6 +119,27 @@
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Bulls N Bears Backup</string>
+			<key>UTTypeIconFiles</key>
+			<array>
+				<string>FileIcon@3x.png</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>co.uk.apptoolfactory.bullsnbears.document.bbf</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>bbf</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
 				<string>public.csv</string>
 			</array>
 			<key>UTTypeDescription</key>
@@ -112,6 +157,29 @@
 	</array>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Bulls N Bears backup</string>
+			<key>UTTypeIconFiles</key>
+			<array>
+				<string>FileIcon@3x.png</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>co.uk.apptoolfactory.bullsnbears.document.bbf</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>bbf</string>
+				</array>
+				<key>public.mime-type</key>
+				<array/>
+			</dict>
+		</dict>
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>

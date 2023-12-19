@@ -19,7 +19,57 @@ enum RatiosParameter {
 }
 
 @objc(Ratios)
-public class Ratios: NSManagedObject {
+public class Ratios: NSManagedObject, Codable {
+    
+    // MARK: - coding
+    
+    enum CodingKeys: CodingKey {
+        case pe_ratios
+        case roa
+        case roe
+        case roi
+        case bvps
+        case ocfPerShare
+        case fcfPerShare
+        case share
+        case shareSymbol
+    }
+    
+    required convenience public init(from decoder: Decoder) throws {
+        
+        guard let context = decoder.userInfo[CodingUserInfoKey.managedObjectContext] as? NSManagedObjectContext else {
+            throw DecoderConfigurationError.missingManagedObjectContext
+        }
+        
+        self.init(context: context)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.pe_ratios = try container.decodeIfPresent(Data.self, forKey: .pe_ratios)
+        self.roa = try container.decodeIfPresent(Data.self, forKey: .roa)
+        self.roe = try container.decodeIfPresent(Data.self, forKey: .roe)
+        self.roi = try container.decodeIfPresent(Data.self, forKey: .roi)
+        self.bvps = try container.decodeIfPresent(Data.self, forKey: .bvps)
+        self.ocfPerShare = try container.decodeIfPresent(Data.self, forKey: .ocfPerShare)
+        self.fcfPerShare = try container.decodeIfPresent(Data.self, forKey: .fcfPerShare)
+//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
+//        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
+
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encodeIfPresent(pe_ratios, forKey: .pe_ratios)
+        try container.encodeIfPresent(roa, forKey: .roa)
+        try container.encodeIfPresent(roe, forKey: .roe)
+        try container.encodeIfPresent(roi, forKey: .roi)
+        try container.encodeIfPresent(bvps, forKey: .bvps)
+        try container.encodeIfPresent(ocfPerShare, forKey: .ocfPerShare)
+        try container.encodeIfPresent(fcfPerShare, forKey: .fcfPerShare)
+//        try container.encodeIfPresent(share, forKey: .share)
+//        try container.encode(shareSymbol!, forKey: .shareSymbol)
+
+    }
     
     func getValues(parameter: RatiosParameter) -> Labelled_DatedValues? {
         

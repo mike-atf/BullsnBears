@@ -175,12 +175,12 @@ class ValueChart: UIView {
         maxValue1 = CGFloat(dateAscendingValues!.max() ?? Double())
         if maxValue1 < 0 { maxValue1 = 0 }
         
-        if (maxValue1 ).isInfinite {
-            for value in dateAscendingValues ?? [] {
-                print(value)
-            }
-            print()
-        }
+//        if (maxValue1 ).isInfinite {
+//            for value in dateAscendingValues ?? [] {
+//                print(value)
+//            }
+//            print()
+//        }
 
         
         if showXLabels{

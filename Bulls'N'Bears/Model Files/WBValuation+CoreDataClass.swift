@@ -10,12 +10,45 @@ import UIKit
 import CoreData
 
 @objc(WBValuation)
-public class WBValuation: NSManagedObject {
+public class WBValuation: NSManagedObject, Codable {
     
-//    override public func awakeFromInsert() {
-//
-//    }
+    // MARK: - coding
     
+    enum CodingKeys: CodingKey {
+        case date
+        case userEvaluations
+        case intrinsicValueTrend
+        case share
+        case shareSymbol
+    }
+    
+    required convenience public init(from decoder: Decoder) throws {
+        
+        guard let context = decoder.userInfo[CodingUserInfoKey.managedObjectContext] as? NSManagedObjectContext else {
+            throw DecoderConfigurationError.missingManagedObjectContext
+        }
+        
+        self.init(context: context)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.date = try container.decodeIfPresent(Date.self, forKey: .date)
+//        self.userEvaluations = try container.decodeIfPresent(Set<UserEvaluation>.self, forKey: .userEvaluations)
+        self.intrinsicValueTrend = try container.decodeIfPresent(Data.self, forKey: .intrinsicValueTrend)
+//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
+//        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
+
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encodeIfPresent(date, forKey: .date)
+//        try container.encodeIfPresent(userEvaluations, forKey: .userEvaluations)
+        try container.encodeIfPresent(intrinsicValueTrend, forKey: .intrinsicValueTrend)
+//        try container.encodeIfPresent(share, forKey: .share)
+//        try container.encode(shareSymbol!, forKey: .shareSymbol)
+
+    }
     /// qEPS_TTM, returns date ascending Datedvalue within TTM or minDate
     func annualEPS_TTM_DV(minDate:Date?=nil) -> [DatedValue]? {
         

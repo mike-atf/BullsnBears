@@ -57,8 +57,6 @@ class StockChartVC: UIViewController, UIPopoverPresentationControllerDelegate {
         
         let newLabel: UILabel = {
             let label = UILabel()
-//            label.font = UIFont.preferredFont(forTextStyle: .title3)
-//            label.text = titleText + currencyText + exchangeText
             label.attributedText = title$
             label.adjustsFontSizeToFitWidth = true
             label.preferredMaxLayoutWidth = self.view.frame.width * 0.5
