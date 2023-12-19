@@ -46,5 +46,8 @@ class SettingsCell: UITableViewCell {
         } else if path.section == 2 {
             inconView.image = UIImage(systemName: "square.and.arrow.up")
         }
+        else if path.section == 3 {
+            inconView.image = UIImage(systemName: "square.and.arrow.down")
+        }
     }
 }

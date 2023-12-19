@@ -49,22 +49,37 @@ class ImportManager {
     private func installBackupData(fileURL: URL) async {
         
         print("restore from backup...")
-        
+        var safetyBackup: URL?
         do {
             //1. create local backup
-            print("creating backup from current data...")
-            let _ = await BackupManager.backupData()
+            safetyBackup = await BackupManager.backupData()
             
             //2. delete current data
-            print("deleting current data...")
             try await BackupManager.deleteAllData()
             
             //3. restore data
-            print("restoring from backup data...")
             try await BackupManager.restoreData(fromURL: fileURL)
+            DispatchQueue.main.async {
+                AlertController.shared().showDialog(title: "Restore from imported archive completed successfully", alertMessage: "")
+            }
+            return
         } catch {
-            print("error during import and decoding process: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                AlertController.shared().showDialog(title: "Re-installing data from imported Archive failed", alertMessage: "\(error.localizedDescription)\nWill tryto regenerate original data from safety backup")
+            }
         }
+        
+        do {
+            try await BackupManager.restoreData(fromURL: safetyBackup)
+        } catch {
+            print("+++++++++++++++")
+            print("Restore from safety backup failed \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                AlertController.shared().showDialog(title: "Restore from safety backup failed", alertMessage: "\(error.localizedDescription)")
+            }
+
+        }
+
         
     }
 

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UniformTypeIdentifiers
 
 class SettingsTVC: UITableViewController {
     
@@ -18,8 +19,8 @@ class SettingsTVC: UITableViewController {
         
         tableView.register(UINib(nibName: "SettingsCell", bundle: nil), forCellReuseIdentifier: "settingsCell")
         
-        settingsSectionTitles = ["Version","Internal settings","Backup"]
-        settingsRowTitles = [["Build no."],["Rating score weighing factors"],["Export backup"]]
+        settingsSectionTitles = ["Version","Internal settings","Backup", "Import"]
+        settingsRowTitles = [["Build no."],["Rating score weighing factors"],["Export archive"],["Import archive"]]
 
     }
 
@@ -59,6 +60,10 @@ class SettingsTVC: UITableViewController {
             tableView.deselectRow(at: indexPath, animated: true)
             exportBackup()
         }
+        else if indexPath.section == 3 {
+            tableView.deselectRow(at: indexPath, animated: true)
+            openImportView()
+        }
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -89,5 +94,26 @@ class SettingsTVC: UITableViewController {
             }
         }
     }
+    
+    func openImportView() {
+        
+        let archive = UTType(exportedAs: "co.uk.apptoolfactory.bullsnbears.document.bbf", conformingTo: .data)
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [archive], asCopy: true)
+        documentPicker.delegate = self
+        documentPicker.modalPresentationStyle = .automatic
+        
+        self.present(documentPicker, animated: true)
+    }
 
+}
+
+
+extension SettingsTVC: UIDocumentPickerDelegate {
+    
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+
+        let _ = ImportManager(fileURL: urls.first!)
+        self.dismiss(animated: true)
+    }
+    
 }
