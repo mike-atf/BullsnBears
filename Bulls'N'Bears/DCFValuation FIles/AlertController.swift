@@ -30,8 +30,9 @@ class AlertController: NSObject {
             
             let windowScene = (UIApplication.shared.connectedScenes.first as? UIWindowScene)
             let sceneDelegate = windowScene?.delegate as? SceneDelegate
-            let presentingVC = viewController ?? sceneDelegate?.window?.rootViewController
-            
+            var presentingVC = viewController ?? sceneDelegate?.window?.rootViewController
+            presentingVC = presentingVC?.presentedViewController ?? presentingVC
+
             guard presentingVC != nil else {
                 return
             }

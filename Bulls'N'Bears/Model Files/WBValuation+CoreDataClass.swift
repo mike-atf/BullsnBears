@@ -31,11 +31,8 @@ public class WBValuation: NSManagedObject, Codable {
         self.init(context: context)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        self.date = try container.decodeIfPresent(Date.self, forKey: .date)
-//        self.userEvaluations = try container.decodeIfPresent(Set<UserEvaluation>.self, forKey: .userEvaluations)
+        self.date = try container.decode(Date.self, forKey: .date)
         self.intrinsicValueTrend = try container.decodeIfPresent(Data.self, forKey: .intrinsicValueTrend)
-//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
-//        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
 
     }
     
@@ -43,10 +40,7 @@ public class WBValuation: NSManagedObject, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
         try container.encodeIfPresent(date, forKey: .date)
-//        try container.encodeIfPresent(userEvaluations, forKey: .userEvaluations)
         try container.encodeIfPresent(intrinsicValueTrend, forKey: .intrinsicValueTrend)
-//        try container.encodeIfPresent(share, forKey: .share)
-//        try container.encode(shareSymbol!, forKey: .shareSymbol)
 
     }
     /// qEPS_TTM, returns date ascending Datedvalue within TTM or minDate
@@ -117,18 +111,10 @@ public class WBValuation: NSManagedObject, Codable {
 
     func returnUserEvaluations() -> [UserEvaluation]? {
         
-        var evaluations: [UserEvaluation]?
-        if userEvaluations?.count ?? 0 > 0 {
-            evaluations = [UserEvaluation]()
+        if userEvaluations != nil {
+            return Array(userEvaluations!)
         }
-        
-        for element in userEvaluations ?? [] {
-            if let evaluation = element as? UserEvaluation {
-                evaluations?.append(evaluation)
-            }
-        }
-        
-        return evaluations
+        else { return nil }
     }
     
     func returnUserCommentsTexts() -> [String]? {
@@ -138,12 +124,10 @@ public class WBValuation: NSManagedObject, Codable {
             texts = [String]()
         }
         
-        for element in userEvaluations ?? [] {
-            if let evaluation = element as? UserEvaluation {
-                if !(evaluation.comment ?? "").starts(with: "Enter your notes here...") && (evaluation.comment ?? "") != "" {
-                    let text = (evaluation.wbvParameter ?? "") + ": " + (evaluation.comment ?? "")
-                    texts?.append(text)
-                }
+        for evaluation in userEvaluations ?? [] {
+            if !(evaluation.comment ?? "").starts(with: "Enter your notes here...") && (evaluation.comment ?? "") != "" {
+                let text = (evaluation.wbvParameter ?? "") + ": " + (evaluation.comment ?? "")
+                texts?.append(text)
             }
         }
         
@@ -155,26 +139,7 @@ public class WBValuation: NSManagedObject, Codable {
         
         return share!.grossProfitMargins()
         
-       
-        // OLD
-//        guard revenue != nil && grossProfit != nil else {
-//            return ([Double()], ["there are no revenue and/or gross profit data"])
-//        }
-//
-//        let rawData = [revenue!, grossProfit!]
-//
-//        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
-//
-//        var margins = [Double]()
-//        var errors: [String]?
-//        for i in 0..<cleanedData[0].count {
-//            margins.append(cleanedData[1][i] / cleanedData[0][i])
-//        }
-//
-//        if let validError = error {
-//            errors = [validError]
-//        }
-//        return (margins, errors)
+
     }
     
     public func sgaProportion() -> ([Double], [String]?) {
@@ -193,67 +158,14 @@ public class WBValuation: NSManagedObject, Codable {
         let sgaValues = cleanedData[1].values()
 
         var proportions = [Double]()
-//        var errorList: [String]?
         for i in 0..<grossProfitValues.count {
             proportions.append(sgaValues[i] / grossProfitValues[i])
         }
-
-
-        // OLD
-//        guard grossProfit != nil && sgaExpense != nil else {
-//            return ([Double()], ["there are no gross profit and/or SGA expense data"])
-//        }
-//
-//        let rawData = [grossProfit!, sgaExpense!]
-//
-//        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
-//
-//        guard cleanedData[0].count == cleanedData[1].count else {
-//            return ([Double()], ["insufficient gross profit and SGA expense data"])
-//        }
-//
-//        var margins = [Double]()
-//        var errorList: [String]?
-//        for i in 0..<cleanedData[0].count {
-//            margins.append(cleanedData[1][i] / cleanedData[0][i])
-//        }
-//
-//        if let validError = error {
-//            errorList = [validError]
-//        }
-
-        
+     
         return (proportions, nil)
 
     }
-    
-    /// returns arary of sums of sahreholdersEquity + equityRepurchased
-//    public func adjustedEquity() -> [Double] {
-//
-//
-//        guard let erp = equityRepurchased else {
-//            return [Double]()
-//        }
-//
-//        var sums = [Double]()
-//        var count = 0
-//
-//        if shareholdersEquity?.count ?? 0 > 0 {
-//
-//            for element in shareholdersEquity ?? [] {
-//                if (erp.count) > count {
-//                    sums.append(element + erp[count])
-//                }
-//
-//                count += 1
-//            }
-//        }
-//        else {
-//            sums = equityRepurchased ?? [Double]()
-//        }
-//
-//        return sums
-//    }
+
     
     /// returns porportions of array 2 / array 1 elements
     public func proportions(array1: [Double]?, array2: [Double]?, removeZeroElements: Bool?=true) -> ([Double], [String]?) {
@@ -310,65 +222,15 @@ public class WBValuation: NSManagedObject, Codable {
         let rANDdValues = cleanedData[1].values()
 
         var proportions = [Double]()
-//        var errorList: [String]?
         for i in 0..<grossProfitValues.count {
             proportions.append(rANDdValues[i] / grossProfitValues[i])
         }
 
-        
-        //
-//        guard grossProfit != nil && rAndDexpense != nil else {
-//            return ([Double()], ["there are no gross profit and/or R&D expense data"])
-//        }
-//
-//        let rawData = [grossProfit!, rAndDexpense!]
-//
-//        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
-//
-//        guard cleanedData[0].count == cleanedData[1].count else {
-//            return ([Double()], ["insufficient gross profit and R&D expense data"])
-//        }
-//
-//        var proportions = [Double]()
-//        var errorList: [String]?
-//        for i in 0..<cleanedData[0].count {
-//            proportions.append(cleanedData[1][i] / cleanedData[0][i])
-//        }
-//
-//        if let validError = error {
-//            errorList = [validError]
-//        }
+ 
         return (proportions, nil)
 
     }
-    
-    /*
-    public func netIncomeProportion() -> ([Double], [String]?) {
-        
-        guard revenue != nil && netEarnings != nil else {
-            return ([Double()], ["there are no revenue and/or net income data"])
-        }
-        
-        let rawData = [revenue!, netEarnings!]
-        
-        let (cleanedData, error) = ValuationDataCleaner.cleanValuationData(dataArrays: rawData, method: .wb)
-        
-        guard cleanedData[0].count == cleanedData[1].count else {
-            return ([Double()], ["insufficient revenue and net income data"])
-        }
-        
-        var proportions = [Double]()
-        var errorList: [String]?
-        for i in 0..<cleanedData[0].count {
-            proportions.append(cleanedData[1][i] / cleanedData[0][i])
-        }
-        
-        if let validError = error {
-            errorList = [validError]
-        }
-        return (proportions, errorList)
-    }
-    */
+
     
     public func longtermDebtProportion() -> ([Double], [String]?) {
         
@@ -938,13 +800,9 @@ public class WBValuation: NSManagedObject, Codable {
         return (ivalue, errors)
     }
     
-    public func ageOfValuation() -> TimeInterval? {
+    public func ageOfValuation() -> TimeInterval {
         
-        if let date = self.date {
-            return Date().timeIntervalSince(date)
-        }
-        
-        return nil
+        return Date().timeIntervalSince(date)
     }
     
     func addIntrinsicValueTrend(date: Date, value: Double) {

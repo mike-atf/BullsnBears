@@ -27,64 +27,8 @@ class ResearchController {
             share?.research?.share = share
         }
         
-//        fillParameters()
-        
         titleDictionary = titleParameterDictionary()
     }
-    
-    /*
-    func fillParameters() {
-        
-        if let validShare = share {
-            
-            if let marketCap = validShare.key_stats?.marketCap.valuesOnly(dateOrdered: .ascending, withoutZeroes: true)?.last {
-                
-            }
-            
-            if validShare.research?.companySize == nil {
-                if let validDCF = validShare.dcfValuation {
-                    let mcap = validDCF.marketCap
-                    share?.research?.companySize = "MCap = " + (currencyFormatterGapNoPence.string(from: mcap as NSNumber) ?? "-")
-                }
-            }
-
-            if let validR1 = validShare.rule1Valuation {
-                
-                if validShare.research?.insiderBuying == nil {
-                    if validR1.insiderStocks > 0 {
-                        let buying = validR1.insiderStockBuys / validR1.insiderStocks
-                        let selling = validR1.insiderStockSells / validR1.insiderStocks
-                        var text = "Buying: " + (percentFormatter0Digits.string(from: buying as NSNumber) ?? "-")
-                        text += ", selling: " + (percentFormatter0Digits.string(from: selling as NSNumber) ?? "-")
-                        share?.research?.insiderBuying = text
-                    }
-                }
-                
-            }
-            
-            if let wbValuation = validShare.wbValuation {
-                
-                if validShare.research?.assets == nil {
-                    let lastStockPrice =  validShare.getDailyPrices()?.last?.close
-                    if let valid = wbValuation.bvps?.first {
-                        if lastStockPrice != nil {
-                            if let t$ = percentFormatter0Digits.string(from: (valid / lastStockPrice!) as NSNumber) {
-                                if let t2$ = currencyFormatterGapWithPence.string(from: valid as NSNumber) {
-                                    validShare.research?.assets = "Book value per share / price per share: " + t$ + " (" + t2$ + ")"
-                                }
-                            }
-                        }
-                    }
-
-                }
-                
-            }
- 
-            validShare.save()
-        }
-
-    }
-    */
     
     func titleParameterDictionary() -> [String : String]? {
         

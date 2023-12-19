@@ -14,7 +14,9 @@ class ImportManager {
         
         let windowScene = (UIApplication.shared.connectedScenes.first as? UIWindowScene)
         let sceneDelegate = windowScene?.delegate as? SceneDelegate
-        let presentingVC = sceneDelegate?.window?.rootViewController
+        var presentingVC = sceneDelegate?.window?.rootViewController
+        
+        presentingVC = presentingVC?.presentedViewController ?? presentingVC
         
         guard presentingVC != nil else {
             AlertController.shared().showDialog(title: "Import attempt failed", alertMessage: "there is no visible view to present the import dialog")

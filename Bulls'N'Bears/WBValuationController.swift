@@ -346,7 +346,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     
                     if let trendData = r1v.moatScoreTrend.datedValues(dateOrder: .ascending) { // share.trendValues(trendName: .moatScore) {
                         let pastData = trendData.filter({ datedValue in
-                            if datedValue.date < r1v.creationDate! { return true }
+                            if datedValue.date < r1v.creationDate { return true }
                             else { return false }
                         })
                         if let mostRecent = pastData.first {
@@ -480,7 +480,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     
                     if let trendData = share.trendValues(trendName: .stickerPrice) {
                         let pastData = trendData.filter { datedValue in
-                            if datedValue.date < r1v.creationDate! { return true }
+                            if datedValue.date < r1v.creationDate { return true }
                             else { return false }
                         }
                         if let mostRecent = pastData.first {
@@ -505,7 +505,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                         
                         if let trendData = share.trendValues(trendName: .dCFValue) {
                             let pastData = trendData.filter { datedValue in
-                                if datedValue.date < dcfv.creationDate! { return true }
+                                if datedValue.date < dcfv.creationDate { return true }
                                 else { return false }
                             }
                             if let mostRecent = pastData.first {
@@ -985,9 +985,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
         if storedEvaluations?.count ?? 0 != 0 {
             
             for element in storedEvaluations! {
-                if let evaluation = element as? UserEvaluation {
-                    if evaluation.wbvParameter == parameter { return evaluation }
-                }
+                if element.wbvParameter == parameter { return element }
             }
         }
 

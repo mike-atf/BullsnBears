@@ -30,7 +30,7 @@ public class DCFValuation: NSManagedObject, Codable {
         self.init(context: context)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        self.creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
+        self.creationDate = try container.decode(Date.self, forKey: .creationDate)
         self.ivalueTrend = try container.decodeIfPresent(Data.self, forKey: .ivalueTrend)
 //        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
 //        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
@@ -103,13 +103,10 @@ public class DCFValuation: NSManagedObject, Codable {
 //        copyDataFromDCFaR1Valuations()
     }
     
-    public func ageOfValuation() -> TimeInterval? {
+    public func ageOfValuation() -> TimeInterval {
         
-        if let date = creationDate {
-            return Date().timeIntervalSince(date)
-        }
-        
-        return nil
+            return Date().timeIntervalSince(creationDate)
+
     }
     
     func save() {

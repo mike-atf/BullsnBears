@@ -33,12 +33,10 @@ public class Rule1Valuation: NSManagedObject, Codable {
         self.init(context: context)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        self.creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
+        self.creationDate = try container.decode(Date.self, forKey: .creationDate)
         self.moatScoreTrend = try container.decodeIfPresent(Data.self, forKey: .moatScoreTrend)
         self.stickerPriceTrend = try container.decodeIfPresent(Data.self, forKey: .stickerPriceTrend)
         self.ceoRating = try container.decode(Double.self, forKey: .ceoRating)
-//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
-//        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
 
     }
     
@@ -49,22 +47,20 @@ public class Rule1Valuation: NSManagedObject, Codable {
         try container.encodeIfPresent(moatScoreTrend, forKey: .moatScoreTrend)
         try container.encodeIfPresent(stickerPriceTrend, forKey: .stickerPriceTrend)
         try container.encode(ceoRating, forKey: .ceoRating)
-//        try container.encodeIfPresent(share, forKey: .share)
-//        try container.encode(shareSymbol!, forKey: .shareSymbol)
 
     }
     
-    static func create(in managedObjectContext: NSManagedObjectContext) {
-        let newValuation = self.init(context: managedObjectContext)
-        newValuation.creationDate = Date()
-
-        do {
-            try  managedObjectContext.save()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-    }
+//    static func create(in managedObjectContext: NSManagedObjectContext) {
+//        let newValuation = self.init(context: managedObjectContext)
+//        newValuation.creationDate = Date()
+//
+//        do {
+//            try  managedObjectContext.save()
+//        } catch {
+//            let nserror = error as NSError
+//            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+//        }
+//    }
     
      
     func save() {
@@ -90,13 +86,10 @@ public class Rule1Valuation: NSManagedObject, Codable {
         }
     }
     
-    public func ageOfValuation() -> TimeInterval? {
+    public func ageOfValuation() -> TimeInterval {
         
-        if let date = creationDate {
-            return Date().timeIntervalSince(date)
-        }
-        
-        return nil
+        return Date().timeIntervalSince(creationDate)
+
     }
     
 //    func historicalYearsCompleted() -> Int {

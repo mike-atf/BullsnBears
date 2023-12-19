@@ -47,12 +47,12 @@ public class StockResearch: NSManagedObject, Codable {
         self.creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
         self.assets = try container.decodeIfPresent(String.self, forKey: .assets)
         self.insiderBuying = try container.decodeIfPresent(String.self, forKey: .insiderBuying)
+        self.theBuyStory = try container.decodeIfPresent(String.self, forKey: .theBuyStory)
         self.news = try container.decodeIfPresent(Set<CompanyNews>.self, forKey: .news)
         self.nextReportDate = try container.decodeIfPresent(Date.self, forKey: .nextReportDate)
         self.targetBuyPrice = try container.decode(Double.self, forKey: .targetBuyPrice)
         self.annualStatementOutlook = try container.decodeIfPresent(Data.self, forKey: .annualStatementOutlook)
         self.pricePredictions = try container.decodeIfPresent(Data.self, forKey: .pricePredictions)
-//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
 
     }
     
@@ -71,8 +71,7 @@ public class StockResearch: NSManagedObject, Codable {
         try container.encode(targetBuyPrice, forKey: .targetBuyPrice)
         try container.encodeIfPresent(annualStatementOutlook, forKey: .annualStatementOutlook)
         try container.encodeIfPresent(pricePredictions, forKey: .pricePredictions)
-//        try container.encodeIfPresent(share, forKey: .share)
-
+        try container.encodeIfPresent(theBuyStory, forKey: .theBuyStory)
     }
 
     public override func awakeFromInsert() {

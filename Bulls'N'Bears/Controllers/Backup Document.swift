@@ -115,16 +115,15 @@ class BNB_Archive: UIDocument {
             throw InternalError.init(location: #function, errorInfo: "backup document has no shares data to decode")
         }
         
-        do { // for debugging - remove later
+//        do { // for debugging - remove later
             for data in validSharesData {
-                print("decoding a share from \((data as NSData).length) of bytes data...")
                 let share = try decoder.decode(Share.self, from: data)
                 context.insert(share)
             }
-        } catch {
-            print("error with \(sharesData?.count ?? 0 ) shares decoding from data array: \(error.localizedDescription)")
-            print()
-        }
+//        } catch {
+//            print("error with \(sharesData?.count ?? 0 ) shares decoding from data array: \(error.localizedDescription)")
+//            print()
+//        }
         
         try context.save()
      }

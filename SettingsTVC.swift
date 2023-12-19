@@ -12,6 +12,7 @@ class SettingsTVC: UITableViewController {
     
     var settingsSectionTitles: [String]!
     var settingsRowTitles: [[String]]!
+    var callingVC: StockChartVC!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -103,6 +104,7 @@ class SettingsTVC: UITableViewController {
         documentPicker.modalPresentationStyle = .automatic
         
         self.present(documentPicker, animated: true)
+//        self.dismiss(animated: true)
     }
 
 }
@@ -113,7 +115,6 @@ extension SettingsTVC: UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
 
         let _ = ImportManager(fileURL: urls.first!)
-        self.dismiss(animated: true)
     }
     
 }

@@ -187,10 +187,71 @@ public class Share: NSManagedObject, Codable {
         self.key_stats = try container.decodeIfPresent(Key_stats.self, forKey: .key_stats)
         self.ratios = try container.decodeIfPresent(Ratios.self, forKey: .ratios)
         self.research = try container.decodeIfPresent(StockResearch.self, forKey: .research)
-        self.rule1Valuation = try container.decodeIfPresent(Rule1Valuation.self, forKey: .rule1Valuation)
+        self.company_info = try container.decodeIfPresent(Company_Info.self, forKey: .company_info)
+       self.rule1Valuation = try container.decodeIfPresent(Rule1Valuation.self, forKey: .rule1Valuation)
         self.transactions = try container.decodeIfPresent(Set<ShareTransaction>.self, forKey: .transactions)
         self.wbValuation = try container.decodeIfPresent(WBValuation.self, forKey: .wbValuation)
         self.healthData = try container.decodeIfPresent(HealthData.self, forKey: .healthData)
+        
+        self.analysis?.share = self
+        self.balance_sheet?.share = self
+        self.cash_flow?.share = self
+        self.income_statement?.share = self
+        self.dcfValuation?.share = self
+        self.key_stats?.share = self
+        self.ratios?.share = self
+        self.research?.share = self
+        self.company_info?.share = self
+        self.rule1Valuation?.share = self
+        for transaction in self.transactions ?? [] {
+            transaction.share = self
+        }
+        self.wbValuation?.share = self
+        self.healthData?.share = self
+        
+        if analysis != nil {
+            context.insert(analysis!)
+        }
+        if balance_sheet != nil {
+            context.insert(balance_sheet!)
+        }
+        if cash_flow != nil {
+            context.insert(cash_flow!)
+        }
+        if income_statement != nil {
+            context.insert(income_statement!)
+        } 
+        if dcfValuation != nil {
+            context.insert(dcfValuation!)
+        }
+        if key_stats != nil {
+            context.insert(key_stats!)
+        }
+        if ratios != nil {
+            context.insert(ratios!)
+        }
+        if research != nil {
+            context.insert(research!)
+        }
+        if company_info != nil {
+            context.insert(company_info!)
+        }
+        if rule1Valuation != nil {
+            context.insert(rule1Valuation!)
+        }
+        if transactions != nil {
+            for transaction in transactions! {
+                context.insert(transaction)
+            }
+        }
+        if wbValuation != nil {
+            context.insert(wbValuation!)
+        }
+        if healthData != nil {
+            context.insert(healthData!)
+        }
+
+
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -281,7 +342,7 @@ public class Share: NSManagedObject, Codable {
                 if let r1v = self.rule1Valuation {
                     let (_, moat) = r1v.moatScore()
                     if moat != nil {
-                        let date = r1v.creationDate!
+                        let date = r1v.creationDate
                         datedValue = DatedValue(date:date, value: moat!)
                     }
                 }
@@ -289,7 +350,7 @@ public class Share: NSManagedObject, Codable {
                 if let r1v = self.rule1Valuation {
                     let (sp, _) = r1v.stickerPrice()
                     if sp != nil {
-                        let date = r1v.creationDate!
+                        let date = r1v.creationDate
                         datedValue = DatedValue(date:date, value: sp!)
                     }
                 }
@@ -297,7 +358,7 @@ public class Share: NSManagedObject, Codable {
                 if let dcfv = self.dcfValuation {
                     let (sp, _) = dcfv.returnIValueNew()
                     if sp != nil {
-                        let date = dcfv.creationDate!
+                        let date = dcfv.creationDate
                         datedValue = DatedValue(date:date, value: sp!)
                     }
                 }
@@ -376,7 +437,7 @@ public class Share: NSManagedObject, Codable {
                 if let r1v = self.rule1Valuation {
                     let (_, moat) = r1v.moatScore()
                     if moat != nil {
-                        let date = r1v.creationDate!
+                        let date = r1v.creationDate
                         dataSet.append(ChartDataSet(x:date, y: moat!))
                     }
                 }
@@ -384,7 +445,7 @@ public class Share: NSManagedObject, Codable {
                 if let r1v = self.rule1Valuation {
                     let (sp, _) = r1v.stickerPrice()
                     if sp != nil {
-                        let date = r1v.creationDate!
+                        let date = r1v.creationDate
                         dataSet.append(ChartDataSet(x:date, y: sp))
                     }
                 }
@@ -392,7 +453,7 @@ public class Share: NSManagedObject, Codable {
                 if let dcfv = self.dcfValuation {
                     let (sp, _) = dcfv.returnIValueNew()
                     if sp != nil {
-                        let date = dcfv.creationDate!
+                        let date = dcfv.creationDate
                         dataSet.append(ChartDataSet(x:date, y: sp))
                     }
                 }

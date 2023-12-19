@@ -99,8 +99,8 @@ class StockChartVC: UIViewController, UIPopoverPresentationControllerDelegate {
             
             settingsView.modalPresentationStyle = .popover
             settingsView.preferredContentSize = CGSize(width: self.view.bounds.width / 2, height: self.view.bounds.height)
-//            settingsView.loadViewIfNeeded()
-//            settingsView.callingViewController = self
+            settingsView.loadViewIfNeeded()
+            settingsView.callingVC = self
 
             let popUpController = settingsView.popoverPresentationController
             popUpController!.permittedArrowDirections = .up

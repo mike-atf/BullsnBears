@@ -1179,7 +1179,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "206"
             endingLineNumber = "206"
-            landmarkName = "findOtherSharesOnYahoo(searchTerm:)"
+            landmarkName = "downloadYahooNameSearchPage(_:)"
             landmarkType = "7">
             <Locations>
                <Location
@@ -1383,8 +1383,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "189"
             endingLineNumber = "189"
-            landmarkName = "StockSearchTVC"
-            landmarkType = "3">
+            landmarkName = "findOtherSharesOnYahoo(searchTerm:)"
+            landmarkType = "7">
             <Locations>
                <Location
                   uuid = "AE800D16-1800-424A-A517-89F8C964C534 - d640e1f89fbc42b"
@@ -3250,6 +3250,21 @@
                   endingLineNumber = "115"
                   offsetFromSymbolStart = "4560">
                </Location>
+               <Location
+                  uuid = "9CB5FBD9-01BF-466D-9783-C19559EF15A0 - 8a3c19327e7d6bd5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for Bulls_N_Bears.BNB_Archive.decodeShares() async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/Backup%20Document.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "115"
+                  endingLineNumber = "115"
+                  offsetFromSymbolStart = "3464">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -3491,19 +3506,19 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "9C75330A-8435-4C8A-9F0B-480350E36377"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Bulls&apos;N&apos;Bears/Controllers/Backup Document.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "126"
-            endingLineNumber = "126"
+            startingLineNumber = "125"
+            endingLineNumber = "125"
             landmarkName = "decodeShares()"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "9C75330A-8435-4C8A-9F0B-480350E36377 - 8a3c19327e7d626c"
+                  uuid = "9C75330A-8435-4C8A-9F0B-480350E36377 - 8a3c19327e7d6a0f"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -3513,12 +3528,12 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/Backup%20Document.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "188"
-                  endingLineNumber = "188"
-                  offsetFromSymbolStart = "9388">
+                  startingLineNumber = "125"
+                  endingLineNumber = "125"
+                  offsetFromSymbolStart = "4936">
                </Location>
                <Location
-                  uuid = "9C75330A-8435-4C8A-9F0B-480350E36377 - 8a3c19327e7d626c"
+                  uuid = "9C75330A-8435-4C8A-9F0B-480350E36377 - 8a3c19327e7d6da8"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -3528,24 +3543,9 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/Backup%20Document.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "188"
-                  endingLineNumber = "188"
-                  offsetFromSymbolStart = "8280">
-               </Location>
-               <Location
-                  uuid = "9C75330A-8435-4C8A-9F0B-480350E36377 - 8a3c19327e7d6a6e"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for Bulls_N_Bears.BNB_Archive.decodeShares() async throws -&gt; ()"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/Backup%20Document.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "126"
-                  endingLineNumber = "126"
-                  offsetFromSymbolStart = "7564">
+                  startingLineNumber = "128"
+                  endingLineNumber = "128"
+                  offsetFromSymbolStart = "2544">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -3734,8 +3734,8 @@
             filePath = "Bulls&apos;N&apos;Bears/ImportManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "19"
-            endingLineNumber = "19"
+            startingLineNumber = "21"
+            endingLineNumber = "21"
             landmarkName = "init(fileURL:)"
             landmarkType = "7">
             <Locations>
@@ -3770,6 +3770,38 @@
                   offsetFromSymbolStart = "3172">
                </Location>
             </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D2AB640F-4151-4ABD-BEA1-4875E88DFDB4"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "76"
+            endingLineNumber = "76"
+            landmarkName = "backupData()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "033FF9AD-BFE9-4890-A63C-D55EB636A18A"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StockResearch+CoreDataClass.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "43"
+            endingLineNumber = "43"
+            landmarkName = "init(from:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

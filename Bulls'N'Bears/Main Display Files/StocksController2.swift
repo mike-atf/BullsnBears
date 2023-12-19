@@ -611,7 +611,7 @@ class StocksController2: NSFetchedResultsController<Share> {
                     let wbv = managedObjectContext.object(with: wbValuationID) as! WBValuation
                     let (_,lynch) = share.lynchRatio()
                     if lynch != nil {
-                        let trendValue = DatedValue(date: wbv.date!, value: lynch!)
+                        let trendValue = DatedValue(date: wbv.date, value: lynch!)
                         share.saveTrendsData(datedValuesToAdd: [trendValue], trendName: .lynchScore)
                     }
                     let (value2, _) = wbv.ivalue()
