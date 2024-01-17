@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import OSLog
 
 struct FinHealthListView: View {
     
@@ -37,7 +38,7 @@ struct FinHealthListView: View {
     @State private var solvencyChange = ""
 
     var controller: FinHealthListController
-
+    
     init(share: Share) {
         
         self.share = share

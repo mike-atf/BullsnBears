@@ -26,9 +26,7 @@ extension StockResearch {
     @NSManaged public var theBuyStory: String?
     @NSManaged public var share: Share?
     @NSManaged public var news: Set<CompanyNews>?
-//    @NSManaged public var businessDescription: String?
     @NSManaged public var nextReportDate: Date?
-//    @NSManaged public var futureGrowthMean: Double
     @NSManaged public var targetBuyPrice: Double
     @NSManaged public var annualStatementOutlook: Data?
     @NSManaged public var pricePredictions: Data?

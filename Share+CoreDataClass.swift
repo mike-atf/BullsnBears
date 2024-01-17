@@ -29,16 +29,16 @@ public class Share: NSManagedObject, Codable {
     var sharePriceSplitCorrected = false
     
     public override func awakeFromInsert() {
-        watchStatus = 2
-        
-        if let context = self.managedObjectContext {
-            wbValuation = WBValuation(context: context)
-            wbValuation?.date = Date()
-            rule1Valuation = Rule1Valuation(context: context)
-            rule1Valuation?.creationDate = Date()
-            dcfValuation = DCFValuation(context: context)
-            dcfValuation?.creationDate = Date()
-        }
+//        watchStatus = 2
+//        
+//        if let context = self.managedObjectContext {
+//            wbValuation = WBValuation(context: context)
+//            wbValuation?.date = Date()
+//            rule1Valuation = Rule1Valuation(context: context)
+//            rule1Valuation?.creationDate = Date()
+//            dcfValuation = DCFValuation(context: context)
+//            dcfValuation?.creationDate = Date()
+//        }
         
     }
     
@@ -188,7 +188,7 @@ public class Share: NSManagedObject, Codable {
         self.ratios = try container.decodeIfPresent(Ratios.self, forKey: .ratios)
         self.research = try container.decodeIfPresent(StockResearch.self, forKey: .research)
         self.company_info = try container.decodeIfPresent(Company_Info.self, forKey: .company_info)
-       self.rule1Valuation = try container.decodeIfPresent(Rule1Valuation.self, forKey: .rule1Valuation)
+        self.rule1Valuation = try container.decodeIfPresent(Rule1Valuation.self, forKey: .rule1Valuation)
         self.transactions = try container.decodeIfPresent(Set<ShareTransaction>.self, forKey: .transactions)
         self.wbValuation = try container.decodeIfPresent(WBValuation.self, forKey: .wbValuation)
         self.healthData = try container.decodeIfPresent(HealthData.self, forKey: .healthData)
@@ -689,16 +689,10 @@ public class Share: NSManagedObject, Codable {
         guard let valid = dailyPrices else { return nil }
         
         do {
-            if let data = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(valid) as? Data {
+            if let data = try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSDate.self, NSNumber.self], from: valid) as? Data {
 
                 // the 'setDailyPrices' function ensure PricePoints are stored in date sorted order for faster retrieval without sorting
                 prices = try PropertyListDecoder().decode([PricePoint].self, from: data)
-//once
-//                if symbol == "TSLA" && !sharePriceSplitCorrected {
-//                    let ratio = Double(1/3)
-//                    return shareSplitPriceRecalculation(pricePoints: prices, splitDateString: "08/24/22" , newPerOldShares: ratio)
-//                }
-                // once
 
                 let nonZeroes = prices?.filter({ pp in
                     if pp.close > 0 { return true }
@@ -711,6 +705,37 @@ public class Share: NSManagedObject, Codable {
                 
                 setDailyPrices(pricePoints: sorted)
                 return sorted
+            }
+        } catch let error {
+            ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
+        }
+        
+        return nil
+    }
+
+    /// return DV in time ACENDING order
+    func getDailyClosingPriceDVs() -> [DatedValue]? {
+
+        guard let valid = dailyPrices else { return nil }
+        
+        do {
+            if let data = try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSDate.self, NSNumber.self], from: valid) as? Data {
+
+                prices = try PropertyListDecoder().decode([PricePoint].self, from: data)
+
+                let nonZeroes = prices?.filter({ pp in
+                    if pp.close > 0 { return true }
+                    else { return false }
+                })
+                let sorted = nonZeroes?.sorted(by: { p0, p1 in
+                    if p0.tradingDate < p1.tradingDate { return true }
+                    else { return false }
+                })
+
+                
+                return sorted?.compactMap({ ppoint in
+                    return DatedValue(date: ppoint.tradingDate, value: ppoint.close)
+                })
             }
         } catch let error {
             ErrorController.addInternalError(errorLocation: #file + "." + #function, systemError: error, errorInfo: "error retrieving stored share price data")
@@ -992,6 +1017,71 @@ public class Share: NSManagedObject, Codable {
         
         return getDailyPrices()?.last?.returnPrice(option: option)
         
+    }
+    
+    func latestPriceDV() -> DatedValue? {
+        
+        guard let latestPricePoint = getDailyPrices()?.last else {
+            return nil
+        }
+        
+        return DatedValue(date: latestPricePoint.tradingDate, value: latestPricePoint.close)
+    }
+
+    /// returns mean change calculated from correlation of TTM closing prices
+    func priceChangeLastyear() -> Correlation? {
+        
+        guard let latestPriceDV = latestPriceDV() else { return nil }
+        
+        let dailyPrices = getDailyClosingPriceDVs()
+        let yearAgo = Date().addingTimeInterval(-52*7*24*3600)
+        
+        guard let lastYearsClosingPrices = dailyPrices?.filter({ dv in
+            if dv.date < yearAgo { return false }
+            else { return true }
+        }) else { return nil }
+        
+        guard lastYearsClosingPrices.count > 1 else {
+            return nil
+        }
+        
+        let earliestPriceDV = lastYearsClosingPrices.first!
+        let timeSpan = lastYearsClosingPrices.last!.date.timeIntervalSince(earliestPriceDV.date)
+        
+        let yArray = lastYearsClosingPrices.compactMap { $0.value }
+        let xArray = lastYearsClosingPrices.compactMap { $0.date.timeIntervalSince(earliestPriceDV.date)}
+
+        /// x=0 or place of yInterCept is date of earliest element
+        return Calculator.correlation2(xArray: xArray, yArray: yArray)
+
+    }
+    
+    /// returns mean change  calculated from correlation  of TTM qEPS
+    func epsChangeLastYear() -> Correlation? {
+        
+        guard let qepsDV = self.income_statement?.eps_quarter.datedValues(dateOrder: .ascending, includeThisYear: true) else { return  nil }
+        
+        let yearAgo = Date().addingTimeInterval(-53*7*24*3600)
+        
+        let lastYearsqEPS = qepsDV.filter ({ dv in
+            if dv.date < yearAgo { return false }
+            else { return true }
+        })
+                                           
+       guard (lastYearsqEPS.count > 1) else {
+            return nil
+        }
+                                           
+        let latestqEPS = lastYearsqEPS.last!
+        let earliestqEPS = lastYearsqEPS.first!
+        let timeSpan = latestqEPS.date.timeIntervalSince(earliestqEPS.date)
+
+                                           
+        let yArray = lastYearsqEPS.compactMap { $0.value }
+        let xArray = lastYearsqEPS.compactMap { $0.date.timeIntervalSince(earliestqEPS.date)}
+        
+        /// x=0 or place of yInterCept is date of earliest element
+        return Calculator.correlation2(xArray: xArray, yArray: yArray)
     }
 
     // MARK: - correlations and trends
@@ -1353,7 +1443,7 @@ public class Share: NSManagedObject, Codable {
                 continue
             }
 
-            let predictedPrice = correlation.yIntercept + correlation.incline * (foreCastTime)
+            let predictedPrice = correlation.yInterceptAtZero + correlation.incline * (foreCastTime)
 
             totalCounted += 1
             if trendType == .bottom {
@@ -2192,13 +2282,13 @@ public class Share: NSManagedObject, Codable {
             let keyStats = self.key_stats ?? Key_stats(context: backgroundMoc)
             keyStats.share = self
             
-            let r1v = self.rule1Valuation ?? Rule1Valuation(context: backgroundMoc)
+            let r1v = self.rule1Valuation ?? Rule1Valuation(moc: backgroundMoc)
             r1v.share = self
             
-            let dcfv = self.dcfValuation ?? DCFValuation(context: backgroundMoc)
+            let dcfv = self.dcfValuation ?? DCFValuation(moc: backgroundMoc)
             dcfv.share = self
 
-            let wbv = self.wbValuation ?? WBValuation(context: backgroundMoc)
+            let wbv = self.wbValuation ?? WBValuation(moc: backgroundMoc)
             wbv.share = self
 
             

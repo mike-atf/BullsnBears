@@ -19,7 +19,6 @@ extension CompanyNews {
     @NSManaged public var newsText: String?
     @NSManaged public var creationDate: Date?
     @NSManaged public var research: StockResearch?
-//    @NSManaged public var shareSymbol: String?
 }
 
 extension CompanyNews : Identifiable {

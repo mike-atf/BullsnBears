@@ -537,8 +537,8 @@ class ChartView: UIView {
         if trendProperties.type == TrendType.regression {
             // draw regression trends
             if let correlation = stock.correlationTrend(properties: trendProperties) {
-                let a = PriceDate(date:trendStart, price: correlation.yIntercept)
-                let b = PriceDate(date:trendEnd, price: correlation.yIntercept + correlation.incline * trendEnd.timeIntervalSince(trendStart))
+                let a = PriceDate(date:trendStart, price: correlation.yInterceptAtZero)
+                let b = PriceDate(date:trendEnd, price: correlation.yInterceptAtZero + correlation.incline * trendEnd.timeIntervalSince(trendStart))
                 
                 coCoEff = correlation.coEfficient
                 startPrice = a.price

@@ -38,8 +38,6 @@ public class HealthData: NSManagedObject, Codable {
         self.quickRatio = try container.decodeIfPresent(Data.self, forKey: .quickRatio)
         self.currentRatio = try container.decodeIfPresent(Data.self, forKey: .currentRatio)
         self.solvency = try container.decodeIfPresent(Data.self, forKey: .solvency)
-//        self.share = try container.decodeIfPresent(Share.self, forKey: .share)
-//        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
 
     }
     
@@ -51,8 +49,6 @@ public class HealthData: NSManagedObject, Codable {
         try container.encodeIfPresent(quickRatio, forKey: .quickRatio)
         try container.encodeIfPresent(currentRatio, forKey: .currentRatio)
         try container.encodeIfPresent(solvency, forKey: .solvency)
-//        try container.encodeIfPresent(share, forKey: .share)
-//        try container.encode(shareSymbol!, forKey: .shareSymbol)
 
     }
 

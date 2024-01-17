@@ -11,18 +11,25 @@ import UserNotifications
 
 let localBackupFolderURL: URL? = {
     
-    let applicationSupportDirectoryPaths = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true)
-    let localFolderPath = applicationSupportDirectoryPaths[0] + "/LocalBackups"
-    if FileManager.default.fileExists(atPath: localFolderPath) {
-        return URL(fileURLWithPath: localFolderPath)
-    } else {
-        do {
-            try FileManager.default.createDirectory(atPath: localFolderPath, withIntermediateDirectories: true, attributes: nil)
-        } catch {
-            print("a local Backup folder could not be created \(error.localizedDescription)")
+//    let applicationSupportDirectoryPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+    
+    if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first{
+        
+        let localFolderURL = documentDirectory.appendingPathComponent("Local Backups")
+
+        if FileManager.default.fileExists(atPath: localFolderURL.path()) {
+            return localFolderURL
+        } else {
+            do {
+                try FileManager.default.createDirectory(at: localFolderURL, withIntermediateDirectories: true)
+            } catch {
+                print("a local Backup folder could not be created \(error.localizedDescription)")
+            }
+            return localFolderURL
         }
-        return URL(fileURLWithPath: localFolderPath)
     }
+    
+    return nil
 }()
 
 

@@ -758,43 +758,54 @@ let yahooCSVFileDateFormatter: DateFormatter = {
 }()
 
 
-
+/// yInterceptAtZero (m or a)  is at x=0! this may not be where the first x/y pair of the array is
+/// xDistance is (positive) difference between x.first and x.last
 struct Correlation {
-    var incline = Double()
-    var yIntercept = Double()
+    var incline = Double() // b
+    var yInterceptAtZero = Double() // m or a
     var coEfficient = Double()
-    var xElements = Int()
+    var xElementsCount = Int()
+    var maxX: Double?
     
-    init(m: Double, b: Double, r: Double, xElements: Int) {
+    /// xDistance = x-Axis difference between max in min/yInterceptAtZero
+    init(m: Double, b: Double, r: Double, xElements: Int, maxX:Double?=nil) {
         self.incline = m
-        self.yIntercept = b
+        self.yInterceptAtZero = b
         self.coEfficient = r
-        self.xElements = xElements
+        self.xElementsCount = xElements
+        self.maxX = maxX
     }
-    
-    /// increase/ decline in % from yIntercept to endpoint using timeInterval as x-axis
+
+    /// assumes once annual x array elements, NOT timeInterval x-axis; use 'change()' for latter; returns annual change calculated over n=xArray count years
     public func meanGrowth(for xElements: Double?=nil) -> Double? {
         
-        guard (xElements ?? Double(self.xElements)) > 0 else {
+        guard (xElements ?? Double(self.xElementsCount)) > 0 else {
             return nil
         }
         
-        let intercept = (yIntercept != 0) ? yIntercept : 1
+        let endPoint = incline * (xElements ?? Double(self.xElementsCount)) + yInterceptAtZero
+        let change = (endPoint - yInterceptAtZero) / yInterceptAtZero
         
-        let endPoint = incline * (xElements ?? Double(self.xElements)) + yIntercept
-        let change = (endPoint - yIntercept) / abs(intercept)
-        
-        return change / (xElements ?? Double(self.xElements))
+        return change / (xElements ?? Double(self.xElementsCount))
     }
     
-    public func compoundGrowthRate(for xElements: Double?=nil) -> Double {
+    public func change() -> Double? {
         
-        let endPoint = incline * (xElements ?? Double(self.xElements)) + yIntercept
-        return (pow((endPoint/yIntercept), (1/((xElements ?? Double(self.xElements))-1)))-1)
+        guard maxX != nil else { return nil }
+        
+        let zeroValue = yInterceptAtZero
+        let latestValue = zeroValue + incline * maxX!
+        return (latestValue - zeroValue) / zeroValue
     }
+    
+//    public func compoundGrowthRate(for xElements: Double?=nil) -> Double {
+//        
+//        let endPoint = incline * (xElements ?? Double(self.xElementsCount)) + yInterceptAtZero
+//        return (pow((endPoint/yInterceptAtZero), (1/((xElements ?? Double(self.xElementsCount))-1)))-1)
+//    }
     
     public func endValue(for xElements: Double?=nil) -> Double {
-        return yIntercept + (xElements ?? Double(self.xElements)) * incline
+        return yInterceptAtZero + (xElements ?? Double(self.xElementsCount)) * incline
     }
     
     public func r2() -> Double? {
@@ -885,7 +896,6 @@ struct PricePoint: Codable, Hashable {
     public func returnIncline(pricePoint: PricePoint, priceOption: PricePointOptions) -> Double {
         
         return (pricePoint.returnPrice(option: priceOption) - self.returnPrice(option: priceOption)) / pricePoint.tradingDate.timeIntervalSince(self.tradingDate)
-
     }
         
 }

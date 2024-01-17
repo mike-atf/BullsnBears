@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import OSLog
 
 class FinHealthListController: NSObject {
     
@@ -25,6 +26,7 @@ class FinHealthListController: NSObject {
     var allTrendDataSets = [LabelledChartDataSet]()
     
     var healthData: HealthData?
+    let logger = Logger()
     
     init(share: Share) {
         super.init()
@@ -38,6 +40,11 @@ class FinHealthListController: NSObject {
                 if data.share == share { return true }
                 else { return false}
             }).first
+            if healthData == nil {
+                healthData = HealthData(context: PersistenceController.shared.persistentContainer.viewContext)
+                healthData?.share = self.share
+                try PersistenceController.shared.persistentContainer.viewContext.save()
+            }
         } catch {
             ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Error fetching healthData for share \(share.symbol)")
         }
@@ -204,7 +211,7 @@ class FinHealthListController: NSObject {
         
         do {
             values = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Net Profit Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
-            existingProfitabilities = existingProfitabilities?.add(newDV: values, replaceOldValues: true)
+            existingProfitabilities = existingProfitabilities?.add(newDV: values, replaceOldValues: true)  ?? values
             healthData?.profitability = existingProfitabilities?.convertToData()
             healthData?.save()
             
@@ -215,7 +222,7 @@ class FinHealthListController: NSObject {
             }
             
         }  catch {
-            ErrorController.addInternalError(errorLocation: "FinHealthController.profitabilityData", systemError: error, errorInfo: "a background download or analysis error for \(share.symbol!) occurred: \(error)")
+            logger.warning("a profitmargin download or analysis error from Macrotrends for \(self.share.symbol!) occurred: \(error)")
         }
         	
         return netProfitMargins
@@ -246,8 +253,8 @@ class FinHealthListController: NSObject {
 
         do {
             let values = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Operating Margin Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
-            existingEfficiencies = existingEfficiencies?.add(newDV: values, replaceOldValues: true)
-            healthData?.profitability = existingEfficiencies?.convertToData()
+            existingEfficiencies = existingEfficiencies?.add(newDV: values, replaceOldValues: true) ?? values
+            healthData?.efficiency = existingEfficiencies?.convertToData()
             healthData?.save()
 
             for value in existingEfficiencies ?? [] {
@@ -256,7 +263,7 @@ class FinHealthListController: NSObject {
                 }
             }
         }  catch {
-            ErrorController.addInternalError(errorLocation: "FinHealthController.efficiencyData", systemError: error, errorInfo: "a background download or analysis error for \(share.symbol!) occurred: \(error)")
+            logger.warning("a effiency data download or analysis error from Macrotrends for \(self.share.symbol!) occurred: \(error)")
         }
         
         return operatingMargins
@@ -299,7 +306,7 @@ class FinHealthListController: NSObject {
 
         do {
             let values = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Quick Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
-            existingQR = existingQR?.add(newDV: values, replaceOldValues: true)
+            existingQR = existingQR?.add(newDV: values, replaceOldValues: true) ?? values
             healthData?.quickRatio = existingQR?.convertToData()
             healthData?.save()
 
@@ -342,7 +349,7 @@ class FinHealthListController: NSObject {
 
         do {
             let values = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Current Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
-            existingCR = existingCR?.add(newDV: values, replaceOldValues: true)
+            existingCR = existingCR?.add(newDV: values, replaceOldValues: true) ?? values
             healthData?.currentRatio = existingCR?.convertToData()
             healthData?.save()
 
@@ -385,7 +392,7 @@ class FinHealthListController: NSObject {
         do {
             let values = try await MacrotrendsScraper.getqColumnTableData(url: url, companyName: sn, tableHeader: "Debt/Equity Ratio Historical Data", dateColumn: 0 , valueColumn: 3, until: earliestChartDate)
             
-            existingSolvencies = existingSolvencies?.add(newDV: values, replaceOldValues: true)
+            existingSolvencies = existingSolvencies?.add(newDV: values, replaceOldValues: true) ?? values
             healthData?.quickRatio = existingSolvencies?.convertToData()
             healthData?.save()
 

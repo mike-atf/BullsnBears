@@ -118,19 +118,23 @@ class YahooPageScraper {
                         let dv = DatedValue(date: Date(), value: value)
                         results.append(Labelled_DatedValues(label: job.saveTitles.first![i], datedValues: [dv]))
                     } else {
-                        let earningsDates$ = yahooRowStringExtraction(table$: htmlText, rowTitle: title + "</span></td>", textTerminal: "</span></td>").first!
-                       let rangeDates = earningsDates$.split(separator: " - ")
+                        let earningsDates$ = yahooRowStringExtraction(table$: htmlText, rowTitle: title + "</span></td>", textTerminal: "</span></td>")
                         
-                        let dateFormatter: DateFormatter = {
-                            let formatter = DateFormatter()
-                            formatter.locale = NSLocale.current
-                            formatter.timeZone = NSTimeZone.local
-                            formatter.dateFormat = "dd MMM yyy"
-                            return formatter
-                        }()
-
-                        if let firstDate = rangeDates.first {
-                            nextEarningsDate = dateFormatter.date(from: String(firstDate))
+                        if let firstEarningsDate = earningsDates$.first {
+                            
+                            let rangeDates = firstEarningsDate.split(separator: " - ")
+                            
+                            let dateFormatter: DateFormatter = {
+                                let formatter = DateFormatter()
+                                formatter.locale = NSLocale.current
+                                formatter.timeZone = NSTimeZone.local
+                                formatter.dateFormat = "dd MMM yyy"
+                                return formatter
+                            }()
+                            
+                            if let firstDate = rangeDates.first {
+                                nextEarningsDate = dateFormatter.date(from: String(firstDate))
+                            }
                         }
                     }
                     i += 1
@@ -1258,10 +1262,14 @@ class YahooPageScraper {
         var tableText = table$
         
         var labelEndIndex = tableText.range(of: textTerminal, options: .backwards, range: nil, locale: nil)
-        if let index = labelEndIndex {
-            tableText.removeSubrange(index.lowerBound...)
+        
+        guard labelEndIndex != nil else {
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "did not find \(String(describing: textStarter))")
+            return [String]()
         }
-
+        
+        tableText.removeSubrange(labelEndIndex!.lowerBound...)
+        
         repeat {
             guard let labelStartIndex = tableText.range(of: textStarter, options: .backwards, range: tableText.startIndex..<labelEndIndex!.lowerBound, locale: nil) else {
                 ErrorController.addInternalError(errorLocation: #function, errorInfo: "did not find \(String(describing: textStarter))")

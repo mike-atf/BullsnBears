@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import OSLog
 
 enum WBVInfoSection {
     case PE
@@ -32,6 +33,8 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
     var progressView: DownloadProgressView?
     var allDownloadTasks = 0
     var completedDownloadTasks = 0
+    
+    let logger = Logger()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -404,6 +407,10 @@ class WBValuationTVC: UITableViewController, ProgressViewDelegate {
                 destination.otherInfoTexts?.append(TitleAndDetail(title: "Mean Income growth", detail: incomeGrowth))
                 headerText += "the 'Lynch' score?"
             case 4:
+                //TODO: - add price change / eps change
+                headerText += "this?"
+                destination.errors = ["Change of regression of closing prices as well as regression of quart. EPS since 12 months ago.\nIn brackets means regression correlation r2 < 0.5.\nAllows to check how share prices developed in relation to EPS. Normally, these have comparable changes. Drop in price more than EPS indicates could be investment opportunity."]
+            case 5:
                 destination.errors = [valuationInfosTexts[.Returns]!]
                 
                 var currentValue = "-/-"
@@ -685,7 +692,7 @@ extension WBValuationTVC: WebViewDownloadDelegate {
     
     func downloadAnalyseSaveComplete(remove view: WebViewDownloader) {
         
-        print("StocksVC 2 as webView download hosting delegate as received compelte message. removing webView")
+        logger.info("StocksVC 2 as webView download hosting delegate as received compelte message. removing webView")
         view.hostingDelegate = nil
         view.shareID = nil
         view.removeFromSuperview()

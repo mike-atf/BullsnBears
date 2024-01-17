@@ -20,7 +20,6 @@ extension Share {
     @NSManaged public var creationDate: Date
     @NSManaged public var dailyPrices: Data?
     @NSManaged public var dividendWDates: Data?
-//    @NSManaged public var divYieldCurrent: Double
     @NSManaged public var employees: Double
     @NSManaged public var pe_min: Double // undated - for Rule1
     @NSManaged public var pe_max: Double // undated - for Rule1

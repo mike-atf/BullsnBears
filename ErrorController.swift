@@ -7,6 +7,7 @@
 
 import Foundation
 import UserNotifications
+import OSLog
 
 protocol ErrorControllerDelegate {
     func activateErrorButton()
@@ -61,6 +62,9 @@ struct InternalError: Error {
 
 class ErrorController {
     
+    
+    static let logger = Logger.errorMessage
+    
     static func addInternalError(errorLocation: String, systemError: Error? = nil, errorInfo: String? = nil, type: InternalErrorType?=nil) {
         
         if errorLog == nil {
@@ -72,11 +76,7 @@ class ErrorController {
         
         NotificationCenter.default.post(name: Notification.Name(rawValue: "NewErrorLogged"), object: nil, userInfo: nil)
         
-        print()
-        print("=================================")
-        print("ERROR in \(errorLocation): \(errorInfo ?? ""), description: \(systemError?.localizedDescription ?? "")")
-        print("=================================")
-        print()
+        logger.error("ERROR in \(errorLocation): \(errorInfo ?? ""), description: \(systemError?.localizedDescription ?? "")")
     }
     
 

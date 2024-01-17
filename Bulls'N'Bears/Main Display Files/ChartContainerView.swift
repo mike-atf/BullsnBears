@@ -148,43 +148,6 @@ class ChartContainerView: UIView {
         sender.setNeedsDisplay()
         buttonDelegate?.trendButtonPressed(button: sender)
     }
-    
-//    @objc
-//    func customZoom(pinchGesture: UIPinchGestureRecognizer) {
-//
-//        let change = pinchGesture.scale - 1.0
-//        var modifiedScale = 1.0 + change * scrollView.frame.width / scrollView.contentSize.width
-//
-//
-//        if modifiedScale > 1.0 {
-//            if chartsContentViewWidth.constant > 6440 {
-//                modifiedScale = 1.0
-//            }
-//        }
-//        else if chartsContentViewWidth.constant <= scrollView.bounds.width {
-//            chartsContentViewWidth.isActive = false
-//            chartsContentViewWidth.constant = scrollView.bounds.width
-//            chartsContentViewWidth.isActive = true
-//            modifiedScale = 1.0
-//            return
-//        }
-//
-//        UIView.animate(withDuration: 0) {
-//            self.chartsContentView.transform = CGAffineTransform(scaleX: modifiedScale, y: 1.0)
-//            self.chartsContentViewWidth.constant *= modifiedScale
-//        }
-//
-//        if pinchGesture.state == .ended {
-//            scrollView.zoomScale = modifiedScale
-//            macdView.setNeedsDisplay()
-//            stochOscView.setNeedsDisplay()
-//            chartView.setNeedsDisplay()
-//            timeLineView.resetAfterZoom()
-//
-//            scrollView.contentSize = chartView.bounds.size
-//            let offset = scrollView.contentSize.width
-//            scrollView.setContentOffset(CGPoint(x: offset, y: 0), animated: false)
-//        }
-//            }
+
     
 }

@@ -344,6 +344,8 @@
 		FA2636EF2AF532EB00E4EB18 /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2636EE2AF532EB00E4EB18 /* ErrorLogListCell.swift */; };
 		FA2636F02AF532EB00E4EB18 /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2636EE2AF532EB00E4EB18 /* ErrorLogListCell.swift */; };
 		FA2636F12AF532EB00E4EB18 /* ErrorLogListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2636EE2AF532EB00E4EB18 /* ErrorLogListCell.swift */; };
+		FA3149B72B514ECD00352096 /* Logger+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3149B62B514ECD00352096 /* Logger+Extension.swift */; };
+		FAA7463A2B35C5BC00FCB910 /* Shares Icon 2_iPhoneApp_60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = FAA746392B35C5BC00FCB910 /* Shares Icon 2_iPhoneApp_60@3x.png */; };
 		FAA7AE8B2B2B94150079DBDA /* ImportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA7AE8A2B2B94150079DBDA /* ImportManager.swift */; };
 		FAF8CD812B29FEBA004B5C82 /* HealthData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF8CD7F2B29FEBA004B5C82 /* HealthData+CoreDataClass.swift */; };
 		FAF8CD822B29FEBA004B5C82 /* HealthData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF8CD7F2B29FEBA004B5C82 /* HealthData+CoreDataClass.swift */; };
@@ -550,7 +552,9 @@
 		EAFCB98725C9A4DE0029AA4F /* ValuationSummaryCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ValuationSummaryCell.xib; sourceTree = "<group>"; };
 		FA2636EE2AF532EB00E4EB18 /* ErrorLogListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorLogListCell.swift; path = ../ErrorLogListCell.swift; sourceTree = "<group>"; };
 		FA2D0DE52B24D10700DB77D2 /* Bulls'N'Bears.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Bulls'N'Bears.entitlements"; sourceTree = "<group>"; };
+		FA3149B62B514ECD00352096 /* Logger+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+Extension.swift"; sourceTree = "<group>"; };
 		FA9356DC2B2264BA000A9B9B /* TrendMyStocks 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TrendMyStocks 16.xcdatamodel"; sourceTree = "<group>"; };
+		FAA746392B35C5BC00FCB910 /* Shares Icon 2_iPhoneApp_60@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Shares Icon 2_iPhoneApp_60@3x.png"; sourceTree = "<group>"; };
 		FAA7AE8A2B2B94150079DBDA /* ImportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImportManager.swift; path = "Bulls'N'Bears/ImportManager.swift"; sourceTree = SOURCE_ROOT; };
 		FAF8CD7E2B29FD68004B5C82 /* BNB Model 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "BNB Model 17.xcdatamodel"; sourceTree = "<group>"; };
 		FAF8CD7F2B29FEBA004B5C82 /* HealthData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HealthData+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -656,6 +660,7 @@
 		EAC1903D257641160030B331 = {
 			isa = PBXGroup;
 			children = (
+				FAA746382B35C5A300FCB910 /* FileIcon */,
 				EAC1908E257642F20030B331 /* CSVImporter.swift */,
 				EAC190C0257663200030B331 /* PublicVars.swift */,
 				EAC1904F257641160030B331 /* Main.storyboard */,
@@ -896,8 +901,17 @@
 			isa = PBXGroup;
 			children = (
 				EAF5D74225B06F2E00E7A681 /* Extensions.swift */,
+				FA3149B62B514ECD00352096 /* Logger+Extension.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		FAA746382B35C5A300FCB910 /* FileIcon */ = {
+			isa = PBXGroup;
+			children = (
+				FAA746392B35C5BC00FCB910 /* Shares Icon 2_iPhoneApp_60@3x.png */,
+			);
+			path = FileIcon;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1014,6 +1028,7 @@
 				EAAB7BCD2753E7D900295DA7 /* Settings.storyboard in Resources */,
 				EA2016182715EE75004432EC /* DiaryTransactionCard.xib in Resources */,
 				EAC61A2626FB74AC000FAC81 /* DateSelectionCell.xib in Resources */,
+				FAA7463A2B35C5BC00FCB910 /* Shares Icon 2_iPhoneApp_60@3x.png in Resources */,
 				EAC19059257641180030B331 /* LaunchScreen.storyboard in Resources */,
 				EAD835FE25DC16470015C93A /* WBValuationCell.xib in Resources */,
 				EAEA758C25ACF53F008EEC05 /* ErrorLogListCell.xib in Resources */,
@@ -1145,6 +1160,7 @@
 				EA7023CC28F8317100048679 /* FinHealthController.swift in Sources */,
 				EA163F77258BA85E000974AB /* StockTrend.swift in Sources */,
 				EA79790225E6F24200663644 /* GradientColorFinder.swift in Sources */,
+				FA3149B72B514ECD00352096 /* Logger+Extension.swift in Sources */,
 				EADA38F727131AA100B294E3 /* ShareTransaction+CoreDataProperties.swift in Sources */,
 				EAA548B527342D170083808A /* StocksController2.swift in Sources */,
 				EAF8CDE1296B3DAB0069D77D /* Ratios+CoreDataClass.swift in Sources */,

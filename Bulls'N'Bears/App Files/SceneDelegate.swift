@@ -114,42 +114,70 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         if !urlContext.options.openInPlace {
             //file needs to be copied in order to be opened
-            if fileURL.startAccessingSecurityScopedResource() {
                 do {
                     
                     guard let localFolderURL = localBackupFolderURL else {
                         return
                     }
                     
-                    // add 'imported' as otherwise safety backup will overwrite the imported one
-                    let importedFileName = localFolderURL.path() + "/Imported " + fileURL.lastPathComponent
-                    let localURL = URL(fileURLWithPath: importedFileName)
-
-                    // move file into local backup folder
-                    print(localURL.path())
-                    if FileManager.default.fileExists(atPath: localURL.path()){
-                        try FileManager.default.removeItem(at: localURL)
+                    let localURL = localFolderURL.appendingPathComponent("Imported archive.bbf")
+                    print("copy from inbox to local url: \(localURL.path())")
+                    let fileURLs = try FileManager.default.contentsOfDirectory(at: localFolderURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                    
+                    for localBackupURL in fileURLs {
+                        if localBackupURL == localURL {
+                            try FileManager.default.removeItem(at: localBackupURL)
+                        }
                     }
                     try FileManager.default.copyItem(at: fileURL, to: localURL)
-                    let _ = ImportManager(fileURL: localURL)
-                    fileURL.stopAccessingSecurityScopedResource()
+                    importDialog(fileURL: localURL)
+                    try FileManager.default.removeItem(at: fileURL)
 
                 } catch {
-                    print("an error during import process: \(error.localizedDescription)")
+                    print("error during import process: \(error.localizedDescription)")
                     print("source file url: \(fileURL.path())")
-                    fileURL.stopAccessingSecurityScopedResource()
                     return
                 }
-
-            }
-            else {
-                print("can't access file to import")
-            }
-        } 
-        else {
-            // file doesn't need to to be copies, ca be opened in place
-            let _ = ImportManager(fileURL: fileURL)
         }
+        else {
+            // file doesn't need to  be copied, ca be opened in place
+            importDialog(fileURL: fileURL)
+        }
+
+    }
+    
+    func importDialog(fileURL: URL) {
+            
+        var presentingVC = self.window?.rootViewController
+        
+        presentingVC = presentingVC?.presentedViewController ?? presentingVC
+        
+        guard presentingVC != nil else {
+            AlertController.shared().showDialog(title: "Import attempt failed", alertMessage: "there is no visible view to present the import dialog")
+            return
+        }
+
+        let importDialog = UIAlertController(title: "Import archive", message: "Warning: will replace any existing data. A safety backup will be made before the replacement", preferredStyle: .actionSheet)
+        
+        importDialog.addAction(UIAlertAction(title: "Proceed", style: .destructive, handler: { (_) -> Void in
+            Task {
+                await ImportManager.installBackupData(fileURL:fileURL)
+            }
+        }))
+        
+        importDialog.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { (_) -> Void in
+            return
+        }))
+        
+        let popUpController = importDialog.popoverPresentationController
+        popUpController!.permittedArrowDirections = .up
+
+        let rect = presentingVC!.view.frame.insetBy(dx: presentingVC!.view.frame.width / 2, dy: presentingVC!.view.frame.height / 2)
+        importDialog.popoverPresentationController?.sourceRect = rect
+        importDialog.popoverPresentationController?.sourceView = presentingVC!.view
+
+        presentingVC!.present(importDialog, animated: true)
+
 
     }
     

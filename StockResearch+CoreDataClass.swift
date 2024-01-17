@@ -53,7 +53,15 @@ public class StockResearch: NSManagedObject, Codable {
         self.targetBuyPrice = try container.decode(Double.self, forKey: .targetBuyPrice)
         self.annualStatementOutlook = try container.decodeIfPresent(Data.self, forKey: .annualStatementOutlook)
         self.pricePredictions = try container.decodeIfPresent(Data.self, forKey: .pricePredictions)
-
+        
+        if let validNews = news {
+            for element in validNews {
+                element.research = self
+                context.insert(element)
+            }
+        }
+        
+        
     }
     
     public func encode(to encoder: Encoder) throws {

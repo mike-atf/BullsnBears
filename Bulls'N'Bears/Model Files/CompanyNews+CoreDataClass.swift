@@ -32,8 +32,7 @@ public class CompanyNews: NSManagedObject, Codable {
         
         self.newsText = try container.decodeIfPresent(String.self, forKey: .newsText)
         self.creationDate = try container.decodeIfPresent(Date.self, forKey: .creationDate)
-        self.research = try container.decodeIfPresent(StockResearch.self, forKey: .research)
-//        self.shareSymbol = try container.decode(String.self, forKey: .shareSymbol)
+//        self.research = try container.decodeIfPresent(StockResearch.self, forKey: .research)
 
     }
     
@@ -42,8 +41,7 @@ public class CompanyNews: NSManagedObject, Codable {
         
         try container.encodeIfPresent(newsText, forKey: .newsText)
         try container.encodeIfPresent(creationDate, forKey: .creationDate)
-        try container.encodeIfPresent(research, forKey: .research)
-//        try container.encode(shareSymbol!, forKey: .shareSymbol)
+//        try container.encodeIfPresent(research, forKey: .research)
 
     }
 

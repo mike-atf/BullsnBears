@@ -24,6 +24,13 @@ public class UserEvaluation: NSManagedObject, Codable {
         case date
     }
     
+    /// importantly, initiates with creation date
+    convenience public init(moc: NSManagedObjectContext) {
+        self.init(context: moc)
+        self.date = Date()
+    }
+
+    
     required convenience public init(from decoder: Decoder) throws {
         
         guard let context = decoder.userInfo[CodingUserInfoKey.managedObjectContext] as? NSManagedObjectContext else {

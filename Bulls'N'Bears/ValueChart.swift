@@ -338,7 +338,7 @@ class ValueChart: UIView {
             
             let pixPerValue = pixPerValue1
 
-            let trendLineStartY = nullAxisY - CGFloat(valuesTrend!.yIntercept) * pixPerValue
+            let trendLineStartY = nullAxisY - CGFloat(valuesTrend!.yInterceptAtZero) * pixPerValue
             let trendLineEndY = nullAxisY - CGFloat(valuesTrend!.endValue(for: Double(xAxisLabels.count))) * pixPerValue // -
             trendLine.move(to: CGPoint(x: chartOrigin.x, y: trendLineStartY))
             trendLine.addLine(to: CGPoint(x: chartEnd.x, y: trendLineEndY))
@@ -354,9 +354,7 @@ class ValueChart: UIView {
             if let r2 = valuesTrend!.r2() {
                 r2$ = percentFormatter0Digits.string(from: r2 as NSNumber) ?? ""
             }
-            
-//            let rates = valuesAreGrowth ? dateAscendingValues?.reversed() : dateAscendingValues!.growthRates(dateOrder: .descending)
-//
+
             if let meanGrowth = valuesTrend?.meanGrowth() {
                 meanGrowth$ = ", Annual mean change: " + (percentFormatter2Digits.string(from: meanGrowth as NSNumber) ?? "-")
             }

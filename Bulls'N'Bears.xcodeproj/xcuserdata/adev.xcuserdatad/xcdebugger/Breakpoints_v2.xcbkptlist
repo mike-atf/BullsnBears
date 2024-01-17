@@ -14,8 +14,8 @@
             filePath = "Bulls&apos;N&apos;Bears/WBValuationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "654"
-            endingLineNumber = "654"
+            startingLineNumber = "668"
+            endingLineNumber = "668"
             landmarkName = "value$(path:)"
             landmarkType = "7">
             <Locations>
@@ -62,8 +62,8 @@
             filePath = "Bulls&apos;N&apos;Bears/WBValuationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "659"
-            endingLineNumber = "659"
+            startingLineNumber = "673"
+            endingLineNumber = "673"
             landmarkName = "value$(path:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -78,8 +78,8 @@
             filePath = "Bulls&apos;N&apos;Bears/WBValuationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "682"
-            endingLineNumber = "682"
+            startingLineNumber = "696"
+            endingLineNumber = "696"
             landmarkName = "value$(path:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -238,8 +238,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "606"
-            endingLineNumber = "606"
+            startingLineNumber = "617"
+            endingLineNumber = "617"
             landmarkName = "getqColumnTableData(url:companyName:tableHeader:dateColumn:valueColumn:until:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -254,8 +254,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "613"
-            endingLineNumber = "613"
+            startingLineNumber = "624"
+            endingLineNumber = "624"
             landmarkName = "getqColumnTableData(url:companyName:tableHeader:dateColumn:valueColumn:until:)"
             landmarkType = "7">
             <Locations>
@@ -379,6 +379,21 @@
                   endingLineNumber = "613"
                   offsetFromSymbolStart = "956">
                </Location>
+               <Location
+                  uuid = "2440632F-E377-476F-96FD-DD944113B795 - 92b814c3747f13b6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for static Bulls_N_Bears.MacrotrendsScraper.getqColumnTableData(url: Foundation.URL, companyName: Swift.String, tableHeader: Swift.String, dateColumn: Swift.Int, valueColumn: Swift.Int, until: Swift.Optional&lt;Foundation.Date&gt;) async throws -&gt; Swift.Optional&lt;Swift.Array&lt;Bulls_N_Bears.DatedValue&gt;&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "624"
+                  endingLineNumber = "624"
+                  offsetFromSymbolStart = "956">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -392,8 +407,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "617"
-            endingLineNumber = "617"
+            startingLineNumber = "628"
+            endingLineNumber = "628"
             landmarkName = "getqColumnTableData(url:companyName:tableHeader:dateColumn:valueColumn:until:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -408,8 +423,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "624"
-            endingLineNumber = "624"
+            startingLineNumber = "635"
+            endingLineNumber = "635"
             landmarkName = "getqColumnTableData(url:companyName:tableHeader:dateColumn:valueColumn:until:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1333,13 +1348,13 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "605"
-            endingLineNumber = "605"
+            startingLineNumber = "609"
+            endingLineNumber = "609"
             landmarkName = "companyNamesListSearchOnPage(html:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "A16C07B0-D38A-47D5-8AE3-F25CE4B8BBFE - e828bd33966021a1"
+                  uuid = "A16C07B0-D38A-47D5-8AE3-F25CE4B8BBFE - e828bd3396602216"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -1349,12 +1364,12 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "607"
-                  endingLineNumber = "607"
-                  offsetFromSymbolStart = "6780">
+                  startingLineNumber = "594"
+                  endingLineNumber = "594"
+                  offsetFromSymbolStart = "19484">
                </Location>
                <Location
-                  uuid = "A16C07B0-D38A-47D5-8AE3-F25CE4B8BBFE - e828bd33966021e3"
+                  uuid = "A16C07B0-D38A-47D5-8AE3-F25CE4B8BBFE - e828bd33966021dc"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -1364,8 +1379,23 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "605"
-                  endingLineNumber = "605"
+                  startingLineNumber = "604"
+                  endingLineNumber = "604"
+                  offsetFromSymbolStart = "6340">
+               </Location>
+               <Location
+                  uuid = "A16C07B0-D38A-47D5-8AE3-F25CE4B8BBFE - e828bd3396602067"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Bulls_N_Bears.YahooPageScraper.companyNamesListSearchOnPage(html: Swift.String) throws -&gt; Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Swift.String&gt;&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "609"
+                  endingLineNumber = "609"
                   offsetFromSymbolStart = "17804">
                </Location>
             </Locations>
@@ -1444,8 +1474,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "666"
-            endingLineNumber = "666"
+            startingLineNumber = "670"
+            endingLineNumber = "670"
             landmarkName = "companyNameSearch(html:)"
             landmarkType = "7">
             <Locations>
@@ -1492,8 +1522,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "661"
-            endingLineNumber = "661"
+            startingLineNumber = "665"
+            endingLineNumber = "665"
             landmarkName = "companyNameSearch(html:)"
             landmarkType = "7">
             <Locations>
@@ -1540,8 +1570,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "655"
-            endingLineNumber = "655"
+            startingLineNumber = "659"
+            endingLineNumber = "659"
             landmarkName = "companyNameSearch(html:)"
             landmarkType = "7">
             <Locations>
@@ -1588,10 +1618,57 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "594"
-            endingLineNumber = "594"
+            startingLineNumber = "598"
+            endingLineNumber = "598"
             landmarkName = "companyNamesListSearchOnPage(html:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "F66B943C-6A25-4889-AF39-CF2C09796B32 - e828bd3396602489"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Bulls_N_Bears.YahooPageScraper.companyNamesListSearchOnPage(html: Swift.String) throws -&gt; Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Swift.String&gt;&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "583"
+                  endingLineNumber = "583"
+                  offsetFromSymbolStart = "2520">
+               </Location>
+               <Location
+                  uuid = "F66B943C-6A25-4889-AF39-CF2C09796B32 - e828bd3396602216"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Bulls_N_Bears.YahooPageScraper.companyNamesListSearchOnPage(html: Swift.String) throws -&gt; Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Swift.String&gt;&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "594"
+                  endingLineNumber = "594"
+                  offsetFromSymbolStart = "19484">
+               </Location>
+               <Location
+                  uuid = "F66B943C-6A25-4889-AF39-CF2C09796B32 - e828bd339660229a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Bulls_N_Bears.YahooPageScraper.companyNamesListSearchOnPage(html: Swift.String) throws -&gt; Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Swift.String&gt;&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/YahooPageScraper.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "598"
+                  endingLineNumber = "598"
+                  offsetFromSymbolStart = "19484">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1604,8 +1681,8 @@
             filePath = "Bulls&apos;N&apos;Bears/WBValuationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "856"
-            endingLineNumber = "856"
+            startingLineNumber = "847"
+            endingLineNumber = "847"
             landmarkName = "downloadAllValuationData()"
             landmarkType = "7">
             <Locations>
@@ -1817,8 +1894,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "230"
-            endingLineNumber = "230"
+            startingLineNumber = "237"
+            endingLineNumber = "237"
             landmarkName = "dataDownloadAnalyseSave(shareSymbol:shortName:shareID:downloadOption:progressDelegate:downloadRedirectDelegate:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1833,8 +1910,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "483"
-            endingLineNumber = "483"
+            startingLineNumber = "494"
+            endingLineNumber = "494"
             landmarkName = "extractDatedValuesFromTable(htmlText:rowTitles:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1849,8 +1926,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "488"
-            endingLineNumber = "488"
+            startingLineNumber = "499"
+            endingLineNumber = "499"
             landmarkName = "extractDatedValuesFromTable(htmlText:rowTitles:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1865,8 +1942,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "479"
-            endingLineNumber = "479"
+            startingLineNumber = "490"
+            endingLineNumber = "490"
             landmarkName = "extractDatedValuesFromTable(htmlText:rowTitles:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2356,6 +2433,171 @@
                   endingLineNumber = "96"
                   offsetFromSymbolStart = "9056">
                </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "10056">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "10948">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "9636">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "9896">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "10644">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "10668">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "10460">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "10340">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "10404">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "11068">
+               </Location>
+               <Location
+                  uuid = "C2B0E6F2-C86E-4F44-95BE-20503CF25DE1 - 893aca393f05284e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "96"
+                  endingLineNumber = "96"
+                  offsetFromSymbolStart = "11036">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -2369,28 +2611,28 @@
             filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "112"
-            endingLineNumber = "112"
+            startingLineNumber = "119"
+            endingLineNumber = "119"
             landmarkName = "restoreData(fromURL:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "F0103E6C-DCDE-4EF4-8073-5B00DAB91FE9 - f91f5cc23712fa47"
+                  uuid = "F0103E6C-DCDE-4EF4-8073-5B00DAB91FE9 - b7a3aa46acf7736a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  symbolName = "(5) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
                   moduleName = "Bulls&apos;N&apos;Bears"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "112"
-                  endingLineNumber = "112"
-                  offsetFromSymbolStart = "2212">
+                  startingLineNumber = "121"
+                  endingLineNumber = "121"
+                  offsetFromSymbolStart = "1112">
                </Location>
                <Location
-                  uuid = "F0103E6C-DCDE-4EF4-8073-5B00DAB91FE9 - f91f5cc23712fa47"
+                  uuid = "F0103E6C-DCDE-4EF4-8073-5B00DAB91FE9 - f91f5cc23712faa8"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -2400,8 +2642,8 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "112"
-                  endingLineNumber = "112"
+                  startingLineNumber = "119"
+                  endingLineNumber = "119"
                   offsetFromSymbolStart = "5480">
                </Location>
             </Locations>
@@ -2426,54 +2668,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "0F7E2C51-F735-4C4E-AF7F-FAA3D52E0921"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Bulls&apos;N&apos;Bears/App Files/SceneDelegate.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "146"
-            endingLineNumber = "146"
-            landmarkName = "scene(_:openURLContexts:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "0F7E2C51-F735-4C4E-AF7F-FAA3D52E0921 - 893aca393f052961"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "105"
-                  endingLineNumber = "105"
-                  offsetFromSymbolStart = "1800">
-               </Location>
-               <Location
-                  uuid = "0F7E2C51-F735-4C4E-AF7F-FAA3D52E0921 - 893aca393f0553d8"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "146"
-                  endingLineNumber = "146"
-                  offsetFromSymbolStart = "7636">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
@@ -2485,22 +2679,188 @@
             endingLineNumber = "110"
             landmarkName = "scene(_:openURLContexts:)"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "E2C3ED69-9CE7-4AC0-B1AD-6152F073DAE2"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Bulls&apos;N&apos;Bears/App Files/SceneDelegate.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "141"
-            endingLineNumber = "141"
-            landmarkName = "scene(_:openURLContexts:)"
-            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "9400">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "10408">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "11308">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "9988">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "10248">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "11004">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "11044">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "10836">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "10716">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "10780">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "11452">
+               </Location>
+               <Location
+                  uuid = "CC3ACEA9-417F-4E13-B7BE-A5B3EC43F02B - 893aca393f0556bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "11420">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -2561,8 +2921,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
+            startingLineNumber = "78"
+            endingLineNumber = "78"
             landmarkName = "backupData()"
             landmarkType = "7">
             <Locations>
@@ -2748,28 +3108,163 @@
             filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "91"
-            endingLineNumber = "91"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
             landmarkName = "backupData()"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - 4ccd042a87b0423a"
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - 501921eb87e3751f"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "(11) suspend resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
+                  symbolName = "static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
                   moduleName = "Bulls&apos;N&apos;Bears"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "92"
-                  endingLineNumber = "92"
-                  offsetFromSymbolStart = "2536">
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "44">
                </Location>
                <Location
-                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - 974a5e7494250803"
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - f91f5cc23712f414"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "152">
+               </Location>
+               <Location
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - f91f5cc23712f414"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "680">
+               </Location>
+               <Location
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - ece40363dc3d1a13"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "32">
+               </Location>
+               <Location
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - d0493184fac5b812"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "48">
+               </Location>
+               <Location
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - 948564891b26d319"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) await resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "24">
+               </Location>
+               <Location
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - b7a3aa46acf77c10"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "64">
+               </Location>
+               <Location
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - 7069cf3f32df9717"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(6) await resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "28">
+               </Location>
+               <Location
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - ae9c0f0716a6c02e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(7) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "40">
+               </Location>
+               <Location
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - 92613da833b1662d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(8) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "99"
+                  endingLineNumber = "99"
+                  offsetFromSymbolStart = "36">
+               </Location>
+               <Location
+                  uuid = "3ABC287C-291C-4647-B5F8-D717455E5621 - 974a5e7494250b7a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -2779,8 +3274,8 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "91"
-                  endingLineNumber = "91"
+                  startingLineNumber = "98"
+                  endingLineNumber = "98"
                   offsetFromSymbolStart = "1500">
                </Location>
             </Locations>
@@ -2796,58 +3291,28 @@
             filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "82"
-            endingLineNumber = "82"
+            startingLineNumber = "91"
+            endingLineNumber = "91"
             landmarkName = "backupData()"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "62CBCC9D-2A18-4CB5-B785-E6E1DCBF052D - a6b42f436ad1a9a2"
+                  uuid = "62CBCC9D-2A18-4CB5-B785-E6E1DCBF052D - 974a5e7494250803"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "(9) suspend resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
+                  symbolName = "(12) suspend resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
                   moduleName = "Bulls&apos;N&apos;Bears"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "85"
-                  endingLineNumber = "85"
-                  offsetFromSymbolStart = "2556">
+                  startingLineNumber = "91"
+                  endingLineNumber = "91"
+                  offsetFromSymbolStart = "1500">
                </Location>
                <Location
-                  uuid = "62CBCC9D-2A18-4CB5-B785-E6E1DCBF052D - bd120721b7267814"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(10) await resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "50"
-                  endingLineNumber = "50"
-                  offsetFromSymbolStart = "28">
-               </Location>
-               <Location
-                  uuid = "62CBCC9D-2A18-4CB5-B785-E6E1DCBF052D - bd120721b7267c9b"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(10) await resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "85"
-                  endingLineNumber = "85"
-                  offsetFromSymbolStart = "336">
-               </Location>
-               <Location
-                  uuid = "62CBCC9D-2A18-4CB5-B785-E6E1DCBF052D - 4ccd042a87b0474c"
+                  uuid = "62CBCC9D-2A18-4CB5-B785-E6E1DCBF052D - 4ccd042a87b04205"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -2857,39 +3322,9 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "50"
-                  endingLineNumber = "50"
-                  offsetFromSymbolStart = "68">
-               </Location>
-               <Location
-                  uuid = "62CBCC9D-2A18-4CB5-B785-E6E1DCBF052D - 4ccd042a87b043c3"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(11) suspend resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "85"
-                  endingLineNumber = "85"
-                  offsetFromSymbolStart = "132">
-               </Location>
-               <Location
-                  uuid = "62CBCC9D-2A18-4CB5-B785-E6E1DCBF052D - 4ccd042a87b0436c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(11) suspend resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "82"
-                  endingLineNumber = "82"
-                  offsetFromSymbolStart = "1508">
+                  startingLineNumber = "91"
+                  endingLineNumber = "91"
+                  offsetFromSymbolStart = "1492">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -2904,28 +3339,28 @@
             filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "66"
-            endingLineNumber = "66"
+            startingLineNumber = "75"
+            endingLineNumber = "75"
             landmarkName = "backupData()"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "93E5A691-6F94-4C87-9681-132A7776F221 - 517dfb0cdd1f2721"
+                  uuid = "93E5A691-6F94-4C87-9681-132A7776F221 - a6b42f436ad1ae14"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "(5) suspend resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
+                  symbolName = "(9) suspend resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
                   moduleName = "Bulls&apos;N&apos;Bears"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "66"
-                  endingLineNumber = "66"
-                  offsetFromSymbolStart = "860">
+                  startingLineNumber = "75"
+                  endingLineNumber = "75"
+                  offsetFromSymbolStart = "888">
                </Location>
                <Location
-                  uuid = "93E5A691-6F94-4C87-9681-132A7776F221 - 517dfb0cdd1f2721"
+                  uuid = "93E5A691-6F94-4C87-9681-132A7776F221 - 517dfb0cdd1f2608"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -2935,8 +3370,8 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "66"
-                  endingLineNumber = "66"
+                  startingLineNumber = "75"
+                  endingLineNumber = "75"
                   offsetFromSymbolStart = "1568">
                </Location>
             </Locations>
@@ -2952,8 +3387,8 @@
             filePath = "Bulls&apos;N&apos;Bears/App Files/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "22"
-            endingLineNumber = "22"
+            startingLineNumber = "26"
+            endingLineNumber = "26"
             landmarkName = "unknown"
             landmarkType = "0">
             <Locations>
@@ -3000,8 +3435,8 @@
             filePath = "Bulls&apos;N&apos;Bears/App Files/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "17"
-            endingLineNumber = "17"
+            startingLineNumber = "21"
+            endingLineNumber = "21"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -3016,8 +3451,8 @@
             filePath = "Bulls&apos;N&apos;Bears/App Files/AppDelegate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "20"
-            endingLineNumber = "20"
+            startingLineNumber = "25"
+            endingLineNumber = "25"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -3032,8 +3467,8 @@
             filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "52"
-            endingLineNumber = "52"
+            startingLineNumber = "61"
+            endingLineNumber = "61"
             landmarkName = "backupData()"
             landmarkType = "7">
             <Locations>
@@ -3356,13 +3791,13 @@
             filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "121"
-            endingLineNumber = "121"
+            startingLineNumber = "128"
+            endingLineNumber = "128"
             landmarkName = "restoreData(fromURL:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - f91f5cc23712fb6e"
+                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - f91f5cc23712f815"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -3372,72 +3807,12 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "121"
-                  endingLineNumber = "121"
-                  offsetFromSymbolStart = "6372">
+                  startingLineNumber = "130"
+                  endingLineNumber = "130"
+                  offsetFromSymbolStart = "3688">
                </Location>
                <Location
-                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - ece40363dc3d1ab8"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "104"
-                  endingLineNumber = "104"
-                  offsetFromSymbolStart = "32">
-               </Location>
-               <Location
-                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - ece40363dc3d1569"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "121"
-                  endingLineNumber = "121"
-                  offsetFromSymbolStart = "164">
-               </Location>
-               <Location
-                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - d0493184fac5b8b9"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "104"
-                  endingLineNumber = "104"
-                  offsetFromSymbolStart = "48">
-               </Location>
-               <Location
-                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - d0493184fac5b768"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
-                  moduleName = "Bulls&apos;N&apos;Bears"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "121"
-                  endingLineNumber = "121"
-                  offsetFromSymbolStart = "112">
-               </Location>
-               <Location
-                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - b7a3aa46acf7736a"
+                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - b7a3aa46acf77011"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -3447,8 +3822,53 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "121"
-                  endingLineNumber = "121"
+                  startingLineNumber = "130"
+                  endingLineNumber = "130"
+                  offsetFromSymbolStart = "1952">
+               </Location>
+               <Location
+                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - ae9c0f0716a6cc2f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(7) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "130"
+                  endingLineNumber = "130"
+                  offsetFromSymbolStart = "284">
+               </Location>
+               <Location
+                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - 92613da833b16a2c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(8) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "130"
+                  endingLineNumber = "130"
+                  offsetFromSymbolStart = "1376">
+               </Location>
+               <Location
+                  uuid = "BF023866-AE6E-44B8-890F-86D096C04FF4 - b7a3aa46acf77053"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "128"
+                  endingLineNumber = "128"
                   offsetFromSymbolStart = "1112">
                </Location>
             </Locations>
@@ -3464,28 +3884,28 @@
             filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "126"
-            endingLineNumber = "126"
+            startingLineNumber = "133"
+            endingLineNumber = "133"
             landmarkName = "restoreData(fromURL:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "02C8124A-5819-438E-9E38-A30AD018B77E - b7a3aa46acf77395"
+                  uuid = "02C8124A-5819-438E-9E38-A30AD018B77E - e53450212d7ad731"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "(5) suspend resume partial function for static Bulls_N_Bears.BackupManager.restoreData(fromURL: Swift.Optional&lt;Foundation.URL&gt;) async throws -&gt; ()"
+                  symbolName = "(1) suspend resume partial function for static Bulls_N_Bears.BackupManager.deleteAllData() async throws -&gt; ()"
                   moduleName = "Bulls&apos;N&apos;Bears"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "126"
-                  endingLineNumber = "126"
-                  offsetFromSymbolStart = "1112">
+                  startingLineNumber = "134"
+                  endingLineNumber = "134"
+                  offsetFromSymbolStart = "620">
                </Location>
                <Location
-                  uuid = "02C8124A-5819-438E-9E38-A30AD018B77E - f91f5cc23712fb91"
+                  uuid = "02C8124A-5819-438E-9E38-A30AD018B77E - f91f5cc23712f8fa"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -3495,8 +3915,8 @@
                   urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "126"
-                  endingLineNumber = "126"
+                  startingLineNumber = "133"
+                  endingLineNumber = "133"
                   offsetFromSymbolStart = "8084">
                </Location>
             </Locations>
@@ -3782,10 +4202,42 @@
             filePath = "Bulls&apos;N&apos;Bears/Backup Manager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "76"
-            endingLineNumber = "76"
+            startingLineNumber = "85"
+            endingLineNumber = "85"
             landmarkName = "backupData()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "D2AB640F-4151-4ABD-BEA1-4875E88DFDB4 - 4ccd042a87b04381"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(11) suspend resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "87"
+                  endingLineNumber = "87"
+                  offsetFromSymbolStart = "2536">
+               </Location>
+               <Location
+                  uuid = "D2AB640F-4151-4ABD-BEA1-4875E88DFDB4 - a6b42f436ad1a9a2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(9) suspend resume partial function for static Bulls_N_Bears.BackupManager.backupData() async -&gt; Swift.Optional&lt;Foundation.URL&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Backup%20Manager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "85"
+                  endingLineNumber = "85"
+                  offsetFromSymbolStart = "1600">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -3801,6 +4253,630 @@
             startingLineNumber = "43"
             endingLineNumber = "43"
             landmarkName = "init(from:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "068257EE-106F-4E71-87E9-B60B62A3C9F9"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "PublicVars.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "782"
+            endingLineNumber = "782"
+            landmarkName = "meanGrowth(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1159EE21-163F-4627-835B-CC4BE6BE0064"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/Controllers/Calculator.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "347"
+            endingLineNumber = "347"
+            landmarkName = "correlationDatesToValues(array:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8E8578F6-BBB3-41AD-9FD6-163B5F724EDD"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/Controllers/Calculator.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "398"
+            endingLineNumber = "398"
+            landmarkName = "correlationDatesToValues(array:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F22AF490-0818-4BED-9340-2FA86A7B947A"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/Controllers/Calculator.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "276"
+            endingLineNumber = "276"
+            landmarkName = "correlation(xArray:yArray:xIsDescending:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "F22AF490-0818-4BED-9340-2FA86A7B947A - d9c0b9d5f2e17e4e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Bulls_N_Bears.Calculator.correlation(xArray: Swift.Optional&lt;Swift.Array&lt;Swift.Double&gt;&gt;, yArray: Swift.Optional&lt;Swift.Array&lt;Swift.Double&gt;&gt;) -&gt; Swift.Optional&lt;Bulls_N_Bears.Correlation&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/Calculator.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "270"
+                  endingLineNumber = "270"
+                  offsetFromSymbolStart = "15320">
+               </Location>
+               <Location
+                  uuid = "F22AF490-0818-4BED-9340-2FA86A7B947A - 2cea632ce767789d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Bulls_N_Bears.Calculator.correlation(xArray: Swift.Optional&lt;Swift.Array&lt;Swift.Double&gt;&gt;, yArray: Swift.Optional&lt;Swift.Array&lt;Swift.Double&gt;&gt;, xIsDescending: Swift.Optional&lt;Swift.Bool&gt;) -&gt; Swift.Optional&lt;Bulls_N_Bears.Correlation&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/Calculator.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "270"
+                  endingLineNumber = "270"
+                  offsetFromSymbolStart = "15576">
+               </Location>
+               <Location
+                  uuid = "F22AF490-0818-4BED-9340-2FA86A7B947A - 2cea632ce7677900"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Bulls_N_Bears.Calculator.correlation(xArray: Swift.Optional&lt;Swift.Array&lt;Swift.Double&gt;&gt;, yArray: Swift.Optional&lt;Swift.Array&lt;Swift.Double&gt;&gt;, xIsDescending: Swift.Optional&lt;Swift.Bool&gt;) -&gt; Swift.Optional&lt;Bulls_N_Bears.Correlation&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/Calculator.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "273"
+                  endingLineNumber = "273"
+                  offsetFromSymbolStart = "18164">
+               </Location>
+               <Location
+                  uuid = "F22AF490-0818-4BED-9340-2FA86A7B947A - 2cea632ce7677900"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static Bulls_N_Bears.Calculator.correlation(xArray: Swift.Optional&lt;Swift.Array&lt;Swift.Double&gt;&gt;, yArray: Swift.Optional&lt;Swift.Array&lt;Swift.Double&gt;&gt;, xIsDescending: Swift.Optional&lt;Swift.Bool&gt;) -&gt; Swift.Optional&lt;Bulls_N_Bears.Correlation&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/Controllers/Calculator.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "273"
+                  endingLineNumber = "273"
+                  offsetFromSymbolStart = "18176">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "686D9D44-D551-47B9-AEA6-83AD248CCE3B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Share+CoreDataClass.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1083"
+            endingLineNumber = "1083"
+            landmarkName = "epsChangeLastYear()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "686D9D44-D551-47B9-AEA6-83AD248CCE3B - d7415b191a6e5ca9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.Share.epsChangeLastYear() -&gt; Swift.Optional&lt;Swift.Double&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Share+CoreDataClass.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1074"
+                  endingLineNumber = "1074"
+                  offsetFromSymbolStart = "3996">
+               </Location>
+               <Location
+                  uuid = "686D9D44-D551-47B9-AEA6-83AD248CCE3B - d7415b191a6e5ec4"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.Share.epsChangeLastYear() -&gt; Swift.Optional&lt;Swift.Double&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Share+CoreDataClass.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1087"
+                  endingLineNumber = "1087"
+                  offsetFromSymbolStart = "3984">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "003DE0B6-CFAE-4E30-B34A-2211C7E2CC93"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/Controllers/Calculator.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "326"
+            endingLineNumber = "326"
+            landmarkName = "correlation2(xArray:yArray:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0E7BCD86-0BA5-4A2B-9848-8A53880F674C"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/App Files/SceneDelegate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "120"
+            endingLineNumber = "120"
+            landmarkName = "scene(_:openURLContexts:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "0E7BCD86-0BA5-4A2B-9848-8A53880F674C - 893aca393f055776"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "120"
+                  endingLineNumber = "120"
+                  offsetFromSymbolStart = "5324">
+               </Location>
+               <Location
+                  uuid = "0E7BCD86-0BA5-4A2B-9848-8A53880F674C - 893aca393f055776"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "120"
+                  endingLineNumber = "120"
+                  offsetFromSymbolStart = "9764">
+               </Location>
+               <Location
+                  uuid = "0E7BCD86-0BA5-4A2B-9848-8A53880F674C - 893aca393f055776"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "120"
+                  endingLineNumber = "120"
+                  offsetFromSymbolStart = "9732">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F21B8A86-B37F-40AC-A97A-114D29BAC7B0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/App Files/SceneDelegate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "129"
+            endingLineNumber = "129"
+            landmarkName = "scene(_:openURLContexts:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "F21B8A86-B37F-40AC-A97A-114D29BAC7B0 - 893aca393f055409"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "129"
+                  endingLineNumber = "129"
+                  offsetFromSymbolStart = "5696">
+               </Location>
+               <Location
+                  uuid = "F21B8A86-B37F-40AC-A97A-114D29BAC7B0 - 893aca393f055409"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.SceneDelegate.scene(_: __C.UIScene, openURLContexts: Swift.Set&lt;__C.UIOpenURLContext&gt;) -&gt; ()"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/App%20Files/SceneDelegate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "129"
+                  endingLineNumber = "129"
+                  offsetFromSymbolStart = "7532">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/HealthViews SwiftUI/FinHealthListController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "260"
+            endingLineNumber = "260"
+            landmarkName = "efficiencyData()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 2dd3baf72ebf06f4"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "260"
+                  endingLineNumber = "260"
+                  offsetFromSymbolStart = "40">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 65bd4178c5bde40a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "260"
+                  endingLineNumber = "260"
+                  offsetFromSymbolStart = "220">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 1a8c332517763537"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "260"
+                  endingLineNumber = "260"
+                  offsetFromSymbolStart = "36">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 8f002fb31dc5a008"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "260"
+                  endingLineNumber = "260"
+                  offsetFromSymbolStart = "92">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 8f002fb31dc5a008"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "260"
+                  endingLineNumber = "260"
+                  offsetFromSymbolStart = "2732">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 6235430ef1f94e0f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "260"
+                  endingLineNumber = "260"
+                  offsetFromSymbolStart = "88">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 8f002fb31dc5a008"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "260"
+                  endingLineNumber = "260"
+                  offsetFromSymbolStart = "3288">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 2dd3baf72ebf0613"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "261"
+                  endingLineNumber = "261"
+                  offsetFromSymbolStart = "40">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 65bd4178c5bde4ed"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "261"
+                  endingLineNumber = "261"
+                  offsetFromSymbolStart = "220">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 1a8c3325177635d0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "261"
+                  endingLineNumber = "261"
+                  offsetFromSymbolStart = "36">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 8f002fb31dc5a0ef"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "261"
+                  endingLineNumber = "261"
+                  offsetFromSymbolStart = "108">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 8f002fb31dc5a0ef"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "261"
+                  endingLineNumber = "261"
+                  offsetFromSymbolStart = "3560">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 6235430ef1f94ee8"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "261"
+                  endingLineNumber = "261"
+                  offsetFromSymbolStart = "88">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 8f002fb31dc5a0ef"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "261"
+                  endingLineNumber = "261"
+                  offsetFromSymbolStart = "124">
+               </Location>
+               <Location
+                  uuid = "7BB510C6-DFE2-47E6-B8C0-201684B65B0D - 8f002fb31dc5a0ef"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "261"
+                  endingLineNumber = "261"
+                  offsetFromSymbolStart = "4088">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "FE1C6F73-3B7F-4DC6-A450-CEB8019887F7"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/HealthViews SwiftUI/FinHealthListController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "266"
+            endingLineNumber = "266"
+            landmarkName = "efficiencyData()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9DD4AB63-ED35-4DDB-9D6D-862F42629F34"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/HealthViews SwiftUI/FinHealthListController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "269"
+            endingLineNumber = "269"
+            landmarkName = "efficiencyData()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "9DD4AB63-ED35-4DDB-9D6D-862F42629F34 - 8f002fb31dc5a1c6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "270"
+                  endingLineNumber = "270"
+                  offsetFromSymbolStart = "7296">
+               </Location>
+               <Location
+                  uuid = "9DD4AB63-ED35-4DDB-9D6D-862F42629F34 - 6235430ef1f94fc1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for Bulls_N_Bears.FinHealthListController.efficiencyData() async -&gt; Swift.Array&lt;Bulls_N_Bears.ChartDataSet&gt;"
+                  moduleName = "Bulls&apos;N&apos;Bears"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/adev/Dropbox/IOS%20Xcode%20Projects/Bulls&apos;N&apos;Bears/Bulls&apos;N&apos;Bears/HealthViews%20SwiftUI/FinHealthListController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "270"
+                  endingLineNumber = "270"
+                  offsetFromSymbolStart = "6612">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "005F0937-47F8-4F73-8188-539321856592"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Bulls&apos;N&apos;Bears/Controllers/MacrotrendsScraper.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "633"
+            endingLineNumber = "633"
+            landmarkName = "getqColumnTableData(url:companyName:tableHeader:dateColumn:valueColumn:until:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

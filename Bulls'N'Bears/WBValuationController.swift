@@ -414,7 +414,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     if let trendDVs = share.trendValues(trendName: .lynchScore) {
                         
                         if let pdv = trendDVs.filter({ dv in
-                            if dv.date < (wbValuation.date ?? Date()) { return true }
+                            if dv.date < (wbValuation.date) { return true }
                             else { return false }
                         }).first {
                             value$! += " (" + numberFormatterWith1Digit.string(from: pdv.value as NSNumber)! + ")"
@@ -424,33 +424,47 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                 
             case 4:
                 // 12m Price/EPS ratio
-                value$ = "not implemented yet"
                 
-                if let epsDV = share.income_statement?.eps_quarter.datedValues(dateOrder: .ascending) {
-                    let oneYearAgo = Date().addingTimeInterval(-365*24*3600)
-                    let sixMonthsAgo = Date().addingTimeInterval(-182*24*3600)
-                    
-                    let epsInTargetRange = epsDV.filter { dv in
-                        if dv.date < oneYearAgo { return false }
-                        else if dv.date > sixMonthsAgo { return false }
-                        else { return true }
-                    }
-                    
-                    if let earliestQEPS = epsInTargetRange.first {
-                        if let latestQEPS = epsInTargetRange.last {
-                            // may be the same member
-                            if latestQEPS.date.timeIntervalSince(earliestQEPS.date) > 182*24*3600 {
-                                let epsDifference = latestQEPS.value - earliestQEPS.value
-                                let proportion = epsDifference / earliestQEPS.value
-                            }
+                var priceChange$ = "-"
+                var epsChange$ = "-"
+                
+                let priceCorrelation = share.priceChangeLastyear()
+                let priceChange = priceCorrelation?.change()
+                
+                if priceChange != nil {
+                    priceChange$ = percentFormatter0Digits.string(from: priceChange! as NSNumber) ?? "-"
+                    if let r2 = priceCorrelation?.r2() {
+                        if r2 < 0.5 {
+                            priceChange$ = "(\(priceChange$))"
                         }
                     }
-
                 }
-                else {
-                    value$ = "-/-"
+                
+                let epsCorrelation = share.epsChangeLastYear()
+                let epsChange = epsCorrelation?.change()
+                
+                if epsChange != nil {
+                    epsChange$ = percentFormatter0Digits.string(from: epsChange! as NSNumber) ?? "-"
+                    if let r2 = epsCorrelation?.r2() {
+                        if r2 < 0.5 {
+                            epsChange$ = "(\(epsChange$))"
+                        }
+                    }
                 }
-
+                
+                value$ = (priceChange$) + " / " + (epsChange$)
+                
+//                if epsChange != nil && priceChange != nil  {
+//                    let ratio = priceChange! / epsChange!
+//                    if ratio > 1.2 { color = UIColor.red }
+//                    else if ratio < 0.8 && ratio > 0 {
+//                        color = UIColor.green
+//                    } 
+//                    else if ratio < 0 {
+//                        if priceChange! > epsChange! { color = .red }
+//                        else { color = .green }
+//                    }
+//                }
 
             case 5:
             // Return 10/3 years
@@ -524,7 +538,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                     
                     if let trendData = share.trendValues(trendName: .intrinsicValue) {
                         let pastData = trendData.filter { datedValue in
-                            if datedValue.date < wbValuation.date ?? Date() { return true }
+                            if datedValue.date < wbValuation.date { return true }
                             else { return false }
                         }
                         if let mostRecent = pastData.first {
@@ -684,11 +698,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                         value$ = percentFormatter0DigitsPositive.string(from:  proportionOver10 as NSNumber) ?? "-"
                         color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: proportionOver10, greenCutoff: 0.8, redCutOff: 0.5)
                     }
-
-//                    if let growthEMA = values.ema(periods: emaPeriod) {
-//                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
-//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
-//                    }
                  }
 
                 return (value$, color, errors)
@@ -707,11 +716,6 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                         value$ = percentFormatter0DigitsPositive.string(from:  proportionOver10 as NSNumber) ?? "-"
                         color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: proportionOver10, greenCutoff: 0.8, redCutOff: 0.5)
                     }
-
-//                    if let growthEMA = values.ema(periods: emaPeriod) {
-//                        value$ = percentFormatter0DigitsPositive.string(from: growthEMA as NSNumber) ?? "-"
-//                        color = GradientColorFinder.gradientColor(lowerIsGreen: false, min: 0, max: 100, value: growthEMA, greenCutoff: 0.3, redCutOff: 0.1)
-//                    }
                  }
                 return (value$, color, errors)
 
@@ -738,23 +742,10 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
                         }
                     }
                 }
-            
-//                if let sumDiv = wbValuation.netEarnings?.reduce(0, +) {
-//                    // use 10 y sums / averages, not ema according to Book Ch 51
-//                    if let sumDenom = wbValuation.capExpend?.reduce(0, +) {
-//                        let tenYAverages = abs(sumDenom / sumDiv)
-//                        value$ = percentFormatter0Digits.string(from: tenYAverages as NSNumber) ?? "-"
-//                        color = GradientColorFinder.gradientColor(lowerIsGreen: true, min: 0, max: 1, value: tenYAverages, greenCutoff: 0.25, redCutOff: 0.5)
-//                    }
-//                }
-                
                 return (value$,color,errors)
 
             case 1:
             // Lt debt / net income
-                
-                
-                
                 
                 let (proportions, es$) = wbValuation.longtermDebtProportion()
                 errors = es$
@@ -817,7 +808,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     private func returnRowTitles() -> [[String]] {
         // careful when changing these - terms and order are linked to WBVParameters() in public vars
         // and used in identifying UserEvaluation.wbvParameter via 'userEvaluation(for indexpath)' below
-        return [["Moat", "P/E ratio", "BVPS/price","Lynch ratio", "Price/EPS 12m" ,"Return (10/3y)" ,"beta","R1 price","DCF Price", "intr. value (10y)"],
+        return [["Moat", "P/E ratio", "BVPS/price","Lynch ratio", "Price/EPS 1yr" ,"Return (10/3y)" ,"beta","R1 price","DCF Price", "intr. value (10y)"],
                 ["Revenue", "Net income", "Ret. earnings", "EPS", "Profit margin", "OpCash flow"],
                 ["ROI","ROE", "ROA"],
                 ["CapEx/earnings", "LT Debt/earnings", "SGA /profit", "R&D /profit"]
@@ -829,7 +820,7 @@ class WBValuationController: NSObject, WKUIDelegate, WKNavigationDelegate {
     func downloadAllValuationData() async {
                      
         guard let symbol = share.symbol else {
-            ErrorController.addInternalError(errorLocation: #function, errorInfo: "all data download reauested for \(String(describing: share)) but symbol not available")
+            ErrorController.addInternalError(errorLocation: #function, errorInfo: "all data download requested for \(String(describing: share)) but symbol not available")
             return
  
         }

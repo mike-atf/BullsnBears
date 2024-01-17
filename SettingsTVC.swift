@@ -80,6 +80,7 @@ class SettingsTVC: UITableViewController {
                     let exportView = UIActivityViewController(activityItems: [backupURL], applicationActivities: nil)
                     exportView.completionWithItemsHandler = {(activityType: UIActivity.ActivityType?, completed: Bool, returnedItems: [Any]?, error: Error?) in
                         
+                        UserDefaults.standard.setValue(Date(), forKey: "LastDataExportDate")
                         self.dismiss(animated: true)
                     }
 
@@ -104,7 +105,6 @@ class SettingsTVC: UITableViewController {
         documentPicker.modalPresentationStyle = .automatic
         
         self.present(documentPicker, animated: true)
-//        self.dismiss(animated: true)
     }
 
 }

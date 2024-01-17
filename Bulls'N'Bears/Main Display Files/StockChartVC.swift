@@ -17,6 +17,7 @@ class StockChartVC: UIViewController, UIPopoverPresentationControllerDelegate {
     @IBOutlet var dcfButton: UIButton!
     @IBOutlet var priceUpdateButton: UIButton!
     
+    @IBOutlet weak var exportButton: UIButton!
     @IBOutlet var healthButton: UIButton!
     @IBOutlet var transactionButton: UIButton!
     @IBOutlet var researchButton: UIButton!
@@ -70,6 +71,19 @@ class StockChartVC: UIViewController, UIPopoverPresentationControllerDelegate {
         spinner.color = UIColor.label
         spinner.hidesWhenStopped = true
         spinnerMenuButton = UIBarButtonItem(customView: spinner)
+        
+        if let latestExportDate = UserDefaults.standard.value(forKey: "LastDataExportDate") as? Date {
+            if Date().timeIntervalSince(latestExportDate) > 7*24*3600 {
+                exportButton.tintColor = UIColor.red
+            }
+            else {
+                exportButton.tintColor = UIColor.blue
+
+            }
+        } else {
+            exportButton.tintColor = UIColor.red
+        }
+
 
         settingsMenuButton = UIBarButtonItem(image: UIImage(systemName: "slider.horizontal.3"), style: .plain, target: self, action: #selector(settingsMenu))
 
@@ -188,8 +202,7 @@ class StockChartVC: UIViewController, UIPopoverPresentationControllerDelegate {
                 }
             }
 
-        }
-        
+        }        
     }
     
     
@@ -235,7 +248,7 @@ class StockChartVC: UIViewController, UIPopoverPresentationControllerDelegate {
         popUpController?.sourceView = view
         popUpController?.sourceRect = CGRect(x: 20, y: view.frame.height-20, width: 5, height: 5)
 
-        self.parent?.present(citationView, animated: true, completion: nil)
+        self.present(citationView, animated: true, completion: nil) // parent?.
 
     }
     
@@ -277,6 +290,35 @@ class StockChartVC: UIViewController, UIPopoverPresentationControllerDelegate {
         
         stocksListVC.showFinHealthView(share: share!)
         
+    }
+    
+    @IBAction func exportAction(_ sender: UIButton) {
+        
+        Task {
+            if let backupURL = await BackupManager.backupData() {
+                
+                DispatchQueue.main.async {
+                    let exportView = UIActivityViewController(activityItems: [backupURL], applicationActivities: nil)
+                    exportView.completionWithItemsHandler = {(activityType: UIActivity.ActivityType?, completed: Bool, returnedItems: [Any]?, error: Error?) in
+                        
+                        UserDefaults.standard.setValue(Date(), forKey: "LastDataExportDate")
+                        self.exportButton.tintColor = .blue
+                        BackupManager.deleteBackup(fileURL: backupURL)
+                        self.dismiss(animated: true)
+                    }
+
+                    let popUpController = exportView.popoverPresentationController
+                    popUpController?.sourceView = sender
+                    
+                    self.present(exportView, animated: true)
+
+                }
+            }
+            else {
+                print("backup not completed")
+            }
+        }
+
     }
     
     

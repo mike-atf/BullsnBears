@@ -47,7 +47,6 @@ class TrendIconView2: UIView {
         
         // MARK: - baseline
         var baselineY = latestValue < 0 ? rect.height * 0.1 : rect.height * 0.9
-//        let previous4Values = chartValues![0...3]
         let valuesProduct = chartValues!.reduce(1,*) //previous4Values
         let valuesSum = chartValues!.reduce(0,+) // previous4Values
         if valuesProduct < 0 {

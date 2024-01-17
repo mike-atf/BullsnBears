@@ -187,7 +187,8 @@ class Calculator {
         return nil
     }
     
-    class func correlation(xArray: [Double]?, yArray: [Double]?) -> Correlation? {
+    /// assumes xArray is in time DESCENDING order
+    class func correlation(xArray: [Double]?, yArray: [Double]?, xIsDescending:Bool?=true) -> Correlation? {
         
         guard (yArray ?? []).count > 0 else {
             return nil
@@ -203,7 +204,6 @@ class Calculator {
         }
         
         // Removing any empty Double() or NaN elements
-        
         var elementsToRemove = [Int]()
         for i in 0..<xArray!.count {
             if xArray![i] == Double() || yArray![i] == Double() {
@@ -216,6 +216,9 @@ class Calculator {
         
         let cleanedArrayX = xArray?.enumerated().filter { !elementsToRemove.contains($0.offset) }.map { $0.element} ?? []
         let cleanedArrayY = yArray?.enumerated().filter { !elementsToRemove.contains($0.offset) }.map { $0.element} ?? []
+        
+        guard cleanedArrayX.count > 1 else {  return nil }
+        guard cleanedArrayY.count > 1 else { return nil }
         
         let ySum = cleanedArrayY.reduce(0,+)
         let xSum = cleanedArrayX.reduce(0,+)
@@ -267,10 +270,63 @@ class Calculator {
         
 // b = y axis intercept of regression line
         let b = yMean - m * xMean
-
-        return Correlation(m: m, b: b, r: r, xElements: cleanedArrayX.count)
+        let xDifference = (xIsDescending ?? true) ? cleanedArrayX.first! - cleanedArrayX.last! : cleanedArrayX.last! - cleanedArrayX.first! // so that xDiffrence is positive
+        
+        
+        return Correlation(m: m, b: b, r: r, xElements: cleanedArrayX.count, maxX: xDifference)
     }
+    
+    /// assumes (time) ASCENDING values and arrays have same number of elements; has regression calculation and correlation calculation
+    class func correlation2(xArray:[Double]?, yArray: [Double]?) -> Correlation? {
+        
+        guard let xValues = xArray, let yValues = yArray else { return nil }
+        
+        guard xValues.count == yValues.count else {
+            print("============")
+            print("error in calculating regression - arrays have unequal number of elements")
+            print("============")
+            return nil
+        }
+        
+        guard xValues.count > 1, yValues.count > 1 else {
+            print("============")
+            print("error in calculating regression - less than 2 array elements")
+            print("============")
+            return nil
 
+        }
+        
+        let ySum = yValues.reduce(0,+)
+        let xSum = xValues.reduce(0,+)
+        let count = Double(xValues.count)
+        
+        var y2s = [Double]()
+        var x2s = [Double]()
+        var xyProducts = [Double]()
+        
+        for i in 0..<xValues.count {
+            xyProducts.append(xValues[i] * yValues[i])
+            y2s.append(yValues[i]*yValues[i])
+            x2s.append(xValues[i]*xValues[i])
+        }
+        
+        let y2Sum = y2s.reduce(0, +)
+        let x2Sum = x2s.reduce(0, +)
+        let xyProductSum = xyProducts.reduce(0, +)
+        
+        let yInterceptAtZero = (ySum * x2Sum - xSum * xyProductSum) / (count * x2Sum - (xSum * xSum))
+        let incline = (count * xyProductSum - xSum * ySum) / (count * x2Sum - (xSum * xSum))
+        
+        let correlationDenominator = (count * x2Sum - (xSum * xSum)) * (count * y2Sum - (ySum * ySum))
+
+        let correlation = (count * xyProductSum - xSum * ySum) / sqrt(correlationDenominator)
+        
+        let xDifference = xValues.last! - xValues.first!
+        
+        return Correlation(m: incline, b: yInterceptAtZero, r: correlation, xElements: xValues.count, maxX: xDifference)
+    }
+    
+    
     class func correlationDatesToValues(array: [DatedValue]?) -> Correlation? {
         
         guard (array ?? []).count > 0 else {

@@ -22,6 +22,13 @@ public class WBValuation: NSManagedObject, Codable {
         case shareSymbol
     }
     
+    
+    /// importanrtly, initiates with creation date
+    convenience public init(moc: NSManagedObjectContext) {
+        self.init(context: moc)
+        self.date = Date()
+    }
+    
     required convenience public init(from decoder: Decoder) throws {
         
         guard let context = decoder.userInfo[CodingUserInfoKey.managedObjectContext] as? NSManagedObjectContext else {
@@ -43,6 +50,8 @@ public class WBValuation: NSManagedObject, Codable {
         try container.encodeIfPresent(intrinsicValueTrend, forKey: .intrinsicValueTrend)
 
     }
+    
+    
     /// qEPS_TTM, returns date ascending Datedvalue within TTM or minDate
     func annualEPS_TTM_DV(minDate:Date?=nil) -> [DatedValue]? {
         

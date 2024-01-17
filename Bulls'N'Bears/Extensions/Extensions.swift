@@ -359,6 +359,19 @@ extension [DatedValue] {
         }
     }
     
+    /// return minimum and maximum value DV elements [min,max]
+    func minMax() -> [DatedValue]? {
+        
+        guard self.count > 0 else {  return nil }
+        
+        let sortedByPriceAscending = self.sorted { dv0, dv1 in
+            if dv0.value < dv1.value { return true }
+            else { return false }
+        }
+        
+        return [sortedByPriceAscending.first!, sortedByPriceAscending.last!]
+    }
+    
     func minYear$() -> String {
         
         let dateFormatter: DateFormatter = {

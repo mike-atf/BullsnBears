@@ -38,10 +38,19 @@ class BackupManager {
         return backupManager
     }
     
+    class func deleteBackup(fileURL: URL) {
+        
+        do {
+            try FileManager.default.removeItem(at: fileURL)
+        } catch {
+            ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "Failed to delete backup after export")
+        }
+    }
+    
     class func backupData() async -> URL? {
         
         guard let backupFolderURL = localBackupFolderURL else {
-            print("backup failed - there's no local backup directory")
+            alertController.showDialog(title: "Backup failed", alertMessage: "Failed to get local backup folder", viewController: nil, delegate: nil)
             return nil
         }
         
@@ -81,8 +90,6 @@ class BackupManager {
                 alertController.showDialog(title: "Backup failed", alertMessage: "The backup file couldn't be closed", viewController: nil, delegate: nil)
                 return nil
             }            
-            print("...archive closed")
-
             
             return backupURL
             

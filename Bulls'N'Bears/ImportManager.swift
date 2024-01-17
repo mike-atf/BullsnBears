@@ -27,7 +27,7 @@ class ImportManager {
         
         importDialog.addAction(UIAlertAction(title: "Proceed", style: .destructive, handler: { (_) -> Void in
             Task {
-                await self.installBackupData(fileURL: fileURL)
+                await ImportManager.installBackupData(fileURL: fileURL)
             }
         }))
         
@@ -48,7 +48,7 @@ class ImportManager {
     
     // MARK: - File import
     
-    private func installBackupData(fileURL: URL) async {
+    class func installBackupData(fileURL: URL) async {
         
         print("restore from backup...")
         var safetyBackup: URL?
@@ -61,13 +61,14 @@ class ImportManager {
             
             //3. restore data
             try await BackupManager.restoreData(fromURL: fileURL)
+            try FileManager.default.removeItem(at: fileURL)
             DispatchQueue.main.async {
                 AlertController.shared().showDialog(title: "Restore from imported archive completed successfully", alertMessage: "")
             }
             return
         } catch {
             DispatchQueue.main.async {
-                AlertController.shared().showDialog(title: "Re-installing data from imported Archive failed", alertMessage: "\(error.localizedDescription)\nWill tryto regenerate original data from safety backup")
+                AlertController.shared().showDialog(title: "Re-installing data from imported Archive failed", alertMessage: "\(error.localizedDescription)\nWill try to regenerate original data from safety backup")
             }
         }
         

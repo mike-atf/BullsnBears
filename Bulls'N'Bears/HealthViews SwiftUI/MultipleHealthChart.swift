@@ -75,8 +75,6 @@ struct MultipleHealthChart: View {
 
     var body: some View {
         
-        let _ = print("drawing health chart \(title) with data count \(chartData.count)")
-        
         Chart(chartData) { data in
                         
             LineMark (

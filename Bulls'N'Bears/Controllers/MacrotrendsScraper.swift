@@ -7,7 +7,7 @@
 
 import UIKit
 import CoreData
-
+import OSLog
 
 enum DownloadOptions {
     case allPossible
@@ -188,6 +188,7 @@ class MacrotrendsScraper {
             return
         }
 
+        let logger = Logger()
         var labelledDatedResults = [Labelled_DatedValues]()
         var sectionCount = 0
         
@@ -203,10 +204,14 @@ class MacrotrendsScraper {
                 var eps_datedValues: [DatedValue]?
 
                 let perAndEPSvalues = await MacrotrendsScraper.getHxEPSandPEData(url: url, companyName: sn, until: nil, downloadRedirectDelegate: downloadRedirectDelegate)
+                if perAndEPSvalues?.count ?? 0 < 1 {
+                    logger.warning("downloaded nil for \(shareSymbol ?? "missing") PE ratios from Macrotrends")
+                }
                 
                 pe_datedValues = perAndEPSvalues?.compactMap({ element in
                     return DatedValue(date: element.date, value: element.peRatio)
                 })
+                
                 if pe_datedValues?.count ?? 0 > 0 {
                     labelledDatedResults.append(Labelled_DatedValues(label: "PE Ratio Historical data", datedValues: pe_datedValues!))
                 }
@@ -219,6 +224,8 @@ class MacrotrendsScraper {
             }
             else if job.pageNameForURL == "stock-price-history" {
                 guard let htmlText = await Downloader.downloadDataWithRedirectionOption(url: url) else {
+                    logger.warning("downloaded nil for \(shareSymbol ?? "missing") stock price history webpage from Macrotrends")
+
                     continue
                 }
                 if let datedValues = numbersFromColumn(html$: htmlText, tableHeader: "Historical Annual Stock Price Data</th>", targetColumnsFromLeft: [1]) {
@@ -227,6 +234,7 @@ class MacrotrendsScraper {
             }
             else {
                 guard let htmlText = await Downloader.downloadDataWithRedirectionOption(url: url) else {
+                    logger.warning("downloaded nil for \(shareSymbol ?? "missing") data webpage from Macrotrends")
                     continue
                 }
                 if let labelledDatedValues = await MacrotrendsScraper.extractDatedValuesFromTable(htmlText: htmlText, rowTitles: job.rowTitles) {
@@ -250,26 +258,26 @@ class MacrotrendsScraper {
 
     
     /// uses MacroTrends webpage
-    class func wbvDataDownloadAnalyseSave(shareSymbol: String?, shortName: String?, shareID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
-        
-        
-        
-        guard let symbol = shareSymbol else {
-            throw InternalErrorType.shareSymbolMissing
-        }
-        
-        guard var sn = shortName else {
-            throw InternalErrorType.shareShortNameMissing
-        }
-        
-        if sn.contains(" ") {
-            sn = sn.replacingOccurrences(of: " ", with: "-")
-        }
-        
-        
-        await dataDownloadAnalyseSave(shareSymbol: symbol, shortName: sn, shareID: shareID, downloadOption: .wbvOnly, progressDelegate: progressDelegate ,downloadRedirectDelegate: downloadRedirectDelegate)
-
-    }
+//    class func wbvDataDownloadAnalyseSave(shareSymbol: String?, shortName: String?, shareID: NSManagedObjectID, progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate) async throws {
+//        
+//        
+//        
+//        guard let symbol = shareSymbol else {
+//            throw InternalErrorType.shareSymbolMissing
+//        }
+//        
+//        guard var sn = shortName else {
+//            throw InternalErrorType.shareShortNameMissing
+//        }
+//        
+//        if sn.contains(" ") {
+//            sn = sn.replacingOccurrences(of: " ", with: "-")
+//        }
+//        
+//        
+//        await dataDownloadAnalyseSave(shareSymbol: symbol, shortName: sn, shareID: shareID, downloadOption: .wbvOnly, progressDelegate: progressDelegate ,downloadRedirectDelegate: downloadRedirectDelegate)
+//
+//    }
     
     
     /// fetches [["Revenue","EPS - Earnings Per Share","Net Income"],["ROI - Return On Investment","Book Value Per Share","Operating Cash Flow Per Share"],["Long Term Debt"]]. Does NOT fetch: OCF (single), Debt (single),  growthEstimates, hx PE,  insider stocks, -buys and - sells; these come from Yahoo
@@ -306,8 +314,11 @@ class MacrotrendsScraper {
 
              NotificationCenter.default.addObserver(downloadRedirectDelegate, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
              
+             let logger = Logger()
+             
              guard let htmlText = await Downloader.downloadDataWithRedirectionOption(url: url) else {
                  errors.append(RunTimeError.specificError(description: "empty page / download failure for \(pageName) "))
+                 logger.warning("empty Macrotrends page / download for \(pageName) ")
                  progressDelegate?.taskCompleted()
                  continue
              }
@@ -351,67 +362,67 @@ class MacrotrendsScraper {
      }
     
     /// downloads row data from the horizontal tables in MT, NOT the vertical tables for PE or EPS
-    class func selectMTDataDownloadAnalyse(symbol: String, shortName: String, pageNames: [String], rowTitles: [[String]], progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate?) async throws -> [Labelled_DatedValues]? {
-        
-        var hyphenatedShortName = String()
-        let shortNameComponents = shortName.split(separator: " ")
-        hyphenatedShortName = String(shortNameComponents.first ?? "").lowercased()
-        
-        guard hyphenatedShortName != "" else {
-            throw InternalErrorType.shareShortNameMissing
-        }
-        
-        for index in 1..<shortNameComponents.count {
-            if !shortNameComponents[index].contains("(") {
-                hyphenatedShortName += "-" + String(shortNameComponents[index]).lowercased()
-            }
-        }
-
-        var results = [Labelled_DatedValues]()
-        var sectionCount = 0
-        let downloader = Downloader(task: .r1Valuation)
-        for pageName in pageNames {
-            
-            var components: URLComponents?
-            components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(hyphenatedShortName)/" + pageName)
-            
-            guard let url = components?.url else {
-                progressDelegate?.downloadError(error: InternalErrorType.urlInvalid.localizedDescription)
-                continue
-            }
-            
-            var htmlText: String?
-
-            do {
-                if downloadRedirectDelegate != nil {
-                    NotificationCenter.default.addObserver(downloadRedirectDelegate!, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
-                }
-                
-                htmlText = try await downloader.downloadDataWithRedirection(url: url)
-                
-            } catch let error as InternalErrorType {
-                progressDelegate?.downloadError(error: error.localizedDescription)
-                continue
-            }
-            
-            guard let pageText = htmlText else {
-                progressDelegate?.downloadError(error: InternalErrorType.emptyWebpageText.localizedDescription)
-                continue
-            }
-            
-            if let labelledDatedValues = await MacrotrendsScraper.extractDatedValuesFromTable(htmlText: pageText, rowTitles: rowTitles[sectionCount]) {
-                
-                results.append(contentsOf: labelledDatedValues)
-            }
-            
-            progressDelegate?.taskCompleted()
-            
-            sectionCount += 1
-        }
-        
-        return results
-        
-    }
+//    class func selectMTDataDownloadAnalyse(symbol: String, shortName: String, pageNames: [String], rowTitles: [[String]], progressDelegate: ProgressViewDelegate?=nil, downloadRedirectDelegate: DownloadRedirectionDelegate?) async throws -> [Labelled_DatedValues]? {
+//        
+//        var hyphenatedShortName = String()
+//        let shortNameComponents = shortName.split(separator: " ")
+//        hyphenatedShortName = String(shortNameComponents.first ?? "").lowercased()
+//        
+//        guard hyphenatedShortName != "" else {
+//            throw InternalErrorType.shareShortNameMissing
+//        }
+//        
+//        for index in 1..<shortNameComponents.count {
+//            if !shortNameComponents[index].contains("(") {
+//                hyphenatedShortName += "-" + String(shortNameComponents[index]).lowercased()
+//            }
+//        }
+//
+//        var results = [Labelled_DatedValues]()
+//        var sectionCount = 0
+//        let downloader = Downloader(task: .r1Valuation)
+//        for pageName in pageNames {
+//            
+//            var components: URLComponents?
+//            components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(symbol)/\(hyphenatedShortName)/" + pageName)
+//            
+//            guard let url = components?.url else {
+//                progressDelegate?.downloadError(error: InternalErrorType.urlInvalid.localizedDescription)
+//                continue
+//            }
+//            
+//            var htmlText: String?
+//
+//            do {
+//                if downloadRedirectDelegate != nil {
+//                    NotificationCenter.default.addObserver(downloadRedirectDelegate!, selector: #selector(DownloadRedirectionDelegate.awaitingRedirection(notification:)), name: Notification.Name(rawValue: "Redirection"), object: nil)
+//                }
+//                
+//                htmlText = try await downloader.downloadDataWithRedirection(url: url)
+//                
+//            } catch let error as InternalErrorType {
+//                progressDelegate?.downloadError(error: error.localizedDescription)
+//                continue
+//            }
+//            
+//            guard let pageText = htmlText else {
+//                progressDelegate?.downloadError(error: InternalErrorType.emptyWebpageText.localizedDescription)
+//                continue
+//            }
+//            
+//            if let labelledDatedValues = await MacrotrendsScraper.extractDatedValuesFromTable(htmlText: pageText, rowTitles: rowTitles[sectionCount]) {
+//                
+//                results.append(contentsOf: labelledDatedValues)
+//            }
+//            
+//            progressDelegate?.taskCompleted()
+//            
+//            sectionCount += 1
+//        }
+//        
+//        return results
+//        
+//    }
 
     /// returns historical pe ratios and eps TTM with dates from macro trends website
     /// in form of [DatedValues] = (date, epsTTM, peRatio )
