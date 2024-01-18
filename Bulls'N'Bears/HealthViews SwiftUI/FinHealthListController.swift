@@ -195,6 +195,13 @@ class FinHealthListController: NSObject {
             sn = sn.replacingOccurrences(of: " ", with: "-").lowercased()
         }
         
+        if let bracket = sn.firstIndex(of: "(") {
+            sn = String(sn[sn.startIndex..<bracket])
+        }
+        
+        if sn.last == "-" {
+            sn = String(sn.dropLast())
+        }
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/net-profit-margin") else {
             ErrorController.addInternalError(errorLocation: "FinHealthController.profitabilityData", systemError: nil, errorInfo: "url components error for \(share.symbol!)")
             return netProfitMargins
@@ -236,6 +243,14 @@ class FinHealthListController: NSObject {
         
         if sn.contains(" ") {
             sn = sn.replacingOccurrences(of: " ", with: "-").lowercased()
+        }
+        
+        if let bracket = sn.firstIndex(of: "(") {
+            sn = String(sn[sn.startIndex..<bracket])
+        }
+        
+        if sn.last == "-" {
+            sn = String(sn.dropLast())
         }
         
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/operating-margin") else {
@@ -290,6 +305,13 @@ class FinHealthListController: NSObject {
             sn = sn.replacingOccurrences(of: " ", with: "-").lowercased()
         }
         
+        if let bracket = sn.firstIndex(of: "(") {
+            sn = String(sn[sn.startIndex..<bracket])
+        }
+        
+        if sn.last == "-" {
+            sn = String(sn.dropLast())
+        }
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/quick-ratio") else {
             ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "quick ratio download or analysis failed for \(share.symbol!) due to invalid url")
             return emptyChartData
@@ -333,6 +355,13 @@ class FinHealthListController: NSObject {
             sn = sn.replacingOccurrences(of: " ", with: "-").lowercased()
         }
         
+        if let bracket = sn.firstIndex(of: "(") {
+            sn = String(sn[sn.startIndex..<bracket])
+        }
+        
+        if sn.last == "-" {
+            sn = String(sn.dropLast())
+        }
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/current-ratio") else {
             ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "current ratio download or analysis failed for \(share.symbol!) due to invalid url")
             return emptyChartData
@@ -376,6 +405,13 @@ class FinHealthListController: NSObject {
             sn = sn.replacingOccurrences(of: " ", with: "-").lowercased()
         }
         
+        if let bracket = sn.firstIndex(of: "(") {
+            sn = String(sn[sn.startIndex..<bracket])
+        }
+        
+        if sn.last == "-" {
+            sn = String(sn.dropLast())
+        }
         guard let components = URLComponents(string: "https://www.macrotrends.net/stocks/charts/\(share.symbol!)/\(sn)/debt-equity-ratio") else {
             ErrorController.addInternalError(errorLocation: #function, systemError: nil, errorInfo: "debt/equity ratio download or analysis failed for \(share.symbol!) due to invalid url components")
             return emptylabellChartData
