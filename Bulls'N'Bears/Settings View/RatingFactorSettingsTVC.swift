@@ -41,7 +41,10 @@ class RatingFactorSettingsTVC: UITableViewController {
     @objc
     func saveAndBackToRootView() {
         self.dismiss(animated: true) {
-            valuationFactors.saveUserDefaults()
+            
+            UserDefaults.standard.set(valuationFactors.propertyDictionary, forKey: userDefaultTerms.valuationFactorWeights)
+
+//            valuationFactors.saveUserDefaults()
             let notification = Notification(name: Notification.Name(rawValue: "userChangedValuationWeights"), object: nil, userInfo: nil)
             NotificationCenter.default.post(notification)
         }
@@ -85,21 +88,12 @@ class RatingFactorSettingsTVC: UITableViewController {
 extension RatingFactorSettingsTVC: RatingFactorCellDelegate {
     
     func userChangedSetting(value: Double, path: IndexPath) {
-        valuationFactors.setValue(value: value, parameter: factorTitles[path.row])
+//        valuationFactors.setValue(value: value, parameter: factorTitles[path.row])
+        valuationFactors.propertyDictionary[factorTitles[path.row]] = value
         
         if let cell = tableView.cellForRow(at: IndexPath(row: path.row, section: 0)) as? RatingFactorCell {
             cell.adjustValue(value: value)
         }
-    }
-    
-    func userCompletedSetting(value: Double, path: IndexPath) {
-        let factorTitle = factorTitles[path.row]
-        
-        valuationFactors.setValue(value: value, parameter: factorTitle)
-        combinedValue = valuationFactors.weightsSum()
-        tableView.reloadData()
-
-    }
-    
+    }    
     
 }

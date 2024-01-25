@@ -119,7 +119,7 @@ class StockListCellTableViewCell: UITableViewCell {
             updateIcon.tintColor = UIColor.systemRed
         }
         
-        if stock.watchStatus == 1 {
+        if stock.watchStatus < 2 {
             setHealthIcon(share: stock)
         }
     }

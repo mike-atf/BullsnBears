@@ -328,7 +328,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         newShare.macd = newShare.convertMACDToData(macds: macds)
 
         do {
-            try newShare.managedObjectContext?.save() // TODO: - does this refresh to UI/TVC??
+            try newShare.managedObjectContext?.save() // TODO: - does this refresh UI/TVC??
         } catch {
             ErrorController.addInternalError(errorLocation: #function, systemError: error, errorInfo: "failure trying to save new share in mainthread MOC")
         }
@@ -423,6 +423,11 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     @objc
     func userChangedValuationWeights() {
+        
+        for share in StocksController2.allShares() ?? [] {
+            share.setFinancialsScore()
+        }
+        
         tableView.reloadData()
     }
     
@@ -431,7 +436,7 @@ class StocksListTVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         if let symbol = notification.userInfo?["symbol"] as? String {
             if let currency = notification.object as? String {
-                //TODO: - this always thorws error
+                //TODO: - this always throws error
                 if let share = controller.fetchShare(symbol: symbol) {
                     share.currency = currency
                     do {

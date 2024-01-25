@@ -8,7 +8,7 @@
 import UIKit
 
 protocol RatingFactorCellDelegate {
-    func userCompletedSetting(value: Double, path: IndexPath)
+//    func userCompletedSetting(value: Double, path: IndexPath)
     func userChangedSetting(value: Double, path: IndexPath)
 }
 
@@ -49,7 +49,6 @@ class RatingFactorCell: UITableViewCell {
             self.slider.value = Float(valid)
             if valid > 0 {
                 self.detail.text = numberFormatterWith1Digit.string(from: valid as NSNumber)
-//                self.detail.text = percentFormatter0Digits.string(from: (valid/totalValue) as NSNumber)
             }
             else {
                 self.detail.text = "Off"
@@ -74,8 +73,4 @@ class RatingFactorCell: UITableViewCell {
 //        self.detail.text = numberFormatter2Decimals.string(from: NSNumber(value: sender.value))
         cellDelegate.userChangedSetting(value: Double(sender.value), path: self.indexPath!)
     }
-    
-//    @IBAction func sliderValueSet(_ sender: UISlider) {
-//        cellDelegate.userCompletedSetting(value: Double(sender.value), path: self.indexPath!)
-//    }
 }

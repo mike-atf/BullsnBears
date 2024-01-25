@@ -29,16 +29,6 @@ public class Share: NSManagedObject, Codable {
     var sharePriceSplitCorrected = false
     
     public override func awakeFromInsert() {
-//        watchStatus = 2
-//        
-//        if let context = self.managedObjectContext {
-//            wbValuation = WBValuation(context: context)
-//            wbValuation?.date = Date()
-//            rule1Valuation = Rule1Valuation(context: context)
-//            rule1Valuation?.creationDate = Date()
-//            dcfValuation = DCFValuation(context: context)
-//            dcfValuation?.creationDate = Date()
-//        }
         
     }
     
@@ -2140,6 +2130,19 @@ public class Share: NSManagedObject, Codable {
         return (errors,nil)
 
     }
+    
+    /// sets and saves the 'valueScore' property, here called 'Financials score' based on the userdefaults weights
+    public func setFinancialsScore() {
+        
+        let factors = Financial_Valuation_Factors()
+        
+        self.valueScore = factors.financialsScore(forShare: self).score
+        save()
+
+    }
+    
+    
+
     
     public func latestBookValuePerPrice() -> [Double?]? {
         

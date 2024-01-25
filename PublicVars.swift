@@ -959,22 +959,6 @@ struct Financial_Valuation_Factors {
         
         // translate into values 0-1.0
         
-//        let sum = self.weightsSum() ?? 1.0
-//        peRatio /= sum
-//        retEarningsGrowth /= sum
-//        lynchScore /= sum
-//        moatScore /= sum
-//        epsGrowth /= sum
-//        capExpendDivEarnings /= sum
-//        profitMargin /= sum
-//        ltDebtDivIncome /= sum
-//        opCashFlowGrowth /= sum
-//        sgaDivProfit /= sum
-//        radDivProfit /= sum
-//        revenueGrowth /= sum
-//        roeGrowth /= sum
-//        futureEarningsGrowth /= sum
-
         var dictionary = [String: Double]()
         let mirror = Mirror(reflecting: self)
         for property in mirror.children {
@@ -990,8 +974,12 @@ struct Financial_Valuation_Factors {
     
     public func saveUserDefaults() {
         
-//        let data = NSKeyedArchiver.archivedData(withRootObject: propertyDictionary, requiringSecureCoding: false)
         UserDefaults.standard.set(propertyDictionary, forKey: userDefaultTerms.valuationFactorWeights)
+        if let savedDict = UserDefaults.standard.value(forKey: userDefaultTerms.valuationFactorWeights) as? [String: Double] {
+            for key in savedDict.keys {
+                print(key, savedDict[key])
+            }
+        }
     }
     
     public func weightsSum() -> Double? {
@@ -1025,11 +1013,6 @@ struct Financial_Valuation_Factors {
         }
         
         return sortedDictionary.compactMap { $0.key }
-        
-//        .filter { key in
-//            if key != "propertyDictionary" { return true }
-//            else { return false }
-//        }
 
     }
     
@@ -1063,10 +1046,9 @@ struct Financial_Valuation_Factors {
         
         propertyDictionary[parameter] = value
                 
-        propertyDictionary = setPropertyDictionary()
+//        propertyDictionary = setPropertyDictionary()
     }
     
-    /// ret
     public func financialsScore(forShare: Share) -> ScoreData {
         
         var allFactors = [Double]()
